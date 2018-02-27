@@ -16,5 +16,6 @@
     ~/.config/i3:
         path: config/i3/
         create: true
-
-
+    ~/.config/kak:
+        path: config/kak/
+        create: true

@@ -1,0 +1,11 @@
+#!/bin/bash
+cquery --init='{
+  "cacheDirectory": "/tmp/cquery-cache-dir/",
+  "cacheFormat": "msgpack",
+  "completion": {
+    "detailedLabel": true
+  },
+  "xref": {
+    "container": true
+  }
+}'
