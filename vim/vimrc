@@ -1,0 +1,2 @@
+source $HOME/.config/nvim/init.vim
+set clipboard=unnamedplus
