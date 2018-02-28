@@ -1,0 +1,3 @@
+sxhkd &
+bar_notifyd &
+exec env STEAM_RUNTIME=false /usr/bin/steam --bigpicture

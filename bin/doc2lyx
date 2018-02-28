@@ -1,0 +1,58 @@
+#!/usr/bin/python3
+import os
+import zipfile, tempfile
+import click
+import shutil
+
+@click.command()
+@click.argument('input', nargs=1, type=click.Path(exists=True, file_okay=True, dir_okay=False))
+def main(input):
+    """A small script that converts docx files to lyx using pandoc and tex2lyx.
+A folder with the name of the input file is created, with a subfolder `media`,
+holding all images etc. from the docx file. The main folder will also contain
+a copy of the original file and the final lyx file.
+    """
+    path = os.path.abspath(input)
+    name = os.path.splitext(os.path.basename(path))[0]
+    p = os.path.join(os.getcwd(),name)
+    i = 1
+    p1 = p
+    while os.path.exists(p1):
+        p1 = "{p}-{i}".format(p=p,i=i)
+        i += 1
+    p = p1
+    os.mkdir(p1)
+    os.mkdir(os.path.join(p1,"media"))
+    with zipfile.ZipFile(path) as zf:
+        for file in zf.namelist():
+            # Path traversal defense copied from
+            # http://hg.python.org/cpython/file/tip/Lib/http/server.py#l789
+            words = file.split('/')
+            dest = os.path.join(p1, "media")
+            if words[0] == "word" and words[1] == "media":
+                for word in words[2:]:
+                    while True:
+                        drive, word = os.path.splitdrive(word)
+                        head, word = os.path.split(word)
+                        if not drive:
+                            break
+                    if word in (os.curdir, os.pardir, ''):
+                        continue
+                    dest = os.path.join(dest, word)
+                click.echo("{} -> {}".format(file, dest))
+                of = open(dest, 'wb')
+                of.write(zf.read(file))
+                of.close()
+
+    newdoc = os.path.join(p1, os.path.basename(path))
+    lyxfile = os.path.join(p1, name + ".lyx")
+    texfile = os.path.join(p1, name + ".tex")
+    shutil.copyfile(path, newdoc)
+    os.system("pandoc -s -f docx -t latex -o '{of}' '{i}'".format(of=texfile, i=newdoc))
+    os.system("tex2lyx '{i}' '{o}'".format(i=texfile, o=lyxfile))
+    os.remove(texfile)
+    os.system("convertwmf {dir}".format(dir=os.path.join(p1, "media")))
+    click.echo(lyxfile)
+
+if __name__ == '__main__':
+    main()

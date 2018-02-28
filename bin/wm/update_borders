@@ -1,0 +1,37 @@
+#!/bin/sh
+
+. $WM_SCRIPT_DIR/config
+
+BW=${BW:-4}                    # border width
+ACTIVE=FF${C12:1}     # active border color
+INACTIVE=AF${C8:1} # inactive border color
+
+wid=${1:-$(pfw)}
+
+window_type() {
+    wattr $wid || return
+    wattr o $wid && return
+
+    if [[ $(wmcl maximize status $wid) == on ]]; then
+        echo "maximized"
+    elif [[ $wid == $(pfw) ]]; then
+        echo "active"
+    else
+        echo "inactive"
+    fi
+}
+
+case $(window_type $wid) in
+    active)
+        chwb -s $BW -c $ACTIVE $wid
+        #chwb2 -O $ACTIVE -I 000000 -i 4 -o 4 $wid
+        ;;
+    inactive)
+        chwb -s $BW -c $INACTIVE $wid
+        #chwb2 -O $INACTIVE -I 000000 -i 4 -o 4 $wid
+        ;;
+    maximized)
+        chwb -s 0 $wid
+        #chwb2 -i 0 -o 0 $wid
+        ;;
+esac

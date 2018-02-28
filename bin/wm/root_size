@@ -1,0 +1,10 @@
+#!/bin/bash
+
+display=$(pfm)
+file=$WM_TMP_DIR/$display-root-size
+
+if [[ -f $file ]]; then
+    cat $file
+else
+    mattr xywh $display
+fi

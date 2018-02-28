@@ -1,0 +1,89 @@
+#!/bin/bash
+
+dunst_id=321478
+
+show_help() {
+    echo "Usage: $0 volume [up|down|query] | mute [query|toggle]  -n|--notify"
+}
+
+query_volume() {
+    pamixer --get-volume
+}
+
+query_mute() {
+    pamixer --get-mute
+}
+
+vol_icon() {
+    if [[ $1 == muted ]]; then
+        icon=muted
+    elif (( $1 < 34 )); then
+        icon=low
+    elif (( $1 < 67 )); then
+        icon=medium
+    else
+        icon=high
+    fi
+    echo /usr/share/icons/Papirus-Dark/symbolic/status/audio-volume-$icon-symbolic.svg
+}
+
+send_notification() {
+    if [[ $(query_mute) == "true" ]]; then
+        dunstify -u 0 -i $(vol_icon muted) Muted -r $dunst_id
+    else
+        vol=$(query_volume)
+        dunstify -u 0 -i $(vol_icon $vol) $vol% -r $dunst_id
+    fi
+}
+
+toggle_mute() {
+    pamixer -t
+}
+
+volume() {
+    if [[ $(query_mute) == true ]]; then
+        toggle_mute
+    fi
+    if [[ $1 == "down" ]]; then
+        pamixer -d ${2-5}
+    elif [[ $1 == "up" ]]; then
+        pamixer -i ${2-5}
+    fi
+}
+
+notify=0
+while :; do
+    case $1 in
+        -h|--help|-\?)
+            show_help
+            exit
+            ;;
+        volume)
+            if [[ $1 == "query" ]]; then
+                query_volume
+            else
+                volume $2
+                shift
+            fi
+            ;;
+        mute)
+            if [[ $1 == "query" ]]; then
+                query_mute
+            else
+                toggle_mute $2
+                shift
+            fi
+            ;;
+        -n|--notify)
+            notify=1
+            ;;
+        *)
+            break
+            ;;
+    esac
+    shift
+done
+
+if [[ $notify ]]; then
+    send_notification
+fi

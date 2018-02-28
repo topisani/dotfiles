@@ -1,0 +1,34 @@
+#!/usr/bin/python3
+import click
+import os
+
+
+@click.command(help="A tool to batch convert wmf files to images")
+@click.option("--format",
+              default="png", help="File extension of the new file")
+@click.option("--move",
+              default=True,
+              help="Move original files to a subdirectory called `wmf`")
+@click.argument("directory",
+                type=click.Path(exists=True, file_okay=False,
+                                dir_okay=True, writable=True),
+                default=".",)
+def main(format, move, directory):
+    if move:
+        os.mkdir(os.path.join(directory, "wmf"))
+    for filename in os.listdir(directory):
+        if filename.endswith(".wmf"):
+            newfn = os.path.splitext(filename)[0] + "." + format
+            click.echo("Converting `{filename}`".format(filename=filename))
+            os.system("wmf2gd {filename} -o {newfn} --maxpect --maxheight=500".format(
+                filename=os.path.join(directory, filename),
+                newfn=os.path.join(directory, newfn)))
+            if move:
+                os.rename(os.path.join(directory, filename), os.path.join(directory, "wmf", filename))
+    click.echo("All done!")
+    if move:
+        click.echo("WMF files were moved to `{dir}`".format(dir=os.path.join(directory, "wmf")))
+            
+
+if __name__ == "__main__":
+    main()

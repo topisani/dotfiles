@@ -19,6 +19,8 @@ fi
 # set PATH so it includes user's private bin directories
 PATH="$HOME/.bin:$HOME/.local/bin:/usr/local/bin:$PATH"
 
+PATH="$(ruby -rrubygems -e 'puts Gem.user_dir')/bin:$PATH"
+
 # Kill the GNU
 export CC=/usr/bin/clang
 export CXX=/usr/bin/clang++

@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+# z3bra - 2014 (c) wtfpl
+# window focus wrapper that sets borders and can focus next/previous window
+
+# get current window id
+CUR=$(pfw || echo NONE)
+
+usage() {
+    echo "usage: $(basename $0) <next|prev|wid>" >&2
+    exit 1
+}
+
+case $1 in
+    next)
+        wid=$(lsw|grep -v $CUR|sed '1 p;d')
+        ;;
+    prev)
+        wid=$(lsw|grep -v $CUR|sed '$ p;d')
+        ;;
+    *)
+        wattr $1 && wid=$1
+        #test "$wid" = "$CUR" && exit
+	;;
+esac
+
+# Menus in certain apps (firefox, chrome) dont have override
+type="$(wmcl type $wid)"
+if [[ $type == "menu" || $type == "notification" ]]; then
+    exit
+fi
+
+# exit if we can't find another window to focus
+test -z "$wid" && { echo "$(basename $0): no window to focus" >&2; exit 1; }
+
+wtf $wid                # set focus on it
+wmcl chwso -r $wid           # raise windows
+[[ "$(wname $CUR 2> /dev/null)" == "tilda" ]] && mapw -u $CUR
+
+
+wmcl maximize refresh $CUR
+wmcl update_borders $wid
+
+exit 0

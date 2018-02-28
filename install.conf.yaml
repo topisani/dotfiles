@@ -19,3 +19,6 @@
     ~/.config/kak:
         path: config/kak/
         create: true
+    ~/.bin:
+        path: bin
+        create: true

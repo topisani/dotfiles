@@ -1,0 +1,48 @@
+#!/bin/python3
+
+import click
+import os, json, subprocess, shlex
+
+
+def run_command(cmd):
+    """given shell command, returns stdout"""
+    return (subprocess.check_output(cmd, shell=True)).decode('utf-8')
+
+@click.group()
+def cli():
+    pass
+
+
+@cli.group()
+def prompt():
+    """
+    Opens various prompts.
+    """
+
+
+@prompt.group("ws")
+def prompt_ws():
+    """
+    Workspace related prompts
+    """
+
+
+@prompt_ws.command("rename")
+def prompt_ws_rename():
+    """
+    Opens a prompt to rename the current workspace
+    """
+    workspaces=json.loads(run_command("i3-msg -t get_workspaces"))
+    ws = [ ws for ws in workspaces if ws['focused']][0]
+    name = ws['name'][2:]
+    num = ws['num']
+    newname = run_command("echo \"\" | rofi -dmenu -l 0 -p \"Rename Workspace\"".format(name))
+    if not (newname is None or newname.isspace() or newname == ""):
+        newname = "{num}: {name}".format(num=num, name=newname)
+    else:
+        newname = "%s" % num
+    run_command("i3-msg -t command \"rename workspace to \\\"" + newname + "\\\"\"")
+
+
+if __name__ == "__main__":
+    cli()
