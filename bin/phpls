@@ -1,0 +1,4 @@
+#!/bin/bash
+
+php ~/.composer/vendor/felixfbecker/language-server/bin/php-language-server.php
+

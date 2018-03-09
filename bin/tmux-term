@@ -1,0 +1,9 @@
+#!/bin/bash
+
+session=${1:-$(tmux list-sessions -F "#S" | rofi -dmenu)}
+
+if [[ -n "$session" ]]; then
+    termite -e "sh -c 'TERM=tmux-256color tmux attach -t $session'"
+else 
+    termite
+fi

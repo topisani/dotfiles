@@ -1,9 +1,7 @@
 [submodule "dotbot"]
 	path = dotbot
 	url = https://github.com/anishathalye/dotbot
+
 [submodule "config/kak/scripts/cquery-kakoune"]
 	path = config/kak/scripts/cquery-kakoune
 	url = https://github.com/topisani/cquery-kakoune
-[submodule "config/kak/autoload/kakoune-gdb"]
-	path = config/kak/autoload/kakoune-gdb
-	url = https://github.com/occivink/kakoune-gdb

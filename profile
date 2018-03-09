@@ -41,3 +41,6 @@ export MULLVAD_USE_GTK3=yes
 export NUMCPUS=`grep -c '^processor' /proc/cpuinfo`
 export MAKEFLAGS="-j$NUMCPUS --load-average=$NUMCPUS"
 alias tb="nc termbin.com 9999"
+
+export EDITOR=kak
+export VISUAL=kak

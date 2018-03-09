@@ -3,60 +3,58 @@
 # Generate flatblue theme.
 # Call with variable list
 
-eval "$@"
-
 echo "
 # Markdown highlighting
-face title                       $green,           $bg       +b
-face header                      $orange,          $bg
-face bold                        $fg,              $bg       +b
-face italic                      $fg3,             $bg       +i
-face mono                        $fg3,             $bg
-face block                       $fg,              $bg
-face link                        $fg,              $bg
-face bullet                      $fg,              $bg
-face list                        $fg,              $bg
+face title                       $green,            $bg       +b
+face header                      $orange,           $bg
+face bold                        $fg,               $bg       +b
+face italic                      $fg3,              $bg       +i
+face mono                        $fg3,              $bg
+face block                       $fg,               $bg
+face link                        $fg,               $bg
+face bullet                      $fg,               $bg
+face list                        $fg,               $bg
 
-face Default                     $fg,              $bg
-face PrimarySelection            $fg,              $blue
-face SecondarySelection          $bg,              $blue
-face PrimaryCursor               $bg,              $fg
-face SecondaryCursor             $bg,              $fg
-face LineNumbers                 $bg4,             $bg
-face LineNumberCursor            $yellow,          $bg1
-face MenuForeground              $bg2,             $blue
-face MenuBackground              $fg,              $bg2
-face MenuInfo                    $bg,              $bg
-face Information                 $bg,              $yellow
-face Error                       $fg,              $red
-face StatusLine                  $fg,              $bg
-face StatusLineMode              $yellow,          $bg       +b
-face StatusLineInfo              $purple,          $bg
-face StatusLineValue             $red,             $bg
-face StatusCursor                $bg,              $fg
-face Prompt                      $yellow,          $bg
-face MatchingChar                $fg,              $bg       +b
-face BufferPadding               $bg2,             $bg
-face Whitespace                  $bg2,             $bg
-face PrimaryCursorEol            $fg,              $bg
-face SecondaryCursorEol          $fg,              $bg
-face LineNumbersWrapped          $fg,              $bg
+face Default                     $fg,               $bg
+face PrimarySelection            $fg,               $blue
+face SecondarySelection          $fg,               $blue_dark
+face PrimaryCursor               $bg0,              $fg0
+face PrimaryCursorEol            $bg0,              $fg0
+face SecondaryCursor             $bg3,              $fg3
+face SecondaryCursorEol          $bg3,              $fg3
+face LineNumbers                 $bg4,              $bg
+face LineNumberCursor            $fg3,              $bg1
+face LineNumbersWrapped          $bg,              $bg
+face MenuForeground              $bg2,              $blue
+face MenuBackground              $fg,               $bg2
+face MenuInfo                    $bg,               $bg
+face Information                 $bg,               $yellow
+face Error                       $fg,               $red
+face StatusLine                  $fg,               $bg
+face StatusLineMode              $yellow,           $bg       +b
+face StatusLineInfo              $purple,           $bg
+face StatusLineValue             $red,              $bg
+face StatusCursor                $bg,               $fg
+face Prompt                      $yellow,           $bg
+face MatchingChar                $fg,               $bg       +b
+face BufferPadding               $bg2,              $bg
+face Whitespace                  $bg2,              $bg
 
 # Code highlighting
-face value                       $purple,          $bg
-face type                        $blue_light,      $bg
-face variable                    $blue,            $bg
-face module                      $orange,          $bg
-face function                    $yellow_light,    $bg
-face string                      $green,           $bg
-face keyword                     $red,             $bg
-face operator                    $fg,              $bg
-face attribute                   $red,             $bg
-face comment                     $gray,            $bg
-face meta                        $orange,          $bg
-face builtin                     $red,             $bg
-face comment                     $gray,            $bg       +i
-face identifier                  $orange,          $bg
+face value                       $purple,           $bg
+face type                        $blue_light,       $bg
+face variable                    $blue,             $bg
+face module                      $orange,           $bg
+face function                    $yellow_light,     $bg
+face string                      $green,            $bg
+face keyword                     $red,              $bg
+face operator                    $fg,               $bg
+face attribute                   $red,              $bg
+face comment                     $gray,             $bg
+face meta                        $orange,           $bg
+face builtin                     $red,              $bg
+face comment                     $gray,             $bg       +i
+face identifier                  $orange,           $bg
 
 # Cquery semantic highlighting
 face cqueryTypes                 type
@@ -64,15 +62,15 @@ face cqueryEnums                 variable
 face cqueryTypeAliases           type
 face cqueryTemplateParameters    variable
 face cqueryFreeStandingFunctions function
-face cqueryMemberFunctions       $yellow_light,    $bg       +i
-face cqueryStaticMemberFunctions $yellow_light,    $bg
+face cqueryMemberFunctions       $yellow_light,     $bg       +i
+face cqueryStaticMemberFunctions $yellow_light,     $bg
 face cqueryFreeStandingVariables variable
 face cqueryGlobalVariables       variable
 face cqueryStaticMemberVariables variable
-face cqueryMemberVariables       $blue,            $bg       +i
+face cqueryMemberVariables       $blue,             $bg       +i
 face cqueryParameters            variable 
 face cqueryEnumConstants         variable
 face cqueryNamespaces            module
-face cqueryMacros                $purple_light,    $bg
+face cqueryMacros                $purple_light,     $bg
 " | sed 's/, */,/' | sed 's/ *+/+/'
 
