@@ -1,0 +1,147 @@
+#!/bin/bash
+
+# modify the following two variables to match your requirements
+# path to the folder where you store your colorschemes
+COLORSCHEME_PATH=$HOME/.config/colorschemes
+# path to your xrdb config file
+XRDB_CONF_PATH=$HOME/.Xresources
+
+getXrdbColor() {
+    echo xrdb -query | LANG=C grep -F "$@:" | cut -d '#' -f2
+}
+
+updateXrdb() {
+    xrdb -load $XRDB_CONF_PATH
+    xrdb -merge $COLORSCHEME
+}
+
+updateBspwm() {
+    bspc config normal_border_color "#$(getXrdbColor color0)"
+    bspc config active_border_color "#$(getXrdbColor color8)"
+    bspc config focused_border_color "#$(getXrdbColor color6)"
+    bspc config presel_feedback_color "#$(getXrdbColor color8)"
+}
+
+build_query() {
+    local key=$1
+    local value=$2
+    case key in
+        \*.foreground)
+            printf "%b" 
+    query="\033]10;#$(getXrdbColor foreground)\007"
+    query+="\033]11;#$(getXrdbColor background)\007"
+    query+="\033]12;#$(getXrdbColor cursorColor)\007"
+    # urxvt borders
+    query+="\033]708;#$(getXrdbColor background)\007"
+    esac
+}
+
+updateTerminal() {
+    while read line; do
+        kv=( ${line//:/ } )
+        key=${kv[0]}
+        value=${kv[1]}
+        case $key in
+            \*.color*)
+                local n=${key//\*.color/}
+                echo -e "\033]4;$n;$value\007"
+            ;;
+            \*.foreground)
+                echo -e "\033]10;$value\007"
+            ;;
+            \*.background)
+                echo -e "\033]11;$value\007"
+                # URXVT border color
+                echo -e "\033]708;$value\007"
+            ;;
+            \*.cursorColor)
+                echo -e "\033]12;$value\007"
+            ;;
+        esac
+    done <<< $(xrdb -query)
+}
+
+updateTerminals() {
+    # send sequence to all terminals
+    local query terminal
+    query=$(updateTerminal);
+    for terminal in /dev/pts/[0-9]*; do
+        printf "%b" "${query}" > "${terminal}" &
+    done
+}
+
+updateKak() {
+    for session in $(kak -l); do
+        echo "colorscheme $COLORSCHEME_NAME" | kak -p $session
+    done
+}
+
+getColorschemePath() {
+    find "${COLORSCHEME_PATH}/$1".*resources -type f
+}
+
+showColorschemes() {
+    find "${COLORSCHEME_PATH}/" -type f | sed 's/\..resources//g; s/.*\///g'
+}
+
+showHelp() {
+    cat <<EOF
+Make sure that the variables located at the top of the script colorscheme-switch match your setup
+Usage: colorscheme-switch (-h | --help) | (-l | --list) | (-s colorscheme | --switch colorscheme)
+    --help = show this help text
+    --list = list all available colorschemes
+    --switch = set a available colorscheme in xrdb and all terminals
+    --reload = reload the current colorscheme
+    --terminal = reload the current colorscheme just for the current terminal
+    --current = get the name of the current colorscheme
+EOF
+}
+
+switch() {
+    COLORSCHEME_NAME=$1
+    if getColorschemePath $COLORSCHEME_NAME &> /dev/null; then
+        COLORSCHEME="$(getColorschemePath $COLORSCHEME_NAME)"
+        echo "$COLORSCHEME_NAME" > $COLORSCHEME_PATH/current
+        updateXrdb
+        if pgrep -x bspwm &> /dev/null; then
+            updateBspwm
+        fi
+        updateKak
+        updateTerminals
+    else
+        exit 1
+    fi
+}
+
+main() {
+    local option argument
+    option="${1-}"
+    argument="${2-}"
+    case "${option}" in
+        -r | --reload)
+            switch $(cat $COLORSCHEME_PATH/current);
+            ;;
+        -t | --terminal)
+            updateTerminal
+            ;;
+        -c | --current)
+            cat $COLORSCHEME_PATH/current
+            ;;
+        -s | --switch)
+            switch $argument
+            ;;
+        -l | --list)
+            showColorschemes
+            ;;
+        -h | --help)
+            showHelp
+            ;;
+        *)
+            showHelp
+            exit 1
+            ;;
+    esac
+}
+
+COLORSCHEME=''
+main "$@"

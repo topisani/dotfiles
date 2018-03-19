@@ -33,7 +33,8 @@ def lsp-log %{
 decl str lsp_servers %{
     cpp:/home/topisani/.config/kak/scripts/start-cquery
     python:pyls
-    #php:phpls
+    javascript:jsls
+    typescript:jsls
 }
 
 def lsp-rename-ask %{
@@ -66,7 +67,7 @@ def lsp-setup %{
 #    set buffer autoshowcompl false
 }
 
-filetype-hook (python|php) %{
+filetype-hook (python|javascript|typescript) %{
     lsp-start
 }
 
@@ -89,4 +90,15 @@ define-command lsp-disable-autocomplete -docstring "Disable lsp completion" %{
 # Ignore E501 for python (Line length > 80 chars)
 # decl str lsp-python-disabled-diagnostics '^E501'
 
-# Example keybindings
+define-command php-format %{
+    write
+    nop %sh{ php-cs-fixer fix $kak_buffile &> /dev/null }
+    edit %val{buffile}
+    echo "Formatted"
+}
+
+filetype-hook php %{
+    map-all filetype %{
+        = 'php-format' 'Format file'
+    }
+}

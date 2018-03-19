@@ -17,7 +17,7 @@ if [ -n "$BASH_VERSION" ]; then
 fi
 
 # set PATH so it includes user's private bin directories
-PATH="$HOME/.bin:$HOME/.local/bin:/usr/local/bin:$PATH"
+PATH="$HOME/.bin:$HOME/.local/bin:/usr/local/bin:$HOME/.composer/vendor/bin:$PATH"
 
 PATH="$(ruby -rrubygems -e 'puts Gem.user_dir')/bin:$PATH"
 
@@ -44,3 +44,5 @@ alias tb="nc termbin.com 9999"
 
 export EDITOR=kak
 export VISUAL=kak
+
+(colorscheme-switch --terminal &) 2> /dev/null 

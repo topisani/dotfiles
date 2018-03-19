@@ -1,5 +1,7 @@
 # Global settings
-colorscheme flatblue-dark
+
+# Load current terminal colorscheme
+colorscheme %sh{ colorscheme-switch --current }
 
 # Show line numbers
 addhl global number_lines -hlcursor -separator ' '
