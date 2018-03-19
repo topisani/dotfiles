@@ -58,6 +58,11 @@ map-all gdbrepeat -repeat %{
     N gdb-session-new       'new session' -norepeat
 }
 
+def clang-format -docstring "Format selection using clang-format" %{
+    exec -draft "|clang-format<ret>"
+    echo "Formatted selection"
+}
+
 # filetype hook
 filetype-hook cpp %{
     cquery-start
@@ -65,6 +70,7 @@ filetype-hook cpp %{
     map-all filetype -scope buffer %{
         d     "enter-user-mode gdbrepeat" 'GDB...'
         <tab> "alt"                       'Other file'
+        =     "clang-format"              'clang-format selection'
     }
 
     set buffer tabstop 2
