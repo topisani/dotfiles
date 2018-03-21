@@ -44,18 +44,18 @@ updateTerminal() {
         case $key in
             \*.color*)
                 local n=${key//\*.color/}
-                echo -e "\033]4;$n;$value\007"
+                echo -en "\033]4;$n;$value\007"
             ;;
             \*.foreground)
-                echo -e "\033]10;$value\007"
+                echo -en "\033]10;$value\007"
             ;;
             \*.background)
-                echo -e "\033]11;$value\007"
+                echo -en "\033]11;$value\007"
                 # URXVT border color
-                echo -e "\033]708;$value\007"
+                echo -en "\033]708;$value\007"
             ;;
             \*.cursorColor)
-                echo -e "\033]12;$value\007"
+                echo -en "\033]12;$value\007"
             ;;
         esac
     done <<< $(xrdb -query)
