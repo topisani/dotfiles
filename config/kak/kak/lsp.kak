@@ -5,11 +5,18 @@ def lsp-start %{
         pid_file=/tmp/kak-lspc-pid-$kak_session
         log_file=/tmp/kak-lspc-log-$kak_session
         if ! [[ -f $pid_file ]]; then
-            ( python $HOME/.config/kak/scripts/kakoune-cquery/lspc.py $kak_session
+            ( python $HOME/.config/kak/scripts/kakoune-cquery/libkak/lspc.py $kak_session
               rm $pid_file $log_file
             ) > $log_file 2>&1 < /dev/null &
             echo &! > /tmp/kak-lspc-pid-${kak_session}
         fi
+    }
+    remove-hooks global lsp-kill
+    hook global -group lsp-kill KakEnd .* %{
+        %sh{
+            pid_file=/tmp/kak-lspc-pid-$kak_session
+            kill $(cat $pid_file)
+        }
     }
     lsp-setup
 }
@@ -67,7 +74,7 @@ def lsp-setup %{
 #    set buffer autoshowcompl false
 }
 
-filetype-hook (python|javascript|typescript) %{
+filetype-hook (javascript|typescript) %{
     lsp-start
 }
 
@@ -89,16 +96,3 @@ define-command lsp-disable-autocomplete -docstring "Disable lsp completion" %{
 
 # Ignore E501 for python (Line length > 80 chars)
 # decl str lsp-python-disabled-diagnostics '^E501'
-
-define-command php-format %{
-    write
-    nop %sh{ php-cs-fixer fix $kak_buffile &> /dev/null }
-    edit %val{buffile}
-    echo "Formatted"
-}
-
-filetype-hook php %{
-    map-all filetype %{
-        = 'php-format' 'Format file'
-    }
-}

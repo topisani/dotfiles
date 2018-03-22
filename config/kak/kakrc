@@ -83,7 +83,7 @@ map-all user -sh %{
 # Filetypes
 
 filetype-import python lsp
-filetype-import php lsp
+filetype-import php php
 filetype-import cpp c++
 filetype-import markdown markdown
 

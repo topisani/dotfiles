@@ -1,3 +1,7 @@
+- defaults:
+    link:
+      create: true
+
 - clean: ['~']
 
 - link:
@@ -5,26 +9,15 @@
     ~/.bash_logout: bash_logout
     ~/.gitconfig: gitconfig
     ~/.tmux.conf: tmux.conf
-    ~/.vim/vimrc:
-        path: vim/vimrc
-        create: true
+    ~/.vim/vimrc: vim/vimrc
     ~/.Xresources: Xresources
     ~/.xinitrc: xinitrc
-    ~/.config/awesome:
-        path: config/awesome/
-        create: true
-    ~/.config/i3:
-        path: config/i3/
-        create: true
-    ~/.config/kak:
-        path: config/kak/
-        create: true
-    ~/.config/colorschemes:
-        path: config/colorschemes/
-        create: true
-    ~/.bin:
-        path: bin
-        create: true
-    ~/.fonts:
-        path: fonts
-        create: true
+    ~/.bin: bin
+    ~/.fonts/hermit: fonts/hermit
+    ~/.config/awesome: config/awesome/
+    ~/.config/i3: config/i3/
+    ~/.config/kak: config/kak/
+    ~/.config/colorschemes: config/colorschemes/
+    ~/.config/windowchef: config/windowchef/
+    ~/.config/sxhkd: config/sxhkd/
+

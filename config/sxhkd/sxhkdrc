@@ -1,0 +1,20 @@
+super + shift + Return
+	tmux-term
+
+super + alt + Return
+	termite
+
+super + space
+	rofi -show drun -modi drun,run,window
+
+Print
+	rofi-shoot
+
+XF86Audio{Raise,Lower}Volume
+    volume volume {up,down} --notify
+
+XF86AudioMute
+    volume mute toggle --notify
+
+XF86MonBrightness{Up,Down}
+    brightness {up, down} --notify

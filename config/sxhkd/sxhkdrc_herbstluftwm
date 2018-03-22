@@ -1,0 +1,59 @@
+# shift + quit wm
+super + alt + Escape
+	herbstclient quit
+
+# reload wm
+super + shift + r
+	herbstclient reload
+
+# close window
+super + q
+	herbstclient close
+
+# focus clients
+super + {h,j,k,l}
+	herbstclient focus {left,down,up,right}
+
+# move clients
+super + shift + {h,j,k,l}
+	herbstclient shift {left,down,up,right}
+
+# split frames
+super + {u,o}
+	herbstclient split {bottom,right} 0.5
+
+# explode
+super + ctrl + space
+	herbstclient split explode
+
+# resize frames
+super + ctrl + {h,j,k,l}
+	herbstclient resize {left,down,up,right} +0.05
+
+# tags
+super + {_,shift} + {1-9}
+	herbstclient {use,move}_index $(( {1-9} - 1 ))
+
+super + {_,shift} + 0
+	herbstclient {use,move}_index 9
+
+# cycle
+super + ctrl + {_,shift} + Tab
+	herbstclient use_index {+,-}1 --skip-visible
+
+# layouts
+super + r
+	herbstclient remove
+
+super + f
+	herbstclient floating toggle
+
+# cycle
+alt + {_,shift} + Tab
+	herbstclient cycle_all {+,-}1
+
+super + Return
+	$HOME/.config/herbstluftwm/dropdown.sh
+
+super + m
+	$HOME/.config/herbstluftwm/maximize.sh

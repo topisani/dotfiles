@@ -1,0 +1,74 @@
+# -*- mode: conf; tab-width: 4 -*-
+
+# MOUSE BINDINGS
+
+# move / resize
+super button{1,3}
+    {xmmv,xmrs} $(wmcl underneath)
+
+# Assure move/resize stops on keyrelease
+super @button{1,3}
+     pkill "{xmmv,xmrs}"
+
+# Assure move/resize stops on keyrelease, even if super was released first
+#~@button{1,3}
+#    pkill "{xmmv,xmrs}"
+
+# Focus on click
+~button1
+    ;wmcl focus $(wmcl underneath)
+
+# SYSTEM BINDINGS
+
+# Reload sxhkd
+super + shift + r
+    wmcl autostart
+
+super + shift + q
+    pkill xinit
+
+# WINDOW MANAGEMENT
+
+# switch windows
+super + {h, j, k, l} 
+    wmcl pos_focus {west, south, north, east} $(pfw)
+
+alt + Tab
+    wmcl focus prev
+
+alt + shift + Tab
+    wmcl focus next
+
+# move windows    
+super + shift + {h, j, k, l}
+    wmv {-20 0, 0 20, 0 -20, 20 0} $(pfw)
+
+# resize
+super + ctrl + {h, j, k, l} 
+    wrs {-20 0, 0 20, 0 -20, 20 0} $(pfw)
+
+# WORKSPACES
+
+# workspaces
+super + {1-9}
+    wmcl desktop goto {1-9}
+
+super + shift + {1-9}
+    wmcl desktop move {1-9}
+
+super + 0
+    wmcl desktop goto 10
+
+super + shift + 0
+    wmcl desktop move 10
+
+# WINDOW ACTIONS
+
+super + q
+    killw $(pfw)
+
+super + m
+    wmcl maximize toggle $(pfw)
+
+super + c
+    wmcl center

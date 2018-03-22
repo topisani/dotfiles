@@ -1,0 +1,60 @@
+#!/bin/sh
+
+mkdir -p $WM_TMP_DIR
+
+pid_file=$WM_TMP_DIR/pids
+
+if [[ -f $pid_file ]]; then
+   while read pid; do
+       kill $pid -9
+   done < $pid_file
+   :> $pid_file
+fi
+
+run() {
+    $@ &> $WM_TMP_DIR/$1.log &
+    echo $! >> $pid_file
+}
+
+waitron wm_config border_width 5
+waitron wm_config color_focused $(xrq "*.color12" | sed 's/\#/0xFF/')
+waitron wm_config color_unfocused $(xrq "*.background" | sed 's/\#/0xFF/')
+waitron wm_config gap_width all 0
+waitron wm_config grid_gap_width 0
+waitron wm_config cursor_position middle
+waitron wm_config workspaces_nr 10
+waitron wm_config enable_resize_hints false
+waitron wm_config enable_sloppy_focus false
+waitron wm_config sticky_windows true
+waitron wm_config enable_borders true
+waitron wm_config enable_last_window_focusing true
+waitron wm_config apply_settings true
+waitron wm_config replay_click_on_focus true
+waitron wm_config pointer_actions move resize_side resize_corner
+waitron wm_config pointer_modifier super
+waitron wm_config click_to_focus any
+waitron wm_config bar_padding 0 21 0 0
+
+setxkbmap dk nodeadkeys -option ctrl:nocaps
+run sxhkd -c $HOME/.config/sxhkd/sxhkdrc $HOME/.config/sxhkd/sxhkdrc_windowchef
+run ruler $WM_SCRIPS_DIR/../rulerrc
+
+run compton
+run polybar -c $HOME/.config/polybar/config_windowchef main_bar > windowchef.log
+run dunst
+run battery_notifyd
+run xautolock -time 10 -locker "wmcl lock"
+
+bg=$HOME/.config/background
+run feh --bg-fill $bg
+
+if [[ "$(xrq 'windowchef.startup' 2> /dev/null)" != "true" ]]; then
+    xrdb -merge <<< "windowchef.startup:true"
+    test "$WM_TMP_DIR" != "" && rm -rf $WM_TMP_DIR/**
+    setxkbmap dk nodeadkeys -option ctrl:nocaps
+
+    nm-applet &
+    dex --autostart &
+    tilda &
+    lock.sh -u $HOME/.config/background &
+fi
