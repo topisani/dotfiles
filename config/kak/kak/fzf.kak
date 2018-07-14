@@ -1,5 +1,5 @@
 def fzf-file -params 0..1 %{
-    fzf "edit $1" "find %arg{1} -name .git -prune -o -name .svn -prune -o -regex '.*\(bower_components\|output\|.mozilla\|firefox\|node_modules\|grunt\|cache\|Cache\|config/\(Slack\|chromium\|goole-chrome\)\).*' -prune -o \( -type d -o -type f -o -type l \) -a -not -path %arg{1} -a -not -name '.' -print | sed 's@^\./@@'"
+    fzf "edit $1" "find -L %arg{1} -name .git -prune -o -name .svn -prune -o -regex '.*\(bower_components\|output\|.mozilla\|firefox\|node_modules\|grunt\|cache\|Cache\|config/\(Slack\|chromium\|goole-chrome\)\).*' -prune -o \( -type f -o -type l \) -a -not -path %arg{1} -a -not -name '.' -print | sed 's@^\./@@'"
                 # "ag -l -f -p ~/.binignore -p ~/.ignore --hidden --one-device . %arg{1}"
                 # "rg --ignore-file ~/.binignore -L --hidden --files %arg{1}"
 }
@@ -23,7 +23,7 @@ options:
     <items-command>: Shell command to get items.
 flags:
     -multi: allow multiple selected items. <callback> will be run for each." \
-%{ %sh{
+%{ exec %sh{
     tmp=$(mktemp /tmp/kak-fzf.XXXXXX)
     exec=$(mktemp /tmp/kak-exec.XXXXXX)
     callback=$1; shift
@@ -43,7 +43,7 @@ flags:
     ) > /dev/null 2>&1 < /dev/null &
 } }
 
-def fzf-buffer %{ %sh{
+def fzf-buffer %{ exec %sh{
     tmp=$(mktemp /tmp/kak-fzf.XXXXXX)
     setbuf=$(mktemp /tmp/kak-setbuf.XXXXXX)
     delbuf=$(mktemp /tmp/kak-delbuf.XXXXXX)

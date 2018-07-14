@@ -51,5 +51,5 @@ super + {_,shift +}{1-9}
 super + {_,shift +} 0
 	waitron {workspace_goto,workspace_add_window} 10
 
-super + {y,u,i,o,c}
-	waitron window_snap {topleft,bottomleft,topright,bottomright,middle}
+#super + {y,u,i,o,c}
+#	waitron window_snap {topleft,bottomleft,topright,bottomright,middle}

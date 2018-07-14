@@ -1,3 +1,6 @@
+super + Return
+	dropdown
+
 super + shift + Return
 	tmux-term
 

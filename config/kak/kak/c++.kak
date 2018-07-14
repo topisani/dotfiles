@@ -1,43 +1,78 @@
 # C++
-import lsp
-
-def cquery-start %{
-    %sh{
-        pid_file=/tmp/kak-cquery-pid-$kak_session
-        log_file=/tmp/kak-cquery-log-$kak_session
-        if ! [[ -f $pid_file ]]; then
-            ( python $HOME/.config/kak/scripts/kakoune-cquery/cquery.py $kak_session
-              rm $pid_file $log_file
-            ) > $log_file 2>&1 < /dev/null &
-            echo &! > /tmp/kak-cquery-pid-${kak_session}
-        fi
-    }
-    lsp-setup
-}
-
-def cquery-log %{
-    %sh{
-        log_file=/tmp/kak-cquery-log-$kak_session
-        if ! [[ -f $log_file ]]; then
-            echo "fail 'cquery does not seem to be running'"
-        else
-            echo "
-            edit $log_file
-            set buffer readonly true
-            set buffer autoreload true
-            "
-        fi
-    }
-}
+#import lsp
 
 # Highlight qualifiers
-addhl shared/cpp/code regex %{([\w_0-9]+)::} 1:module
+addhl shared/cpp/code/ regex %{([\w_0-9]+)::} 1:module
 
 # Highlight doc comments
-addhl shared/cpp/comment regex '[^/]*(///([^/].*)?)' 1:string
-addhl shared/cpp/comment regex '[^/]*(/\*\*[^/].*\*/)' 0:string
-addhl shared/cpp/comment regex '`.*`' 0:module
 
+rmhl shared/cpp/line_comment
+rmhl shared/cpp/comment
+
+add-highlighter shared/cpp/doc_comment region /\*\* \*/ group
+add-highlighter shared/cpp/doc_comment2 region /// $ ref cpp/doc_comment
+
+add-highlighter shared/cpp/line_comment region // $ fill comment
+add-highlighter shared/cpp/comment region /\* \*/ fill comment
+
+add-highlighter shared/cpp/doc_comment/ fill string
+add-highlighter shared/cpp/doc_comment/ regex '\h*(///|\*/?|/\*\*+)' 1:comment 
+add-highlighter shared/cpp/doc_comment/ regex '`.*?`' 0:module
+add-highlighter shared/cpp/doc_comment/ regex '\\\w+' 0:module
+
+#addhl shared/c/comment/ regex '[^/]*(///([^/].*)?)' 1:string
+#addhl shared/c/comment/ regex '[^/]*(/\*\*[^/].*\*/)' 0:string
+#addhl shared/c/comment/ regex '`.*?`' 0:module
+#
+define-command -hidden -override c-family-insert-on-newline %[ evaluate-commands -itersel -draft %[
+    execute-keys \;
+    try %[
+        evaluate-commands -draft -save-regs '/"' %[
+            # copy the commenting prefix
+            execute-keys -save-regs '' k <a-x>1s^\h*(//+\h*)<ret> y
+            try %[
+                # if the previous two comments aren't empty, create a new one
+                execute-keys K<a-x><a-K>^(\h*//+\h*\n){2}<ret> jj<a-x>s^\h*<ret>P
+            ] catch %[
+                # if there is no text in the previous comment, remove it completely
+                execute-keys d
+            ]
+        ]
+    ]
+    try %[
+        # if the previous line isn't within a comment scope, break
+        execute-keys -draft k<a-x> <a-k>^(\h*/\*|\h+\*(?!/))<ret>
+
+        # find comment opening, validate it was not closed, and check its using star prefixes
+        execute-keys -draft <a-?>/\*<ret><a-H> <a-K>\*/<ret> <a-k>\A\h*/\*([^\n]*\n\h*\*)*[^\n]*\n\h*.\z<ret>
+
+        try %[
+            # if the previous line is opening the comment, insert star preceeded by space
+            execute-keys -draft k<a-x><a-k>^\h*/\*<ret>
+            execute-keys -draft i*<space><esc>
+        ] catch %[
+           try %[
+                # if the next line is a comment line insert a star
+                execute-keys -draft j<a-x><a-k>^\h+\*<ret>
+                execute-keys -draft i*<space><esc>
+            ] catch %[
+                try %[
+                    # if the previous line is an empty comment line, close the comment scope
+                    /*
+                    execute-keys -draft kK<a-x><a-k>^(\h+\*\h+\n){2}<ret> ;<a-x>d <a-x>1s\*(\h*)<ret>c/<esc>
+                ] catch %[
+                    # if the previous line is a non-empty comment line, add a star
+                    execute-keys -draft i*<space><esc>
+                ]
+            ]
+        ]
+
+        # trim trailing whitespace on the previous line
+        try %[ execute-keys -draft s\h+$<ret> d ]
+        # align the new star with the previous one
+        execute-keys K<a-x>1s^[^*]*(\*)<ret>&
+    ]
+] ]
 import occivink/kakoune-gdb/gdb
 
 new-mode gdbrepeat
@@ -55,25 +90,27 @@ map-all gdbrepeat -repeat %{
     T gdb-backtrace         'backtrace'
     p gdb-print             'print'
     q gdb-session-stop      'stop'
-    N gdb-session-new       'new session' -norepeat
 }
+map-mode gdbrepeat N ":gdb-session-new " 'new session' -raw
 
 def clang-format -docstring "Format selection using clang-format" %{
     exec -draft "|clang-format<ret>"
     echo "Formatted selection"
 }
 
-# filetype hook
-filetype-hook cpp %{
-    cquery-start
+set global c_include_guard_style pragma
 
-    map-all filetype -scope buffer %{
+# filetype hook
+filetype-hook (cpp|c) %{
+    lsp-start
+
+    map-all filetype -scope window %{
         d     "enter-user-mode gdbrepeat" 'GDB...'
         <tab> "alt"                       'Other file'
         =     "clang-format"              'clang-format selection'
     }
 
-    set buffer tabstop 2
-    set buffer indentwidth 2 
+    set window tabstop 2
+    set window indentwidth 2
 }
 

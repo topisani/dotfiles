@@ -1,6 +1,6 @@
 # flatblue-dark theme
 
-%sh{
+evaluate-commands %sh{
     bg0="rgb:0d1011"
     bg="rgb:18191c"
     bg1="rgb:1E1F21"

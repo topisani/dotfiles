@@ -20,4 +20,7 @@
     ~/.config/colorschemes: config/colorschemes/
     ~/.config/windowchef: config/windowchef/
     ~/.config/sxhkd: config/sxhkd/
+    ~/.config/termite: config/termite/
+    ~/.config/dunstrc: config/dunstrc
+    ~/.oh-my-zsh/themes/oxide.zsh-theme: .oh-my-zsh/themes/oxide.zsh-theme
 

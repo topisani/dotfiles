@@ -1,0 +1,42 @@
+#!/bin/bash
+
+GEOMETRY=950x500+203
+
+THIS_FILE=$0
+
+# is_dropdown <window_id>
+# Checks if window is the dropdown window
+is_dropdown() {
+	xprop -id $1 WM_WINDOW_ROLE | grep " = \"DropdownTerm\""
+}
+
+kill_dropdown() {
+	wins=$(lsw -a)
+	while read win; do
+		is_dropdown $win && killw $win
+	done <<< $wins &
+}
+
+open_dropdown() {
+    args="$@"
+    args="${args@Q}"
+	termite --role=DropdownTerm --title=Dropdown --geometry=$GEOMETRY \
+		--exec="sh -c '$THIS_FILE --setup $args'"
+}
+
+setup_term() {
+    colorscheme-switch -t
+    TERM=tmux-256color tmux attach -t Dropdown || tmux new-session -s Dropdown \; attach
+}
+
+if [[ "$1" == "--setup" ]]; then
+    shift;
+    setup_term "$@"
+else
+	if is_dropdown $(pfw); then
+		killw $(pfw)
+	else
+		kill_dropdown
+		open_dropdown
+	fi
+fi

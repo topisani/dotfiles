@@ -4,7 +4,7 @@ try %{
 
 # Import a module by name. Checks if the module has already been imported
 def import -params 1 -shell-candidates %{find -L $HOME/.config/kak/kak/ -type f -name "*.kak" | sed "s|$HOME/.config/kak/kak/\(.*\)\.kak$|\1|"} \
-%{ try %{ %sh{
+%{ try %{ evaluate-commands %sh{
     if ! [[ ":$kak_opt_imported_modules:" =~ ":$1:" ]]; then
         echo "source $HOME/.config/kak/kak/$1.kak"
         echo "set -add global imported_modules $1" 
@@ -14,7 +14,7 @@ def import -params 1 -shell-candidates %{find -L $HOME/.config/kak/kak/ -type f 
 decl str-list installed_plugs
 
 def plug -params 1..2 %{
-    set -add global installed_plugs %sh{ echo $1,${2:-.} }
+    set -add global installed_plugs %{ evaluate-commands %sh{ echo $1,${2:-.} } }
 }
 
 def install-plugs %{ nop %sh{

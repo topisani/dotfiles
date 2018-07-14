@@ -1,4 +1,6 @@
 #!/bin/bash
+source ~/.profile
+
 rofi_res=$(rofi -dmenu -mesg \
 	"<b>Selection:</b> <tt>s</tt>,   \
 	<b>Delay:</b> <tt>d time</tt>,   \

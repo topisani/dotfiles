@@ -16,7 +16,7 @@ flags:
     -scope to register keybinds in.
     -docstring <str>: Docstring for keybind. Defaults to '<name>...'
     -parent <mode>: Mode to register keybinding in. Defaults to 'user'" \
-%{ %sh{
+%{ eval %sh{
     name=$1; shift
     key=${1:-}; shift
     docstring="$name..."
@@ -51,7 +51,7 @@ options:
     <body>: lines expanded to 'map-mode <mode> {line}'.
 flags:
     all flags are forwarded to every keybind. See map-mode"\
-%{ %sh{
+%{ eval %sh{
     mode=$1; shift
     flags=''
     while [[ $# > 1 ]]; do
@@ -73,7 +73,7 @@ flags:
     -sh: run <command> in a shell, ignoring the output
     -repeat: After execution, return to <mode>
     -norepeat: force this entry to skip repetition" \
-%{ %sh{
+%{ eval %sh{
     mode=$1; shift
     key=$1; shift
     command=$1; shift
@@ -112,25 +112,39 @@ Add hook for opening a buffer matching <filetype>
 options:
     <command>: Command to run on hook
 switches:
+    -scoppe: window or buffer.
     -group: Group to add hook to.
 "\
-%{ %sh{
+%{ eval %sh{
     filetype=$1; shift
     flags=''
+    hook=WinSetOption
     while [[ $# != 0 ]] && [[ "$1" =~ "^-" ]]; do
         case $1 in
             -group)
                 shift
                 flags="$flags -group $1"
                 ;;
+            -scope)
+                shift
+                [[ "$1" == "window" ]] && hook="WinSetOption"
+                [[ "$1" == "buffer" ]] && hook="BufSetOption"
+                ;;
         esac
         shift
     done
-    echo "hook $flags global BufSetOption filetype=$filetype %{$@}"
+    echo "hook $flags global $hook filetype=$filetype %{$@}"
 }}
 
 def filetype-import -params 2 -docstring \
 "filetype-import <filetype> <module>: Import <module> when first opening a <filetype>" \
-%{ %sh{
-    echo "filetype-hook $1 %{ import $2 }"
+%{ eval %sh{
+    echo "filetype-hook -scope buffer $1 %{ import $2 }"
 }}
+
+def runtime -docstring "Echo how long kakoune has been running" %{ eval %sh{
+    #echo echo -debug Kakoune has run for $( echo $(date +%s.%N) - $(date +%s.%N --date="$(stat -c %x /proc/$KAK_PID)") | bc ) seconds
+    echo echo -debug Kakoune started in $( echo $(date +%s.%N) - $KAK_START_TIME | bc ) seconds
+    echo echo Kakoune started in $( echo $(date +%s.%N) - $KAK_START_TIME | bc ) seconds
+}}
+

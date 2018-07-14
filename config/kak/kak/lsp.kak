@@ -55,7 +55,7 @@ def lsp-setup %{
 
     # Hover and diagnostics on idle
     hook -group lsp buffer NormalIdle .* %{
-        lsp-diagnostics info
+        #lsp-diagnostics info
         lsp-hover echo
     }
 
@@ -74,7 +74,7 @@ def lsp-setup %{
 #    set buffer autoshowcompl false
 }
 
-filetype-hook (javascript|typescript) %{
+filetype-hook (python|javascript|typescript) %{
     lsp-start
 }
 
@@ -95,4 +95,4 @@ define-command lsp-disable-autocomplete -docstring "Disable lsp completion" %{
 
 
 # Ignore E501 for python (Line length > 80 chars)
-# decl str lsp-python-disabled-diagnostics '^E501'
+decl str lsp_python_disabled_diagnostics '^E501'

@@ -27,7 +27,6 @@ export CXX=/usr/bin/clang++
 
 
 export PATH="$HOME/.cargo/bin:$PATH"
-export PATH="$HOME/.cabal/bin:$PATH"
 alias termbin="nc termbin.com 9999"
 
 # Use gtk theme for qt
@@ -42,7 +41,17 @@ export NUMCPUS=`grep -c '^processor' /proc/cpuinfo`
 export MAKEFLAGS="-j$NUMCPUS --load-average=$NUMCPUS"
 alias tb="nc termbin.com 9999"
 
+# Call less if there is only one argument and it is a filename. Otherwise, call ls
+less_or_ls() {
+    ([ "$#" -eq "1" ] && [ -f "$1" ] && less $@ ) || ls $@
+}
+alias ls=less_or_ls
+
 export EDITOR=kak
 export VISUAL=kak
+export TERMINAL=tmux-term
 
 (colorscheme-switch --terminal &) 2> /dev/null 
+#PATH=$PATH:~/dev/rpi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin
+
+# vim: ft=sh

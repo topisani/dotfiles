@@ -33,14 +33,14 @@ waitron wm_config replay_click_on_focus true
 waitron wm_config pointer_actions move resize_side resize_corner
 waitron wm_config pointer_modifier super
 waitron wm_config click_to_focus any
-waitron wm_config bar_padding 0 21 0 0
+waitron wm_config bar_padding 0 18 0 0
 
 setxkbmap dk nodeadkeys -option ctrl:nocaps
 run sxhkd -c $HOME/.config/sxhkd/sxhkdrc $HOME/.config/sxhkd/sxhkdrc_windowchef
 run ruler $WM_SCRIPS_DIR/../rulerrc
 
 run compton
-run polybar -c $HOME/.config/polybar/config_windowchef main_bar > windowchef.log
+run polybar -c $HOME/.config/polybar/config main_bar > windowchef.log
 run dunst
 run battery_notifyd
 run xautolock -time 10 -locker "wmcl lock"
@@ -55,6 +55,6 @@ if [[ "$(xrq 'windowchef.startup' 2> /dev/null)" != "true" ]]; then
 
     nm-applet &
     dex --autostart &
-    tilda &
+    #tilda &
     lock.sh -u $HOME/.config/background &
 fi

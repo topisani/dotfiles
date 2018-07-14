@@ -4,14 +4,14 @@
 colorscheme %sh{ colorscheme-switch --current }
 
 # Show line numbers
-addhl global number_lines -hlcursor -separator ' '
+addhl global/ number-lines -hlcursor -separator ' '
 # highlight matching parens
-addhl global show_matching
+addhl global/ show-matching
 # Disable clippy
 set global ui_options ncurses_assistant=none
 
 
-hook global InsertChar \t %{ exec -draft -itersel h@ }
+hook -group tabstop global InsertChar \t %{ exec -draft -itersel h@ }
 set global tabstop 4
 set global indentwidth 4
 
@@ -22,12 +22,12 @@ hook global InsertKey <backspace> %{ try %{
 # Tab completion
 hook global InsertCompletionShow .* %{
     map window insert <tab> <c-n>
-    map window insert <backtab> <c-p>
+    map window insert <s-tab> <c-p>
 }
 
 hook global InsertCompletionHide .* %{
     unmap window insert <tab> <c-n>
-    unmap window insert <backtab> <c-p>
+    unmap window insert <s-tab> <c-p>
 }
 
 # space is my leader
@@ -43,7 +43,7 @@ declare-user-mode noThankYou
 
 # Tab through search results
 def tabsearch -params 1 %{
-    define-command -allow-override next "exec \"%arg{1}\%reg{/}\""
+    define-command -override next "exec ""%arg{1}\%reg{/}"""
     map global prompt <tab> <ret>:next<ret>
     exec %arg{1}
 }

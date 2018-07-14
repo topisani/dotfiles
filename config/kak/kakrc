@@ -1,4 +1,4 @@
-source %sh{echo $HOME/.config/kak/kak/modules.kak}
+evaluate-commands %sh{echo source $HOME/.config/kak/kak/modules.kak}
 
 import utils
 import global
@@ -9,6 +9,9 @@ import fzf
 plug occivink/kakoune-gdb
 plug fsub/kakoune-mark
 plug TeddyDD/kakoune-cfdg
+plug TeddyDD/kakoune-wiki
+plug lenormf/kakoune-extra
+plug TeddyDD/kakoune-lf
 
 install-plugs
 
@@ -18,18 +21,12 @@ install-plugs
 #map-mode user m mark-word
 #map-mode user M mark-clear
 
-import TeddyDD/kakoune-cfdg/cfdg
+#import TeddyDD/kakoune-cfdg/cfdg
+import TeddyDD/kakoune-wiki/wiki
+wiki_setup %sh(echo $HOME/ownCloud/wiki)
 
-def ide %{
-    rename-client main
-    set global jumpclient main
-
-    new rename-client tools
-    set global toolsclient tools
-
-    new rename-client docs
-    set global docsclient docs
-}
+import lenormf/kakoune-extra/hatch_terminal
+import TeddyDD/kakoune-lf/lf
 
 # Keymaps
 
@@ -37,10 +34,19 @@ map-all normal %{
     '#' comment-line "Comment line"
 }
 
+def file-delete -docstring \
+"Delete current file" %{
+    %sh{ rm $kak_buffile }
+    delete-buffer
+}
+
 new-mode files f %{
-    f "fzf-file"                               "List files" 
+    f "fzf-file"                               "List files"
+    t "lf"                                     "File tree (current file)"
+    T "lf ."                                   "File tree (current dir)"
     w "write"                                  "Write file" 
     c "fzf-file ~/.config/kak/"                "Open config dir"
+    d "file-delete"                            "Delete current file"
 }
 
 new-mode buffers b %{
@@ -65,6 +71,23 @@ new-mode tmux w %{
     d     quit                  'Delete pane'
 }
 
+def git-blame-toggle %{
+    try %[
+        addhl window/git-blame flag_lines Info git_blame_flags
+        rmhl window/git-blame
+        git blame
+    ] catch %[
+        git hide-blame
+    ]
+}
+
+new-mode git g %{
+    g     'repl tig'            'Open tig'
+    f     'fzf-git'             'Open files in repo'
+    p     ':git '               'Open git prompt' -raw
+    b     'git-blame-toggle'    'Toggle git blame'
+}
+
 # switch windows
 map-all user -sh %{
     1 'tmux-select-pane 1'  'Select pane 1'
@@ -80,18 +103,9 @@ map-all user -sh %{
 }
 
 
-# Filetypes
-
-filetype-import python lsp
-filetype-import php php
-filetype-import cpp c++
-filetype-import markdown markdown
-
-# Local settings files
-
 def source-local-config -params ..1 %{
     try %{
-        source %sh{
+        source %{ eval %sh{
             function upsearch () {
                 test / == "$PWD" && return || test -e "$1" && echo "$PWD/$1" && return || cd .. && upsearch "$1"
             }
@@ -99,8 +113,31 @@ def source-local-config -params ..1 %{
             startdir=${1:-$(dirname $kak_buffile)}
             cd $startdir
             upsearch ".local.kak"
-        }
+        } }
    }
 }
 
 hook global BufCreate .* source-local-config 
+hook global BufCreate .* modeline-parse
+
+# Autoload manually
+
+declare-option regex autoload_pattern ".*(?!php).*"
+
+eval %sh{
+    find -L "${kak_config}/kak-autoload/" -type f -name '*\.kak' | \
+        grep -P "^${kak_config}/kak-autoload/${kak_opt_autoload_pattern}\.kak$" | xargs -i printf 'try %%{ source "%s" } catch %%{ echo -debug Autoload: could not load "%s" }\n' '{}' '{}'
+}
+
+# Filetypes
+
+import markdown
+import php
+import c++
+import meson
+
+# Setup kak-lsp
+eval %sh{kak-lsp --kakoune}
+lsp-auto-hover-enable
+
+hook global KakBegin .* runtime

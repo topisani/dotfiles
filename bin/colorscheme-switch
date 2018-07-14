@@ -34,9 +34,9 @@ build_query() {
 
 updateTerminal() {
     while read line; do
-        kv=( ${line//:/ } )
-        key=${kv[0]}
-        value=${kv[1]}
+        local kv=( ${line//:/ } )
+        local key=${kv[0]}
+        local value=${kv[1]}
         case $key in
             \*.color*)
                 local n=${key//\*.color/}
@@ -116,7 +116,7 @@ main() {
             switch $(cat $COLORSCHEME_PATH/current);
             ;;
         -t | --terminal)
-            updateTerminal
+            updateTerminal > $(tty)
             ;;
         -c | --current)
             cat $COLORSCHEME_PATH/current
