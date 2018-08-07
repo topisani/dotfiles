@@ -59,7 +59,7 @@ while :; do
             exit
             ;;
         volume)
-            if [[ $1 == "query" ]]; then
+            if [[ $2 == "query" ]]; then
                 query_volume
             else
                 volume $2

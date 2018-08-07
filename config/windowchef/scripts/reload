@@ -40,10 +40,17 @@ run sxhkd -c $HOME/.config/sxhkd/sxhkdrc $HOME/.config/sxhkd/sxhkdrc_windowchef
 run ruler $WM_SCRIPS_DIR/../rulerrc
 
 run compton
-run polybar -c $HOME/.config/polybar/config main_bar > windowchef.log
 run dunst
 run battery_notifyd
 run xautolock -time 10 -locker "wmcl lock"
+
+if type "xrandr"; then
+  for m in $(xrandr --query | grep " connected" | cut -d" " -f1); do
+    MONITOR=$m run polybar -c $HOME/.config/polybar/config main_bar --reload
+  done
+else
+  run polybar -c $HOME/.config/polybar/config main_bar --reload
+fi
 
 bg=$HOME/.config/background
 run feh --bg-fill $bg

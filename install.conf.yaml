@@ -22,5 +22,6 @@
     ~/.config/sxhkd: config/sxhkd/
     ~/.config/termite: config/termite/
     ~/.config/dunstrc: config/dunstrc
+    ~/.config/tablecloth.ini: config/tablecloth.ini
     ~/.oh-my-zsh/themes/oxide.zsh-theme: .oh-my-zsh/themes/oxide.zsh-theme
 

@@ -1,5 +1,5 @@
 def fzf-file -params 0..1 %{
-    fzf "edit $1" "find -L %arg{1} -name .git -prune -o -name .svn -prune -o -regex '.*\(bower_components\|output\|.mozilla\|firefox\|node_modules\|grunt\|cache\|Cache\|config/\(Slack\|chromium\|goole-chrome\)\).*' -prune -o \( -type f -o -type l \) -a -not -path %arg{1} -a -not -name '.' -print | sed 's@^\./@@'"
+    fzf "edit $1" "find -L %arg{1} -name .git -prune -o -name .svn -prune -o -regex '.*\b\(bower_components\|output\|.mozilla\|firefox\|node_modules\|grunt\|cache\|Cache\|config/\(Slack\|chromium\|goole-chrome\)\)\(/|$\).*' -prune -o \( -type f -o -type l \) -a -not -path %arg{1} -a -not -name '.' -print | sed 's@^\./@@'"
                 # "ag -l -f -p ~/.binignore -p ~/.ignore --hidden --one-device . %arg{1}"
                 # "rg --ignore-file ~/.binignore -L --hidden --files %arg{1}"
 }
@@ -43,19 +43,19 @@ flags:
     ) > /dev/null 2>&1 < /dev/null &
 } }
 
-def fzf-buffer %{ exec %sh{
+def fzf-buffer %{ eval %sh{
     tmp=$(mktemp /tmp/kak-fzf.XXXXXX)
     setbuf=$(mktemp /tmp/kak-setbuf.XXXXXX)
     delbuf=$(mktemp /tmp/kak-delbuf.XXXXXX)
-    echo 'echo eval -client $kak_client "buffer        $1" | kak -p $kak_session' > $setbuf
-    echo 'echo eval -client $kak_client "delete-buffer $1" | kak -p $kak_session' > $delbuf
-    echo 'echo eval -client $kak_client bufzf              | kak -p $kak_session' >> $delbuf
+    echo "echo eval -client $kak_client \"buffer        \$1\" | kak -p $kak_session" > $setbuf
+    echo "echo eval -client $kak_client \"delete-buffer \$1\" | kak -p $kak_session" > $delbuf
+    echo "echo eval -client $kak_client \"fzf-buffer       \" | kak -p $kak_session" >> $delbuf
     chmod 755 $setbuf
     chmod 755 $delbuf
     (
         # todo: expect ctrl-[vw] to make execute in new windows instead
-        eval "echo $kak_buflist | tr ':' '\n' | sort |
-            fzf-tmux -d 15 --reverse --color=16 -0 -1 -e '--preview=$setbuf {}' --preview-window=up:0 --expect ctrl-d > $tmp"
+        eval "echo $kak_buflist | tr ' ' '\n' | sort |
+            fzf-tmux -d 15 --color=16 -e --preview='$setbuf {}' --preview-window=up:hidden --expect ctrl-d > $tmp"
         if [ -s $tmp ]; then
             ( read action
               read buf

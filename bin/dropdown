@@ -1,6 +1,16 @@
 #!/bin/bash
 
-GEOMETRY=950x500+203
+# Config
+WIDTH_PCT=70
+HEIGHT_PCT=60
+
+
+# Screen dimensions
+DIMS=$(xrandr | grep \* | cut -d' ' -f4 | tail -n1)
+WIDTH=$(echo "$DIMS" | cut -dx -f1)
+HEIGHT=$(echo "$DIMS" | cut -dx -f2)
+
+GEOMETRY=$((WIDTH * WIDTH_PCT / 100))x$((HEIGHT * HEIGHT_PCT / 100))+$(( (WIDTH - WIDTH * WIDTH_PCT / 100) / 2 ))
 
 THIS_FILE=$0
 

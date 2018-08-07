@@ -4,6 +4,9 @@
 # Highlight qualifiers
 addhl shared/cpp/code/ regex %{([\w_0-9]+)::} 1:module
 
+# Highlight attributes
+addhl shared/cpp/code/ regex '(\[\[)([^\]]*)(\]\])' 2:meta
+
 # Highlight doc comments
 
 rmhl shared/cpp/line_comment
@@ -12,8 +15,12 @@ rmhl shared/cpp/comment
 add-highlighter shared/cpp/doc_comment region /\*\* \*/ group
 add-highlighter shared/cpp/doc_comment2 region /// $ ref cpp/doc_comment
 
-add-highlighter shared/cpp/line_comment region // $ fill comment
-add-highlighter shared/cpp/comment region /\* \*/ fill comment
+add-highlighter shared/cpp/comment region /\* \*/ group
+add-highlighter shared/cpp/line_comment region // $ group
+
+add-highlighter shared/cpp/comment/ fill comment
+add-highlighter shared/cpp/line_comment/ ref cpp/comment
+add-highlighter shared/cpp/comment/ regex '(TODO|NOTE|NOTES|PREV|FIXME)' 1:identifier
 
 add-highlighter shared/cpp/doc_comment/ fill string
 add-highlighter shared/cpp/doc_comment/ regex '\h*(///|\*/?|/\*\*+)' 1:comment 
@@ -73,6 +80,7 @@ define-command -hidden -override c-family-insert-on-newline %[ evaluate-commands
         execute-keys K<a-x>1s^[^*]*(\*)<ret>&
     ]
 ] ]
+
 import occivink/kakoune-gdb/gdb
 
 new-mode gdbrepeat
@@ -93,12 +101,27 @@ map-all gdbrepeat -repeat %{
 }
 map-mode gdbrepeat N ":gdb-session-new " 'new session' -raw
 
-def clang-format -docstring "Format selection using clang-format" %{
-    exec -draft "|clang-format<ret>"
+def clang-format -docstring "Format buffer using clang-format" %{
+    exec -draft '%|clang-format<ret>'
     echo "Formatted selection"
 }
 
 set global c_include_guard_style pragma
+
+decl str other_file
+set global modeline_vars -add other_file
+
+def other-or-alt -docstring \
+"Jump to alternative file.
+If the current buffer has an 'other_file' option, use that.
+Otherwise, calls :alt" \
+%{ eval %sh{
+    if [[ -n "$kak_opt_other_file" ]]; then
+        echo "try %[ edit -existing '$(dirname $kak_buffile)/$kak_opt_other_file' ] catch %[ alt ]"
+    else
+        echo alt
+    fi
+}}
 
 # filetype hook
 filetype-hook (cpp|c) %{
@@ -106,7 +129,7 @@ filetype-hook (cpp|c) %{
 
     map-all filetype -scope window %{
         d     "enter-user-mode gdbrepeat" 'GDB...'
-        <tab> "alt"                       'Other file'
+        <tab> "other-or-alt"              'Other file'
         =     "clang-format"              'clang-format selection'
     }
 

@@ -52,11 +52,10 @@ face global string                      $green,            $bg
 face global keyword                     $red,              $bg
 face global operator                    $fg,               $bg
 face global attribute                   $red,              $bg
-face global comment                     $gray,             $bg
 face global meta                        $orange,           $bg
-face global builtin                     $red,              $bg
+face global builtin                     $red_dark,         $bg
 face global comment                     $gray,             $bg       +i
-face global identifier                  $orange,           $bg
+face global identifier                  $yellow_dark,      $bg
 
 face global DiagnosticWarning           $yellow,           $bg       +u
 face global DiagnosticError             $red,              $bg       +u

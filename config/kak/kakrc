@@ -3,6 +3,8 @@ evaluate-commands %sh{echo source $HOME/.config/kak/kak/modules.kak}
 import utils
 import global
 import fzf
+import diff
+import macros
 
 # Plugs
 
@@ -36,7 +38,7 @@ map-all normal %{
 
 def file-delete -docstring \
 "Delete current file" %{
-    %sh{ rm $kak_buffile }
+    nop %sh{ rm $kak_buffile }
     delete-buffer
 }
 
@@ -54,6 +56,7 @@ new-mode buffers b %{
     n buffer-next     "Next Buffer" 
     p buffer-previous "Prev buffer" 
     d delete-buffer   "Delete buffer"
+    u 'buffer *debug*' "Debug buffer"
 }
 
 new-mode tmux w %{
@@ -122,19 +125,23 @@ hook global BufCreate .* modeline-parse
 
 # Autoload manually
 
-declare-option regex autoload_pattern ".*(?!php).*"
+declare-option str-list autoload_ignore core/php extra/modeline
 
 eval %sh{
+    ignore=${kak_opt_autoload_ignore// /|}
+    ignore=${ignore//\'/}
     find -L "${kak_config}/kak-autoload/" -type f -name '*\.kak' | \
-        grep -P "^${kak_config}/kak-autoload/${kak_opt_autoload_pattern}\.kak$" | xargs -i printf 'try %%{ source "%s" } catch %%{ echo -debug Autoload: could not load "%s" }\n' '{}' '{}'
+        grep -P "^${kak_config}/kak-autoload/(?!${ignore})" | xargs -i printf 'try %%{ source "%s" } catch %%{ echo -debug Autoload: could not load "%s" }\n' '{}' '{}'
 }
 
 # Filetypes
 
+import modeline
 import markdown
 import php
 import c++
 import meson
+import faust
 
 # Setup kak-lsp
 eval %sh{kak-lsp --kakoune}
