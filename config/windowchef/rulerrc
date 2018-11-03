@@ -1,2 +1,0 @@
-class="Tilda"
-	waitron win_config allow_offscreen $RULER_WID 1

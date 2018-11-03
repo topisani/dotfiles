@@ -1,2 +1,0 @@
-#!/bin/bash
-acpi | grep -o "[0-9]*%" | grep -o "[0-9]*"

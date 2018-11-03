@@ -1,3 +1,0 @@
-#!/bin/bash
-tmux select-pane -t $(tmux list-panes | grep $1: | sed 's/^.*%/%/')
-

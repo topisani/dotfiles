@@ -1,3 +1,0 @@
-#/bin/sh
-
-lock.sh -l dim

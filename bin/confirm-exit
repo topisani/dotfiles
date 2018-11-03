@@ -1,5 +1,0 @@
-#!/bin/bash
-
-eval $@
-
-read -p "Press enter to exit"

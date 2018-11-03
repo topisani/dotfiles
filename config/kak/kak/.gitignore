@@ -1,9 +1,0 @@
-/fsub/kakoune-mark
-/TeddyDD/kakoune-cfdg
-/occivink/kakoune-gdb
-/TeddyDD/kakoune-wiki
-/lenormf/kakoune-extra
-/TeddyDD/kakoune-lf
-/' evaluate-commands %sh{ echo $1
-/-.} } ' ' evaluate-commands %sh{ echo $1
-/-.} } '

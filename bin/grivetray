@@ -1,2 +1,0 @@
-#!/bin/bash
-alltray -i ~/.local/share/icons/grive-panel.png "termite -e grivesync"

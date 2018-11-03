@@ -1,9 +1,0 @@
-#!/bin/bash
-
-target=$1
-if [[ -e "$target" ]]; then
-    target="file://$PWD/$target"
-elif [[ ! "$target" =~ ^[a-zA-Z]+:// ]]; then
-    target="http://$target"
-fi
-google-chrome-stable --app="$target"
