@@ -11,6 +11,7 @@ getXrdbColor() {
 }
 
 updateXrdb() {
+    xrdb $XRDB_CONF_PATH
     xrdb -merge $COLORSCHEME
 }
 

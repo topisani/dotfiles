@@ -13,3 +13,4 @@
 .gdbinit,.gdbinit
 .config/LyX,.config/LyX
 .oh-my-zsh/themes/oxide.zsh-theme,.oh-my-zsh/themes/oxide.zsh-theme
+.tmux.conf,.tmux.conf
