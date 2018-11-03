@@ -1,0 +1,17 @@
+#!/bin/bash
+
+init='{
+  "cacheDirectory": "'$HOME'/.cache/cquery/",
+  "cacheFormat": "msgpack",
+  "highlight": {
+    "enabled": true
+  },
+  "completion": {
+    "detailedLabel": true
+  },
+  "xref": {
+    "container": true
+  }
+}'
+
+cquery --init="$init" # --log-all-to-stderr

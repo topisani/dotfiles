@@ -1,0 +1,81 @@
+#!/bin/bash
+
+# Generate flatblue theme.
+# Call with variable list
+
+echo "
+# Markdown highlighting
+face global title                       $green,            $bg       +b
+face global header                      $orange,           $bg       +b
+face global bold                        $fg,               $bg       +b
+face global italic                      $fg3,              $bg       +i
+face global mono                        $fg3,              $bg
+face global block                       $fg2,               $bg
+face global link                        $blue,               $bg
+face global bullet                      $purple,               $bg
+face global list                        $purple,               $bg
+
+face global Default                     $fg,               $bg
+face global PrimarySelection            $fg,               $blue
+face global SecondarySelection          $fg,               $blue_dark
+face global PrimaryCursor               $bg0,              $fg0
+face global PrimaryCursorEol            $bg0,              $fg0
+face global SecondaryCursor             $bg3,              $fg3
+face global SecondaryCursorEol          $bg3,              $fg3
+face global LineNumbers                 $bg4,              $bg
+face global LineNumberCursor            $fg3,              $bg1
+face global LineNumbersWrapped          $bg,               $bg
+face global MenuForeground              $bg2,              $blue
+face global MenuBackground              $fg,               $bg2
+face global MenuInfo                    $blue_light,       $bg2
+face global Information                 $bg,               $yellow
+face global Error                       $red,              $bg       +u
+face global StatusLine                  $fg,               $bg
+face global StatusLineMode              $yellow,           $bg       +b
+face global StatusLineInfo              $purple,           $bg
+face global StatusLineValue             $red,              $bg
+face global StatusCursor                $bg,               $fg
+face global Prompt                      $yellow,           $bg
+face global MatchingChar                $fg,               $bg       +b
+face global BufferPadding               $bg2,              $bg
+face global Whitespace                  $bg2,              $bg
+
+face global GitBlame                    $fg2,              $bg
+
+# Code highlighting
+face global value                       $purple,           $bg
+face global type                        $blue_light,       $bg
+face global variable                    $blue,             $bg
+face global module                      $orange,           $bg
+face global function                    $yellow_light,     $bg
+face global string                      $green,            $bg
+face global keyword                     $red,              $bg
+face global operator                    $fg,               $bg
+face global attribute                   $red,              $bg
+face global meta                        $orange,           $bg
+face global builtin                     $red_dark,         $bg
+face global comment                     $gray,             $bg       +i
+face global identifier                  $yellow_dark,      $bg
+
+face global DiagnosticWarning           $yellow,           $bg       +u
+face global DiagnosticError             $red,              $bg       +u
+face global LineFlagErrors              $red,              $bg       +b
+
+# Cquery semantic highlighting
+face global cqueryTypes                 type
+face global cqueryEnums                 variable
+face global cqueryTypeAliases           type
+face global cqueryTemplateParameters    variable
+face global cqueryFreeStandingFunctions function
+face global cqueryMemberFunctions       $yellow_light,     $bg       +i
+face global cqueryStaticMemberFunctions $yellow_light,     $bg
+face global cqueryFreeStandingVariables variable
+face global cqueryGlobalVariables       variable
+face global cqueryStaticMemberVariables variable
+face global cqueryMemberVariables       $blue,             $bg       +i
+face global cqueryParameters            variable 
+face global cqueryEnumConstants         variable
+face global cqueryNamespaces            module
+face global cqueryMacros                $purple_light,     $bg
+" | sed 's/, */,/' | sed 's/ *+/+/'
+

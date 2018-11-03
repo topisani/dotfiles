@@ -1,0 +1,14 @@
+#!/bin/bash
+
+setup_term() {
+    colorscheme-switch -t
+    TERM=tmux-256color tmux new-session "$*"\; set destroy-unattached 1\; set status 0 \; attach
+}
+
+if [[ "$1" == "--setup" ]]; then
+    shift;
+    setup_term "$*"
+else
+    args="$*"
+    termite --title="Terminal" -e "sh -c '$0 --setup $args'"
+fi

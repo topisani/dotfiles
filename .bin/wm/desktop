@@ -1,0 +1,102 @@
+#!/bin/bash
+# Constructs and groups windows into disktops to switch between using your favorite keybinder.
+
+usage() {
+    cat <<EOF
+usage: $(basename $0) <command> [options]
+
+Commands:
+  init             Set up required files. Should be called in init script.
+  current          Echo the current desktop number
+  goto <num>       Switch to desktop <num>
+  move [num] [wid] Move [wid] or the focused window to desktop [num] or the
+                   current desktop
+EOF
+}
+
+dsk_dir=$WM_TMP_DIR/desktops
+curr_file=$dsk_dir/current
+
+init_dsk() {
+    mkdir -p $dsk_dir
+    echo 1 > $curr_file
+    return
+}
+
+# get_dsk <wid>
+get_dsk() {
+    cat $dsk_dir/client_$1 2> /dev/null || echo -1
+}
+
+# Move <wid> to <desktop>
+# set_dsk <wid> <desktop>
+set_dsk() {
+    wid=$1
+    dsk=$2
+    wattr $wid || return
+    [[ $(get_dsk $wid) == 0 ]] && return
+    echo $dsk > $dsk_dir/client_$wid
+    map=$(update_win $wid $dsk)
+    [[ "$map" != "" ]] && mapw -$map $wid
+}
+
+# Hide/show <win> on [dsk]
+# update_win <win> [dsk]
+update_win() {
+    win=$1
+    dsk=${2:-$(get_dsk $win)}
+    if [[ $dsk == 0 || $dsk == -1 ]]; then
+        return 1
+    fi
+    if [[ $dsk != $curr_dsk ]]; then
+        echo u
+    else
+        echo m
+    fi
+}
+
+# goto_dsk <desktop>
+goto_dsk() {
+    echo $1 > $curr_file
+    curr_dsk=$1
+    map=( )
+    umap=( )
+    while read wid; do
+        pred=$(update_win $wid)
+        [[ "$pred" == "m" ]] && map+=( $wid )
+        [[ "$pred" == "u" ]] && umap+=( $wid )
+    done <<< "$(lsw -a)"
+    test -n "$umap" && mapw -u ${umap[@]}
+    if test -n "$map"; then
+        mapw -m ${map[@]}
+        wmcl focus ${map[-1]}
+    fi
+}
+
+action=$1
+
+case $action in
+    goto)
+        goto_dsk $2 ;;
+    move)
+        curr_dsk=$(cat $curr_file)
+        set_dsk ${3:-$(pfw)} ${2:-$curr_dsk};;
+    init)
+        init_dsk;;
+    current)
+        cat $curr_file;;
+    delete)
+        if [[ -f $dsk_dir/client_$wid ]]; then
+            wmap -m $wid
+            rm $dsk_dir/client_$wid
+        fi
+        ;;
+    assign)
+        wid=$2
+        if [ ! -f $dsk_dir/client_$wid ]; then
+            echo $(cat $curr_file) > $dsk_dir/client_$wid
+        fi
+        ;;
+    *)
+        usage;;
+esac

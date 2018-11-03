@@ -1,0 +1,21 @@
+#!/bin/bash
+
+init='{
+  "cacheDirectory": "'$HOME'/.cache/ccls/",
+  "cacheFormat": "binary",
+  "highlight": {
+    "lsRanges": true
+  },
+  "completion": {
+    "detailedLabel": true
+  },
+  "xref": {
+    "container": true
+  },
+  "index": {
+    "comments": 1,
+    "trackDependency": 2
+  }
+}'
+
+ccls --init="$init"

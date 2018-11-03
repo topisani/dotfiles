@@ -1,0 +1,78 @@
+#!/bin/bash
+BLUE="\033[0;34m"
+LIGHT_BLUE="\033[1;34m"
+CYAN="\[\033[0;36m\]"
+LIGHT_CYAN="\[\033[1;36m\]"
+NC='\033[0m'
+
+echo -e "$LIGHT_BLUE Welcome to this desktop entry wizard. What should this entry be called? $NC"
+read -e -p "Name=" name
+
+echo -e "${LIGHT_BLUE}What should this desktop entry execute?${NC}"
+read -e -p "Exec=" -i ${name,,} exec
+
+echo -e "${LIGHT_BLUE}Should it run in a terminal?${NC}"
+read -e -p "Terminal=" -i true term
+
+if [[ "$term" == "true" ]]; then
+    echo -e "${LIGHT_BLUE}Use termite with custom parameters?$NC"
+    DEFAULT="y"
+    read -ep "Termite= [Y/n]" termite
+    termite=${termite:-$DEFAULT}
+    termite=${termite,,}
+    if [ $termite != "y" ] ; then
+        echo -e "${LIGHT_BLUE}Using normal desktop entry with Terminal=true$NC"
+        termite=false
+    else
+        echo -e "${LIGHT_BLUE}Using termite with custom parameters$NC"
+        termite=true
+    fi
+else
+    termite=false
+fi
+
+echo -e "${LIGHT_BLUE}The generic name, e.g. the programs function. Ex: Text Editor${NC}"
+read -e -p "GenericName=" generic
+
+echo -e "${LIGHT_BLUE}Path to an icon${NC}"
+read -e -p "Icon=" -i ${name,,} icon
+
+echo -e "${LIGHT_BLUE}The class this window will get in the WM${NC}"
+read -e -p "StartupWMClass=" -i $name class
+
+echo -e "${LIGHT_BLUE}Mime types associated with this program. Semi-colon seperated${NC}"
+read -e -p "MimeType=" mime
+
+if [[ "$termite" == "true" ]]; then
+    exec="termite -e '$exec' -r '$class' -t '$name'"
+    term="false"
+fi
+entry="[Desktop Entry]
+Name=$name
+GenericName=$generic
+MimeType=$mime
+Exec=$exec
+Icon=$icon
+Type=Application
+Terminal=$term
+StartupWMClass=$class"
+
+echo "
+$entry
+"
+
+echo -n "Are you sure you want to generate this desktop entry?.  "
+
+DEFAULT="y"
+read -e -p "[y/n]:" PROCEED
+
+PROCEED="${PROCEED:-${DEFAULT}}"
+PROCEED="${PROCEED,,}"
+
+if [ "${PROCEED}" != "y" ] ; then
+  echo "Cancelled desktop entry generation"
+  exit
+else
+  echo "Generating desktop entry"
+  sudo bash -c "echo '$entry' > '/usr/share/applications/${name,,}.desktop'"
+fi

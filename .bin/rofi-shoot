@@ -1,0 +1,52 @@
+#!/bin/bash
+source ~/.profile
+
+rofi_res=$(rofi -dmenu -mesg \
+	"<b>Selection:</b> <tt>s</tt>,   \
+	<b>Delay:</b> <tt>d time</tt>,   \
+	<b>Save to file:</b> <tt>f [file]</tt>"\
+	-p "Args for shoot: " \
+  -filter "s" \
+	-l 0 "s")
+
+# Do nothing if ESC was pressed in rofi
+if [[ $? != 0 ]]; then
+  exit 1
+fi
+
+rofi_res=" $rofi_res "
+
+rofi_res=$(sed "s/ s / -s /g" <<< $rofi_res)
+rofi_res=$(sed "s/ d / -d /g" <<< $rofi_res)
+rofi_res=$(sed "s/ f / -f /g" <<< $rofi_res)
+
+exit_msg=$(shoot $rofi_res)
+if [[ $? != 0 ]]; then
+  if [[ -n $exit_msg ]]; then
+    rofi -e "$exit_msg"
+  else
+    rofi -e "Shoot failed with an unknown error"
+  fi
+  exit 1
+fi
+
+thumbnail="/tmp/rofi-shoot-thumbnail.png"
+filename="${exit_msg##*$'\n'}"
+
+# Crop square image
+# convert $exit_msg -set option:size '%[fx:min(w,h)]x%[fx:min(w,h)]' \
+#           xc:none +swap -gravity center -composite $thumbnail
+
+
+convert "$filename" -resize "512x512>" -quality 60 "$thumbnail"
+
+msg=$(dunstify -i $thumbnail \
+  "Captured Screenshot" \
+  "Saved as $filename" \
+  -A "i,Open image")
+
+if [[ $msg == i ]]; then
+  xdg-open $filename
+fi
+
+# vim: ts=2 sw=2 et

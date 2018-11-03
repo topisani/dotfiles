@@ -1,0 +1,21 @@
+#!/bin/bash
+
+root_size=( $(wmcl root_size) )
+sx=${root_size[0]}
+sy=${root_size[1]}
+sw=${root_size[2]}
+sh=${root_size[3]}
+
+wid=$(pfw)
+window_size=( $(wattr xywh $wid) )
+wx=${window_size[0]}
+wy=${window_size[1]}
+ww=${window_size[2]}
+wh=${window_size[3]}
+
+x=$(( $sx + $sw / 2 - $ww / 2 ))
+y=$(( $sy + $sh / 2 - $wh / 2 ))
+w=$ww
+h=$wh
+
+wtp $x $y $w $h $wid

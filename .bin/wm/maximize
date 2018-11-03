@@ -1,0 +1,65 @@
+#!/bin/sh
+
+usage() {
+        echo "usage: $(basename $0) wid [on|off|toggle|refresh|status]" >&2
+        exit 1
+}
+
+is_maxed() {
+    test -f $EXPANDIR/$WID
+}
+
+expand_win() {
+    [[ "$1" != "false" ]] && wattr xywhi $WID > $EXPANDIR/$WID
+    wmcl update_borders $WID
+    BW=$(wattr b $WID)
+    RS=( $(wmcl root_size) )
+    SX=$(( ${RS[0]} ))
+    SY=$(( ${RS[1]} ))
+    SW=$(( ${RS[2]} - 2*$BW))
+    SH=$(( ${RS[3]} - 2*$BW))
+    wtp $SX $SY $SW $SH ${WID}
+}
+
+collapse_win() {
+    if [[ -f $EXPANDIR/$WID ]]; then
+        wtp $(grep $WID $EXPANDIR/$WID)
+        rm $EXPANDIR/$WID
+    fi
+    wmcl update_borders $WID
+}
+
+if [[ $# == 0 ]]; then
+    action=toggle
+    WID=$(pfw)
+else
+    action=$1
+    WID=$2
+fi
+
+WID=${WID:-$(pfw)}
+EXPANDIR=$WM_TMP_DIR/maximized
+
+test -d $EXPANDIR || mkdir -p $EXPANDIR
+
+case $action in
+    on)
+        expand_win
+        ;;
+    off)
+        collapse_win
+        ;;
+    toggle)
+        is_maxed && collapse_win || expand_win
+        ;;
+    refresh)
+        is_maxed && expand_win false || collapse_win
+        ;;
+    status)
+        is_maxed && echo "on" || echo "off"
+        ;;
+    delete)
+        rm $EXPANDIR/$WID
+        ;;
+esac
+

@@ -1,0 +1,118 @@
+#!/bin/bash
+
+function help_message {
+  echo "shoot - a wrapper for maim and xclip to take screenshots"
+  echo " "
+  echo "shoot [options] application [arguments]"
+  echo " "
+  echo "options:"
+  echo "-h, --help                show this help message"
+  echo "-d seconds                screenshot delay"
+  echo "-s                        select an area"
+  echo "-f [filename]             Save the image to file."
+  echo "                          If no filename is supplied, it will be saved to"
+  echo "                          ~/Pictures/Screenshots/<date>-<time>.png"
+}
+
+if [[ -n $UING_X11 ]]; then
+
+  maim_flags="-u"
+  filename="/tmp/shoot.png"
+
+  while test $# -gt 0; do
+  	case "$1" in
+  		-h|--help)
+        help_message
+  			exit 0
+  			;;
+  		-d)
+  			shift
+  			if test $# -gt 0; then
+  				export maim_flags="$maim_flags -d $1"
+  			else
+  				echo "No delay specified"
+  				exit 1
+  			fi
+  			;;
+  		-s)
+  		  export maim_flags="$maim_flags -s"
+  			;;
+      -f)
+  			shift
+  			if test $# -gt 0; then
+  				export filename="$1"
+  			else
+          export filename="~/Pictures/Screenshots/%Y-%m-%d-%H%M%S.png"
+  			fi
+        ;;
+  		*)
+        echo "Usage: shoot --help for help"
+        exit 1
+  			;;
+  	esac
+    shift
+  done
+
+  filename=$(date "+${filename/#\~/$HOME}")
+  maim $maim_flags $filename
+  if [[ -f $filename ]]; then
+    xclip -selection c -t image/png -i -l 0 $filename > /dev/null
+    echo $filename
+  else
+    echo "maim failed to create image file"
+    exit 1
+  fi
+
+else # WAYLAND - Use GRIM
+
+  grim_flags=""
+  filename="/tmp/shoot.png"
+  delay=0
+
+  while test $# -gt 0; do
+  	case "$1" in
+  		-h|--help)
+        help_message
+  			exit 0
+  			;;
+  		-d)
+  			shift
+  			if test $# -gt 0; then
+  				delay=$1
+  			else
+  				echo "No delay specified"
+  				exit 1
+  			fi
+  			;;
+  		-s)
+        grim_flags="$grim_flags -g '$(slurp)'"
+  			;;
+      -f)
+  			shift
+  			if test $# -gt 0; then
+  				filename="$1"
+  			else
+          filename="~/Pictures/Screenshots/%Y-%m-%d-%H%M%S.png"
+  			fi
+        ;;
+  		*)
+        echo "Usage: shoot --help for help"
+        exit 1
+  			;;
+  	esac
+    shift
+  done
+
+  filename=$(date "+${filename/#\~/$HOME}")
+  sleep $delay 
+  eval grim "$grim_flags" "$filename"
+  if [[ -f $filename ]]; then
+    xclip -selection c -t image/png -i -l 0 $filename > /dev/null
+    echo $filename
+  else
+    echo "grim failed to create image file"
+    exit 1
+  fi
+fi
+
+# vim: ts=2 sw=2 et

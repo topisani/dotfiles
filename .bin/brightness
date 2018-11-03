@@ -1,0 +1,69 @@
+#!/bin/bash
+
+dunst_id=321478
+
+show_help() {
+    echo "Usage: $0 [up|down|query] --notify|-n"
+}
+
+query() {
+    res=$(brightnessctl info | grep -oP "\(\K\d+%\)")
+    echo ${res//%)/}
+}
+
+icon() {
+    if (( $1 == 0 )); then
+        icon=off
+    elif (( $1 < 34 )); then
+        icon=low
+    elif (( $1 < 67 )); then
+        icon=medium
+    else
+        icon=high
+    fi
+    echo /usr/share/icons/Papirus-Dark/symbolic/status/display-brightness-$icon-symbolic.svg
+
+}
+
+send_notification() {
+    val=$(query)
+    dunstify -u 0 -i $(icon $val) $val% -r $dunst_id
+}
+
+brightness() {
+    if [[ $1 == "down" ]]; then
+        xbacklight -dec ${2-5}
+    elif [[ $1 == "up" ]]; then
+        xbacklight -inc ${2-5}
+    fi
+}
+
+notify=0
+
+while :; do
+    case $1 in
+        -h|-\?|--help)
+            show_help
+            ;;
+        query)
+            query
+            ;;
+        up)
+            brightnessctl set +5%
+            ;;
+        down)
+            brightnessctl set 5%-
+            ;;
+        --notify|-n)
+            notify=1
+            ;;
+        *)
+            break;
+            ;;
+    esac
+    shift
+done
+
+if [[ $notify ]]; then
+    send_notification
+fi

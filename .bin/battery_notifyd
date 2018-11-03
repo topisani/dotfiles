@@ -1,0 +1,19 @@
+#!/bin/bash
+
+not_id=568492
+
+last_bat=$(query_bat)
+while true; do
+    bat=$(query_bat)
+    sl=60
+    if [[ $bat -lt 16 ]] && ! acpi | grep Charging; then
+	if [[ $bat != $last_bat ]] ; then
+            dunstify -u 2 -i /usr/share/icons/Papirus-Light/48x48/status/battery-empty.svg "Battery Low!" "$bat%" -r $not_id
+        fi
+        sl=10
+    else
+        dunstify -C $not_id
+    fi
+    last_bat=$bat
+    sleep $sl
+done

@@ -1,0 +1,66 @@
+[server]
+ip = "127.0.0.1"
+port = 31337
+
+[language.rust]
+extensions = ["rs"]
+roots = ["Cargo.toml"]
+command = "rls"
+
+[language.javascript]
+extensions = ["js", "jsx"]
+roots = ["package.json"]
+command = "flow-language-server"
+args = ["--stdio"]
+
+[language.json]
+extensions = ["json"]
+roots = ["package.json"]
+command = "json-languageserver"
+args = ["--stdio"]
+
+[language.css]
+extensions = ["css"]
+roots = ["package.json"]
+command = "css-languageserver"
+args = ["--stdio"]
+
+[language.html]
+extensions = ["html"]
+roots = ["package.json"]
+command = "html-languageserver"
+args = ["--stdio"]
+
+[language.ocaml]
+extensions = ["ml", "mli"]
+roots = ["Makefile", ".git"]
+command = "ocaml-language-server"
+args = ["--stdio"]
+
+[language.reason]
+extensions = ["re", "rei"]
+roots = ["package.json", "Makefile", ".git"]
+command = "ocaml-language-server"
+args = ["--stdio"]
+
+[language.python]
+extensions = ["py"]
+roots = ["requirements.txt", "setup.py", ".git"]
+command = "pyls"
+
+[language.php]
+extensions = ["php"]
+roots = ["composer.json", ".git"]
+command = "phpls"
+
+[language.cpp]
+extensions = ["cpp", "hpp", "c", "h", "cc", "hh", "c++", "h++", "ino"]
+roots = ["compile_commands.json"]
+command = "/home/topisani/.config/kak/scripts/start-ccls"
+
+[language.java]
+extensions = ["java"]
+roots = ["gradle.build"]
+command = "jdtls"
+args = []
+
