@@ -1,8 +1,5 @@
 # Global settings
 
-# Load current terminal colorscheme
-colorscheme %sh{ colorscheme-switch --current }
-
 # Show line numbers
 addhl global/ number-lines -hlcursor -separator ' '
 # highlight matching parens
@@ -12,8 +9,8 @@ set global ui_options ncurses_assistant=none
 
 
 hook -group tabstop global InsertChar \t %{ exec -draft -itersel h@ }
-set global tabstop 4
-set global indentwidth 4
+set global tabstop 2
+set global indentwidth 2
 
 hook global InsertKey <backspace> %{ try %{
     exec -draft hGh<a-k>\A\h+\Z<ret>gihyp<lt>

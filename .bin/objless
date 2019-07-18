@@ -1,0 +1,19 @@
+#!/bin/bash
+
+file="$1"
+funct="$2"
+
+_objdump() {
+  objdump -d -C -S -Mintel "$file"
+}
+
+_filtered_dump() {
+  if [[ -n "$funct" ]]; then
+    _objdump | awk "/^[[:xdigit:]]+ <$funct/{flag=1;print;next}/^[[:xdigit:]]+ <.*>:$/{flag=0}flag"
+    #_objdump | sed -n -e "/^[0-9A-Fa-f]+ <$funct/,/^[[:xdigit:]]+ <.*>:$/{ p; }"
+  else
+    _objdump
+  fi
+}
+
+_filtered_dump | highlight --syntax x86 -O ansi | less

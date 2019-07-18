@@ -14,7 +14,8 @@ init='{
   },
   "index": {
     "comments": 1,
-    "trackDependency": 2
+    "trackDependency": 2,
+    "threads": 4
   }
 }'
 

@@ -1,3 +1,12 @@
 #!/bin/bash
 
-xclip -selection c "$@"
+if [[ -n "$USING_X11" ]]; then
+  xclip -selection c "$@"
+else
+  if [[ " $1 " =~ " -o " ]]; then
+    shift
+    wl-paste "$@"
+  else
+    wl-copy "$@"
+  fi
+fi

@@ -1,6 +1,10 @@
 # C++
 import lsp
 
+hook global BufCreate .*[.](ipp|ixx|inl) %{
+    set-option buffer filetype c++
+}
+
 # Highlight qualifiers
 addhl shared/cpp/code/ regex %{([\w_0-9]+)::} 1:module
 
@@ -78,6 +82,47 @@ define-command -hidden -override c-family-insert-on-newline %[ evaluate-commands
         execute-keys K<a-x>1s^[^*]*(\*)<ret>&
     ]
 ] ]
+
+define-command -hidden c-family-alternative-file -override %{
+    evaluate-commands %sh{
+        file="${kak_buffile##*/}"
+        file_noext="${file%.*}"
+        dir=$(dirname "${kak_buffile}")
+
+        # Set $@ to alt_dirs
+        eval "set -- ${kak_opt_alt_dirs}"
+
+        case ${file} in
+            *.c|*.cc|*.cpp|*.cxx|*.C|*.inl|*.m)
+                for alt_dir in "$@"; do
+                    for ext in h hh hpp hxx H; do
+                        altname="${dir}/${alt_dir}/${file_noext}.${ext}"
+                        if [ -f ${altname} ]; then
+                            printf 'edit %%{%s}\n' "${altname}"
+                            exit
+                        fi
+                    done
+                done
+            ;;
+            *.h|*.hh|*.hpp|*.hxx|*.H)
+                for alt_dir in "$@"; do
+                    for ext in c cc cpp cxx C m inl; do
+                        altname="${dir}/${alt_dir}/${file_noext}.${ext}"
+                        if [ -f ${altname} ]; then
+                            printf 'edit %%{%s}\n' "${altname}"
+                            exit
+                        fi
+                    done
+                done
+            ;;
+            *)
+                echo "echo -markup '{Error}extension not recognized'"
+                exit
+            ;;
+        esac
+        echo "echo -markup '{Error}alternative file not found'"
+    }
+}
 
 import occivink/kakoune-gdb/gdb
 

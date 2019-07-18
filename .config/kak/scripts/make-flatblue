@@ -15,6 +15,7 @@ face global link                        $blue,               $bg
 face global bullet                      $purple,               $bg
 face global list                        $purple,               $bg
 
+face global Reference                   $fg,               $bg       +b
 face global Default                     $fg,               $bg
 face global PrimarySelection            $fg,               $blue
 face global SecondarySelection          $fg,               $blue_dark
@@ -60,6 +61,7 @@ face global identifier                  $yellow_dark,      $bg
 face global DiagnosticWarning           $yellow,           $bg       +u
 face global DiagnosticError             $red,              $bg       +u
 face global LineFlagErrors              $red,              $bg       +b
+face global LineFlagWarnings            $yellow,           $bg       +b
 
 # Cquery semantic highlighting
 face global cqueryTypes                 type
@@ -77,5 +79,8 @@ face global cqueryParameters            variable
 face global cqueryEnumConstants         variable
 face global cqueryNamespaces            module
 face global cqueryMacros                $purple_light,     $bg
+
+set global lsp_diagnostic_line_error_sign '{LineFlagErrors}*'
+set global lsp_diagnostic_line_warning_sign '{LineFlagWarnings}!'
 " | sed 's/, */,/' | sed 's/ *+/+/'
 

@@ -54,13 +54,13 @@ roots = ["composer.json", ".git"]
 command = "phpls"
 
 [language.cpp]
-extensions = ["cpp", "hpp", "c", "h", "cc", "hh", "c++", "h++", "ino"]
+extensions = ["cpp", "hpp", "c", "h", "cc", "hh", "c++", "h++", "ino", "ipp", "i++", "inl"]
 roots = ["compile_commands.json"]
 command = "/home/topisani/.config/kak/scripts/start-ccls"
 
 [language.java]
 extensions = ["java"]
-roots = ["gradle.build"]
+roots = ["gradle.build", ".java_root"]
 command = "jdtls"
-args = []
+args = ["-data", "."]
 

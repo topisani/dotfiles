@@ -29,17 +29,11 @@ export CXX=/usr/bin/clang++
 export PATH="$HOME/.cargo/bin:$PATH"
 alias termbin="nc termbin.com 9999"
 
-# Use gtk theme for qt
-export QT_QPA_PLATFORMTHEME="qt5ct"
-
-# Use GTK3 for mullvad - See comments https://aur.archlinux.org/packages/mullvad
-# Needed to fix a wxpython issue
-export MULLVAD_USE_GTK3=yes
-
 # Auto make flags
 export NUMCPUS=`grep -c '^processor' /proc/cpuinfo`
 export MAKEFLAGS="-j$NUMCPUS --load-average=$NUMCPUS"
 alias tb="nc termbin.com 9999"
+alias cht="cht.sh"
 
 # Call less if there is only one argument and it is a filename. Otherwise, call ls
 less_or_ls() {
@@ -52,7 +46,11 @@ mkcd() {
     cd "$@"
 }
 
-alias tgdb='tmux new gdb -x ~/.tgdbinit'
+# Calculator
+calc() {
+    local IFS=' '
+    bc -l <<<"scale=10;$@"
+}
 
 export EDITOR=kak
 export VISUAL=kak
@@ -69,8 +67,17 @@ function start_agent {
     /usr/bin/ssh-add;
 }
 
+export DOT_REPO="https://github.com/topisani/dotfiles.git"
+export DOT_DIR="$HOME/.dotfiles"
+fpath=($HOME/.zsh/dot $fpath)  # <- for completion
+source $HOME/.zsh/dot/dot.sh
+#PATH=$PATH:~/dev/rpi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin
+
 if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
-  cloth-start &
+  #export USING_X11=false
+  #tmux kill-server
+  #sway-start &
+  gnome-shell
 else 
     # Source SSH settings, if applicable
     if [ -f "${SSH_ENV}" ]; then
@@ -83,11 +90,5 @@ else
         start_agent;
     fi
 fi
-
-export DOT_REPO="https://github.com/topisani/dotfiles.git"
-export DOT_DIR="$HOME/.dotfiles"
-fpath=($HOME/.zsh/dot $fpath)  # <- for completion
-source $HOME/.zsh/dot/dot.sh
-#PATH=$PATH:~/dev/rpi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin
 
 # vim: ft=sh

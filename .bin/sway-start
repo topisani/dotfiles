@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#export QT_QPA_PLATFORM=wayland
+export _JAVA_AWT_WM_NONREPARENTING=1
+export QT_QPA_PLATFORMTHEME=gtk2
+export QT_SCALE_FACTOR=1
+#export QT_QPA_PLATFORM=wayland-egl
+
+# Use gtk theme for qt
+export QT_QPA_PLATFORMTHEME="qt5ct"
+
+# Use GTK3 for mullvad - See comments https://aur.archlinux.org/packages/mullvad
+# Needed to fix a wxpython issue
+export MULLVAD_USE_GTK3=yes
+
+export XDG_CURRENT_DESKTOP=Unity
+
+sway 

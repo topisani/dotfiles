@@ -2,21 +2,27 @@ evaluate-commands %sh{echo source $HOME/.config/kak/kak/modules.kak}
 
 import utils
 import global
-import fzf
 import diff
 import macros
+import fzf
 
 # Plugs
+
+source "%val{config}/plugins/plug.kak/rc/plug.kak"
+plug andreyorst/plug.kak "branch: kakoune-git" noload
 
 plug occivink/kakoune-gdb
 plug fsub/kakoune-mark
 plug TeddyDD/kakoune-cfdg
 plug TeddyDD/kakoune-wiki
-plug lenormf/kakoune-extra
+#plug lenormf/kakoune-extra
 plug TeddyDD/kakoune-lf
 plug TeddyDD/kakoune-edit-or-dir
+plug occivink/kakoune-snippets
+plug alexherbo2/select.kak
+plug alexherbo2/yank-ring.kak
 
-install-plugs
+plug-install
 
 # mark
 #import fsub/kakoune-mark/mark
@@ -28,16 +34,13 @@ install-plugs
 #import TeddyDD/kakoune-wiki/wiki
 #wiki_setup %sh(echo $HOME/ownCloud/wiki)
 
-import lenormf/kakoune-extra/hatch_terminal
-import TeddyDD/kakoune-lf/lf
-import TeddyDD/kakoune-edit-or-dir/edit-or-dir
-
 unalias global e edit
 alias global e edit-or-dir
 # Keymaps
 
 map-all normal %{
-    '<a-3>' comment-line "Comment line"
+    '#' comment-line "Comment line"
+    '<a-#>' comment-block "Comment line"
 }
 
 def file-delete -docstring \
@@ -63,6 +66,14 @@ new-mode buffers b %{
     u 'buffer *debug*' "Debug buffer"
 }
 
+def tmux-new-vertical -params .. -command-completion %{
+  tmux-terminal-vertical kak -c %val{session} -e "%arg{@}"
+}
+
+def tmux-new-horizontal -params .. -command-completion %{
+  tmux-terminal-horizontal kak -c %val{session} -e "%arg{@}"
+}
+
 new-mode tmux w %{
     h     'tmux select-pane -L' 'Select pane to the left'  -sh
     j     'tmux select-pane -D' 'Select pane below'        -sh
@@ -73,8 +84,8 @@ new-mode tmux w %{
     J     'tmux swap-pane -D'   'Swap pane below'          -sh
     K     'tmux swap-pane -U'   'Swap pane above'          -sh
 
-    s     tmux-new-vertical     'Split horizontally'
-    v     tmux-new-horizontal   'Split vertically'
+    s     'tmux-new-vertical'   'Split horizontally'
+    v     'tmux-new-horizontal' 'Split vertically'
     d     quit                  'Delete pane'
 }
 
@@ -109,19 +120,27 @@ map-all user -sh %{
     0 'tmux-select-pane 10' 'Select pane 10'
 }
 
+decl str local_config_dir
 
 def source-local-config -params ..1 %{
-    try %{
-        source %sh{
+        eval %sh{
             function upsearch () {
-                test / == "$PWD" && return || test -e "$1" && echo "$PWD/$1" && return || cd .. && upsearch "$1"
+                if test / == "$PWD"; then
+                    return
+                elif test -e "$1"; then
+                    echo "set buffer local_config_dir $PWD"
+                    echo "source $PWD/$1"
+                    return
+                else
+                    cd ..
+                    upsearch "$1"
+                fi
             }
 
             startdir=${1:-$(dirname $kak_buffile)}
             cd $startdir
             upsearch ".local.kak"
         }
-    }
 }
 
 hook global BufCreate .* source-local-config 
@@ -144,6 +163,7 @@ import modeline
 import markdown
 import php
 import c++
+import js
 import meson
 import faust
 
@@ -153,5 +173,11 @@ ide-setup
 # Setup kak-lsp
 eval %sh{kak-lsp --kakoune}
 lsp-auto-hover-enable
+lsp-auto-signature-help-enable
+set global lsp_auto_highlight_references true
+
+
+# Load current terminal colorscheme
+colorscheme %sh{ colorscheme-switch --current }
 
 #hook global KakBegin .* runtime

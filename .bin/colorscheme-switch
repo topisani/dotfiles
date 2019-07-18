@@ -11,7 +11,7 @@ getXrdbColor() {
 }
 
 updateXrdb() {
-    xrdb $XRDB_CONF_PATH
+    xrdb -merge $XRDB_CONF_PATH
     xrdb -merge $COLORSCHEME
 }
 
@@ -145,10 +145,10 @@ main() {
     argument="${2-}"
     case "${option}" in
         -r | --reload)
-            #switch $(cat $COLORSCHEME_PATH/current);
+            switch $(cat $COLORSCHEME_PATH/current);
             ;;
         -t | --terminal)
-            #updateTerminal > $(tty)
+            # updateTerminal > $(tty)
             ;;
         -c | --current)
             cat $COLORSCHEME_PATH/current

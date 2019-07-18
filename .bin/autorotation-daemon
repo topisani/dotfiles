@@ -9,6 +9,7 @@ screenname="eDP-1"
 #Do not change unless you know what you are doing!
 
 cloth_msg="cloth-msg"
+swaymsg="swaymsg"
 
 resourcepaths=[
 	"./",
@@ -60,7 +61,8 @@ def getOrientation(accelX, accelY, accelZ):
 
 def rotate(orientation):
     if orientation in orientations:
-        subprocess.call([cloth_msg, "-r", "rotate_output {} {}".format(orientation, screenname)])
+        subprocess.call([swaymsg, "output", screenname, "transform", orientation])
+        #subprocess.call([cloth_msg, "-r", "rotate_output {} {}".format(orientation, screenname)])
 
 def toggleRotLock(event):
     global rotlock

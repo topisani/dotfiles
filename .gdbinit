@@ -1574,6 +1574,9 @@ set print array on
 set print array-indexes on
 set python print-stack full
 skip -gfi /usr/include/c++/**
+skip -gfi /usr/include/c++/*/*/*
+skip -gfi /usr/include/c++/*/*
+skip -gfi /usr/include/c++/*
 
 # Start ------------------------------------------------------------------------
 

@@ -6,10 +6,7 @@ def ide-setup %{
 
     set global jumpclient client0
 
-    tmux-new-impl "split-window -p 0" %{
-        rename-client tools
-        ide-hide-tools
-    }
+    tmux-terminal-impl "split-window -p 0" kak -c %val{session} -e 'rename-client tools; ide-hide-tools'
     set global toolsclient tools
 
     hook -group ide global ClientClose "^(?!tools).*$" %{

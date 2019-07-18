@@ -2,6 +2,8 @@
 	email = topisani@hamsterpoison.com
 	name = topisani
 [credential]
-	helper = store
+	helper = cache
 [github]
 	user = topisani
+[color]
+	ui = auto

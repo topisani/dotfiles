@@ -2,7 +2,7 @@
 
 setup_term() {
     colorscheme-switch -t
-    TERM=tmux-256color tmux new-session "$*"\; set destroy-unattached 1\; set status 0 \; attach
+    TERM=tmux-256color tmux new-session "$*"\; set destroy-unattached 1\; set status off \; attach
 }
 
 if [[ "$1" == "--setup" ]]; then
