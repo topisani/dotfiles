@@ -1,22 +1,24 @@
 #!/bin/bash
 
 init='{
-  "cacheDirectory": "'$HOME'/.cache/ccls/",
-  "cacheFormat": "binary",
+  "cache": {
+    "directory": "'$HOME'/.cache/ccls/",
+    "format": "binary"
+  },
   "highlight": {
     "lsRanges": true
   },
   "completion": {
-    "detailedLabel": true
-  },
-  "xref": {
-    "container": true
+    "detailedLabel": false
   },
   "index": {
     "comments": 1,
     "trackDependency": 2,
-    "threads": 4
+    "threads": 4,
+    "multiVersion": 0,
+    "multiVersionBlacklist": ["^/usr/include"],
+    "onChange": false
   }
 }'
 
-ccls --init="$init"
+ccls --init="$init" -log-file=/tmp/ccls.log "$@"

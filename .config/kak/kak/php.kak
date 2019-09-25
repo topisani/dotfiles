@@ -26,6 +26,7 @@ add-highlighter shared/php/code/ regex \b((string|int|bool)|[A-Z][a-z].*?)\b 0:t
 add-highlighter shared/php/code/ regex \B/[^\n/]+/[gimy]* 0:meta
 add-highlighter shared/php/code/ regex '<\?(php)?|\?>' 0:meta
 
+add-highlighter shared/php/double_string/ fill string
 add-highlighter shared/php/double_string/ regex (?<!\\)(\\\\)*(\$\w+)(->\w+)* 0:variable
 add-highlighter shared/php/double_string/ regex \{(?<!\\)(\\\\)*(\$\w+)(->\w+)*\} 0:variable
 

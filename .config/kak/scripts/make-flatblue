@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Generate flatblue theme.
-# Call with variable list
 
 echo "
 # Markdown highlighting
@@ -82,5 +81,25 @@ face global cqueryMacros                $purple_light,     $bg
 
 set global lsp_diagnostic_line_error_sign '{LineFlagErrors}*'
 set global lsp_diagnostic_line_warning_sign '{LineFlagWarnings}!'
+
+declare-option -hidden str-list powerline_themes
+set-option -add global powerline_themes flatblue
+
+define-command -hidden -override powerline-theme-flatblue %{
+    declare-option -hidden str powerline_color00 $fg # fg: bufname
+    declare-option -hidden str powerline_color01 $bg2 # bg: position
+    declare-option -hidden str powerline_color02 $fg # fg: git
+    declare-option -hidden str powerline_color03 $bg # bg: bufname
+    declare-option -hidden str powerline_color04 $bg # bg: git
+    declare-option -hidden str powerline_color05 $bg # fg: position
+    declare-option -hidden str powerline_color06 $fg # fg: line-column
+    declare-option -hidden str powerline_color07 $fg # fg: mode-info
+    declare-option -hidden str powerline_color08 $bg # base background
+    declare-option -hidden str powerline_color09 $bg1 # bg: line-column
+
+    declare-option -hidden str powerline_color30 $bg1 # unused
+    declare-option -hidden str powerline_color31 rgb:fbf1c7 # unused
+}
+
 " | sed 's/, */,/' | sed 's/ *+/+/'
 

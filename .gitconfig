@@ -2,8 +2,13 @@
 	email = topisani@hamsterpoison.com
 	name = topisani
 [credential]
-	helper = cache
+	helper = store
 [github]
 	user = topisani
 [color]
 	ui = auto
+[core]
+  whitespace = -trailing-space,-indent-with-non-tab,-tab-in-indent
+[alias]
+  diffw = diff -w -U0 --word-diff-regex=[^[:space:]]
+  lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit

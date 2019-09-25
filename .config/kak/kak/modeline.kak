@@ -13,7 +13,7 @@ declare-option -docstring "amount of lines that will be checked at the beginning
 declare-option -docstring "variables that can be set in kak-formatted modelines" \
     str-list modeline_vars scrolloff tabstop indentwidth autowrap_column eolformat filetype BOM
 
-define-command -hidden modeline-parse-impl %{
+define-command -hidden -override modeline-parse-impl %{
     evaluate-commands %sh{
         # Translate a vim option into the corresponding kakoune one
         translate_opt_vim() {
@@ -95,7 +95,7 @@ define-command -hidden modeline-parse-impl %{
 # ref. options.txt (in vim `:help options`) : 2 forms of modelines: 
 #   [text]{white}{vi:|vim:|ex:}[white]{options}
 #   [text]{white}{vi:|vim:|Vim:|ex:}[white]se[t] {options}:[text]
-define-command modeline-parse -docstring "Read and interpret vi-format modelines at the beginning/end of the buffer" %{
+define-command modeline-parse -override -docstring "Read and interpret vi-format modelines at the beginning/end of the buffer" %{
     try %{ evaluate-commands -draft %{
         execute-keys \%s\A|.\z<ret> %opt{modelines}k <a-x> %opt{modelines}X \
              s^\S*?\s+?(vim?|kak(oune)?):\s?[^\n]+<ret> <a-x>

@@ -1,5 +1,5 @@
 def fzf-file -params 0..1 %{
-    fzf "edit $1" "find -L %arg{1} -name .git -prune -o -name .svn -prune -o -regex '.*\b\(bower_components\|output\|.mozilla\|firefox\|node_modules\|grunt\|cache\|Cache\|config/\(Slack\|chromium\|goole-chrome\)\)\(/|$\).*' -prune -o \( -type f -o -type l \) -a -not -path %arg{1} -a -not -name '.' -print | sed 's@^\./@@'"
+    fzf "edit $1" "find -L %arg{1} -name .git -prune -o -name .svn -prune -o -regex '.*\b\(bower_components\|output\|.mozilla\|firefox\|node_modules\|grunt\|cache\|Cache\|vendor\|build\|config/\(Slack\|chromium\|goole-chrome\)\)\(/|$\).*' -prune -o \( -type f -o -type l \) -a -not -path %arg{1} -a -not -name '.' -print | sed 's@^\./@@'"
                 # "ag -l -f -p ~/.binignore -p ~/.ignore --hidden --one-device . %arg{1}"
                 # "rg --ignore-file ~/.binignore -L --hidden --files %arg{1}"
 }

@@ -1,4 +1,4 @@
-try %{
+ try %{
     decl str-list imported_modules "modules"
 }
 

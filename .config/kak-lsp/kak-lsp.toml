@@ -1,66 +1,131 @@
+snippet_support = false
+verbosity = 2
+
 [server]
-ip = "127.0.0.1"
-port = 31337
+# exit session if no requests were received during given period in seconds
+# works only in unix sockets mode (-s/--session)
+# set to 0 to disable
+timeout = 1800 # seconds = 30 minutes
 
 [language.rust]
-extensions = ["rs"]
+filetypes = ["rust"]
 roots = ["Cargo.toml"]
 command = "rls"
 
+[language.crystal]
+filetypes = ["crystal"]
+roots = ["shard.yml"]
+command = "scry"
+
 [language.javascript]
-extensions = ["js", "jsx"]
+filetypes = ["javascript"]
 roots = ["package.json"]
-command = "flow-language-server"
-args = ["--stdio"]
+command = "flow"
+args = ["lsp"]
 
 [language.json]
-extensions = ["json"]
+filetypes = ["json"]
 roots = ["package.json"]
 command = "json-languageserver"
 args = ["--stdio"]
 
 [language.css]
-extensions = ["css"]
+filetypes = ["css"]
 roots = ["package.json"]
 command = "css-languageserver"
 args = ["--stdio"]
 
 [language.html]
-extensions = ["html"]
+filetypes = ["html"]
 roots = ["package.json"]
 command = "html-languageserver"
 args = ["--stdio"]
 
 [language.ocaml]
-extensions = ["ml", "mli"]
-roots = ["Makefile", ".git"]
+filetypes = ["ocaml"]
+roots = ["Makefile", "opam", "*.opam"]
 command = "ocaml-language-server"
 args = ["--stdio"]
 
 [language.reason]
-extensions = ["re", "rei"]
-roots = ["package.json", "Makefile", ".git"]
+filetypes = ["reason"]
+roots = ["package.json", "Makefile", ".git", ".hg"]
 command = "ocaml-language-server"
 args = ["--stdio"]
 
 [language.python]
-extensions = ["py"]
-roots = ["requirements.txt", "setup.py", ".git"]
+filetypes = ["python"]
+roots = ["requirements.txt", "setup.py", ".git", ".hg"]
 command = "pyls"
+offset_encoding = "utf-8"
 
-[language.php]
-extensions = ["php"]
-roots = ["composer.json", ".git"]
-command = "phpls"
-
-[language.cpp]
-extensions = ["cpp", "hpp", "c", "h", "cc", "hh", "c++", "h++", "ino", "ipp", "i++", "inl"]
-roots = ["compile_commands.json"]
+[language.c_cpp]
+filetypes = ["c", "cpp"]
+roots = ["compile_commands.json", ".ccls"]
 command = "/home/topisani/.config/kak/scripts/start-ccls"
+#args = ['--init={"cache.directory":"/home/topisani/.cache/ccls","highlight":{"enabled":true}}']
 
 [language.java]
-extensions = ["java"]
-roots = ["gradle.build", ".java_root"]
-command = "jdtls"
-args = ["-data", "."]
+filetypes = ["java"]
+roots = ["pom.xml", "build.gradle"]
+command = "eclipse.jdt.ls"
 
+[language.java.initialization_options]
+workspaceFolders = ["file:///home/topisani/dev/minecraft/RTG114"]
+
+[language.java.initialization_options.settings.java.trace]
+server = "verbose"
+
+[language.haskell]
+filetypes = ["haskell"]
+roots = ["Setup.hs", "stack.yaml", "*.cabal"]
+command = "hie"
+args = ["--lsp"]
+
+[language.go]
+filetypes = ["go"]
+roots = ["Gopkg.toml", "go.mod", ".git", ".hg"]
+command = "bingo"
+offset_encoding = "utf-8"
+
+[language.bash]
+filetypes = ["sh"]
+roots = [".git", ".hg"]
+command = "bash-language-server"
+args = ["start"]
+
+[language.dart]
+filetypes = ["dart"]
+roots = ["pubspec.yaml", ".git"]
+command = "dart_language_server"
+
+[language.d]
+filetypes = ["d", "di"]
+roots = [".git", "dub.sdl", "dub.json"]
+command = "dls"
+
+[language.php]
+filetypes = ["php"]
+roots = [".htaccess", "composer.json"]
+command = "intelephense"
+args = ["--stdio"]
+
+[language.php.initialization_options]
+storagePath = "/tmp/intelephense"
+
+[language.nim]
+filetypes = ["nim"]
+roots = ["*.nimble", ".git"]
+command = "nimlsp"
+
+[language.elm]
+filetypes = ["elm"]
+roots = ["elm.json"]
+command = "elm-language-server"
+args = ["--stdio"]
+
+[language.elm.initialization_options]
+runtime = "node"
+elmPath = "elm"
+elmFormatPath = "elm-format"
+elmTestPath = "elm-test"
