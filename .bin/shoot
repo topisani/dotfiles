@@ -14,7 +14,7 @@ function help_message {
   echo "                          ~/Pictures/Screenshots/<date>-<time>.png"
 }
 
-if [[ -n "$USING_X11" ]]; then
+if [[ "$USING_X11" == "true" ]]; then
 
   maim_flags="-u"
   filename="/tmp/shoot.png"

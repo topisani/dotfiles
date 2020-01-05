@@ -74,5 +74,5 @@ if [ "${PROCEED}" != "y" ] ; then
   exit
 else
   echo "Generating desktop entry"
-  sudo bash -c "echo '$entry' > '/usr/share/applications/${name,,}.desktop'"
+  sh -c "echo '$entry' > '$HOME/.local/share/applications/${name,,}.desktop'"
 fi

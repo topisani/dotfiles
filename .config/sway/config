@@ -43,7 +43,7 @@ input "1739:32651:SYNA2B31:00_06CB:7F8B_Touchpad" {
 input * {
     xkb_layout dk,dk
     xkb_variant nodeadkeys,
-    xkb_options ctrl:nocaps
+    xkb_options ctrl:nocaps,compose:rctrl
 }
 default_border pixel 4
 hide_edge_borders smart
@@ -299,8 +299,7 @@ for_window [app_id="pavucontrol"] floating enable
 
 
 # Open specific applications in floating mode
-for_window [title="alsamixer"] floating enable border pixel 1
-for_window [class="calamares"] floating enable border normal
+for_window [title="(?i)mullvad vpn"] floating enable border normal
 for_window [class="Clipgrab"] floating enable
 for_window [title="File Transfer*"] floating enable
 for_window [class="Galculator"] floating enable border pixel 1
@@ -330,16 +329,29 @@ for_window [urgent=latest] focus
 
 #output DP-3 pos 0 0
 #output DP-4 pos 0 0
-#output eDP-1 pos 0 1080
+#Output eDP-1 pos 0 1080
 
 
-exec sh -c '(cd ~/dev/tablecloth; ASAN_OPTIONS="new_delete_type_mismatch=0" build/cloth-notifications/cloth-notifications &)'
+exec xrdb -load ~/.Xresources
+exec cloth-notifications &
 exec battery_notifyd &
 exec autorotation-daemon &
 exec ~/.config/sway/waybar-positioner &
-exec systemd-lock-handler cloth-lock &
+#exec systemd-lock-handler cloth-lock &
 exec dex --autostart &
+exec ~/.config/sway/autotile &
 
 exec redshift -l 56:10 -m wayland &
+exec nm-applet
+
+set $gnomeschema org.gnome.desktop.interface
+
+exec {
+  gsettings set $gnomeschema gtk-theme 'Yaru'
+  gsettings set $gnomeschema icon-theme 'Yaru'
+  gsettings set $gnomeschema cursor-theme 'Yaru'
+}
+
+exec swayidle -w timeout 600 'cloth-lock' timeout 1200 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' before-sleep 'cloth-lock' &
 
 include /etc/sway/config.d/*

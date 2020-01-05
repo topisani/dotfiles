@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dunst_id=321478
+dunst_id=321477
 
 show_help() {
     echo "Usage: $0 [up|down|query] --notify|-n"
@@ -21,8 +21,8 @@ icon() {
     else
         icon=high
     fi
-    echo /usr/share/icons/Papirus-Dark/symbolic/status/display-brightness-$icon-symbolic.svg
-
+    #echo /usr/share/icons/Yaru/scalable/status/display-brightness-$icon-symbolic.svg
+    echo /usr/share/icons/Yaru/scalable/status/display-brightness-symbolic.svg
 }
 
 send_notification() {

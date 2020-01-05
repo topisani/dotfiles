@@ -15,4 +15,5 @@ export MULLVAD_USE_GTK3=yes
 
 export XDG_CURRENT_DESKTOP=Unity
 
-sway 
+export USING_X11=false
+sway-gnome &> /tmp/sway.log

@@ -18,6 +18,7 @@ fi
 
 # set PATH so it includes user's private bin directories
 PATH="$HOME/.bin:$HOME/.local/bin:/usr/local/bin:$HOME/.composer/vendor/bin:$PATH"
+PATH="$HOME/dev/flutter/bin:$PATH"
 
 PATH="$(ruby -rrubygems -e 'puts Gem.user_dir')/bin:$PATH"
 
@@ -98,21 +99,23 @@ source $HOME/.zsh/dot/dot.sh
 #PATH=$PATH:~/dev/rpi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin
 
 if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
-  #export USING_X11=false
-  #tmux kill-server
-  #sway-start &
+  export USING_X11=false
+  sway-start &
   #gnome-shell
 else 
     # Source SSH settings, if applicable
     if [ -f "${SSH_ENV}" ]; then
         . "${SSH_ENV}" > /dev/null
-        #ps ${SSH_AGENT_PID} doesn't work under cywgin
-        ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
+        ps ${SSH_AGENT_PID} > /dev/null || {
+          echo "starting ssh agent"
             start_agent;
         }
     else
+          echo "starting ssh agent"
         start_agent;
     fi
 fi
 
 # vim: ft=sh
+export PATH="$PATH:/usr/lib/dart/bin"
+export PATH="$PATH":"$HOME/dev/flutter/.pub-cache/bin"

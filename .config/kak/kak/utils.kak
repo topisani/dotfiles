@@ -20,7 +20,7 @@ provide-module -override my-utils %{
       -parent <mode>: Mode to register keybinding in. Defaults to 'user'" \
   %{ eval %sh{
       name=$1; shift
-      key=${1:-}; shift
+      key=${1:-}; [ ! $# == 0 ] && shift
       docstring="$name..."
       parent="user"
       scope="global"
@@ -42,7 +42,7 @@ provide-module -override my-utils %{
           shift
       done
       echo declare-user-mode $name
-      [[ -n "$key" ]] && echo map $scope $parent $key %{:enter-user-mode $name\<ret\>} -docstring %{$docstring}
+      [[ -n "$key" ]] && echo map $scope $parent $key %{: enter-user-mode $name\<ret\>} -docstring %{$docstring}
       [[ $# != 0 ]] && echo "map-all $name -scope $scope %{ $@ }"
 
   }}
@@ -80,7 +80,7 @@ provide-module -override my-utils %{
       key=$1; shift
       command=$1; shift
       docstring=$command
-      run=":$command<ret>"
+      run=": $command<ret>"
       scope="global"
       repeat=''
       [[ ! "$1" =~ ^- ]] && docstring=$1 && shift

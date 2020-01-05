@@ -9,5 +9,3 @@ filetype-hook (javascript|scss|css) %{
 filetype-hook javascript %{ set buffer formatcmd "prettier --parser babel" }
 filetype-hook scss %{ set buffer formatcmd "prettier --parser scss" }
 filetype-hook css %{ set buffer formatcmd "prettier --parser css" }
-
-

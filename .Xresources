@@ -1,4 +1,5 @@
 Xcursor.size: 16
+Xft.dpi: 96
 
 ! special
 *.foreground:   #fcfefb

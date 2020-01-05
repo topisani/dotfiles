@@ -15,3 +15,6 @@
 .oh-my-zsh/themes/oxide.zsh-theme,.oh-my-zsh/themes/oxide.zsh-theme
 .tmux.conf,.tmux.conf
 .config/sway,.config/sway
+.config/sxiv,.config/sxiv
+.gdbinit,.gdbinit
+.gdbinit.d,.gdbinit.d

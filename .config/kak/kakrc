@@ -13,52 +13,114 @@ plug andreyorst/plug.kak branch kakoune-git noload
 
 plug occivink/kakoune-gdb
 plug TeddyDD/kakoune-cfdg
-plug TeddyDD/kakoune-wiki
+#plug TeddyDD/kakoune-wiki
 #plug lenormf/kakoune-extra
-plug TeddyDD/kakoune-lf
 plug TeddyDD/kakoune-edit-or-dir
-plug occivink/kakoune-snippets
+plug occivink/kakoune-snippets config %{
+    set-option -add global snippets_directories "%opt{plug_install_dir}/kakoune-snippet-collection/snippets"
+    set global snippets_auto_expand false
+}
+plug andreyorst/kakoune-snippet-collection
 plug alexherbo2/select.kak
-plug alexherbo2/yank-ring.kak
+plug alexherbo2/auto-pairs.kak config %{
+  hook global WinCreate .* %{
+    auto-pairs-enable
+  }
+  map global user s -docstring 'Surround' ': auto-pairs-surround <lt> <gt><ret>'
+  map global user S -docstring 'Surround++' ': auto-pairs-surround <lt> <gt> _ _ * *<ret>'
+}
+plug alexherbo2/phantom.kak config %{
+  hook global WinCreate .* %{
+    phantom-enable -with-maps
+  }
+}
+plug alexherbo2/connect.kak
 
-plug "andreyorst/kaktree" defer kaktree %{
-    set-option global kaktree_dir_icon_open  '▾  '
-    set-option global kaktree_dir_icon_close '▸  '
-    set-option global kaktree_file_icon      '⠀⠀ '
+plug "git@gitlab.com:topisani/kaktree.git" defer kaktree %{
+    set-option global kaktree_dir_icon_close  '▸  '
+    set-option global kaktree_dir_icon_open   '▾  '
+    set-option global kaktree_file_icon       '⠀⠀ '
                                             # ^^ these are not spaces. It is invisible characters.
                                             # This needed to make folding work correctly if you do
                                             # space alignment of icons.
 } config %{
     map global user '<tab>' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
     hook global WinSetOption filetype=kaktree %{
-        remove-highlighter buffer/numbers
-        remove-highlighter buffer/matching
-        remove-highlighter buffer/wrap
-        remove-highlighter buffer/show-whitespaces
+        remove-highlighter window/numbers
+        remove-highlighter window/matching
+        remove-highlighter window/wrap
+        remove-highlighter window/show-whitespaces
         set buffer modelinefmt ""
     }
     kaktree-enable
 }
 
-plug "andreyorst/powerline.kak" defer "powerline" %{
+plug andreyorst/powerline.kak defer "powerline" %{
+  set-option global powerline_format 'powerline-format git bufname filetype mode_info lsp-errors line_column position'
   powerline-theme flatblue
 }
 
-plug "occivink/kakoune-find" config %{
+plug occivink/kakoune-find config %{
   define-command -docstring "grep-apply-changes: apply changes specified in current *grep* buffer to their respective files" \
   grep-apply-changes %{ find-apply-changes -force }
 }
 
-# plug-install
+# use :pad-number to pad numbers with zeros
+plug alexherbo2/pad-number.kak
+plug alexherbo2/yank-ring.kak config %{
+  map global normal Y ': yank-ring<ret>'
+}
 
-# mark
-#import TeddyDD/kakoune-cfdg/cfdg
-#import TeddyDD/kakoune-wiki/wiki
-#wiki_setup %sh(echo $HOME/ownCloud/wiki)
+plug alexherbo2/mkdir.kak config %{
+  hook global BufWritePre .* %{
+  	mkdir-buffer
+  }
+}
+
+plug alexherbo2/distraction-free.kak config %{
+	map global user d ': distraction-free-toggle<ret>' -docstring "Case manipulation..."
+}
+plug alexherbo2/search-highlighter.kak config %{
+  hook global WinCreate .* %{
+    search-highlighter-enable
+  }
+}
+
+plug alexherbo2/bc.kak config %{
+  map global normal = -docstring 'Prompt for bc' ': bc-prompt<ret>'
+}
+
+plug alexherbo2/palette.kak
+
+plug occivink/kakoune-vertical-selection
+plug Delapouite/kakoune-text-objects
+plug 'https://gitlab.com/FlyingWombat/case.kak' config %{
+	map global user '`' ': enter-user-mode case<ret>' -docstring "Case manipulation..."
+}
+plug 'delapouite/kakoune-hump' %{
+  # Suggested mappings
+  map global normal æ ': select-previous-hump<ret>' -docstring 'select prev hump'
+  map global normal ø ': select-next-hump<ret>'     -docstring 'select next hump'
+  map global normal Æ ': extend-previous-hump<ret>' -docstring 'extend prev hump'
+  map global normal Ø ': extend-next-hump<ret>'     -docstring 'extend next hump'
+}
+
+plug 'https://gitlab.com/Screwtapello/kakoune-inc-dec' config %{
+  map global normal + ': inc-dec-modify-numbers + %val{count}<ret>'
+  map global normal <minus> ': inc-dec-modify-numbers - %val{count}<ret>'
+}
+
+#################################################
+# CONFIGURATION
+#################################################
 
 unalias global e edit
 alias global e edit-or-dir
 # Keymaps
+
+# Move macros to ¨
+map global normal ¨ q
+map global normal <a-¨> Q
 
 map-all normal %{
     '#' comment-line "Comment line"
@@ -144,7 +206,7 @@ map-all user -sh %{
 
 decl str local_config_dir
 
-def source-local-config -params ..1 %{
+def source-local-config -override -params ..1 %{
   eval %sh{
       function upsearch () {
           if test / == "$PWD"; then
@@ -160,7 +222,7 @@ def source-local-config -params ..1 %{
       }
 
       startdir=${1:-$(dirname $kak_buffile)}
-      cd $startdir
+      [[ -d "$startdir" ]] && cd $startdir
       upsearch ".local.kak"
   }
 }
@@ -174,6 +236,9 @@ declare-option str-list autoload_ignore core/php extra/modeline
 
 # Filetypes
 
+# Load current terminal colorscheme
+colorscheme %sh{ colorscheme-switch --current }
+
 import modeline
 import markdown
 import php
@@ -185,7 +250,6 @@ import faust
 import ide
 ide-setup
 
-# Load current terminal colorscheme
 colorscheme %sh{ colorscheme-switch --current }
 
 #hook global KakBegin .* runtime

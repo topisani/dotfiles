@@ -1,4 +1,4 @@
-snippet_support = false
+snippet_support = true
 verbosity = 2
 
 [server]
@@ -62,7 +62,9 @@ offset_encoding = "utf-8"
 [language.c_cpp]
 filetypes = ["c", "cpp"]
 roots = ["compile_commands.json", ".ccls"]
-command = "/home/topisani/.config/kak/scripts/start-ccls"
+command = "clangd"
+args = ['--suggest-missing-includes']
+#command = "/home/topisani/.config/kak/scripts/start-ccls"
 #args = ['--init={"cache.directory":"/home/topisani/.cache/ccls","highlight":{"enabled":true}}']
 
 [language.java]
@@ -71,7 +73,7 @@ roots = ["pom.xml", "build.gradle"]
 command = "eclipse.jdt.ls"
 
 [language.java.initialization_options]
-workspaceFolders = ["file:///home/topisani/dev/minecraft/RTG114"]
+# workspaceFolders = ["file:///home/topisani/dev/minecraft/RTG114"]
 
 [language.java.initialization_options.settings.java.trace]
 server = "verbose"
@@ -97,7 +99,8 @@ args = ["start"]
 [language.dart]
 filetypes = ["dart"]
 roots = ["pubspec.yaml", ".git"]
-command = "dart_language_server"
+command = "dart"
+args = ["/usr/lib/dart/bin/snapshots/analysis_server.dart.snapshot", "--lsp"]
 
 [language.d]
 filetypes = ["d", "di"]
@@ -129,3 +132,13 @@ runtime = "node"
 elmPath = "elm"
 elmFormatPath = "elm-format"
 elmTestPath = "elm-test"
+
+[semantic_scopes]
+variable="variable"
+entity_name_function="function"
+entity_name_function_method="memberFunction"
+variable_other_field="memberVariable"
+entity_name_type="type"
+variable_other_enummember="variable"
+entity_name_namespace="module"
+

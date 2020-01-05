@@ -187,7 +187,7 @@ define-command php-format %{
 }
 
 filetype-hook php %{
-    map-all filetype %{
-        = 'php-format' 'Format file'
-    }
+  map-all filetype %{
+    = 'php-format' 'Format file'
+  }
 }

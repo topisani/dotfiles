@@ -18,10 +18,10 @@ face global Reference                   $fg,               $bg       +b
 face global Default                     $fg,               $bg
 face global PrimarySelection            $fg,               $blue
 face global SecondarySelection          $fg,               $blue_dark
-face global PrimaryCursor               $bg0,              $fg0
-face global PrimaryCursorEol            $bg0,              $fg0
-face global SecondaryCursor             $bg3,              $fg3
-face global SecondaryCursorEol          $bg3,              $fg3
+face global PrimaryCursor               $bg0,              $fg0      +f
+face global PrimaryCursorEol            $bg0,              $fg0      +f
+face global SecondaryCursor             $bg3,              $fg3      +f
+face global SecondaryCursorEol          $bg3,              $fg3      +f
 face global LineNumbers                 $bg4,              $bg
 face global LineNumberCursor            $fg3,              $bg1
 face global LineNumbersWrapped          $bg,               $bg
@@ -54,7 +54,7 @@ face global operator                    $fg,               $bg
 face global attribute                   $red,              $bg
 face global meta                        $orange,           $bg
 face global builtin                     $red_dark,         $bg
-face global comment                     $gray,             $bg       +i
+face global comment                     $gray,             $bg         +i
 face global identifier                  $yellow_dark,      $bg
 
 face global DiagnosticWarning           $yellow,           $bg       +u
@@ -79,7 +79,18 @@ face global cqueryEnumConstants         variable
 face global cqueryNamespaces            module
 face global cqueryMacros                $purple_light,     $bg
 
-set global lsp_diagnostic_line_error_sign '{LineFlagErrors}*'
+# Plugs
+face global Phantom                     $bg,               $green_dark
+face global Search                      $fg,               $bg3
+face global PrimarySelectionDefault     $fg,               $blue
+face global PrimarySelectionSearch      $fg,               $blue
+
+face global memberFunction $yellow_light,$bg+i
+face global memberVariable $blue,$bg+i
+
+decl str lsp_diagnostic_line_error_sign
+decl str lsp_diagnostic_line_warning_sign
+set global lsp_diagnostic_line_error_sign '{LineFlagErrors}!'
 set global lsp_diagnostic_line_warning_sign '{LineFlagWarnings}!'
 
 declare-option -hidden str-list powerline_themes
@@ -102,4 +113,3 @@ define-command -hidden -override powerline-theme-flatblue %{
 }
 
 " | sed 's/, */,/' | sed 's/ *+/+/'
-

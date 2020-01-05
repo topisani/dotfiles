@@ -1,0 +1,39 @@
+set history save
+set verbose off
+set print pretty on
+set print array on
+set print array-indexes on
+set python print-stack full
+# skip -gfi /usr/include/c++/**
+# skip -gfi /usr/include/c++/*/*/*
+# skip -gfi /usr/include/c++/*/*
+# skip -gfi /usr/include/c++/*
+
+dashboard -layout source variables threads breakpoints stack
+alias db=dashboard
+db -style syntax_highlighting 'monokai'
+dashboard source -style height 10
+dashboard stack -style compact True
+dashboard variables -style compact False
+dashboard variables -style align True
+dashboard memory -style full True
+
+set breakpoint pending on
+set confirm off
+set disassembly-flavor intel
+
+# requires: https://github.com/cyrus-and/gdb-dashboard
+#
+#     wget -P ~ git.io/.gdbinit
+
+define hookpost-up
+  dashboard
+end
+
+define hookpost-down
+  dashboard
+end
+
+define hookpost-frame
+  dashboard
+end
