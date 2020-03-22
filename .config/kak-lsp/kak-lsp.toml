@@ -63,7 +63,8 @@ offset_encoding = "utf-8"
 filetypes = ["c", "cpp"]
 roots = ["compile_commands.json", ".ccls"]
 command = "clangd"
-args = ['--suggest-missing-includes']
+args = ['--query-driver=/home/topisani/dev/**,/usr/bin/**,arm-none-eabi-gcc', '--log=verbose']
+#args = ['--log=verbose', '--query-driver=/home/topisani/dev/otto-bsp/build/tmp/work/otto_proto_v1-poky-linux-gnueabi/otto-core/*/recipe-sysroot-native/usr/bin/arm-poky-linux-gnueabi/arm-poky-linux-gnueabi-*']
 #command = "/home/topisani/.config/kak/scripts/start-ccls"
 #args = ['--init={"cache.directory":"/home/topisani/.cache/ccls","highlight":{"enabled":true}}']
 
@@ -100,7 +101,7 @@ args = ["start"]
 filetypes = ["dart"]
 roots = ["pubspec.yaml", ".git"]
 command = "dart"
-args = ["/usr/lib/dart/bin/snapshots/analysis_server.dart.snapshot", "--lsp"]
+args = ["/opt/dart-sdk/bin/snapshots/analysis_server.dart.snapshot", "--lsp"]
 
 [language.d]
 filetypes = ["d", "di"]
@@ -141,4 +142,6 @@ variable_other_field="memberVariable"
 entity_name_type="type"
 variable_other_enummember="variable"
 entity_name_namespace="module"
+entity_name_function_preprocessor="cppMacro"
+meta_disabled="disabledRegion"
 

@@ -1,8 +1,0 @@
-#!/bin/bash
-
-DOTS_DIR=~/dots
-
-add() {
-    local file="$(pwd)/$1"
-    
-}

@@ -24,7 +24,7 @@ vol_icon() {
     else
         icon=high
     fi
-    echo /usr/share/icons/Yaru/scalable/status/audio-volume-$icon-symbolic.svg
+    echo /usr/share/icons/Papirus-Dark/symbolic/status/audio-volume-$icon-symbolic.svg
 }
 
 send_notification() {

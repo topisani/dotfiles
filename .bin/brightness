@@ -21,8 +21,8 @@ icon() {
     else
         icon=high
     fi
-    #echo /usr/share/icons/Yaru/scalable/status/display-brightness-$icon-symbolic.svg
-    echo /usr/share/icons/Yaru/scalable/status/display-brightness-symbolic.svg
+    echo /usr/share/icons/Papirus-Dark/symbolic/status/display-brightness-$icon-symbolic.svg
+    #echo /usr/share/icons/Yaru/scalable/status/display-brightness-symbolic.svg
 }
 
 send_notification() {

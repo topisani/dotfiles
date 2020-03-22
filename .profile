@@ -99,9 +99,10 @@ source $HOME/.zsh/dot/dot.sh
 #PATH=$PATH:~/dev/rpi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin
 
 if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
-  export USING_X11=false
-  sway-start &
+  #export USING_X11=false
+  #sway-start &
   #gnome-shell
+  startx
 else 
     # Source SSH settings, if applicable
     if [ -f "${SSH_ENV}" ]; then

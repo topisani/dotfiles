@@ -18,3 +18,9 @@
 .config/sxiv,.config/sxiv
 .gdbinit,.gdbinit
 .gdbinit.d,.gdbinit.d
+.config/i3,.config/i3
+.config/picom.conf,.config/picom.conf
+.config/dunst,.config/dunst
+.config/spotify-tui/config.yml,.config/spotify-tui/config.yml
+.config/waybar,.config/waybar
+.config/zathura,.config/zathura

@@ -49,7 +49,7 @@ def -hidden universal-snippets-next-placeholders %{
   } catch %{
     snippets-select-next-placeholders
   } catch %{
-    exec -with-maps -with-hooks '<c-i>'
+    exec -with-maps -with-hooks '<c-n>'
   }
 }
 def -hidden insert-mode-tab %{
@@ -62,11 +62,11 @@ def -hidden insert-mode-tab %{
     # On the next key, start replacing the placeholder contents
     on-key %{ exec "<esc>c%val{key}"  }
   } catch %{
-    exec -with-hooks '<tab>'
+    exec -with-hooks '<c-n>'
   }
 }
-map global insert <tab> "<a-;>: insert-mode-tab<ret>"
-map global normal <tab> ": universal-snippets-next-placeholders<ret>"
+map global insert <c-n> "<a-;>: insert-mode-tab<ret>"
+map global normal <c-n> ": universal-snippets-next-placeholders<ret>"
 
 # <c-i> is the same as <tab>, so move <c-i>/<c-o> to <c-o>/<c-p>
 # map global normal <c-o> <c-i>

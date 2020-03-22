@@ -1,0 +1,22 @@
+#!/bin/bash
+# requires jq
+
+action=${1:-swap}
+scrns=$(swaymsg -t get_outputs | jq -r '.[]|"\(.name):\(.current_workspace)"' | grep -v '^null:null$')
+curscrn=$(swaymsg -t get_tree | jq -r 'recurse(.nodes[]?) | if .type == "output" and (recurse(.nodes[]?) | .focused ) then .name else empty end')
+prev=$(echo "$scrns" | tail -n1 | cut -d: -f1)
+echo "$prev"
+
+while IFS=: read -r name current_workspace; do
+  if [[ "$name" == "$curscrn" ]]; then
+    if [[ "$action" == "swap" ]]; then
+      echo "moving ${current_workspace} to $prev..."
+      swaymsg workspace "${current_workspace}"
+      swaymsg move workspace to output "$prev"
+    else
+      echo "moving focus to $prev"
+      swaymsg focus output "$prev"
+    fi
+  fi
+  prev=$name
+done <<< $scrns 

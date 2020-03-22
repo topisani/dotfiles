@@ -9,6 +9,10 @@ set python print-stack full
 # skip -gfi /usr/include/c++/*/*
 # skip -gfi /usr/include/c++/*
 
+set pagination off
+set history expansion on
+set history remove-duplicates unlimited
+
 dashboard -layout source variables threads breakpoints stack
 alias db=dashboard
 db -style syntax_highlighting 'monokai'

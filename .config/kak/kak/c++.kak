@@ -35,8 +35,8 @@ add-highlighter shared/cpp/doc_comment/ regex '`.*?`' 0:module
 add-highlighter shared/cpp/doc_comment/ regex '\\\w+' 0:module
 add-highlighter shared/cpp/doc_comment/ regex '@\w+' 0:module
 
-add-highlighter shared/cpp/macro/macro_def regex ^\h*#define\h+(\w*)\h*(\([^)]*\))? 1:cqueryMacros 2:Default
-add-highlighter shared/cpp/code/macro regex '\b[A-Z_]{3,}\b' 0:cqueryMacros
+add-highlighter shared/cpp/macro/macro_def regex ^\h*#define\h+(\w*)\h*(\([^)]*\))? 1:cppMacro 2:Default
+#add-highlighter shared/cpp/code/macro regex '\b[A-Z_]{3,}\b' 0:cqueryMacros
 
 define-command -hidden -override c-family-insert-on-newline %[ evaluate-commands -itersel -draft %[
   execute-keys \;

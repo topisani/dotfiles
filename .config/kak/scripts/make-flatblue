@@ -87,6 +87,8 @@ face global PrimarySelectionSearch      $fg,               $blue
 
 face global memberFunction $yellow_light,$bg+i
 face global memberVariable $blue,$bg+i
+face global cppMacro       $purple_light, $bg
+face global disabledRegion $gray, $bg
 
 decl str lsp_diagnostic_line_error_sign
 decl str lsp_diagnostic_line_warning_sign

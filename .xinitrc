@@ -1,23 +1,23 @@
 #!/bin/bash
-
 export USING_X11=true
 export LANG="en_DK.UTF-8"
+export QT_QPA_PLATFORMTHEME=qt5ct
 source /etc/profile.d/locale.sh
 
 # Set cursor from X to pointer
 xrdb ~/.Xresources
 setxkbmap dk ,nodeadkeys -option ctrl:nocaps
+xinput set-prop 13 'libinput Natural Scrolling Enabled' 1
 
 xsetroot -cursor_name left_ptr &
 
-awesome
 # wmutils
 # $HOME/.bin/wm/autostart
 # exec $HOME/.bin/xwait 
 
 # windowchef
-#export WM_SCRIPT_DIR=$HOME/.config/windowchef/scripts
-#export WM_TMP_DIR=/tmp/windowchef_$(whoami)_$DISPLAY
+export WM_SCRIPT_DIR=$HOME/.bin/wm
+export WM_TMP_DIR=/tmp/wm_$(whoami)_$DISPLAY
 
 #logged_windowchef() {
    #windowchef &> $HOME/windowchef.log
@@ -33,3 +33,5 @@ awesome
 #    done < $pid_file
 #    :> $pid_file
 # fi
+xset r rate 600 25
+i3 &> i3.log

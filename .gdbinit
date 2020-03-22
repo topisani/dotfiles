@@ -1,3 +1,5 @@
+add-auto-load-safe-path /home/topisani/dev/otto-bsp/build/workspace/sources/otto-core/.gdbinit
+
 python
 
 # GDB dashboard - Modular visual interface for GDB in Python.
@@ -2205,13 +2207,6 @@ class Breakpoints(Dashboard.Module):
 end
 
 # Better GDB defaults ----------------------------------------------------------
-
-set history save
-set verbose off
-set print pretty on
-set print array off
-set print array-indexes on
-set python print-stack full
 
 # Start ------------------------------------------------------------------------
 
