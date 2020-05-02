@@ -49,6 +49,7 @@ face global variable                    $blue,             $bg
 face global module                      $orange,           $bg
 face global function                    $yellow_light,     $bg
 face global string                      $green,            $bg
+face global documentation               $green,            $bg
 face global keyword                     $red,              $bg
 face global operator                    $fg,               $bg
 face global attribute                   $red,              $bg

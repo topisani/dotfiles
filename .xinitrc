@@ -6,7 +6,7 @@ source /etc/profile.d/locale.sh
 
 # Set cursor from X to pointer
 xrdb ~/.Xresources
-setxkbmap dk ,nodeadkeys -option ctrl:nocaps
+setxkbmap dk nodeadkeys -option ctrl:nocaps -option compose:rctrl
 xinput set-prop 13 'libinput Natural Scrolling Enabled' 1
 
 xsetroot -cursor_name left_ptr &

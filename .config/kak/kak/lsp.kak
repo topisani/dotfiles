@@ -32,6 +32,8 @@ def lsp-setup %{
     try %{
       lsp-enable
     }
+
+    #set buffer idle_timeout 250
 }
 
 def lsp-restart -docstring "Restart lsp server" %{

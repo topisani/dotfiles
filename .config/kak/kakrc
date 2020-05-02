@@ -13,30 +13,30 @@ plug andreyorst/plug.kak branch kakoune-git noload
 
 plug occivink/kakoune-gdb
 plug TeddyDD/kakoune-cfdg
-#plug TeddyDD/kakoune-wiki
-#plug lenormf/kakoune-extra
 plug TeddyDD/kakoune-edit-or-dir
 plug occivink/kakoune-snippets config %{
     set-option -add global snippets_directories "%opt{plug_install_dir}/kakoune-snippet-collection/snippets"
     set global snippets_auto_expand false
 }
 plug andreyorst/kakoune-snippet-collection
-plug alexherbo2/select.kak
 plug alexherbo2/auto-pairs.kak config %{
   hook global WinCreate .* %{
     auto-pairs-enable
   }
-  map global user s -docstring 'Surround' ': auto-pairs-surround <lt> <gt><ret>'
-  map global user S -docstring 'Surround++' ': auto-pairs-surround <lt> <gt> _ _ * *<ret>'
 }
-plug alexherbo2/phantom.kak config %{
-  hook global WinCreate .* %{
-    phantom-enable -with-maps
-  }
+plug alexherbo2/surround.kak config %{
+  map global user s -docstring 'Surround' ': surround <lt> <gt><ret>'
+  map global user S -docstring 'Surround++' ': surround <lt> <gt> _ _ * *<ret>'
 }
+#plug alexherbo2/phantom.kak config %{
+#  hook global WinCreate .* %{
+#    phantom-enable -with-maps
+#  }
+#}
 plug alexherbo2/connect.kak
 
 plug "git@gitlab.com:topisani/kaktree.git" defer kaktree %{
+    set-option global kaktree_show_hidden     false
     set-option global kaktree_dir_icon_close  '▸  '
     set-option global kaktree_dir_icon_open   '▾  '
     set-option global kaktree_file_icon       '⠀⠀ '
@@ -55,10 +55,10 @@ plug "git@gitlab.com:topisani/kaktree.git" defer kaktree %{
     kaktree-enable
 }
 
-plug andreyorst/powerline.kak defer "powerline" %{
-  set-option global powerline_format 'powerline-format git bufname filetype mode_info lsp-errors line_column position'
-  powerline-theme flatblue
-}
+# plug andreyorst/powerline.kak defer "powerline" %{
+#   set-option global powerline_format 'powerline-format git bufname filetype mode_info lsp-errors line_column position'
+#   powerline-theme flatblue
+# }
 
 plug occivink/kakoune-find config %{
   define-command -docstring "grep-apply-changes: apply changes specified in current *grep* buffer to their respective files" \
@@ -66,33 +66,30 @@ plug occivink/kakoune-find config %{
 }
 
 # use :pad-number to pad numbers with zeros
-plug alexherbo2/pad-number.kak
-plug alexherbo2/yank-ring.kak config %{
-  map global normal Y ': yank-ring<ret>'
-}
+# plug alexherbo2/pad-number.kak
+# plug alexherbo2/yank-ring.kak config %{
+#   map global normal Y ': yank-ring<ret>'
+# }
 
 plug alexherbo2/mkdir.kak config %{
   hook global BufWritePre .* %{
-  	mkdir-buffer
+  	mkdir-buffer %reg[%]
   }
 }
 
-plug alexherbo2/distraction-free.kak config %{
-	map global user d ': distraction-free-toggle<ret>' -docstring "Case manipulation..."
-}
 plug alexherbo2/search-highlighter.kak config %{
   hook global WinCreate .* %{
     search-highlighter-enable
   }
 }
 
-plug alexherbo2/bc.kak config %{
-  map global normal = -docstring 'Prompt for bc' ': bc-prompt<ret>'
-}
+# plug alexherbo2/bc.kak config %{
+#   map global normal = -docstring 'Prompt for bc' ': bc-prompt<ret>'
+# }
 
 plug alexherbo2/palette.kak
 
-plug occivink/kakoune-vertical-selection
+# plug occivink/kakoune-vertical-selection
 plug Delapouite/kakoune-text-objects
 plug 'https://gitlab.com/FlyingWombat/case.kak' config %{
 	map global user '`' ': enter-user-mode case<ret>' -docstring "Case manipulation..."

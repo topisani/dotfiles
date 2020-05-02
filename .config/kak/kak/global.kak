@@ -78,7 +78,7 @@ map global normal <backspace> <space> -docstring 'remove all sels except main'
 map global normal <a-backspace> <a-space> -docstring 'remove main sel'
 unmap global normal ,
 
-map -docstring "Open shell" global user <ret> ': connect<ret>'
+map -docstring "Open shell" global user <ret> ': connect-terminal<ret>'
 
 # Filetype mode
 

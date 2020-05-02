@@ -62,8 +62,8 @@ offset_encoding = "utf-8"
 [language.c_cpp]
 filetypes = ["c", "cpp"]
 roots = ["compile_commands.json", ".ccls"]
-command = "clangd"
-args = ['--query-driver=/home/topisani/dev/**,/usr/bin/**,arm-none-eabi-gcc', '--log=verbose']
+command = "/usr/bin/clangd"
+args = ['--query-driver=/home/topisani/dev/**,/usr/**,arm-none-eabi-gcc,arm-none-eabi-*,arm-none-eabi-g++,*', '--log=verbose']
 #args = ['--log=verbose', '--query-driver=/home/topisani/dev/otto-bsp/build/tmp/work/otto_proto_v1-poky-linux-gnueabi/otto-core/*/recipe-sysroot-native/usr/bin/arm-poky-linux-gnueabi/arm-poky-linux-gnueabi-*']
 #command = "/home/topisani/.config/kak/scripts/start-ccls"
 #args = ['--init={"cache.directory":"/home/topisani/.cache/ccls","highlight":{"enabled":true}}']
@@ -144,4 +144,22 @@ variable_other_enummember="variable"
 entity_name_namespace="module"
 entity_name_function_preprocessor="cppMacro"
 meta_disabled="disabledRegion"
+
+# Semantic tokens support
+# See https://github.com/microsoft/vscode-languageserver-node/blob/8c8981eb4fb6adec27bf1bb5390a0f8f7df2899e/client/src/semanticTokens.proposed.ts#L288
+# for token/modifier types.
+
+[semantic_tokens]
+type = "type"
+variable = "variable"
+namespace = "module"
+function = "function"
+string = "string"
+keyword = "keyword"
+operator = "operator"
+comment = "comment"
+
+[semantic_modifiers]
+documentation = "documentation"
+readonly = "default+d"
 
