@@ -100,9 +100,9 @@ source $HOME/.zsh/dot/dot.sh
 
 if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
   #export USING_X11=false
-  #sway-start &
+  sway-start &
   #gnome-shell
-  startx
+  #startx
 else 
     # Source SSH settings, if applicable
     if [ -f "${SSH_ENV}" ]; then

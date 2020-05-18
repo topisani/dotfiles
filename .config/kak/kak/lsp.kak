@@ -1,8 +1,8 @@
 import util
 
 # Setup kak-lsp
-eval %sh{ RUST_BACKTRACE=1 kak-lsp --kakoune -v -s $kak_session --log /tmp/kak-lsp-%val{session}.log }
-set global lsp_cmd "env RUST_BACKTRACE=1 RUST_LOG=debug kak-lsp --log /tmp/kak-lsp-%val{session}.log -v -v -v -v -v -v -v -s %val{session}"
+eval %sh{ RUST_BACKTRACE=1 kak-lsp --kakoune -s $kak_session --log /tmp/kak-lsp-%val{session}.log }
+set global lsp_cmd "env RUST_BACKTRACE=1 RUST_LOG=debug kak-lsp --log /tmp/kak-lsp-%val{session}.log -s %val{session}"
 hook -always global KakEnd .* %{ nop %sh{
   rm /tmp/kak-lsp-$kak_session.log
 }}

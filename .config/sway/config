@@ -338,7 +338,7 @@ exec autorotation-daemon &
 #exec ~/.config/sway/waybar-positioner &
 exec systemd-lock-handler cloth-lock &
 exec dex --autostart &
-exec ~/.config/sway/autotile &
+#exec ~/.config/sway/autotile &
 
 exec redshift -l 56:10 -m wayland &
 exec nm-applet

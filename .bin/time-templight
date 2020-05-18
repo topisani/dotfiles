@@ -1,0 +1,4 @@
+#!/bin/bash
+
+( /usr/bin/time -f "%e %C" templight++ -Xtemplight -profiler -Xtemplight -memory -Xtemplight -ignore-system "$@" ) 2> >(cat - >> /tmp/time-templight.txt) | sponge
+#( /usr/bin/time -f "%e %C" clang++ "$@" ) 2> >(cat - >> /tmp/time-templight.txt) | sponge

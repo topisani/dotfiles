@@ -11,9 +11,12 @@ import fzf
 source "%val{config}/plugins/plug.kak/rc/plug.kak"
 plug andreyorst/plug.kak branch kakoune-git noload
 
+plug alexherbo2/prelude.kak
 plug occivink/kakoune-gdb
-plug TeddyDD/kakoune-cfdg
-plug TeddyDD/kakoune-edit-or-dir
+plug alexherbo2/explore.kak config %{
+  alias global explore-files fzf-files
+  alias global explore-buffers fzf-buffers
+}
 plug occivink/kakoune-snippets config %{
     set-option -add global snippets_directories "%opt{plug_install_dir}/kakoune-snippet-collection/snippets"
     set global snippets_auto_expand false
@@ -33,7 +36,13 @@ plug alexherbo2/surround.kak config %{
 #    phantom-enable -with-maps
 #  }
 #}
-plug alexherbo2/connect.kak
+plug alexherbo2/connect.kak config %{
+  require-module connect-lf
+  set-option global connect_environment %{
+    GIT_EDITOR='kak -c $KAKOUNE_SESSION'
+    export LYEDITOR='edit %(file)s +%(line)s:%(column)s'
+  }
+}
 
 plug "git@gitlab.com:topisani/kaktree.git" defer kaktree %{
     set-option global kaktree_show_hidden     false
@@ -111,10 +120,6 @@ plug 'https://gitlab.com/Screwtapello/kakoune-inc-dec' config %{
 # CONFIGURATION
 #################################################
 
-unalias global e edit
-alias global e edit-or-dir
-# Keymaps
-
 # Move macros to ¨
 map global normal ¨ q
 map global normal <a-¨> Q
@@ -132,7 +137,7 @@ def file-delete -docstring \
 
 new-mode files f %{
     f "fzf-file"                               "List files"
-    t "lf"                                     "File tree (current file)"
+    t 'lf %reg[percent]'                       "File tree (current file)"
     T "lf ."                                   "File tree (current dir)"
     w "write"                                  "Write file" 
     c "fzf-file ~/.config/kak/"                "Open config dir"
@@ -235,6 +240,13 @@ declare-option str-list autoload_ignore core/php extra/modeline
 
 # Load current terminal colorscheme
 colorscheme %sh{ colorscheme-switch --current }
+
+hook global BufCreate .*\.bb(|class|append) %{
+  set buffer filetype sh
+}
+hook global BufCreate .*\.conf %{
+  set buffer filetype ini
+}
 
 import modeline
 import markdown
