@@ -120,3 +120,4 @@ fi
 # vim: ft=sh
 export PATH="$PATH:/usr/lib/dart/bin"
 export PATH="$PATH":"$HOME/dev/flutter/.pub-cache/bin"
+alias ssh="TERM=xterm-256color ssh"

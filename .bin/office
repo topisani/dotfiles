@@ -4,4 +4,5 @@ echo "Welcome back, have a nice day at work!"
 
 swaymsg output 'eDP-1' pos 0 806
 swaymsg output 'DP-5' pos 1984 806
-swaymsg output 'DP-3' pos 3960 416
+swaymsg output 'DP-3' transform 90
+swaymsg output 'DP-3' pos 3930 465
