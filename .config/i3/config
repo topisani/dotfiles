@@ -312,6 +312,7 @@ for_window [class="Xfburn"] floating enable
 # switch to workspace with urgent window automatically
 for_window [urgent=latest] focus
 
+exec xrdb -load ~/.Xresources
 exec --no-startup-id redshift -l 56:10 &
 exec --no-startup-id dex --autostart &
 exec --no-startup-id nm-applet
@@ -319,6 +320,15 @@ exec --no-startup-id "hsetroot -solid '#18191c'"
 exec --no-startup-id "picom"
 exec --no-startup-id "dunst"
 
+exec battery_notifyd &
+exec systemd-lock-handler cloth-lock &
+
+set $gnomeschema org.gnome.desktop.interface
+
+exec --no-startup-id  gsettings set $gnomeschema gtk-theme 'Yaru'
+exec --no-startup-id  gsettings set $gnomeschema icon-theme 'Yaru'
+exec --no-startup-id  gsettings set $gnomeschema cursor-theme 'Yaru'
+
 # xss-lock grabs a logind suspend inhibit lock and will use i3lock to lock the
 # screen before suspend. Use loginctl lock-session to lock your screen.
-exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock-fancy --nofork
+#exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock-fancy --nofork

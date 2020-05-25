@@ -34,4 +34,5 @@ export WM_TMP_DIR=/tmp/wm_$(whoami)_$DISPLAY
 #    :> $pid_file
 # fi
 xset r rate 600 25
-i3 &> i3.log
+#i3 &> i3.log
+bspwm

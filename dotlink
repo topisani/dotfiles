@@ -25,3 +25,4 @@
 .config/waybar,.config/waybar
 .config/zathura,.config/zathura
 .zshrc,.zshrc
+.config/bspwm,.config/bspwm

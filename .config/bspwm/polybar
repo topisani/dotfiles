@@ -1,0 +1,70 @@
+# vim: ft=ini
+;=====================================================
+;     File Includes
+;=====================================================
+
+[section/base]
+
+[colors]
+black = ${xrdb:color0:#1d2021}
+darkred = ${xrdb:color1:#cc241d}
+darkgreen = ${xrdb:color2:#98971a}
+darkyellow = ${xrdb:color3:#d79921}
+darkblue = ${xrdb:color4:#458588}
+darkmagenta = ${xrdb:color5:#b16286}
+darkcyan = ${xrdb:color6:#689d6a}
+lightgray = ${xrdb:color7:#a89984}
+gray = ${xrdb:color8:#928374}
+red = ${xrdb:color9:#fb4934}
+green = ${xrdb:color10:#b8bb26}
+yellow = ${xrdb:color11:#fabd2f}
+blue = ${xrdb:color12:#83a598}
+magenta = ${xrdb:color13:#d3869b}
+cyan = ${xrdb:color14:#8ec07c}
+white = ${xrdb:color15:#ebdbb2}
+background = ${xrdb:color256:#1d2021}
+foreground = ${xrdb:color257:#ebdbb2}
+
+[bar/main]
+; Use $ xrandr -q | grep " connected" | cut -d ' ' -f1
+monitor = ${env:MONITOR:}
+monitor-fallback = 
+enable-ipc = true
+wm-restack = bspwm
+
+tray-position = right
+;tray-padding =
+;tray-transparent = true
+;tray-background = #0063ff
+
+modules-left   = xwindow
+modules-center = workspaces
+modules-right  = alsa battery pkg network memory temperature coreuse
+
+[module/workspaces]
+type = internal/bspwm
+ 
+pin-workspaces = true
+ 
+label-focused = %name%
+label-focused-foreground = ${colors.black}
+label-focused-background = ${colors.blue}
+label-focused-underline= ${colors.yellow}
+label-focused-padding = 1
+ 
+label-occupied = %name%
+label-occupied-underline = ${colors.blue}
+label-occupied-padding = 1
+ 
+label-urgent = %name%!
+label-urgent-background = ${colors.red}
+label-urgent-padding = 1
+ 
+label-empty = %name%
+label-empty-foreground = ${colors.lightgray}
+label-empty-padding = 1
+
+[module/xwindow]
+type = internal/xwindow
+label = %title:0:45:...%
+format-foreground = ${colors.blue}
