@@ -1,1 +1,2 @@
 .ssh/*.key
+.ssh/id_rsa
