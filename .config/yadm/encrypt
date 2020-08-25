@@ -1,2 +1,3 @@
 .ssh/*.key
 .ssh/id_rsa
+.gnupg/.exported-keyring/**

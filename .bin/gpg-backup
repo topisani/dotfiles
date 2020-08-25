@@ -1,0 +1,44 @@
+#!/bin/bash
+
+EXPORT_PATH="$HOME/.gnupg/.exported-keyring"
+
+do_export() {
+  umask 0077 # -rwx------
+  if [ -d "$EXPORT_PATH" ]; then
+    chmod 0700 "$EXPORT_PATH"
+  else
+    mkdir -m 0700 -p "$EXPORT_PATH"
+  fi
+  if [ ! -d "$EXPORT_PATH" ]; then
+    echo "Unable to create dir $EXPORT_PATH"
+    echo "Aborting"
+    exit 1
+  fi
+  echo "Exporting private key to $EXPORT_PATH"
+  gpg -a --export-secret-key -o "$EXPORT_PATH/private-key.asc"
+  echo "Exporting public keyring to $EXPORT_PATH"
+  for key in $(gpg -k --with-colons | grep pub -A 1 | grep fpr | cut -d: -f10); do
+    echo "  Key: $key"
+    gpg -a --export "$key" >> "$EXPORT_PATH/${key}.asc"
+  done
+  echo "Exporting ownertrust to $EXPORT_PATH"
+  gpg --export-ownertrust > "$EXPORT_PATH/ownertrust.txt"
+}
+
+do_import() {
+  gpg --import "$HOME/.gnupg/.exported-keyring"/*.asc
+  gpg --import-ownertrust "$HOME/.gnupg/.exported-keyring"/ownertrust.txt
+}
+
+case $1 in
+  export)
+    do_export
+    ;;
+  import)
+    do_import
+    ;;
+  *)
+    echo "Backup gpg keys to $EXPORT_PATH"
+    echo "Usage: $0 <export|import>"
+    ;;
+esac
