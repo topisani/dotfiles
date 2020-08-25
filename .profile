@@ -38,7 +38,7 @@ alias cht="cht.sh"
 
 # Call less if there is only one argument and it is a filename. Otherwise, call ls
 less_or_ls() {
-    ([ "$#" -eq "1" ] && [ -f "$1" ] && less $@ ) || ls $@
+    ([ "$#" -eq "1" ] && [ -f "$1" ] && bat $@ ) || ls $@
 }
 alias ls=less_or_ls
 
@@ -96,13 +96,20 @@ export DOT_REPO="https://github.com/topisani/dotfiles.git"
 export DOT_DIR="$HOME/.dotfiles"
 fpath=($HOME/.zsh/dot $fpath)  # <- for completion
 source $HOME/.zsh/dot/dot.sh
-#PATH=$PATH:~/dev/rpi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin
+
+export PATH="$PATH:/usr/lib/dart/bin"
+export PATH="$PATH:$HOME/dev/flutter/.pub-cache/bin"
+export PATH="$HOME/.ghcup/bin:$PATH"
+alias ghcup='TMPDIR=$HOME/.ghcup/tmp ghcup'
+alias ssh="TERM=xterm-256color ssh"
+alias google-chrome="google-chrome --force-dark-mode"
+
 
 if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
   #export USING_X11=false
   #sway-start &
   #gnome-shell
-  startx
+  exec startx
 else 
     # Source SSH settings, if applicable
     if [ -f "${SSH_ENV}" ]; then
@@ -117,7 +124,9 @@ else
     fi
 fi
 
+# Start fish
+if [ -z "$BASH_EXECUTION_STRING" ] && [ -z "$NO_FISH" ]&& [[ $(ps --no-header --pid=$PPID --format=cmd) != "fish" ]]; then
+  exec fish
+fi
+
 # vim: ft=sh
-export PATH="$PATH:/usr/lib/dart/bin"
-export PATH="$PATH":"$HOME/dev/flutter/.pub-cache/bin"
-alias ssh="TERM=xterm-256color ssh"

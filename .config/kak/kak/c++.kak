@@ -13,13 +13,14 @@ addhl shared/cpp/code/ regex %{([\w_0-9]+)::} 1:module
 
 # Highlight attributes
 addhl shared/cpp/code/ regex '(\[\[)([^\]]*)(\]\])' 2:meta
+addhl shared/cpp/code/ regex '\b(co_await|co_yield|co_return)\b' 0:keyword
 
 # Highlight doc comments
 
 rmhl shared/cpp/line_comment
 rmhl shared/cpp/comment
 
-add-highlighter shared/cpp/doc_comment region /\*\*[^/] \*/ group
+add-highlighter shared/cpp/doc_comment region '/\*\*[^/]' \*/ group
 add-highlighter shared/cpp/doc_comment2 region /// $ ref cpp/doc_comment
 
 add-highlighter shared/cpp/comment region /\* \*/ group
@@ -38,55 +39,55 @@ add-highlighter shared/cpp/doc_comment/ regex '@\w+' 0:module
 add-highlighter shared/cpp/macro/macro_def regex ^\h*#define\h+(\w*)(\([^)]*\))? 1:cppMacro 2:Default
 #add-highlighter shared/cpp/code/macro regex '\b[A-Z_]{3,}\b' 0:cqueryMacros
 
-define-command -hidden -override c-family-insert-on-newline %[ evaluate-commands -itersel -draft %[
-  execute-keys \;
-  try %[
-    evaluate-commands -draft -save-regs '/"' %[
-      # copy the commenting prefix
-      execute-keys -save-regs '' k <a-x>1s^\h*(//+\h*)<ret> y
-      try %[
-        # if the previous two comments aren't empty, create a new one
-        execute-keys K<a-x><a-K>^(\h*//+\h*\n){2}<ret> jj<a-x>s^\h*<ret>P
-      ] catch %[
-        # if there is no text in the previous comment, remove it completely
-        execute-keys d
-      ]
-    ]
-  ]
-  try %[
-    # if the previous line isn't within a comment scope, break
-    execute-keys -draft k<a-x> <a-k>^(\h*/\*|\h+\*(?!/))<ret>
-
-    # find comment opening, validate it was not closed, and check its using star prefixes
-    execute-keys -draft <a-?>/\*<ret><a-H> <a-K>\*/<ret> <a-k>\A\h*/\*([^\n]*\n\h*\*)*[^\n]*\n\h*.\z<ret>
-
-    try %[
-      # if the previous line is opening the comment, insert star preceeded by space
-      execute-keys -draft k<a-x><a-k>^\h*/\*<ret>
-      execute-keys -draft i*<space><esc>
-    ] catch %[
-       try %[
-        # if the next line is a comment line insert a star
-        execute-keys -draft j<a-x><a-k>^\h+\*<ret>
-        execute-keys -draft i*<space><esc>
-      ] catch %[
-        try %[
-          # if the previous line is an empty comment line, close the comment scope
-          /*
-          execute-keys -draft kK<a-x><a-k>^(\h+\*\h+\n){2}<ret> ;<a-x>d <a-x>1s\*(\h*)<ret>c/<esc>
-        ] catch %[
-          # if the previous line is a non-empty comment line, add a star
-          execute-keys -draft i*<space><esc>
-        ]
-      ]
-    ]
-
-    # trim trailing whitespace on the previous line
-    try %[ execute-keys -draft s\h+$<ret> d ]
-    # align the new star with the previous one
-    execute-keys K<a-x>1s^[^*]*(\*)<ret>&
-  ]
-] ]
+# define-command -hidden -override c-family-insert-on-newline %[ evaluate-commands -itersel -draft %[
+#   execute-keys \;
+#   try %[
+#     evaluate-commands -draft -save-regs '/"' %[
+#       # copy the commenting prefix
+#       execute-keys -save-regs '' k <a-x>1s^\h*(//+\h*)<ret> y
+#       try %[
+#         # if the previous two comments aren't empty, create a new one
+#         execute-keys K<a-x><a-K>^(\h*//+\h*\n){2}<ret> jj<a-x>s^\h*<ret>P
+#       ] catch %[
+#         # if there is no text in the previous comment, remove it completely
+#         execute-keys d
+#       ]
+#     ]
+#   ]
+#   try %[
+#     # if the previous line isn't within a comment scope, break
+#     execute-keys -draft k<a-x> <a-k>^(\h*/\*|\h+\*(?!/))<ret>
+# 
+#     # find comment opening, validate it was not closed, and check its using star prefixes
+#     execute-keys -draft <a-?>/\*<ret><a-H> <a-K>\*/<ret> <a-k>\A\h*/\*([^\n]*\n\h*\*)*[^\n]*\n\h*.\z<ret>
+# 
+#     try %[
+#       # if the previous line is opening the comment, insert star preceeded by space
+#       execute-keys -draft k<a-x><a-k>^\h*/\*<ret>
+#       execute-keys -draft i*<space><esc>
+#     ] catch %[
+#        try %[
+#         # if the next line is a comment line insert a star
+#         execute-keys -draft j<a-x><a-k>^\h+\*<ret>
+#         execute-keys -draft i*<space><esc>
+#       ] catch %[
+#         try %[
+#           # if the previous line is an empty comment line, close the comment scope
+#           /*
+#           execute-keys -draft kK<a-x><a-k>^(\h+\*\h+\n){2}<ret> ;<a-x>d <a-x>1s\*(\h*)<ret>c/<esc>
+#         ] catch %[
+#           # if the previous line is a non-empty comment line, add a star
+#           execute-keys -draft i*<space><esc>
+#         ]
+#       ]
+#     ]
+# 
+#     # trim trailing whitespace on the previous line
+#     try %[ execute-keys -draft s\h+$<ret> d ]
+#     # align the new star with the previous one
+#     execute-keys K<a-x>1s^[^*]*(\*)<ret>&
+#   ]
+# ] ]
 
 define-command -hidden c-family-alternative-file -override %{
   evaluate-commands %sh{
@@ -203,6 +204,10 @@ filetype-hook (cpp|c) %{
 
   set window tabstop 2
   set window indentwidth 2
+
+  hook window -group semantic-tokens BufReload .* lsp-semantic-tokens
+  hook window -group semantic-tokens NormalIdle .* lsp-semantic-tokens
+  hook window -group semantic-tokens InsertIdle .* lsp-semantic-tokens
 }
 
 

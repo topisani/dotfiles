@@ -30,7 +30,7 @@ kill_dropdown() {
 open_dropdown() {
     args="$@"
     args="${args@Q}"
-	termite --role=DropdownTerm --title=Dropdown --geometry=$GEOMETRY \
+	termite --role=DropdownTerm --title=Dropdown \
 		--exec="sh -c '$THIS_FILE --setup $args'"
 }
 

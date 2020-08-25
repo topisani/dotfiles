@@ -1,8 +1,8 @@
 decl -hidden str toolsclient_tmux_pane
 
 
-def ide-setup -override %{
-  hook -once global KakBegin .* ide-perform-setup
+def ide-setup %{
+  ide-perform-setup
 }
 
 def ide-perform-setup -hidden %{

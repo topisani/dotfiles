@@ -1,0 +1,10 @@
+Google-chrome 
+Firefox 
+Code 
+jetbrains-phpstorm 
+Slack 
+kitty 
+Termite 
+Nautilus 
+Thunderbird 
+Fallback ·

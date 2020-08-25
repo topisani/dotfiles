@@ -219,7 +219,8 @@
     # layout changes.
     force_xinerama = false
     
-    mouse_right_click = do_action
+    mouse_left_click = do_action
+    mouse_right_click = close_current
 
 # Experimental features that may or may not work correctly. Do not expect them
 # to have a consistent behaviour across releases.

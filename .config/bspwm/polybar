@@ -22,8 +22,8 @@ blue = ${xrdb:color12:#83a598}
 magenta = ${xrdb:color13:#d3869b}
 cyan = ${xrdb:color14:#8ec07c}
 white = ${xrdb:color15:#ebdbb2}
-background = ${xrdb:color256:#1d2021}
-foreground = ${xrdb:color257:#ebdbb2}
+background = "#08090c"
+foreground = ${xrdb:foreground:#fcfefb}
 
 [bar/main]
 ; Use $ xrandr -q | grep " connected" | cut -d ' ' -f1
@@ -31,15 +31,24 @@ monitor = ${env:MONITOR:}
 monitor-fallback = 
 enable-ipc = true
 wm-restack = bspwm
+background = ${colors.background}
+foreground = ${colors.foreground}
 
 tray-position = right
 ;tray-padding =
 ;tray-transparent = true
 ;tray-background = #0063ff
 
-modules-left   = xwindow
-modules-center = workspaces
-modules-right  = alsa battery pkg network memory temperature coreuse
+modules-left   = workspaces
+modules-center = windowlist
+modules-right  = battery clock
+
+font-0 = "Jetbrains Mono:size=10:antialias=true;2"
+font-1 = Font Awesome 5 Free:pixelsize=10;3
+font-2 = Font Awesome 5 Free Solid:pixelsize=10;3
+font-3 = Font Awesome 5 Brands:pixelsize=10;3
+font-4 = "MaterialIcons:size=10:antialias=false;2"
+font-5 = "icomoon:size=10:antialias=false;2"
 
 [module/workspaces]
 type = internal/bspwm
@@ -60,11 +69,64 @@ label-urgent = %name%!
 label-urgent-background = ${colors.red}
 label-urgent-padding = 1
  
-label-empty = %name%
+label-empty = 
 label-empty-foreground = ${colors.lightgray}
 label-empty-padding = 1
 
 [module/xwindow]
 type = internal/xwindow
-label = %title:0:45:...%
-format-foreground = ${colors.blue}
+label = %title:0:90:...%
+#format-foreground = ${colors.blue}
+
+[module/clock]
+type = internal/date
+format = <label>
+label-padding = 1
+interval = 5
+time = %R
+label = %{A1:gsimplecal & disown:} %{A3:gsimplecal & disown:} %time%%{A} %{A}
+
+[module/battery]
+type = internal/battery
+; Use $ ls -1 /sys/class/power_supply/
+battery = BAT1
+adapter = AC
+full-at = 98
+poll-interval = 5
+time-format = %H:%M
+
+format-charging    = <animation-charging> <label-charging>
+format-discharging = <ramp-capacity> <label-discharging>
+format-full        = <ramp-capacity> <label-full>
+
+ramp-capacity-0 = 
+ramp-capacity-1 = 
+ramp-capacity-2 = 
+ramp-capacity-3 = 
+ramp-capacity-4 = 
+ramp-capacity-0-foreground = ${colors.red}
+ramp-capacity-1-foreground = #ffa900
+ramp-capacity-foreground   = ${colors.blue}
+
+bar-capacity-width = 10
+animation-charging-0 = " "
+animation-charging-1 = " "
+animation-charging-2 = " "
+animation-charging-3 = " "
+animation-charging-4 = " "
+animation-charging-framerate = 750
+
+[module/windowlist]
+type = custom/script
+# interval = 0.1
+tail = true
+exec = "/home/topisani/.config/bspwm/bspwm_window_titles.sh ${env:MONITOR}"
+
+; cycle between windows
+click-left = bspc node -f next.local
+click-right = bspc node -f prev.local
+
+format = <label>
+#format-background = #000
+format-foreground = #FFF
+format-padding = 4

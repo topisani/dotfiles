@@ -55,7 +55,7 @@ super + Escape
 super + g
     bspc config window_gap 0
 super + shift + g
-    bspc config window_gap 10
+    bspc config window_gap 5
 
 # bspwm hotkeys
 
@@ -105,24 +105,31 @@ super + shift + o
   bspc desktop -f $desk
 
 # focus the node in the given direction
+# All of the extra stuff is to try prev/next in case directions dont work,
+# i.e. in monocle layout.
 super + {_,shift + }{h,j,k,l}
-  bspc node -{f,s} {west,south,north,east}
+  fs={f,s}; \
+  dir=( {west prev,south prev,north next, east next} ); \
+  bspc node -$fs ${dir[1]}.local || \
+  bspc node -$fs ${dir[2]}.local
 
 # focus the node for the given path jump
 super + {a,b,comma,period}
   bspc node -f @{parent,brother,first,second}
 
 # focus the next/previous node in the current desktop
+
 alt + {_,shift + }Tab
   bspc node -f {next,prev}.local
+
 
 # focus the next/previous desktop in the current monitor
 super + bracket{left,right}
   bspc desktop -f {prev,next}.local
 
 # focus the last node/desktop
-super + {grave,Tab}
-  bspc {node,desktop} -f last
+# super + {grave,Tab}
+#   bspc {node,desktop} -f last
 
 # focus the older or newer node in the focus history
 super + {o,i}
@@ -131,8 +138,14 @@ super + {o,i}
   bspc wm -h on
 
 # focus or send to the given desktop
-super + {_,shift + }{1-9,0}
-  bspc {desktop -f,node -d} '{1-9,0}'
+super + {1-9,0}
+  eval "$(xdotool getmouselocation --shell)" && \
+  xdotool mousemove 10000 10000 && \
+  bspc desktop -f '{1-9,0}' && \
+  xdotool mousemove --screen $SCREEN $X $Y
+
+super shift + {1-9,0}
+  bspc node -d '{1-9,0}'
 
 #
 # preselect

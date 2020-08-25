@@ -100,8 +100,8 @@ source $ZSH/oh-my-zsh.sh
 
 eval "$(jira --completion-script-zsh)"
 
-source ~/src/forgit/forgit.plugin.zsh
-
 # Then, source plugins and add commands to $PATH
 
 source ~/.profile
+
+source /home/topisani/.config/broot/launcher/bash/br

@@ -109,13 +109,21 @@ getColorschemePath() {
 }
 
 showColorschemes() {
-    find "${COLORSCHEME_PATH}/" -type f | sed 's/\..resources//g; s/.*\///g'
+    find "${COLORSCHEME_PATH}/" -type f | sed 's/\..resources//g; s/.*\///g; /^current$/d'
 }
 
 showHelp() {
     cat <<EOF
 Make sure that the variables located at the top of the script colorscheme-switch match your setup
-Usage: colorscheme-switch (-h | --help) | (-l | --list) | (-s colorscheme | --switch colorscheme)
+Usage:
+      colorscheme-switch
+      colorscheme-switch (-h | --help)
+      colorscheme-switch (-l | --list)
+      colorscheme-switch (-s colorscheme | --switch colorscheme)
+
+Calling with no arguments will rotate between colorschemes
+
+Arguments:
     --help = show this help text
     --list = list all available colorschemes
     --switch = set a available colorscheme in xrdb and all terminals
@@ -139,7 +147,18 @@ switch() {
     fi
 }
 
+swap() {
+  local cur=$(cat $COLORSCHEME_PATH/current)
+  local next=$cur
+  for col in $(showColorschemes); do
+    ! [[ $col = $cur ]] && next=$col
+  done
+  echo $next
+  switch $next
+}
+
 main() {
+    [[ $# = 0 ]] && swap && return 0
     local option argument
     option="${1-}"
     argument="${2-}"

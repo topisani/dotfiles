@@ -1,11 +1,11 @@
 def fzf-file -params 0..1 %{
-    fzf "edit $1" "find -L %arg{1} -name .git -prune -o -name .svn -prune -o -regex '.*\b\(bower_components\|output\|.mozilla\|firefox\|node_modules\|grunt\|cache\|Cache\|vendor\|build\|config/\(Slack\|chromium\|goole-chrome\)\)\(/|$\).*' -prune -o \( -type f -o -type l \) -a -not -path %arg{1} -a -not -name '.' -print | sed 's@^\./@@'"
+    fzf "edit $1" "find -L %arg{1}"
                 # "ag -l -f -p ~/.binignore -p ~/.ignore --hidden --one-device . %arg{1}"
                 # "rg --ignore-file ~/.binignore -L --hidden --files %arg{1}"
 }
 
-def fzf-git -params 0..1 %{
-    fzf "edit $1" "git ls-tree --name-only -r HEAD %arg{1}"
+def fzf-git %{
+    fzf "edit $1" "( git status --short| grep '^?' | cut -d\  -f2- && git ls-files ) | ( xargs -d '\n' -- stat -c\%%n 2>/dev/null  ||: )"
 }
 
 def fzf-tag -params 0..1 %{

@@ -12,30 +12,14 @@ source "%val{config}/plugins/plug.kak/rc/plug.kak"
 plug andreyorst/plug.kak branch kakoune-git noload
 
 plug alexherbo2/prelude.kak
+plug alexherbo2/terminal-mode.kak
 plug occivink/kakoune-gdb
-plug alexherbo2/explore.kak config %{
-  alias global explore-files fzf-files
-  alias global explore-buffers fzf-buffers
-}
-plug occivink/kakoune-snippets config %{
-    set-option -add global snippets_directories "%opt{plug_install_dir}/kakoune-snippet-collection/snippets"
-    set global snippets_auto_expand false
-}
-plug andreyorst/kakoune-snippet-collection
+
 plug alexherbo2/auto-pairs.kak config %{
   hook global WinCreate .* %{
     auto-pairs-enable
   }
 }
-plug alexherbo2/surround.kak config %{
-  map global user s -docstring 'Surround' ': surround <lt> <gt><ret>'
-  map global user S -docstring 'Surround++' ': surround <lt> <gt> _ _ * *<ret>'
-}
-#plug alexherbo2/phantom.kak config %{
-#  hook global WinCreate .* %{
-#    phantom-enable -with-maps
-#  }
-#}
 plug alexherbo2/connect.kak config %{
   require-module connect-lf
   set-option global connect_environment %{
@@ -43,78 +27,19 @@ plug alexherbo2/connect.kak config %{
     export LYEDITOR='edit %(file)s +%(line)s:%(column)s'
   }
 }
-
-plug "git@gitlab.com:topisani/kaktree.git" defer kaktree %{
-    set-option global kaktree_show_hidden     false
-    set-option global kaktree_dir_icon_close  '▸  '
-    set-option global kaktree_dir_icon_open   '▾  '
-    set-option global kaktree_file_icon       '⠀⠀ '
-                                            # ^^ these are not spaces. It is invisible characters.
-                                            # This needed to make folding work correctly if you do
-                                            # space alignment of icons.
-} config %{
-    map global user '<tab>' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
-    hook global WinSetOption filetype=kaktree %{
-        remove-highlighter window/numbers
-        remove-highlighter window/matching
-        remove-highlighter window/wrap
-        remove-highlighter window/show-whitespaces
-        set buffer modelinefmt ""
-    }
-    kaktree-enable
-}
-
-# plug andreyorst/powerline.kak defer "powerline" %{
-#   set-option global powerline_format 'powerline-format git bufname filetype mode_info lsp-errors line_column position'
-#   powerline-theme flatblue
-# }
-
 plug occivink/kakoune-find config %{
   define-command -docstring "grep-apply-changes: apply changes specified in current *grep* buffer to their respective files" \
   grep-apply-changes %{ find-apply-changes -force }
 }
-
-# use :pad-number to pad numbers with zeros
-# plug alexherbo2/pad-number.kak
-# plug alexherbo2/yank-ring.kak config %{
-#   map global normal Y ': yank-ring<ret>'
-# }
 
 plug alexherbo2/mkdir.kak config %{
   hook global BufWritePre .* %{
   	mkdir-buffer %reg[%]
   }
 }
+plug alexherbo2/search-highlighter.kak
 
-plug alexherbo2/search-highlighter.kak config %{
-  hook global WinCreate .* %{
-    search-highlighter-enable
-  }
-}
-
-# plug alexherbo2/bc.kak config %{
-#   map global normal = -docstring 'Prompt for bc' ': bc-prompt<ret>'
-# }
-
-plug alexherbo2/palette.kak
-
-# plug occivink/kakoune-vertical-selection
-plug Delapouite/kakoune-text-objects
-plug 'https://gitlab.com/FlyingWombat/case.kak' config %{
-	map global user '`' ': enter-user-mode case<ret>' -docstring "Case manipulation..."
-}
-plug 'delapouite/kakoune-hump' %{
-  # Suggested mappings
-  map global normal æ ': select-previous-hump<ret>' -docstring 'select prev hump'
-  map global normal ø ': select-next-hump<ret>'     -docstring 'select next hump'
-  map global normal Æ ': extend-previous-hump<ret>' -docstring 'extend prev hump'
-  map global normal Ø ': extend-next-hump<ret>'     -docstring 'extend next hump'
-}
-
-plug 'https://gitlab.com/Screwtapello/kakoune-inc-dec' config %{
-  map global normal + ': inc-dec-modify-numbers + %val{count}<ret>'
-  map global normal <minus> ': inc-dec-modify-numbers - %val{count}<ret>'
-}
+set-option global modelinefmt '{{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default} {{context_info}}'
 
 #################################################
 # CONFIGURATION
@@ -131,8 +56,7 @@ map-all normal %{
 
 def file-delete -docstring \
 "Delete current file" %{
-    nop %sh{ rm $kak_buffile }
-   delete-buffer
+   prompt "Delete file [Y/n]? " '%sh{ [[ "$kak_text" =~ [yY] ]] && rm $kak_buffile && echo "delete-buffer" }' 
 }
 
 new-mode files f %{
@@ -160,7 +84,7 @@ def tmux-new-horizontal -params .. -command-completion %{
   tmux-terminal-horizontal kak -c %val{session} -e "%arg{@}"
 }
 
-new-mode tmux w %{
+new-mode my-tmux w %{
     h     'tmux select-pane -L' 'Select pane to the left'  -sh
     j     'tmux select-pane -D' 'Select pane below'        -sh
     k     'tmux select-pane -U' 'Select pane above'        -sh
@@ -205,6 +129,9 @@ map-all user -sh %{
     9 'tmux-select-pane 9'  'Select pane 9'
     0 'tmux-select-pane 10' 'Select pane 10'
 }
+
+import surround
+map global user s -docstring 'Surround' ': surround-mode<ret>'
 
 decl str local_config_dir
 
@@ -257,8 +184,8 @@ import meson
 import faust
 
 import ide
-ide-setup
+
+hook -once global ModeChange .* ide-setup
 
 colorscheme %sh{ colorscheme-switch --current }
 
-#hook global KakBegin .* runtime
