@@ -44,14 +44,12 @@ args = ["--stdio"]
 [language.ocaml]
 filetypes = ["ocaml"]
 roots = ["Makefile", "opam", "*.opam"]
-command = "ocaml-language-server"
-args = ["--stdio"]
+command = "ocamllsp"
 
 [language.reason]
 filetypes = ["reason"]
 roots = ["package.json", "Makefile", ".git", ".hg"]
-command = "ocaml-language-server"
-args = ["--stdio"]
+command = "ocamllsp"
 
 [language.python]
 filetypes = ["python"]
@@ -62,8 +60,8 @@ offset_encoding = "utf-8"
 [language.c_cpp]
 filetypes = ["c", "cpp"]
 roots = ["compile_commands.json"]
-command = "clangd"
-args = ['-cross-file-rename', '--query-driver=/home/topisani/**,/usr/**,arm-none-eabi-gcc,arm-none-eabi-*,arm-none-eabi-g++,**', '--log=verbose']
+command = "sh"
+args = ['-c', '/usr/local/bin/clangd --log=verbose --cross-file-rename --query-driver=/home/topisani/**,/usr/**,arm-none-eabi-gcc,arm-none-eabi-*,arm-none-eabi-g++,** 2> clangd.log']
 
 [language.java]
 filetypes = ["java"]
@@ -84,7 +82,7 @@ args = ["--lsp"]
 [language.go]
 filetypes = ["go"]
 roots = ["Gopkg.toml", "go.mod", ".git", ".hg"]
-command = "bingo"
+command = "gopls"
 offset_encoding = "utf-8"
 
 [language.bash]

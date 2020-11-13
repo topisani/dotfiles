@@ -3,6 +3,9 @@
 super + Return
   tmux-term
 
+super + shift + Return
+  dropdown
+
 super + p
   bspc config top_padding 0; \
   polybar-msg cmd toggle
@@ -10,6 +13,9 @@ super + p
 # apps
 # super + shift + {b,c,f,m,s}
   # {firefox,code,pcmanfm,alacritty -e ncmpcpp,alacritty -e scrcpy}
+
+super + shift + c
+  colorscheme-switch
 
 # brightness keybindings
 XF86MonBrightness{Up,Down}
@@ -120,7 +126,7 @@ super + {a,b,comma,period}
 # focus the next/previous node in the current desktop
 
 alt + {_,shift + }Tab
-  bspc node -f {next,prev}.local
+  bspc node -f {next,prev}.window.local
 
 
 # focus the next/previous desktop in the current monitor

@@ -60,7 +60,7 @@ def -hidden insert-mode-tab %{
       snippets-select-next-placeholders
     }
     # On the next key, start replacing the placeholder contents
-    on-key %{ exec "<esc>c%val{key}"  }
+    exec '<a-;>d'
   } catch %{
     exec -with-hooks '<c-n>'
   }

@@ -104,6 +104,7 @@ alias ghcup='TMPDIR=$HOME/.ghcup/tmp ghcup'
 alias ssh="TERM=xterm-256color ssh"
 alias google-chrome="google-chrome --force-dark-mode"
 
+export CPM_SOURCE_CACHE=$HOME/.cache/CPM
 
 if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
   #export USING_X11=false
@@ -130,3 +131,6 @@ if [ -z "$BASH_EXECUTION_STRING" ] && [ -z "$NO_FISH" ]&& [[ $(ps --no-header --
 fi
 
 # vim: ft=sh
+
+# opam configuration
+test -r /home/topisani/.opam/opam-init/init.sh && . /home/topisani/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true

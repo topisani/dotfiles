@@ -34,5 +34,7 @@ evaluate-commands %sh{
     orange="rgb:fe8019"
     orange_dark="rgb:fe5019"
 
+    bluish_fg="rgb:9EEEFF"
+
     source $HOME/.config/kak/scripts/make-flatblue
 }

@@ -34,7 +34,8 @@ def ide-perform-setup -hidden %{
       eval %sh{
           if [[ "$kak_client" == "$kak_opt_toolsclient" ]]; then
               echo ide-show-tools
-              echo "map window tmux d ':ide-hide-tools<ret>'"
+              echo "map window my-tmux d ' :delete-buffer<ret> :ide-hide-tools<ret>'"
+              echo "map window buffers d ' :delete-buffer<ret> :ide-hide-tools<ret>'"
               echo "focus %opt[toolsclient]"
           fi 
       }

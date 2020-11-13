@@ -12,7 +12,7 @@ require-module c-family
 addhl shared/cpp/code/ regex %{([\w_0-9]+)::} 1:module
 
 # Highlight attributes
-addhl shared/cpp/code/ regex '(\[\[)([^\]]*)(\]\])' 2:meta
+addhl shared/cpp/code/annotation regex '(\[\[)(.*?)(\]\])' 0:annotation
 addhl shared/cpp/code/ regex '\b(co_await|co_yield|co_return)\b' 0:keyword
 
 # Highlight doc comments

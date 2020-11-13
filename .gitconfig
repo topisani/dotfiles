@@ -9,8 +9,11 @@
 	ui = auto
 [core]
   whitespace = -trailing-space,-indent-with-non-tab,-tab-in-indent
+	pager = diff-so-fancy | less --tabs=4 -RFX
 [alias]
   diffw = diff -w -U0 --word-diff-regex=[^[:space:]]
   lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 [diff]
 	tool = vimdiff
+[interactive]
+  diffFilter = (echo && diff-so-fancy)

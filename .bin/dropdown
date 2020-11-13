@@ -39,7 +39,10 @@ setup_term() {
     TERM=tmux-256color tmux attach -t Dropdown || tmux new-session -s Dropdown \; attach
 }
 
-if [[ "$1" == "--setup" ]]; then
+if [[ "$1"  == "--check" ]]; then
+  is_dropdown $2
+  exit $!
+elif [[ "$1" == "--setup" ]]; then
     shift;
     setup_term "$@"
 else

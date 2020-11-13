@@ -1,0 +1,16 @@
+#!/bin/sh
+
+wid=$1
+class=$2
+instance=$3
+consequences=$4
+
+case "$class" in
+	Termite)
+  	if dropdown --check $wid; then
+  		echo "state=floating"
+  	else
+    	echo "$consequences"
+    fi
+		;;
+esac

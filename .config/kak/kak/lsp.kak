@@ -42,7 +42,7 @@ def lsp-restart -docstring "Restart lsp server" %{
     lsp-start
 }
 
-filetype-hook (javascript|php|python|java|rust|dart|haskell) %{
+filetype-hook (javascript|php|python|java|rust|dart|haskell|ocaml) %{
   lsp-setup
 }
 
