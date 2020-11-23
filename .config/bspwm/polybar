@@ -6,23 +6,23 @@
 [section/base]
 
 [colors]
-black = ${xrdb:color0:#1d2021}
-darkred = ${xrdb:color1:#cc241d}
-darkgreen = ${xrdb:color2:#98971a}
-darkyellow = ${xrdb:color3:#d79921}
-darkblue = ${xrdb:color4:#458588}
-darkmagenta = ${xrdb:color5:#b16286}
-darkcyan = ${xrdb:color6:#689d6a}
-lightgray = ${xrdb:color7:#a89984}
-gray = ${xrdb:color8:#928374}
-red = ${xrdb:color9:#fb4934}
-green = ${xrdb:color10:#b8bb26}
-yellow = ${xrdb:color11:#fabd2f}
-blue = ${xrdb:color12:#83a598}
-magenta = ${xrdb:color13:#d3869b}
-cyan = ${xrdb:color14:#8ec07c}
-white = ${xrdb:color15:#ebdbb2}
-background = "#08090c"
+black = ${xrdb:color0:#23262a}
+darkred = ${xrdb:color1:#d92817}
+darkgreen = ${xrdb:color2:#3e871e}
+darkyellow = ${xrdb:color3:#f39c12}
+darkblue = ${xrdb:color4:#005973}
+darkmagenta = ${xrdb:color5:#7e3661}
+darkcyan = ${xrdb:color6:#249991}
+lightgray = ${xrdb:color7:#d9d7cc}
+gray = ${xrdb:color8:#828087}
+red = ${xrdb:color9:#ff6350}
+green = ${xrdb:color10:#71ba51}
+yellow = ${xrdb:color11:#f2bb13}
+blue = ${xrdb:color12:#178ca6}
+magenta = ${xrdb:color13:#ff465a}
+cyan = ${xrdb:color14:#67c5b4}
+white = ${xrdb:color15:#fcfefb}
+background = ${xrdb:background:#08090c}
 foreground = ${xrdb:foreground:#fcfefb}
 
 [bar/main]
@@ -35,13 +35,13 @@ background = ${colors.background}
 foreground = ${colors.foreground}
 
 tray-position = right
-;tray-padding =
+tray-padding = 3
 ;tray-transparent = true
-;tray-background = #0063ff
+tray-background = ${colors.background}
 
 modules-left   = workspaces
 modules-center = windowlist
-modules-right  = battery clock
+modules-right  = battery clock timew 
 
 font-0 = "Jetbrains Mono:size=10:antialias=true;2"
 font-1 = Font Awesome 5 Free:pixelsize=10;3
@@ -81,10 +81,11 @@ label = %title:0:90:...%
 [module/clock]
 type = internal/date
 format = <label>
-label-padding = 1
+label-padding = 0
 interval = 5
 time = %R
 label = %{A1:gsimplecal & disown:} %{A3:gsimplecal & disown:} %time%%{A} %{A}
+format-background = ${colors.darkmagenta}
 
 [module/battery]
 type = internal/battery
@@ -92,28 +93,28 @@ type = internal/battery
 battery = BAT1
 adapter = AC
 full-at = 98
-poll-interval = 5
+poll-interval = 0
 time-format = %H:%M
 
-format-charging    = <animation-charging> <label-charging>
-format-discharging = <ramp-capacity> <label-discharging>
-format-full        = <ramp-capacity> <label-full>
+format-charging    = "<animation-charging> <label-charging> %{B-}"
+format-discharging = "<ramp-capacity> <label-discharging> %{B-}"
+format-full        = "<ramp-capacity> <label-full> %{B-}"
 
-ramp-capacity-0 = 
-ramp-capacity-1 = 
-ramp-capacity-2 = 
-ramp-capacity-3 = 
-ramp-capacity-4 = 
-ramp-capacity-0-foreground = ${colors.red}
-ramp-capacity-1-foreground = #ffa900
-ramp-capacity-foreground   = ${colors.blue}
+ramp-capacity-0 = "%{B#fb4934} "
+ramp-capacity-1 = "%{B#fb4934} "
+ramp-capacity-2 = "%{B#f39c12} "
+ramp-capacity-3 = "%{B#f39c12} "
+ramp-capacity-4 = "%{B#3e871e} "
+#ramp-capacity-0-foreground = ${colors.red}
+#ramp-capacity-1-foreground = #ffa900
+#ramp-capacity-foreground   = ${colors.blue}
 
 bar-capacity-width = 10
-animation-charging-0 = " "
-animation-charging-1 = " "
-animation-charging-2 = " "
-animation-charging-3 = " "
-animation-charging-4 = " "
+animation-charging-0 = "%{B#178ca6}  "
+animation-charging-1 = "%{B#178ca6}  "
+animation-charging-2 = "%{B#178ca6}  "
+animation-charging-3 = "%{B#178ca6}  "
+animation-charging-4 = "%{B#178ca6}  "
 animation-charging-framerate = 750
 
 [module/windowlist]
@@ -130,3 +131,13 @@ format = <label>
 #format-background = #000
 format-foreground = #FFF
 format-padding = 4
+
+[module/timew]
+type = custom/script
+interval = 1
+exec = "/home/topisani/.config/bspwm/polybar_timew.sh"
+
+format = <label>
+#format-background = #000
+#format-foreground = #FFF
+format-padding = 0

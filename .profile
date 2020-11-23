@@ -8,14 +8,6 @@
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
-# if running bash
-if [ -n "$BASH_VERSION" ]; then
-    # include .bashrc if it exists
-    if [ -f "$HOME/.bashrc" ]; then
-	. "$HOME/.bashrc"
-    fi
-fi
-
 # set PATH so it includes user's private bin directories
 PATH="$HOME/.bin:$HOME/.local/bin:/usr/local/bin:$HOME/.composer/vendor/bin:$PATH"
 PATH="$HOME/dev/flutter/bin:$PATH"
@@ -125,12 +117,15 @@ else
     fi
 fi
 
-# Start fish
-if [ -z "$BASH_EXECUTION_STRING" ] && [ -z "$NO_FISH" ]&& [[ $(ps --no-header --pid=$PPID --format=cmd) != "fish" ]]; then
-  exec fish
-fi
-
-# vim: ft=sh
-
 # opam configuration
 test -r /home/topisani/.opam/opam-init/init.sh && . /home/topisani/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
+# vim: ft=sh
+
+# if running bash
+if [ -n "$BASH_VERSION" ]; then
+    # include .bashrc if it exists
+    if [ -f "$HOME/.bashrc" ]; then
+	. "$HOME/.bashrc"
+    fi
+fi
+

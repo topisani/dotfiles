@@ -7,8 +7,9 @@ mon_name=${1:-$MONITOR}
 monitor=$(bspc query -M -m "$mon_name")
 
 # subscribe to events on which the window title list will get updated
-bspc subscribe node_focus node_remove desktop_focus | while read -r evt mon _; do
-    [[ "$mon" != "$monitor" ]] && continue
+#bspc subscribe node_focus node_remove desktop_focus | while read -r evt mon _; do
+xev -root -1 -event property | while read -r evt mon _; do
+    #[[ "$mon" != "$monitor" ]] && continue
 
     # get last focused desktop on given monitor
     last_focused_desktop=$( bspc query -D -m "$monitor" -d .active )
