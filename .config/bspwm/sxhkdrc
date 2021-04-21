@@ -18,18 +18,18 @@ super + shift + c
   colorscheme-switch
 
 # brightness keybindings
-XF86MonBrightness{Up,Down}
-  brightness {up,down}
+# XF86MonBrightness{Up,Down}
+#   brightness {up,down}
 
 # media keys
-XF86Audio{Next,Prev,Play,Stop}
-  mpc {next,prev,toggle,stop}
+# XF86Audio{Next,Prev,Play,Stop}
+#   mpc {next,prev,toggle,stop}
 
 # volume
-XF86Audio{RaiseVolume,LowerVolume}
-  volume volume {up,down}
-XF86AudioMute
-  volume mute
+# XF86Audio{RaiseVolume,LowerVolume}
+#   volume volume {up,down}
+# XF86AudioMute
+#   volume mute
 
 # TABBED
 
@@ -115,9 +115,12 @@ super + shift + o
 # i.e. in monocle layout.
 super + {_,shift + }{h,j,k,l}
   fs={f,s}; \
-  dir=( {west prev,south prev,north next, east next} ); \
-  bspc node -$fs ${dir[1]}.local || \
-  bspc node -$fs ${dir[2]}.local
+  { dir1=west; dir2=prev, \
+    dir1=south; dir2=prev, \
+    dir1=north; dir2=next, \
+    dir1=east; dir2=next }; \
+  bspc node -$fs $dir1.window.local || \
+  bspc node -$fs $dir2.window.local
 
 # focus the node for the given path jump
 super + {a,b,comma,period}
@@ -143,12 +146,18 @@ super + {o,i}
   bspc node {older,newer} -f; \
   bspc wm -h on
 
-# focus or send to the given desktop
+# focus the given desktop:
+# Save mouse location and current monitor
+# move mouse to 100000x100000 to circumvent https://github.com/baskerville/bspwm/issues/811
+# Switch desktop (pointer_follows_monitor means the mouse warps to center of monitor)
+# If new desktop is on same screen as previous, restore the mouse position
 super + {1-9,0}
   eval "$(xdotool getmouselocation --shell)" && \
-  xdotool mousemove 10000 10000 && \
-  bspc desktop -f '{1-9,0}' && \
-  xdotool mousemove --screen $SCREEN $X $Y
+  TARGET={1-9,0} && \
+  PREV_MON=$(bspc query -M -m focused) && \
+  xdotool mousemove 100000 100000 && \
+  bspc desktop -f $TARGET && \
+  [[ "$PREV_MON" == "$(bspc query -M -d $TARGET)" ]] && xdotool mousemove --screen $SCREEN $X $Y
 
 super shift + {1-9,0}
   bspc node -d '{1-9,0}'

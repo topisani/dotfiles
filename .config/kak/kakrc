@@ -1,191 +1,166 @@
-evaluate-commands %sh{echo source $HOME/.config/kak/kak/modules.kak}
+require-module plug
 
-import utils
-import global
-import diff
-import macros
-import fzf
+# Let plug.kak manage itself.
+plug plug https://github.com/alexherbo2/plug.kak %{
+  # Upgrade plugins
+  # Install plugins and build them.
+  define-command plug-upgrade -docstring 'plug-upgrade' %{
+    plug-install
+    plug-execute lsp cargo build --release
+  }
+}
 
-# Plugs
+plug-core %{
+  # User interface
+  set-option -add global ui_options ncurses_status_on_top=false
+  set-option -add global ui_options ncurses_assistant=none
+  set-option -add global ui_options ncurses_set_title=no
 
-source "%val{config}/plugins/plug.kak/rc/plug.kak"
-plug andreyorst/plug.kak branch kakoune-git noload
+  colorscheme %sh{ colorscheme-switch --current }
 
-plug alexherbo2/prelude.kak
-plug alexherbo2/terminal-mode.kak
-plug occivink/kakoune-gdb
+  set-option global modelinefmt '{yellow}%opt{out_of_view_status_line}{default} {{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {{context_info}} {cyan}U+%sh{printf ''%04x'' "$kak_cursor_char_value"}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default}'
+  #set-option global modelinefmt '{yellow}%opt{out_of_view_status_line}{default} {{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default} {{context_info}}'
 
-plug alexherbo2/auto-pairs.kak config %{
+  # Tools
+  set-option global makecmd 'make -j 8'
+  set-option global grepcmd 'rg --column --with-filename'
+
+  # Window-based settings
   hook global WinCreate .* %{
-    auto-pairs-enable
+    addhl window/numbers number-lines -hlcursor -separator ' '
+    addhl window/matching show-matching
+    # addhl window/show-whitespaces show-whitespaces
+  }
+
+  # Default indentation
+  set global tabstop 2
+  set global indentwidth 2
+
+  # [space] [backspace] [ret]
+  map -docstring 'leader' global normal <space> ': enter-user-mode user<ret>'  
+  map -docstring 'remove all sels except main' global normal <backspace> <space> 
+  map -docstring 'remove main sel' global normal <a-backspace> <a-space> 
+  map -docstring 'Command Prompt' global normal <ret> :
+
+  # User Mode bindings
+  map -docstring 'Open terminal' global user <ret> ': connect-terminal<ret>'
+
+	# Filetype mode from [,] or [c-f]
+  declare-user-mode filetype
+  unmap global normal ,
+  map global normal , ': enter-user-mode filetype<ret>'
+  map global normal <c-f> ': enter-user-mode filetype<ret>'
+  map global insert <c-f> ': enter-user-mode filetype<ret>'
+
+  # Prompt
+  map -docstring 'Search' global prompt <c-f> '<home>(?i)<end>'
+  map -docstring 'Paste' global prompt <c-v> '<c-r>"'
+  map -docstring 'Insert the directory name of the current buffer' global prompt <c-d> '%sh{dirname "$kak_bufname"}<a-!>/'
+
+  # Select all occurrences of current selection.
+  # https://code.visualstudio.com/docs/getstarted/keybindings#_basic-editing
+  map -docstring 'Select all occurrences of current selection' global normal <a-L> '"aZ*%s<ret>"bZ"az"b<a-z>a'
+
+  # Comment
+  map -docstring 'Comment' global normal '#' ':comment-line<ret>'
+  map -docstring 'Comment' global normal '<a-#>' ':comment-block<ret>'
+}
+
+hook global ModuleLoaded tmux %{
+  define-command tmux-terminal-popup -params 1.. -shell-completion -docstring '
+  tmux-terminal-popup <program> [<arguments>]: create a new terminal as a tmux popup
+  The program passed as argument will be executed in the new popup' \
+  %{
+      tmux-terminal-impl 'display-popup -E -h 75% -d #{pane_current_path}' %arg{@}
+  }
+  alias global popup tmux-terminal-popup
+}
+
+plug auto-pairs https://github.com/alexherbo2/auto-pairs.kak %{
+  auto-pairs-enable
+}
+
+plug replace-mode https://github.com/alexherbo2/replace-mode.kak %{
+  map -docstring 'Replace' global user r ': enter-replace-mode<ret>'
+}
+
+plug manual-indent https://github.com/alexherbo2/manual-indent.kak %{
+  # Manual indent
+  hook global WinCreate .* %{
+    manual-indent-enable
+  }
+
+  # Remove filetype hooks
+  hook global WinSetOption filetype=.* %{
+    manual-indent-remove-filetype-hooks
   }
 }
-plug alexherbo2/connect.kak config %{
-  require-module connect-lf
-  set-option global connect_environment %{
-    GIT_EDITOR='kak -c $KAKOUNE_SESSION'
-    export LYEDITOR='edit %(file)s +%(line)s:%(column)s'
-  }
-}
-plug occivink/kakoune-find config %{
-  define-command -docstring "grep-apply-changes: apply changes specified in current *grep* buffer to their respective files" \
+
+plug-old kakoune-find https://github.com/occivink/kakoune-find %{
+  define-command -docstring \
+  "grep-apply-changes: apply changes specified in current *grep* buffer to their respective files" \
   grep-apply-changes %{ find-apply-changes -force }
 }
 
-plug alexherbo2/mkdir.kak config %{
-  hook global BufWritePre .* %{
-  	mkdir-buffer %reg[%]
-  }
+plug search-highlighter https://github.com/alexherbo2/search-highlighter.kak %{
+  search-highlighter-enable
 }
-plug alexherbo2/search-highlighter.kak
-
-set-option global modelinefmt '{{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default} {{context_info}}'
-
-#################################################
-# CONFIGURATION
-#################################################
-
-# Move macros to ¨
-map global normal ¨ q
-map global normal <a-¨> Q
-
-map-all normal %{
-    '#' comment-line "Comment line"
-    '<a-#>' comment-block "Comment line"
+plug out-of-view https://github.com/alexherbo2/out-of-view.kak %{
+	out-of-view-enable
 }
 
-def file-delete -docstring \
-"Delete current file" %{
-   prompt "Delete file [Y/n]? " '%sh{ [[ "$kak_text" =~ [yY] ]] && rm $kak_buffile && echo "delete-buffer" }' 
+plug execute-key https://github.com/alexherbo2/execute-key.kak
+plug phantom https://github.com/alexherbo2/phantom.kak %{
+  phantom-enable
+  phantom-add-mappings
 }
 
-new-mode files f %{
-    f "fzf-file"                               "List files"
-    t 'lf %reg[percent]'                       "File tree (current file)"
-    T "lf ."                                   "File tree (current dir)"
-    w "write"                                  "Write file" 
-    c "fzf-file ~/.config/kak/"                "Open config dir"
-    d "file-delete"                            "Delete current file"
+plug snippets https://github.com/alexherbo2/snippets.kak %{
+  # Enable snippets
+  snippets-enable
+
+  # Options
+  set-option global snippets_scope global global/arrows global/bullets global/dashes global/punctuation global/boxes global/math
+
+  # Mappings
+  # Create new snippets
+  map -docstring 'Edit snippets' global user / ': snippets-edit<ret>'
+
+  # Add auto-pairs integration
+  map -docstring 'Expand snippets' global insert <ret> '<a-;>: snippets-enter auto-pairs-insert-new-line<ret>'
+
+  # Hooks
+  # Indent snippets with tabs
+  hook global BufCreate '.+/\.?config/snippets/.+' %{
+    set-option buffer indentwidth 0
+  }  
 }
 
-new-mode buffers b %{
-    b fzf-buffer      "List Buffers" 
-    n buffer-next     "Next Buffer" 
-    p buffer-previous "Prev buffer" 
-    d delete-buffer   "Delete buffer"
-    u 'buffer *debug*' "Debug buffer"
+plug-old kakoune-gdb https://github.com/occivink/kakoune-gdb
+
+plug evaluate-selections https://github.com/alexherbo2/evaluate-selections.kak %{
+  map -docstring 'Evaluate selections' global user = ': evaluate-selections<ret>'
 }
 
-def tmux-new-vertical -params .. -command-completion %{
-  tmux-terminal-vertical kak -c %val{session} -e "%arg{@}"
+plug fzf https://github.com/andreyorst/fzf.kak %{
+  require-module fzf-file
+  set-option global fzf_file_command "fd . --type f -uu --follow"
+  set-option global fzf_file_preview false
+  require-module fzf-vcs
+  set-option global fzf_git_command "fd . --type f --follow"
+  require-module fzf-buffer
 }
 
-def tmux-new-horizontal -params .. -command-completion %{
-  tmux-terminal-horizontal kak -c %val{session} -e "%arg{@}"
+plug-autoload user-mode
+plug-autoload lsp
+plug-autoload clip
+plug-autoload my-cpp
+plug-autoload surround %{
+  map -docstring 'Surround mode' global user s ': surround-mode<ret>'
 }
 
-new-mode my-tmux w %{
-    h     'tmux select-pane -L' 'Select pane to the left'  -sh
-    j     'tmux select-pane -D' 'Select pane below'        -sh
-    k     'tmux select-pane -U' 'Select pane above'        -sh
-    l     'tmux select-pane -R' 'Select pane to the right' -sh
-
-    <tab> 'tmux last-pane'      'Select last pane'         -sh
-    J     'tmux swap-pane -D'   'Swap pane below'          -sh
-    K     'tmux swap-pane -U'   'Swap pane above'          -sh
-
-    s     'tmux-new-vertical'   'Split horizontally'
-    v     'tmux-new-horizontal' 'Split vertically'
-    d     quit                  'Delete pane'
+# kakoune.cr
+# https://github.com/alexherbo2/kakoune.cr
+evaluate-commands %sh{
+  kcr init kakoune
 }
-
-def git-blame-toggle %{
-    try %[
-        addhl window/git-blame flag_lines Info git_blame_flags
-        rmhl window/git-blame
-        git blame
-    ] catch %[
-        git hide-blame
-    ]
-}
-
-new-mode git g %{
-    g     'repl tig'            'Open tig'
-    f     'fzf-git'             'Open files in repo'
-    p     ':git '               'Open git prompt' -raw
-    b     'git-blame-toggle'    'Toggle git blame'
-}
-
-# switch windows
-map-all user -sh %{
-    1 'tmux-select-pane 1'  'Select pane 1'
-    2 'tmux-select-pane 2'  'Select pane 2'
-    3 'tmux-select-pane 3'  'Select pane 3'
-    4 'tmux-select-pane 4'  'Select pane 4'
-    5 'tmux-select-pane 5'  'Select pane 5'
-    6 'tmux-select-pane 6'  'Select pane 6'
-    7 'tmux-select-pane 7'  'Select pane 7'
-    8 'tmux-select-pane 8'  'Select pane 8'
-    9 'tmux-select-pane 9'  'Select pane 9'
-    0 'tmux-select-pane 10' 'Select pane 10'
-}
-
-import surround
-map global user s -docstring 'Surround' ': surround-mode<ret>'
-
-decl str local_config_dir
-
-def source-local-config -override -params ..1 %{
-  eval %sh{
-      function upsearch () {
-          if test / == "$PWD"; then
-              return
-          elif test -e "$1"; then
-              echo "set buffer local_config_dir $PWD"
-              echo "source $PWD/$1"
-              return
-          else
-              cd ..
-              upsearch "$1"
-          fi
-      }
-
-      startdir=${1:-$(dirname $kak_buffile)}
-      [[ -d "$startdir" ]] && cd $startdir
-      upsearch ".local.kak"
-  }
-}
-
-hook global BufCreate .* source-local-config 
-hook global BufCreate .* modeline-parse
-
-# Autoload manually
-
-declare-option str-list autoload_ignore core/php extra/modeline
-
-# Filetypes
-
-# Load current terminal colorscheme
-colorscheme %sh{ colorscheme-switch --current }
-
-hook global BufCreate .*\.bb(|class|append) %{
-  set buffer filetype sh
-}
-hook global BufCreate .*\.conf %{
-  set buffer filetype ini
-}
-
-import modeline
-import markdown
-import php
-import c++
-import js
-import meson
-import faust
-
-import ide
-
-hook -once global ModeChange .* ide-setup
-
-colorscheme %sh{ colorscheme-switch --current }
-

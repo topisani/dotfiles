@@ -42,11 +42,30 @@ done
 
 xrandr --output eDP1 --primary
 
-xrandr \
-  --output eDP1 --mode 1920x1080 --pos 0x0 --rotate normal \
-  --output $(name_for_eeid "DELL P2417H")  --primary --mode 1920x1080 --pos 1997x0 --rotate normal
+# # 3 screens horizontally
+# xrandr \
+#   --output eDP1 --mode 1920x1080 --pos 0x0 --rotate normal \
+#   --output $(name_for_eeid "DELL P2417H")  --primary --mode 1920x1080 --pos 1997x0 --rotate normal
+# 
+# xrandr \
+#   --output eDP1 --mode 1920x1080 --pos 0x0 --rotate normal \
+#   --output $(name_for_eeid "DELL P2417H")  --primary --mode 1920x1080 --pos 1997x0 --rotate normal \
+#   --output $(name_for_eeid "B22T-7 LED PG") --mode 1920x1080 --pos 3996x0 --rotate right
 
-xrandr \
-  --output eDP1 --mode 1920x1080 --pos 0x0 --rotate normal \
-  --output $(name_for_eeid "DELL P2417H")  --primary --mode 1920x1080 --pos 1997x0 --rotate normal \
-  --output $(name_for_eeid "B22T-7 LED PG") --mode 1920x1080 --pos 3996x0 --rotate right 
+# 2 Screens vertically
+dell=$(name_for_eeid "DELL P2417H")
+fujitsu=$(name_for_eeid "B22T-7 LED PG")
+
+if [[ -n "$dell" ]]; then
+  xrandr \
+    --output eDP1 --mode 1920x1080 --pos 0x1140 --rotate normal \
+    --output "$dell" --primary --mode 1920x1080 --pos 0x0 --rotate normal
+fi
+
+if [[ -n "$fujitsu" ]]; then
+  xrandr \
+    --output eDP1 --mode 1920x1080 --pos 0x1140 --rotate normal \
+    --output "$fujitsu" --primary --mode 1920x1080 --pos 0x0 --rotate normal
+fi
+
+bspc wm -r

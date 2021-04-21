@@ -7,6 +7,7 @@ source /etc/profile.d/locale.sh
 # Set cursor from X to pointer
 xrdb ~/.Xresources
 setxkbmap dk nodeadkeys -option ctrl:nocaps -option compose:rctrl
+xinput disable $(xinput | grep "Wacom HID 5113 Finger" | grep -oP 'id=\K\d+')
 xinput set-prop $(xinput | grep SYNA | grep Touchpad | grep -oP 'id=\K\d+') 'libinput Natural Scrolling Enabled' 1
 
 xsetroot -cursor_name left_ptr &

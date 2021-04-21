@@ -1,1 +1,1 @@
-eval (direnv hook fish)
+direnv hook fish | source

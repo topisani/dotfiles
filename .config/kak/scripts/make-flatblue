@@ -4,8 +4,8 @@
 
 alpha() {
   echo -n "rgba:"
-  echo -n $1 | cut -d: -f2 -z
-  echo -n $2
+  echo -n "${1/rgb:/}"
+  echo -n "$2"
 }
 
 echo "
@@ -51,7 +51,7 @@ face global GitBlame                    $fg2,              default
 # Code highlighting
 face global value                       $purple,           default
 face global type                        $blue_light,       default
-face global variable                    $blue,             default
+face global variable                    $aqua_dark,        default
 face global module                      $orange,           default
 face global function                    $yellow_light,     default
 face global string                      $green,            default
@@ -61,7 +61,7 @@ face global operator                    $fg,               default
 face global attribute                   $red,              default
 face global meta                        $orange,           default
 face global builtin                     $red_dark,         default
-face global comment                     $gray,             default         +i
+face global comment                     $gray,             default       +i
 face global identifier                  $yellow_dark,      default
 face global annotation                  $gray,             default
 
@@ -96,10 +96,12 @@ face global PrimarySelectionSearch      $fg,               $blue
 face global SnippetsOtherPlaceholders   default, $(alpha $green 40)
 face global SnippetsNextPlaceholders    default, $(alpha $green A0)
 
-face global memberFunction $yellow_light,$bg+i
-face global memberVariable $blue,$bg+i
-face global cppMacro       $purple_light, $bg
-face global disabledRegion $gray, $bg
+face global memberFunction '+i@function'
+face global cppConcept     '+i@type'
+face global memberVariable '+i@variable'
+face global cppMacro       $purple_light,  default
+face global cppDependent   $aqua,  default
+face global disabledRegion $gray,          default
 
 decl str lsp_diagnostic_line_error_sign
 decl str lsp_diagnostic_line_warning_sign
@@ -125,4 +127,4 @@ define-command -hidden -override powerline-theme-flatblue %{
     declare-option -hidden str powerline_color31 rgb:fbf1c7 # unused
 }
 
-" | sed 's/, */,/' | sed 's/ *+/+/'
+" | sed 's/, */,/;s/ *+/+/'

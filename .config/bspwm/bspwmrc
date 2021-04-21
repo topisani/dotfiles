@@ -21,6 +21,8 @@ bspc config borderless_monocle true
 bspc config single_monocle true
 bspc config gapless_monocle true
 bspc config focus_follows_pointer true
+bspc config pointer_follows_monitor true
+bspc config pointer_follows_focus true
 bspc config remove_disabled_monitors true
 bspc config remove_unplugged_monitors true
 
@@ -41,14 +43,14 @@ run() {
 
 run dunst
 run picom
-run betterlockscreen -w
-run redshift -m randr -l 56:10
+#run betterlockscreen -w
+#run redshift -m randr -l 56:10
 run battery_notifyd
 run nm-applet
-run pa-applet
+#run pa-applet
 run blueman-applet
 
-xss-lock --transfer-sleep-lock -- betterlockscreen -l --nofork &
+#xss-lock --transfer-sleep-lock -- betterlockscreen -l --nofork &
 
 killall polybar
 for m in $( bspc query -M --names ); do

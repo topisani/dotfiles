@@ -96,12 +96,12 @@ full-at = 98
 poll-interval = 0
 time-format = %H:%M
 
-format-charging    = "<animation-charging> <label-charging> %{B-}"
-format-discharging = "<ramp-capacity> <label-discharging> %{B-}"
-format-full        = "<ramp-capacity> <label-full> %{B-}"
+format-charging    = "%{F#fefcfb}<animation-charging> <label-charging> %{B-}%{F-}"
+format-discharging = "%{F#fefcfb}<ramp-capacity> <label-discharging> %{B-}%{F-}"
+format-full        = "%{F#fefcfb}<ramp-capacity> <label-full> %{B-}%{F-}"
 
 ramp-capacity-0 = "%{B#fb4934} "
-ramp-capacity-1 = "%{B#fb4934} "
+ramp-capacity-1 = "%{B#f39c12} "
 ramp-capacity-2 = "%{B#f39c12} "
 ramp-capacity-3 = "%{B#f39c12} "
 ramp-capacity-4 = "%{B#3e871e} "

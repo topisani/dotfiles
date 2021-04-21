@@ -1,4 +1,4 @@
-add-auto-load-safe-path /home/topisani/dev/otto-bsp/build/workspace/sources/otto-core/.gdbinit
+add-auto-load-safe-path /home/topisani/src/otto-bsp/build
 add-auto-load-safe-path /home/topisani/dev/otto-mcu-fw
 
 python

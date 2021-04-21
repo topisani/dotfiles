@@ -13,4 +13,8 @@ case "$class" in
     	echo "$consequences"
     fi
 		;;
+	OTTO)
+  	echo "state=floating"
+  	echo "$consequences"
+  	;;
 esac
