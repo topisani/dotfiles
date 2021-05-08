@@ -1,0 +1,193 @@
+#!/bin/bash
+
+_usage() {
+  echo "
+Symlink-based dotfile manager
+
+  subterranean [cmd]
+
+Commands:
+  git [...]:         Execute git command in dotfiles 
+  add <src> <dst>:   Move <src> into dotfiles/<dst> and create symlink in place of it
+  remove <entry>:    Remove the matching entry and move the files back
+  get-dir:           Output the dotfiles directory
+  install:           Set up symlinks
+  edit:              Edit the links file
+  list:              List symlinks
+"
+}
+
+DOTFILES_FOLDER="$HOME/.dotfiles"
+DOTFILES_FILE="$DOTFILES_FOLDER/subterranean.lst"
+
+# Utils
+
+_err() {
+  tput setaf 1
+  tput bold
+  echo -n "==> "
+  tput sgr0
+  tput bold
+  echo "$@"
+  tput sgr0
+  return 1
+}
+
+_suberr() {
+  tput setaf 1
+  tput bold
+  echo -n " -> "
+  tput sgr0
+  tput bold
+  echo "$@"
+  tput sgr0
+  return 1
+}
+
+_msg() {
+  tput setaf 2
+  tput bold
+  echo -n "==> "
+  tput sgr0
+  # tput bold
+  echo "$@"
+  tput sgr0
+}
+
+_submsg() {
+  tput setaf 12
+  tput bold
+  echo -n " -> "
+  tput sgr0
+  # tput bold
+  echo "$@"
+  tput sgr0
+}
+
+_fail() {
+  _err "$@"
+  exit 1
+}
+
+_confirm() {
+  read -n 1 -p "$(tput setaf 2)$(tput bold)==>$(tput sgr0) $1 [Y/n]: "
+  echo ""
+  case $(echo $REPLY | tr '[A-Z]' '[a-z]') in
+    y) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+# Commands
+
+_add() {
+  local src="$1"; shift
+  local reldst="$1"; shift
+  local dst="$DOTFILES_FOLDER/$reldst"
+  src=$(realpath -s "$src")
+  relsrc=${src/#$HOME/\~}
+  if ! [[ -e "$src" ]]; then
+    _fail "$src not found"
+  fi
+  if [[ -e "$dst" ]]; then
+    _fail "$dst already exists"
+  fi
+  mkdir -p $(dirname "$dst")
+  _msg "Copying $src to $dst"
+  if cp -r "$src" "$dst"; then
+    _msg "Removing $src"
+    rm -rf "$src"
+    _msg "Linking $dst to $src"
+    ln -s "$dst" "$src"
+    _msg "Add entry $(_format_entry $relsrc $reldst) to $DOTFILES_FILE"
+    echo "$relsrc;$reldst" >> $DOTFILES_FILE
+  else
+    _fail "Failed to copy $src to $dst"
+  fi
+}
+
+_remove() {
+  local entry=$(grep -n -m 1 "$1" "$DOTFILES_FILE");
+  local line_number=$(echo "$entry" | cut -d':' -f1)
+  local entry=$(echo "$entry" | cut -d':' -f2)
+  
+  local slpath=$(echo "$entry" | cut -d';' -f1)
+  local dfpathrel=$(echo "$entry" | cut -d';' -f2)
+  local dfpath="$DOTFILES_FOLDER/$dfpathrel"
+  slpath=${slpath/#~/$HOME}
+  
+  if [ -z "$slpath" ] || [ -z "$dfpath" ]; then
+    _fail "No matching entry found"
+  fi
+  if _confirm "Remove entry $(_format_entry $slpath $dfpathrel)?"; then
+    _submsg "Removing symlink $slpath" && \
+    rm "$slpath" && \
+    _submsg "Moving $(_format_entry $dfpath $slpath)" && \
+    mv "$dfpath" "$slpath" && \
+    _submsg "Removing entry from $DOTFILES_FILE" && \
+    sed -i "$line_number d" "$DOTFILES_FILE"
+  fi
+}
+
+_install() {
+  while read line; do
+    local slpath=$(echo "$line" | cut -d';' -f1)
+    local dfpathrel=$(echo "$line" | cut -d';' -f2)
+    local dfpath="$DOTFILES_FOLDER/$dfpathrel"
+    slpath=${slpath/#~/$HOME}
+    _msg "Installing symlink $(_format_entry $slpath $dfpath)" 
+    if [[ -e "$slpath" ]] || [[ -L "$slpath" ]]; then
+      local linkpath=$(readlink -f "$slpath") targetpath=$(realpath "$slpath")
+      if [[ -L "$slpath" ]] && [[ "$linkpath" == "$targetpath" ]]; then
+        _submsg "Symlink already exists"
+      else 
+        _suberr "Not overwriting existing file at '$slpath'"
+      fi
+    else
+      mkdir -p $(dirname "$slpath")
+      ln -s "$dfpath" "$slpath"
+    fi
+  done < "$DOTFILES_FILE" 
+}
+
+_format_entry() {
+  echo -n "$1" 
+  tput setaf 8
+  echo -n " -> "
+  tput sgr0
+  echo -n "$2"
+}
+
+_list() {
+  while read line; do
+    local slpath=$(echo "$line" | cut -d';' -f1)
+    local dfpathrel=$(echo "$line" | cut -d';' -f2)
+    echo $(_format_entry "$slpath" "$dfpathrel")
+  done < "$DOTFILES_FILE" 
+}
+
+_git() {
+  GIT_WORK_TREE="$DOTFILES_FOLDER" GIT_DIR="$DOTFILES_FOLDER/.git" git "$@"
+}
+
+_main() {
+  local cmd="${1-}"; shift
+  case "${cmd}" in
+    get-dir)
+      echo "$DOTFILES_FOLDER"
+      ;;
+    edit)
+      $EDITOR "$DOTFILES_FILE"
+      ;;
+    install | add | remove | list | git)
+      _$cmd "$@"
+      ;;
+    *)
+      _usage
+      exit 1
+      ;;
+  esac
+}
+
+# Run main
+_main "$@"

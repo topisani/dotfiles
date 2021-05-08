@@ -1,3 +1,0 @@
-#!/bin/bash
-
-/usr/bin/rofi -me-select-entry '' -me-accept-entry 'Mouse1' "$@"

@@ -1,0 +1,61 @@
+#!/bin/bash
+
+sxhkd -c ~/.config/bspwm/sxhkdrc &
+
+xsetroot -cursor_name left_ptr &
+setxkbmap dk nodeadkeys -option compose:rctrl -option ctrl:nocaps
+
+# bspc monitor eDP1 -d 1 2 3 4 5 6 7 8 9 0
+desktops=( 1 2 3 4 5 6 7 8 9 0 )
+for m in $(xrandr --query | grep " connected" | sed '/eDP1/d' - | cut -d" " -f1); do
+  bspc monitor $m -d ${desktops[-1]}
+  unset 'desktops[${#desktops[@]}-1]'
+done
+bspc monitor eDP1 -d ${desktops[@]}
+
+bspc config border_width        2
+bspc config window_gap          4
+
+bspc config split_ratio          0.52
+bspc config borderless_monocle true
+bspc config single_monocle true
+bspc config gapless_monocle true
+bspc config focus_follows_pointer true
+bspc config pointer_follows_monitor true
+bspc config pointer_follows_focus false
+bspc config remove_disabled_monitors true
+bspc config remove_unplugged_monitors true
+
+bspc config focused_border_color "#178ca6"
+bspc config normal_border_color "#23262a"
+bspc config external_rules_command "$HOME/.config/bspwm/external_rules"
+bspc rule -a google-chrome desktop='1' follow=on
+bspc rule -a feh state=floating follow=on
+bspc rule -a Lxappearance state=floating follow=on
+bspc rule -a Screenkey manage=off
+bspc rule -a Thunderbird desktop='7'
+bspc rule -a Discord desktop='0'
+
+run() {
+  while pgrep -u $UID -f "$1" >/dev/null; do pkill -f "$1"; done
+  "$@" &
+}
+
+run dunst
+run picom
+#run betterlockscreen -w
+#run redshift -m randr -l 56:10
+run battery_notifyd
+run nm-applet
+#run pa-applet
+run blueman-applet
+
+#xss-lock --transfer-sleep-lock -- betterlockscreen -l --nofork &
+
+killall polybar
+for m in $( bspc query -M --names ); do
+  index=$((index + 1))
+  export P_BSPWM_WINDOW_CMD="tail -f ${HOME}/.cache/bspwm_windows_${index}.txt"
+  export MONITOR=$m
+  polybar -r -c .config/bspwm/polybar main &
+done

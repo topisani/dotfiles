@@ -1,0 +1,132 @@
+#!/bin/bash
+
+# Generate flatblue theme.
+
+alpha() {
+  echo -n "rgba:"
+  echo -n "${1/rgb:/}"
+  echo -n "$2"
+}
+
+echo "
+# Markdown highlighting
+face global title                       $green,            $bg       +b
+face global header                      $orange,           $bg       +b
+face global bold                        $fg,               $bg       +b
+face global italic                      $fg3,              $bg       +i
+face global mono                        $fg3,              $bg
+face global block                       $fg2,               $bg
+face global link                        $blue,               $bg
+face global bullet                      $purple,               $bg
+face global list                        $purple,               $bg
+
+face global Reference                   $fg,               $bg       +b
+face global Default                     $fg,               $bg
+face global PrimarySelection            default,           $(alpha $blue_light 80)
+face global SecondarySelection          default,           $(alpha $blue 40)
+face global PrimaryCursor               $bg0,              $(alpha $bluish_fg e0)
+face global SecondaryCursor             $bg0,              $(alpha $bluish_fg 80)
+face global PrimaryCursorEol            $bg0,              $fg0      +f
+face global SecondaryCursorEol          $bg3,              $fg3      +f
+face global LineNumbers                 $bg4,              default
+face global LineNumberCursor            $fg3,              $bg1
+face global LineNumbersWrapped          $bg,               default
+face global MenuForeground              $bg2,              $blue
+face global MenuBackground              $fg,               $bg2
+face global MenuInfo                    $blue_light,       $bg2
+face global Information                 $bg,               $yellow
+face global Error                       $red,              default       +u
+face global StatusLine                  $fg,               default
+face global StatusLineMode              $yellow,           default       +b
+face global StatusLineInfo              $purple,           default
+face global StatusLineValue             $red,              default
+face global StatusCursor                $bg,               $fg
+face global Prompt                      $yellow,           default
+face global MatchingChar                $fg,               default       +b
+face global BufferPadding               $bg2,              default
+face global Whitespace                  $bg2,              default
+
+face global GitBlame                    $fg2,              default
+
+# Code highlighting
+face global value                       $purple,           default
+face global type                        $blue_light,       default
+face global variable                    $aqua_dark,        default
+face global module                      $orange,           default
+face global function                    $yellow_light,     default
+face global string                      $green,            default
+face global documentation               $green,            default
+face global keyword                     $red,              default
+face global operator                    $fg,               default
+face global attribute                   $red,              default
+face global meta                        $orange,           default
+face global builtin                     $red_dark,         default
+face global comment                     $gray,             default       +i
+face global identifier                  $yellow_dark,      default
+face global annotation                  $gray,             default
+
+face global DiagnosticWarning           $yellow,           default       +u
+face global DiagnosticError             $red,              default       +u
+face global LineFlagErrors              $red,              default       +b
+face global LineFlagWarnings            $yellow,           default       +b
+
+# Cquery semantic highlighting
+face global cqueryTypes                 type
+face global cqueryEnums                 variable
+face global cqueryTypeAliases           type
+face global cqueryTemplateParameters    variable
+face global cqueryFreeStandingFunctions function
+face global cqueryMemberFunctions       $yellow_light,     default       +i
+face global cqueryStaticMemberFunctions $yellow_light,     default
+face global cqueryFreeStandingVariables variable
+face global cqueryGlobalVariables       variable
+face global cqueryStaticMemberVariables variable
+face global cqueryMemberVariables       $blue,             default       +i
+face global cqueryParameters            variable 
+face global cqueryEnumConstants         variable
+face global cqueryNamespaces            module
+face global cqueryMacros                $purple_light,     default
+
+# Plugs
+face global Phantom                     $bg,               $green_dark
+face global Search                      $fg,               $bg3
+face global PrimarySelectionDefault     $fg,               $blue
+face global PrimarySelectionSearch      $fg,               $blue
+face global SearchBackground            $gray,              default
+face global SearchOccurrence            $fg,               default      +ib
+
+face global SnippetsOtherPlaceholders   default, $(alpha $green 40)
+face global SnippetsNextPlaceholders    default, $(alpha $green A0)
+
+face global memberFunction '+i@function'
+face global cppConcept     '+i@type'
+face global memberVariable '+i@variable'
+face global cppMacro       $purple_light,  default
+face global cppDependent   $aqua,  default
+face global disabledRegion $gray,          default
+
+decl str lsp_diagnostic_line_error_sign
+decl str lsp_diagnostic_line_warning_sign
+set global lsp_diagnostic_line_error_sign '{LineFlagErrors}!'
+set global lsp_diagnostic_line_warning_sign '{LineFlagWarnings}!'
+
+declare-option -hidden str-list powerline_themes
+set-option -add global powerline_themes flatblue
+
+define-command -hidden -override powerline-theme-flatblue %{
+    declare-option -hidden str powerline_color00 $fg # fg: bufname
+    declare-option -hidden str powerline_color01 $bg2 # bg: position
+    declare-option -hidden str powerline_color02 $fg # fg: git
+    declare-option -hidden str powerline_color03 $bg # bg: bufname
+    declare-option -hidden str powerline_color04 $bg # bg: git
+    declare-option -hidden str powerline_color05 $bg # fg: position
+    declare-option -hidden str powerline_color06 $fg # fg: line-column
+    declare-option -hidden str powerline_color07 $fg # fg: mode-info
+    declare-option -hidden str powerline_color08 $bg # base background
+    declare-option -hidden str powerline_color09 $bg1 # bg: line-column
+
+    declare-option -hidden str powerline_color30 $bg1 # unused
+    declare-option -hidden str powerline_color31 rgb:fbf1c7 # unused
+}
+
+" | sed 's/, */,/;s/ *+/+/'

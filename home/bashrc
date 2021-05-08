@@ -1,0 +1,57 @@
+#
+# ~/.bashrc
+#
+
+[[ $- != *i* ]] && return
+
+[ -r /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
+
+export TMPDIR="/tmp"
+
+complete -cf sudo
+
+# Bash won't get SIGWINCH if another process is in the foreground.
+# Enable checkwinsize so that bash will check the terminal size when
+# it regains control.  #65623
+# http://cnswww.cns.cwru.edu/~chet/bash/FAQ (E11)
+shopt -s checkwinsize
+
+# Enable history appending instead of overwriting.  #139609
+shopt -s histappend
+HISTSIZE=10000
+HISTFILESIZE=10000
+# Extended globs for more globbing goodness
+shopt -s extglob
+shopt -s expand_aliases
+
+# Disable special handing of <c-s> and <c-q>
+stty -ixon -ixoff
+
+# xhost to allow remote X connections
+# xhost +local:root > /dev/null 2>&1
+
+# Configuration
+source ~/.config/bash/aliases.sh
+source ~/.config/bash/git.sh
+
+# broot
+source /home/topisani/.config/broot/launcher/bash/br
+
+# Node Version Manager
+source /usr/share/nvm/init-nvm.sh
+
+# Opam: Ocaml package manager
+eval $(opam config env)
+
+# Starship prompt
+eval "$(starship init bash)"
+
+# https://github.com/ajeetdsouza/zoxide
+eval "$(zoxide init bash)"
+
+# Enhanced file path completion in bash - https://github.com/sio/bash-complete-partial-path
+if [ -s "$HOME/.config/bash-complete-partial-path/bash_completion" ]
+then
+  source "$HOME/.config/bash-complete-partial-path/bash_completion"
+  _bcpp --defaults
+fi
