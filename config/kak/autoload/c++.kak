@@ -115,6 +115,7 @@ provide-module my-cpp %§
   # filetype hook
   filetype-hook (cpp|c) %{
     lsp-setup
+    lsp-enable-semantic-tokens
 
     map-all filetype -scope window %{
       d     "enter-user-mode gdbrepeat" 'GDB...'
@@ -132,10 +133,6 @@ provide-module my-cpp %§
 
     set window tabstop 2
     set window indentwidth 2
-
-    hook window -group semantic-tokens BufReload .* lsp-semantic-tokens
-    hook window -group semantic-tokens NormalIdle .* lsp-semantic-tokens
-    hook window -group semantic-tokens InsertIdle .* lsp-semantic-tokens
   }
 
 

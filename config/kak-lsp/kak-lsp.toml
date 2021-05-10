@@ -7,12 +7,26 @@ verbosity = 2
 # set to 0 to disable
 timeout = 1800 # seconds = 30 minutes
 
+# [language.rust]
+# filetypes = ["rust"]
+# roots = ["Cargo.toml"]
+# command = "rls"
+
 [language.rust]
 filetypes = ["rust"]
 roots = ["Cargo.toml"]
-command = "rls"
+command = "sh"
+args = ["-c", "if command -v rustup >/dev/null; then $(rustup which rust-analyzer); else rust-analyzer; fi"]
 
-[language.crystal]
+[language.rust.initialization_options]
+# If you get 'unresolved proc macro' warnings, you have two options
+# 1. The safe choice is two disable the warning:
+diagnostics.disabled = ["unresolved-proc-macro"]
+# 2. Or you can opt-in for proc macro support
+procMacro.enable = true
+cargo.loadOutDirsFromCheck = true
+# See https://github.com/rust-analyzer/rust-analyzer/issues/6448[language.crystal]
+
 filetypes = ["crystal"]
 roots = ["shard.yml"]
 command = "scry"

@@ -15,6 +15,15 @@ provide-module lsp %{
   set global lsp_auto_highlight_references true
 
   set global lsp_hover_max_lines 20
+  
+  def -hidden lsp-insert-c-n %{
+   try %{
+     lsp-snippets-select-next-placeholders
+     exec '<a-;>d'
+   } catch %{
+     exec -with-hooks '<c-n>'
+   }
+  }
 
   def lsp-setup %{
       map-all lsp -scope buffer %{
@@ -30,7 +39,8 @@ provide-module lsp %{
       }
 
       lsp-enable-window
-
+      
+      map global insert <c-n> "<a-;>: lsp-insert-c-n<ret>"
       #set buffer idle_timeout 250
   }
 
@@ -48,7 +58,29 @@ provide-module lsp %{
       echo -markup " {Error}%arg{1}"
   }
 
-  filetype-hook (css|scss|typescript|javascript|php|python|java|rust|dart|haskell|ocaml|latex) %{
+  filetype-hook (css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex) %{
     lsp-setup
   }
+  
+  filetype-hook rust %{
+    lsp-setup
+    lsp-enable-semantic-tokens
+    
+    hook window -group rust-inlay-hints BufReload .* rust-analyzer-inlay-hints
+    hook window -group rust-inlay-hints NormalIdle .* rust-analyzer-inlay-hints
+    hook window -group rust-inlay-hints InsertIdle .* rust-analyzer-inlay-hints
+    hook -once -always window WinSetOption filetype=.* %{
+      remove-hooks window rust-inlay-hints
+    }
+  }
+
+  def lsp-enable-semantic-tokens %{
+    hook window -group semantic-tokens BufReload .* lsp-semantic-tokens
+    hook window -group semantic-tokens NormalIdle .* lsp-semantic-tokens
+    hook window -group semantic-tokens InsertIdle .* lsp-semantic-tokens
+    hook -once -always window WinSetOption filetype=.* %{
+      remove-hooks window semantic-tokens
+    }
+  }
+  
 }

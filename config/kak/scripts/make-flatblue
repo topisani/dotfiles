@@ -70,23 +70,6 @@ face global DiagnosticError             $red,              default       +u
 face global LineFlagErrors              $red,              default       +b
 face global LineFlagWarnings            $yellow,           default       +b
 
-# Cquery semantic highlighting
-face global cqueryTypes                 type
-face global cqueryEnums                 variable
-face global cqueryTypeAliases           type
-face global cqueryTemplateParameters    variable
-face global cqueryFreeStandingFunctions function
-face global cqueryMemberFunctions       $yellow_light,     default       +i
-face global cqueryStaticMemberFunctions $yellow_light,     default
-face global cqueryFreeStandingVariables variable
-face global cqueryGlobalVariables       variable
-face global cqueryStaticMemberVariables variable
-face global cqueryMemberVariables       $blue,             default       +i
-face global cqueryParameters            variable 
-face global cqueryEnumConstants         variable
-face global cqueryNamespaces            module
-face global cqueryMacros                $purple_light,     default
-
 # Plugs
 face global Phantom                     $bg,               $green_dark
 face global Search                      $fg,               $bg3
@@ -97,6 +80,9 @@ face global SearchOccurrence            $fg,               default      +ib
 
 face global SnippetsOtherPlaceholders   default, $(alpha $green 40)
 face global SnippetsNextPlaceholders    default, $(alpha $green A0)
+
+# Lsp
+face global InlayHint     $blue_dark+i
 
 face global memberFunction '+i@function'
 face global cppConcept     '+i@type'
@@ -109,24 +95,4 @@ decl str lsp_diagnostic_line_error_sign
 decl str lsp_diagnostic_line_warning_sign
 set global lsp_diagnostic_line_error_sign '{LineFlagErrors}!'
 set global lsp_diagnostic_line_warning_sign '{LineFlagWarnings}!'
-
-declare-option -hidden str-list powerline_themes
-set-option -add global powerline_themes flatblue
-
-define-command -hidden -override powerline-theme-flatblue %{
-    declare-option -hidden str powerline_color00 $fg # fg: bufname
-    declare-option -hidden str powerline_color01 $bg2 # bg: position
-    declare-option -hidden str powerline_color02 $fg # fg: git
-    declare-option -hidden str powerline_color03 $bg # bg: bufname
-    declare-option -hidden str powerline_color04 $bg # bg: git
-    declare-option -hidden str powerline_color05 $bg # fg: position
-    declare-option -hidden str powerline_color06 $fg # fg: line-column
-    declare-option -hidden str powerline_color07 $fg # fg: mode-info
-    declare-option -hidden str powerline_color08 $bg # base background
-    declare-option -hidden str powerline_color09 $bg1 # bg: line-column
-
-    declare-option -hidden str powerline_color30 $bg1 # unused
-    declare-option -hidden str powerline_color31 rgb:fbf1c7 # unused
-}
-
 " | sed 's/, */,/;s/ *+/+/'
