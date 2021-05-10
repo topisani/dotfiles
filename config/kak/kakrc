@@ -27,7 +27,7 @@ plug-core %{
 
   # Window-based settings
   hook global WinCreate .* %{
-    addhl window/numbers number-lines -hlcursor -separator ' '
+    addhl window/numbers number-lines -hlcursor -relative -separator ' '
     addhl window/matching show-matching
     # addhl window/show-whitespaces show-whitespaces
   }
