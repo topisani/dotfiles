@@ -1,0 +1,26 @@
+@import url('/home/topisani/.local/share/gnome-shell/extensions/unite@hardpixel.eu/styles/buttons-right.css');
+
+ /*
+ * Reduce height of window header (title?) bars.
+ * Seems enough to specify padding, no need to repeat
+ *   padding-left padding-right padding-top padding-bottom
+ * nor it seems necessary to even mention
+ *   margin-top margin-bottom
+ */
+.default-decoration {
+    min-height: 0px;
+    padding: 0px;
+}
+
+.default-decoration .titlebutton {
+    min-height: 0px;
+    min-width: 0px;
+    padding: 3px;
+}
+
+/*
+ * Add padding to termite
+ */
+VteTerminal, vte-terminal {
+  padding: 0px;
+}

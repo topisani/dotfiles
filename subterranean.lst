@@ -16,3 +16,4 @@
 ~/.config/zathura;config/zathura
 ~/.config/picom.conf;config/picom.conf
 ~/.config/kak-lsp;config/kak-lsp
+~/.config/gtk-3.0/gtk.css;config/gtk-3.0/gtk.css
