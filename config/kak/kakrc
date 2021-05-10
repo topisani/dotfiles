@@ -16,8 +16,6 @@ plug-core %{
   set-option -add global ui_options ncurses_assistant=none
   set-option -add global ui_options ncurses_set_title=no
 
-  colorscheme %sh{ colorscheme-switch --current }
-
   set-option global modelinefmt '{yellow}%opt{out_of_view_status_line}{default} {{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {{context_info}} {cyan}U+%sh{printf ''%04x'' "$kak_cursor_char_value"}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default}'
   #set-option global modelinefmt '{yellow}%opt{out_of_view_status_line}{default} {{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default} {{context_info}}'
 
@@ -27,9 +25,9 @@ plug-core %{
 
   # Window-based settings
   hook global WinCreate .* %{
-    addhl window/numbers number-lines -hlcursor -relative -separator ' '
+    #addhl window/numbers number-lines -hlcursor -relative -separator ' '
     addhl window/matching show-matching
-    # addhl window/show-whitespaces show-whitespaces
+    #addhl window/show-whitespaces show-whitespaces
   }
 
   # Default indentation
@@ -66,7 +64,7 @@ plug-core %{
   map -docstring 'Comment' global normal '<a-#>' ':comment-block<ret>'
   
   def sidetree %{
-    tmux-terminal-impl 'split-window -hb -l 30' kcr shell -s %val[session] -c %val[client] sidetree
+    $ tmux split-window -hb -t 1 -l 30 sidetree
   }
 
   map -docstring 'sidetree' global user <tab> ': sidetree<ret>'
@@ -162,10 +160,15 @@ plug-old search https://github.com/alexherbo2/search.kak %{
   map -docstring 'Search' global normal F ':search<ret>'  
 }
 
+plug number-toggle https://github.com/evanrelf/number-toggle.kak %{
+  set global number_toggle_params -hlcursor -separator ' '
+}
+
 plug-autoload user-mode
 plug-autoload lsp
 plug-autoload clip
 plug-autoload my-cpp
+plug-autoload ide
 plug-autoload surround %{
   map -docstring 'Surround mode' global user s ': surround-mode<ret>'
 }
@@ -176,3 +179,8 @@ evaluate-commands %sh{
   kcr init kakoune
 }
 
+# Make sure this runs after all modules have been loaded
+hook global KakBegin .* %{
+  colorscheme %sh{ colorscheme-switch --current }
+  ide-setup
+}

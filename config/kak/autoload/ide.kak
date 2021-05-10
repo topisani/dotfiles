@@ -2,12 +2,8 @@ provide-module ide %§
   decl -hidden str toolsclient_tmux_pane
 
   def ide-perform-setup -hidden %{
-    require-module tmux
 
-    set global jumpclient client0
-
-    tmux-terminal-impl "split-window -p 0" kak -c %val{session} -e 'rename-client tools; ide-hide-tools'
-    set global toolsclient tools
+    ide-make-tools
 
     hook -group ide global ClientClose .* %{
         eval -client tools %sh{
@@ -32,7 +28,7 @@ provide-module ide %§
                 echo ide-show-tools
                 echo "map window my-tmux d ' :delete-buffer<ret> :ide-hide-tools<ret>'"
                 echo "map window buffers d ' :delete-buffer<ret> :ide-hide-tools<ret>'"
-                echo "focus %opt[toolsclient]"
+                echo "focus $kak_opt_toolsclient"
             fi 
         }
     }
@@ -53,10 +49,24 @@ provide-module ide %§
         }
     }
 
-    hook global FocusIn .* %{
-        eval %sh{
-          [[ $kak_client =~ ^client ]] && echo "set global jumpclient '$kak_client'"
-        }
+    hook global FocusIn ^client.* %{
+      set global jumpclient %val[client]
+    }
+  }
+
+  def -hidden ide-make-tools %{
+    set global jumpclient %val{client}
+    try %{
+      eval -client "%opt[toolsclient]" %{
+        #quit
+      }
+    }
+    set global toolsclient tools
+    eval %sh{
+      TMUX=${kak_client_env_TMUX:-$TMUX}
+      tmux new-session -ds "kakoune-background" &> /dev/null
+      DEST=$(tmux new-window -P -t kakoune-background kak -c $kak_session -e 'rename-client tools')
+      [[ $? == 0 ]] && echo "set global toolsclient_tmux_pane '$DEST'"
     }
   }
 
@@ -64,14 +74,20 @@ provide-module ide %§
       eval -client tools %{
           buffer *debug*
           eval %sh{
-          TMUX=${kak_client_env_TMUX:-$TMUX}
-          tmux new-session -ds "kakoune-background" &> /dev/null
-        pane=$(tmux break-pane -dP -t "kakoune-background:")
-          [[ $? == 0 ]] && echo "set global toolsclient_tmux_pane '$pane'"
-      }}
+              TMUX=${kak_client_env_TMUX:-$TMUX}
+              tmux new-session -ds "kakoune-background" &> /dev/null
+              pane=$(tmux break-pane -dP -t "kakoune-background:")
+              [[ $? == 0 ]] && echo "set global toolsclient_tmux_pane '$pane'"
+          }
+      }
   }
 
   def ide-show-tools %{
+      try %{
+        eval -client tools ""
+      } catch %{
+        ide-make-tools
+      }
       eval %sh{
           tmux=${kak_client_env_TMUX:-$TMUX}
           if [ -z "$tmux" ]; then
@@ -93,11 +109,9 @@ provide-module ide %§
     echo 'echo -markup "{Information}%arg{4}"'
     echo 'try %{ focus }'
     echo '}'
-  }
+  }}
 
   def ide-setup %{
-    ide-perform-setup
+    hook -once global RawKey .* ide-perform-setup
   }
-
-  ide-setup
 §
