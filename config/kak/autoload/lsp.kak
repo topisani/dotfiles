@@ -40,7 +40,7 @@ provide-module lsp %{
 
       lsp-enable-window
       
-      map global insert <c-n> "<a-;>: lsp-insert-c-n<ret>"
+      map window insert <c-n> "<a-;>: lsp-insert-c-n<ret>"
       #set buffer idle_timeout 250
   }
 

@@ -10,5 +10,5 @@ if [[ "$1" == "--setup" ]]; then
     setup_term "$*"
 else
     args="$*"
-    termite --title="Terminal" -e "sh -c '$0 --setup $args'"
+    kitty --title="Terminal" -1 sh -c "$0 --setup $args"
 fi

@@ -6,7 +6,7 @@ plug plug https://github.com/alexherbo2/plug.kak %{
   # Install plugins and build them.
   define-command plug-upgrade -docstring 'plug-upgrade' %{
     plug-install
-    plug-execute lsp cargo build --release
+    # plug-execute lsp cargo build --release
   }
 }
 
@@ -38,7 +38,7 @@ plug-core %{
   map -docstring 'leader' global normal <space> ': enter-user-mode user<ret>'  
   map -docstring 'remove all sels except main' global normal <backspace> <space> 
   map -docstring 'remove main sel' global normal <a-backspace> <a-space> 
-  map -docstring 'Command Prompt' global normal <ret> :
+  # map -docstring 'Command Prompt' global normal <ret> :
 
   # User Mode bindings
   map -docstring 'Open terminal' global user <ret> ': connect-terminal<ret>'
@@ -63,8 +63,10 @@ plug-core %{
   map -docstring 'Comment' global normal '#' ':comment-line<ret>'
   map -docstring 'Comment' global normal '<a-#>' ':comment-block<ret>'
   
-  def sidetree %{
-    $ tmux split-window -hb -t 1 -l 30 sidetree
+  def sidetree -override %{
+    nop %sh{
+      tmux split-window -hb -t 1 -l 30 -e "KAKOUNE_SESSION=$kak_session" -e "KAKOUNE_CLIENT=$kak_client" sidetree -s "$kak_buffile"
+    }
   }
 
   map -docstring 'sidetree' global user <tab> ': sidetree<ret>'

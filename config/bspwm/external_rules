@@ -6,12 +6,8 @@ instance=$3
 consequences=$4
 
 case "$class" in
-	Termite)
-  	if dropdown --check $wid; then
-  		echo "state=floating"
-  	else
-    	echo "$consequences"
-    fi
+	DropdownTerm)
+		echo "state=floating"
 		;;
 	OTTO)
   	echo "state=floating"
