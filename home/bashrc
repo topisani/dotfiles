@@ -1,4 +1,4 @@
-#
+# vim:ft=sh
 # ~/.bashrc
 #
 
@@ -20,6 +20,14 @@ shopt -s checkwinsize
 shopt -s histappend
 HISTSIZE=10000
 HISTFILESIZE=10000
+HISTCONTROL=ignoreboth:erasedups
+# reedit a history substitution line if it failed
+shopt -s histreedit
+# edit a recalled history line before executing
+shopt -s histverify
+# Append to history after each command. Fucks up `!number` history expansion
+PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
+
 # Extended globs for more globbing goodness
 shopt -s extglob
 shopt -s expand_aliases
@@ -55,3 +63,5 @@ then
   source "$HOME/.config/bash-complete-partial-path/bash_completion"
   _bcpp --defaults
 fi
+
+source <(kitty + complete setup bash)

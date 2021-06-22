@@ -11,7 +11,7 @@ alpha() {
 echo "
 # Markdown highlighting
 face global title                       $green,            $bg       +b
-face global header                      $orange,           $bg       +b
+face global header                      $blue,           $bg       +b
 face global bold                        $fg,               $bg       +b
 face global italic                      $fg3,              $bg       +i
 face global mono                        $fg3,              $bg
