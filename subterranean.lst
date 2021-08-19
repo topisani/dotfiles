@@ -11,10 +11,10 @@
 ~/.gitconfig;home/gitconfig
 ~/.gitignore;home/gitignore
 ~/.profile;home/profile
-~/.tmux.conf;home/tmux.conf
 ~/.xinitrc;home/xinitrc
 ~/.config/zathura;config/zathura
 ~/.config/picom.conf;config/picom.conf
 ~/.config/kak-lsp;config/kak-lsp
 ~/.config/gtk-3.0/gtk.css;config/gtk-3.0/gtk.css
 ~/.config/kitty;config/kitty
+~/.config/tmux;config/tmux
