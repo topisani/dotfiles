@@ -16,7 +16,7 @@ alias l='exa --group-directories-first -F'
 alias ll='l -lh --git'
 alias la='ll -a'
 alias llg='ll --grid'
-alias cd='z'
+# alias cd='z'
 
 export BAT_THEME=base16
 alias cat=bat
@@ -49,6 +49,8 @@ alias a='kcr attach'
 #alias :br='KK broot'
 #alias :cat='kcr cat --raw'
 
+alias st=subterranean
+
 export EDITOR='kcr edit'
 export FZF_DEFAULT_OPTS='--multi --layout=reverse --preview-window=down:60% --color=16'
 
@@ -59,3 +61,10 @@ function tmux-cwd {
 }
 
 alias tcd='tmux-cwd'
+
+# Projects
+function ottobsp {
+  cd ~/src/otto-bsp/
+  source setup-environment build
+  cd workspace/sources/otto-core
+}
