@@ -42,7 +42,7 @@ face global StatusLineInfo              $purple,           default
 face global StatusLineValue             $red,              default
 face global StatusCursor                $bg,               $fg
 face global Prompt                      $yellow,           default
-face global MatchingChar                $fg,               default       +b
+face global MatchingChar                                                '+b'
 face global BufferPadding               $bg2,              default
 face global Whitespace                  $bg2,              default
 
@@ -69,6 +69,9 @@ face global DiagnosticWarning           $yellow,           default       +u
 face global DiagnosticError             $red,              default       +u
 face global LineFlagErrors              $red,              default       +b
 face global LineFlagWarnings            $yellow,           default       +b
+
+face global Reference                                                    '+b'
+face global ReferenceBind                                                '+bu'
 
 # Plugs
 face global Phantom                     $bg,               $green_dark

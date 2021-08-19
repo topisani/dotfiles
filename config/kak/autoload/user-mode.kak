@@ -1,166 +1,84 @@
 # Util functions
-provide-module -override my-utils %{
-
-  def repl-ask %{
-      prompt "Run:" 'repl "confirm-exit %val{text}"'
-  }
-
-  # Define user mode
-
-  def new-mode -params 1.. -docstring \
-  "new-mode <name> [key] [flags..] [body]: Declare a new user mode
-  options:
-      <name>: Name of mode.
-      [key]: If provided, this key will be mapped to enter the mode.
-      [body]: sent to map-all'.
-  flags:
-      -scope to register keybinds in.
-      -docstring <str>: Docstring for keybind. Defaults to '<name>...'
-      -parent <mode>: Mode to register keybinding in. Defaults to 'user'" \
-  %{ eval %sh{
-    source ~/.config/kak/scripts/utils.sh
-    new_mode "$@"
-  }}
-
-  def map-all -params 2.. -docstring \
-  "map-all <mode> <body> [flags..]: Map all keys in <body> to <mode>
-  options:
-      <body>: lines expanded to 'map-mode <mode> {line}'.
-  flags:
-      all flags are forwarded to every keybind. See map-mode"\
-  %{ eval %sh{
-    source ~/.config/kak/scripts/utils.sh
-    map_all "$@"
-  }}
-
-  def map-mode -params 3.. -docstring \
-  "map-mode <mode> <key> <command> [docstring] [flags..]:
-  map <key> in <mode> to <command>
-  options:
-      [docstring] defaults to <command>
-  flags:
-      -scope <scope>: register key in <scope>
-      -raw: interpret <command> as raw keypresses
-      -sh: run <command> in a shell, ignoring the output
-      -repeat: After execution, return to <mode>
-      -norepeat: force this entry to skip repetition" \
-  %{ eval %sh{
-    source ~/.config/kak/scripts/utils.sh
-    map_mode "$@"
-  }}
-
-  def filetype-hook -params 2.. -docstring \
-  "filetype-hook <filetype> [switches] <command>:
-  Add hook for opening a buffer matching <filetype>
-  options:
-      <command>: Command to run on hook
-  switches:
-      -scoppe: window or buffer.
-      -group: Group to add hook to.
-  "\
-  %{ eval %sh{
-      filetype=$1; shift
-      flags=''
-      hook=WinSetOption
-      while [[ $# != 0 ]] && [[ "$1" =~ "^-" ]]; do
-          case $1 in
-              -group)
-                  shift
-                  flags="$flags -group $1"
-                  ;;
-              -scope)
-                  shift
-                  [[ "$1" == "window" ]] && hook="WinSetOption"
-                  [[ "$1" == "buffer" ]] && hook="BufSetOption"
-                  ;;
-          esac
-          shift
-      done
-      echo "hook $flags global $hook filetype=$filetype %{$@}"
-  }}
+def repl-ask %{
+  prompt "Run:" 'repl "confirm-exit %val{text}"'
 }
-
-provide-module user-mode %{
-  require-module my-utils
   
-  map-all normal %{
-    '#' comment-line "Comment line"
-    '<a-#>' comment-block "Comment line"
-  }
-
-  def file-delete -docstring \
-  "Delete current file" %{
-     prompt "Delete file [Y/n]? " '%sh{ [[ "$kak_text" =~ [yY] ]] && rm $kak_buffile && echo "delete-buffer" }' 
-  }
-
-  new-mode files f %{
-      f "fzf-file"                               "List files"
-      t 'lf %reg[percent]'                       "File tree (current file)"
-      T "lf ."                                   "File tree (current dir)"
-      w "write"                                  "Write file" 
-      c "fzf-file ~/.config/kak/"                "Open config dir"
-      d "file-delete"                            "Delete current file"
-  }
-
-  new-mode buffers b %{
-      b fzf-buffer      "List Buffers" 
-      n buffer-next     "Next Buffer" 
-      p buffer-previous "Prev buffer" 
-      d delete-buffer   "Delete buffer"
-      u 'buffer *debug*' "Debug buffer"
-  }
-
-  def tmux-new-vertical -params .. -command-completion %{
-    tmux-terminal-vertical kak -c %val{session} -e "%arg{@}"
-  }
-
-  def tmux-new-horizontal -params .. -command-completion %{
-    tmux-terminal-horizontal kak -c %val{session} -e "%arg{@}"
-  }
-
-  new-mode my-tmux w %{
-      h     'tmux select-pane -L' 'Select pane to the left'  -sh
-      j     'tmux select-pane -D' 'Select pane below'        -sh
-      k     'tmux select-pane -U' 'Select pane above'        -sh
-      l     'tmux select-pane -R' 'Select pane to the right' -sh
-
-      <tab> 'tmux last-pane'      'Select last pane'         -sh
-      J     'tmux swap-pane -D'   'Swap pane below'          -sh
-      K     'tmux swap-pane -U'   'Swap pane above'          -sh
-
-      s     'tmux-new-vertical'   'Split horizontally'
-      v     'tmux-new-horizontal' 'Split vertically'
-      d     quit                  'Delete pane'
-  }
-
-  def git-blame-toggle %{
-      try %[
-          addhl window/git-blame flag_lines Info git_blame_flags
-          rmhl window/git-blame
-          git blame
-      ] catch %[
-          git hide-blame
-      ]
-  }
-
-  new-mode git g %{
-      g     'repl tig'            'Open tig'
-      f     'fzf-git'             'Open files in repo'
-      p     ':git '               'Open git prompt' -raw
-      b     'git-blame-toggle'    'Toggle git blame'
-  }
-
-  # switch windows
-  map-all user -sh %{
-      1 'tmux-select-pane 1'  'Select pane 1'
-      2 'tmux-select-pane 2'  'Select pane 2'
-      3 'tmux-select-pane 3'  'Select pane 3'
-      4 'tmux-select-pane 4'  'Select pane 4'
-      5 'tmux-select-pane 5'  'Select pane 5'
-      6 'tmux-select-pane 6'  'Select pane 6'
-      7 'tmux-select-pane 7'  'Select pane 7'
-      8 'tmux-select-pane 8'  'Select pane 8'
-      9 'tmux-select-pane 9'  'Select pane 9'
-      0 'tmux-select-pane 10' 'Select pane 10'
-  }
+def filetype-hook -params 2 %{ 
+  hook global WinSetOption "filetype=%arg{1}" %arg{2}
 }
+
+map global normal -docstring "Comment line" '#' ': comment-line<ret>'
+map global normal -docstring "Comment block" '<a-#>' ': comment-block<ret>'
+
+define-command file-delete -docstring "Delete current file" %{
+   prompt "Delete file [Y/n]? " '%sh{ [[ "$kak_text" =~ [yY] ]] && rm $kak_buffile && echo "delete-buffer" }' 
+}
+
+declare-user-mode files
+map global user  f ': enter-user-mode files<ret>'    -docstring 'Files...'
+map global files f ': fzf-file<ret>'                 -docstring 'List files'
+map global files t ': lf %reg[percent]<ret>'         -docstring 'File tree (current file)'
+map global files T ': lf .<ret>'                     -docstring 'File tree (current dir)'
+map global files w ': write<ret>'                    -docstring 'Write file' 
+map global files c ': fzf-file ~/.config/kak/<ret>'  -docstring 'Open config dir'
+map global files d ': file-delete<ret>'              -docstring 'Delete current file'
+
+declare-user-mode buffers
+map global user b    ': enter-user-mode buffers<ret>'  -docstring 'Buffers...'
+map global buffers b ': fzf-buffer<ret>'               -docstring "List Buffers" 
+map global buffers n ': buffer-next<ret>'              -docstring "Next Buffer" 
+map global buffers p ': buffer-previous<ret>'          -docstring "Prev buffer" 
+map global buffers d ': delete-buffer<ret>'            -docstring "Delete buffer"
+map global buffers u ': buffer *debug*<ret>'           -docstring "Debug buffer"
+
+def tmux-new-vertical -params .. -command-completion %{
+  tmux-terminal-vertical kak -c %val{session} -e "%arg{@}"
+}
+
+def tmux-new-horizontal -params .. -command-completion %{
+  tmux-terminal-horizontal kak -c %val{session} -e "%arg{@}"
+}
+
+declare-user-mode my-tmux
+map global user    w     ': enter-user-mode my-tmux<ret>'        -docstring 'Tmux...'
+map global my-tmux h     ': nop %sh{ tmux select-pane -L }<ret>' -docstring 'Select pane to the left'
+map global my-tmux j     ': nop %sh{ tmux select-pane -D }<ret>' -docstring 'Select pane below'
+map global my-tmux k     ': nop %sh{ tmux select-pane -U }<ret>' -docstring 'Select pane above'
+map global my-tmux l     ': nop %sh{ tmux select-pane -R }<ret>' -docstring 'Select pane to the right'
+
+map global my-tmux <tab> ': nop %sh{ tmux last-pane }<ret>'      -docstring 'Select last pane'
+map global my-tmux J     ': nop %sh{ tmux swap-pane -D }<ret>'   -docstring 'Swap pane below'
+map global my-tmux K     ': nop %sh{ tmux swap-pane -U }<ret>'   -docstring 'Swap pane above'
+
+map global my-tmux s     ': tmux-new-vertical<ret>'              -docstring 'Split horizontally'
+map global my-tmux v     ': tmux-new-horizontal<ret>'            -docstring 'Split vertically'
+map global my-tmux d     ': quit<ret>'                           -docstring 'Delete pane'
+
+def git-blame-toggle %{
+  try %[
+    addhl window/git-blame flag_lines Info git_blame_flags
+    rmhl window/git-blame
+    git blame
+  ] catch %[
+    git hide-blame
+  ]
+}
+
+declare-user-mode git
+map global user   g ': enter-user-mode git<ret>'   -docstring "Git..."
+map global git    g ': connect terminal tig<ret>'  -docstring 'Open tig'
+map global git    f ': fzf-git<ret>'               -docstring 'Open files in repo'
+map global git    p ':git '                        -docstring 'Open git prompt'
+map global git    b ': git-blame-toggle<ret>'      -docstring 'Toggle git blame'
+
+# switch windows
+map global user 1 ': nop %sh{ tmux-select-pane 1 }<ret>'  -docstring 'Select pane 1'
+map global user 2 ': nop %sh{ tmux-select-pane 2 }<ret>'  -docstring 'Select pane 2'
+map global user 3 ': nop %sh{ tmux-select-pane 3 }<ret>'  -docstring 'Select pane 3'
+map global user 4 ': nop %sh{ tmux-select-pane 4 }<ret>'  -docstring 'Select pane 4'
+map global user 5 ': nop %sh{ tmux-select-pane 5 }<ret>'  -docstring 'Select pane 5'
+map global user 6 ': nop %sh{ tmux-select-pane 6 }<ret>'  -docstring 'Select pane 6'
+map global user 7 ': nop %sh{ tmux-select-pane 7 }<ret>'  -docstring 'Select pane 7'
+map global user 8 ': nop %sh{ tmux-select-pane 8 }<ret>'  -docstring 'Select pane 8'
+map global user 9 ': nop %sh{ tmux-select-pane 9 }<ret>'  -docstring 'Select pane 9'
+map global user 0 ': nop %sh{ tmux-select-pane 10 }<ret>' -docstring 'Select pane 10'

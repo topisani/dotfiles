@@ -1,26 +1,24 @@
-provide-module surround %£
-
-  define-command -hidden setup-surround-pair -params 3 -override %{
-    eval %sh{
-      echo -e "hook window -group surround InsertChar $1 'exec -draft a $2 <esc>' "
-      echo -e "hook window -group surround InsertChar $3 'try %§ set-register a $3; exec -draft \"<a-;>l<a-k>[<c-r>a]<ret>d\" §'"
-      echo -e "hook window -group surround InsertDelete $1 'try %§ set-register a $3; exec -draft \"<a-;>l<a-k>[<c-r>a]<ret>d\" §'"
-    }
+define-command -hidden setup-surround-pair -params 2 -override %{
+  eval %sh{
+    echo "hook window -group surround InsertChar %§\Q$1\E§ %¤exec -draft a %§$2§ <esc>%¤"
+    echo "hook window -group surround InsertDelete %§\Q$1\E§ %¤try %£ set-register a %§$2§; exec -draft %§<a-;>l<a-k>\Q<c-r>a\E<ret>d§ £¤"
+    [[ "$2" != "$1" ]] && echo "hook window -group surround InsertChar %§\Q$2\E§ %¤try %£ set-register a %§$2§; exec -draft %§<a-;>l<a-k>\Q<c-r>a\E<ret>d§ £¤"
   }
+}
 
-  define-command surround-mode -override %§
-    # Please dont mess with the escaping bruv
-    setup-surround-pair "\(" ")" ")"
-    setup-surround-pair "\[" "]" "\]"
-    setup-surround-pair "<" ">" ">"
-    setup-surround-pair "\{" "}" "\}"
-    setup-surround-pair %["'"] %["''"] %["''"]
-    setup-surround-pair '""""' '""""' '""""'
+define-command surround-mode -override %§
+  # Please dont mess with the escaping bruv
+  setup-surround-pair "(" ")"
+  setup-surround-pair "[" "]"
+  setup-surround-pair "<" ">"
+  setup-surround-pair "{" "}"
+  setup-surround-pair "'" "''"
+  setup-surround-pair '"' '"'
+  setup-surround-pair '`' '`'
 
-    exec -with-hooks i
-    
-    hook window -group surround ModeChange pop:insert:.* %{
-      remove-hooks window surround
-    }
-  §
-£
+  exec -with-hooks i
+  
+  hook window -group surround ModeChange pop:insert:.* %{
+    remove-hooks window surround
+  }
+§

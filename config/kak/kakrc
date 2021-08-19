@@ -1,154 +1,108 @@
-require-module plug
+# kakoune.cr
+# https://github.com/alexherbo2/kakoune.cr
+evaluate-commands %sh{
+  kcr init kakoune
+  cork init
+}
 
-# Let plug.kak manage itself.
-plug plug https://github.com/alexherbo2/plug.kak %{
-  # Upgrade plugins
-  # Install plugins and build them.
-  define-command plug-upgrade -docstring 'plug-upgrade' %{
-    plug-install
-    # plug-execute lsp cargo build --release
+def load-conf -params 1 %{
+  source "%val{config}/config/%arg{1}.kak"
+}
+
+cork tmux https://github.com/alexherbo2/tmux.kak %{
+  tmux-integration-enable
+}
+
+# User interface
+set-option -add global ui_options ncurses_status_on_top=false
+set-option -add global ui_options ncurses_assistant=none
+set-option -add global ui_options ncurses_set_title=no
+
+set-option -add global ui_options terminal_status_on_top=false
+set-option -add global ui_options terminal_assistant=none
+set-option -add global ui_options terminal_set_title=no
+
+set-option global modelinefmt '{{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {{context_info}} {cyan}U+%sh{printf ''%04x'' "$kak_cursor_char_value"}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default}'
+#set-option global modelinefmt '{yellow}%opt{out_of_view_status_line}{default} {{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default} {{context_info}}'
+
+# Tools
+set-option global makecmd 'make -j 8'
+# set-option global grepcmd 'rg --column --with-filename'
+
+# Window-based settings
+hook global WinCreate .* %{
+  #addhl window/numbers number-lines -hlcursor -relative -separator ' '
+  addhl window/matching show-matching
+  #addhl window/show-whitespaces show-whitespaces
+}
+
+
+cork lib https://github.com/alexherbo2/lib.kak %{
+  # Indentation
+  set-indent global 2
+  enable-detect-indent
+  enable-auto-indent
+}
+
+# Auto-pairing of characters
+cork auto-pairs https://github.com/alexherbo2/auto-pairs.kak %{
+  enable-auto-pairs
+}
+
+# Disable indentation hooks
+set-option global disabled_hooks '(?!auto)(?!detect)\K(.+)-(trim-indent|insert|indent)'
+
+# [space] [backspace] [ret]
+map -docstring 'leader' global normal <space> ': enter-user-mode user<ret>'  
+map -docstring 'remove all sels except main' global normal <backspace> <space> 
+map -docstring 'remove main sel' global normal <a-backspace> <a-space> 
+# map -docstring 'Command Prompt' global normal <ret> :
+
+# User Mode bindings
+map -docstring 'Open terminal' global user <ret> ': connect terminal<ret>'
+
+# Filetype mode from [,] or [c-f]
+declare-user-mode filetype
+unmap global normal ,
+map global normal , ': enter-user-mode filetype<ret>'
+map global normal <c-f> ': enter-user-mode filetype<ret>'
+map global insert <c-f> ': enter-user-mode filetype<ret>'
+
+# Prompt
+map -docstring 'Search' global prompt <c-f> '<home>(?i)<end>'
+map -docstring 'Paste' global prompt <c-v> '<c-r>"'
+map -docstring 'Insert the directory name of the current buffer' global prompt <c-d> '%sh{dirname "$kak_bufname"}<a-!>/'
+
+# Select all occurrences of current selection.
+# https://code.visualstudio.com/docs/getstarted/keybindings#_basic-editing
+map -docstring 'Select all occurrences of current selection' global normal <a-L> '"aZ*%s<ret>"bZ"az"b<a-z>a'
+
+# Comment
+map -docstring 'Comment' global normal '#' ':comment-line<ret>'
+map -docstring 'Comment' global normal '<a-#>' ':comment-block<ret>'
+
+def sidetree -override %{
+  nop %sh{
+    tmux split-window -hb -t 1 -l 30 -e "KAKOUNE_SESSION=$kak_session" -e "KAKOUNE_CLIENT=$kak_client" sidetree -s "$kak_buffile"
   }
 }
 
-plug-core %{
-  # User interface
-  set-option -add global ui_options ncurses_status_on_top=false
-  set-option -add global ui_options ncurses_assistant=none
-  set-option -add global ui_options ncurses_set_title=no
+map -docstring 'sidetree' global user <tab> ': sidetree<ret>'
 
-  set-option global modelinefmt '{yellow}%opt{out_of_view_status_line}{default} {{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {{context_info}} {cyan}U+%sh{printf ''%04x'' "$kak_cursor_char_value"}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default}'
-  #set-option global modelinefmt '{yellow}%opt{out_of_view_status_line}{default} {{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default} {{context_info}}'
+map -docstring 'Replace' global user r ': enter-replace-mode<ret>'
 
-  # Tools
-  set-option global makecmd 'make -j 8'
-  # set-option global grepcmd 'rg --column --with-filename'
-
-  # Window-based settings
-  hook global WinCreate .* %{
-    #addhl window/numbers number-lines -hlcursor -relative -separator ' '
-    addhl window/matching show-matching
-    #addhl window/show-whitespaces show-whitespaces
-  }
-
-  # Default indentation
-  set global tabstop 2
-  set global indentwidth 2
-
-  # [space] [backspace] [ret]
-  map -docstring 'leader' global normal <space> ': enter-user-mode user<ret>'  
-  map -docstring 'remove all sels except main' global normal <backspace> <space> 
-  map -docstring 'remove main sel' global normal <a-backspace> <a-space> 
-  # map -docstring 'Command Prompt' global normal <ret> :
-
-  # User Mode bindings
-  map -docstring 'Open terminal' global user <ret> ': connect-terminal<ret>'
-
-	# Filetype mode from [,] or [c-f]
-  declare-user-mode filetype
-  unmap global normal ,
-  map global normal , ': enter-user-mode filetype<ret>'
-  map global normal <c-f> ': enter-user-mode filetype<ret>'
-  map global insert <c-f> ': enter-user-mode filetype<ret>'
-
-  # Prompt
-  map -docstring 'Search' global prompt <c-f> '<home>(?i)<end>'
-  map -docstring 'Paste' global prompt <c-v> '<c-r>"'
-  map -docstring 'Insert the directory name of the current buffer' global prompt <c-d> '%sh{dirname "$kak_bufname"}<a-!>/'
-
-  # Select all occurrences of current selection.
-  # https://code.visualstudio.com/docs/getstarted/keybindings#_basic-editing
-  map -docstring 'Select all occurrences of current selection' global normal <a-L> '"aZ*%s<ret>"bZ"az"b<a-z>a'
-
-  # Comment
-  map -docstring 'Comment' global normal '#' ':comment-line<ret>'
-  map -docstring 'Comment' global normal '<a-#>' ':comment-block<ret>'
-  
-  def sidetree -override %{
-    nop %sh{
-      tmux split-window -hb -t 1 -l 30 -e "KAKOUNE_SESSION=$kak_session" -e "KAKOUNE_CLIENT=$kak_client" sidetree -s "$kak_buffile"
-    }
-  }
-
-  map -docstring 'sidetree' global user <tab> ': sidetree<ret>'
-}
-
-hook global ModuleLoaded tmux %{
-  define-command tmux-terminal-popup -params 1.. -shell-completion -docstring '
-  tmux-terminal-popup <program> [<arguments>]: create a new terminal as a tmux popup
-  The program passed as argument will be executed in the new popup' \
-  %{
-      tmux-terminal-impl 'display-popup -E -h 75% -d #{pane_current_path}' %arg{@}
-  }
-  alias global popup tmux-terminal-popup
-}
-
-plug auto-pairs https://github.com/alexherbo2/auto-pairs.kak %{
-  auto-pairs-enable
-}
-
-plug replace-mode https://github.com/alexherbo2/replace-mode.kak %{
-  map -docstring 'Replace' global user r ': enter-replace-mode<ret>'
-}
-
-plug manual-indent https://github.com/alexherbo2/manual-indent.kak %{
-  # Manual indent
-  hook global WinCreate .* %{
-    manual-indent-enable
-  }
-
-  # Remove filetype hooks
-  hook global WinSetOption filetype=.* %{
-    manual-indent-remove-filetype-hooks
+nop cork kakoune-find https://github.com/occivink/kakoune-find %{
+  define-command grep-apply-changes -docstring \
+    "grep-apply-changes: apply changes specified in current *grep* buffer to their respective files" \
+  %{ 
+    find-apply-changes -force 
   }
 }
 
-plug-old kakoune-find https://github.com/occivink/kakoune-find %{
-  define-command -docstring \
-  "grep-apply-changes: apply changes specified in current *grep* buffer to their respective files" \
-  grep-apply-changes %{ find-apply-changes -force }
-}
+cork kakoune-gdb https://github.com/occivink/kakoune-gdb
 
-plug search-highlighter https://github.com/alexherbo2/search-highlighter.kak %{
-  search-highlighter-enable
-}
-plug out-of-view https://github.com/alexherbo2/out-of-view.kak %{
-	out-of-view-enable
-}
-
-plug execute-key https://github.com/alexherbo2/execute-key.kak
-plug phantom https://github.com/alexherbo2/phantom.kak %{
-  phantom-enable
-  phantom-add-mappings
-}
-
-plug snippets https://github.com/alexherbo2/snippets.kak %{
-  # Enable snippets
-  snippets-enable
-
-  # Options
-  set-option global snippets_scope global global/arrows global/bullets global/dashes global/punctuation global/boxes global/math
-
-  # Mappings
-  # Create new snippets
-  map -docstring 'Edit snippets' global user / ': snippets-edit<ret>'
-
-  # Add auto-pairs integration
-  map -docstring 'Expand snippets' global insert <ret> '<a-;>: snippets-enter auto-pairs-insert-new-line<ret>'
-
-  # Hooks
-  # Indent snippets with tabs
-  hook global BufCreate '.+/\.?config/snippets/.+' %{
-    set-option buffer indentwidth 0
-  }  
-}
-
-plug-old kakoune-gdb https://github.com/occivink/kakoune-gdb
-
-plug evaluate-selections https://github.com/alexherbo2/evaluate-selections.kak %{
-  map -docstring 'Evaluate selections' global user = ': evaluate-selections<ret>'
-}
-
-plug fzf https://github.com/andreyorst/fzf.kak %{
+cork fzf https://github.com/andreyorst/fzf.kak %{
+  require-module fzf
   require-module fzf-file
   set-option global fzf_file_command "fd . --type f -uu --follow"
   set-option global fzf_file_preview false
@@ -157,32 +111,29 @@ plug fzf https://github.com/andreyorst/fzf.kak %{
   require-module fzf-buffer
 }
 
-plug-old search https://github.com/alexherbo2/search.kak %{
-  map -docstring 'Search plain text' global normal f ':search<ret>(?i)\Q'
-  map -docstring 'Search' global normal F ':search<ret>'  
-}
-
-plug number-toggle https://github.com/evanrelf/number-toggle.kak %{
+cork number-toggle https://github.com/evanrelf/number-toggle.kak %{
+  require-module number-toggle
   set global number_toggle_params -hlcursor -separator ' '
 }
 
-plug-autoload user-mode
-plug-autoload lsp
-plug-autoload clip
-plug-autoload my-cpp
-plug-autoload ide
-plug-autoload surround %{
-  map -docstring 'Surround mode' global user s ': surround-mode<ret>'
+cork kakoune-mirror https://github.com/delapouite/kakoune-mirror %{
+  # Suggested mapping
+  map global normal "'" ': enter-user-mode -lock mirror<ret>'
 }
 
-# kakoune.cr
-# https://github.com/alexherbo2/kakoune.cr
-evaluate-commands %sh{
-  kcr init kakoune
-}
+map -docstring 'Surround mode' global user s ': surround-mode<ret>'
+map global normal <a-I> ': enter-insert-mode-with-main-selection<ret>'
 
-# Make sure this runs after all modules have been loaded
-hook global KakBegin .* %{
-  colorscheme %sh{ colorscheme-switch --current }
-  ide-setup
+load-conf lsp
+load-conf c++
+load-conf ide
+
+colorscheme %sh{ colorscheme-switch --current }
+ide-setup
+
+hook global BufCreate .*\.bb(|class|append) %{
+  set buffer filetype sh
+}
+hook global BufCreate .*\.conf %{
+  set buffer filetype ini
 }
