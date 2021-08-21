@@ -7,7 +7,6 @@ define-command -hidden setup-surround-pair -params 2 -override %{
 }
 
 define-command surround-mode -override %§
-  # Please dont mess with the escaping bruv
   setup-surround-pair "(" ")"
   setup-surround-pair "[" "]"
   setup-surround-pair "<" ">"

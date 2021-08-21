@@ -9,11 +9,8 @@ def load-conf -params 1 %{
   source "%val{config}/config/%arg{1}.kak"
 }
 
-cork tmux https://github.com/alexherbo2/tmux.kak %{
-  tmux-integration-enable
-}
+# User interface ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-# User interface
 set-option -add global ui_options ncurses_status_on_top=false
 set-option -add global ui_options ncurses_assistant=none
 set-option -add global ui_options ncurses_set_title=no
@@ -23,40 +20,19 @@ set-option -add global ui_options terminal_assistant=none
 set-option -add global ui_options terminal_set_title=no
 
 set-option global modelinefmt '{{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {{context_info}} {cyan}U+%sh{printf ''%04x'' "$kak_cursor_char_value"}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default}'
-#set-option global modelinefmt '{yellow}%opt{out_of_view_status_line}{default} {{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default} {{context_info}}'
-
-# Tools
-set-option global makecmd 'make -j 8'
-# set-option global grepcmd 'rg --column --with-filename'
 
 # Window-based settings
 hook global WinCreate .* %{
-  #addhl window/numbers number-lines -hlcursor -relative -separator ' '
   addhl window/matching show-matching
-  #addhl window/show-whitespaces show-whitespaces
+  addhl window/show-whitespaces show-whitespaces
 }
 
-
-cork lib https://github.com/alexherbo2/lib.kak %{
-  # Indentation
-  set-indent global 2
-  enable-detect-indent
-  enable-auto-indent
-}
-
-# Auto-pairing of characters
-cork auto-pairs https://github.com/alexherbo2/auto-pairs.kak %{
-  enable-auto-pairs
-}
-
-# Disable indentation hooks
-set-option global disabled_hooks '(?!auto)(?!detect)\K(.+)-(trim-indent|insert|indent)'
+# Leader / Filetype modes ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 # [space] [backspace] [ret]
 map -docstring 'leader' global normal <space> ': enter-user-mode user<ret>'  
 map -docstring 'remove all sels except main' global normal <backspace> <space> 
 map -docstring 'remove main sel' global normal <a-backspace> <a-space> 
-# map -docstring 'Command Prompt' global normal <ret> :
 
 # User Mode bindings
 map -docstring 'Open terminal' global user <ret> ': connect terminal<ret>'
@@ -68,28 +44,25 @@ map global normal , ': enter-user-mode filetype<ret>'
 map global normal <c-f> ': enter-user-mode filetype<ret>'
 map global insert <c-f> ': enter-user-mode filetype<ret>'
 
-# Prompt
-map -docstring 'Search' global prompt <c-f> '<home>(?i)<end>'
-map -docstring 'Paste' global prompt <c-v> '<c-r>"'
-map -docstring 'Insert the directory name of the current buffer' global prompt <c-d> '%sh{dirname "$kak_bufname"}<a-!>/'
+# Plugins ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-# Select all occurrences of current selection.
-# https://code.visualstudio.com/docs/getstarted/keybindings#_basic-editing
-map -docstring 'Select all occurrences of current selection' global normal <a-L> '"aZ*%s<ret>"bZ"az"b<a-z>a'
-
-# Comment
-map -docstring 'Comment' global normal '#' ':comment-line<ret>'
-map -docstring 'Comment' global normal '<a-#>' ':comment-block<ret>'
-
-def sidetree -override %{
-  nop %sh{
-    tmux split-window -hb -t 1 -l 30 -e "KAKOUNE_SESSION=$kak_session" -e "KAKOUNE_CLIENT=$kak_client" sidetree -s "$kak_buffile"
-  }
+cork tmux https://github.com/alexherbo2/tmux.kak %{
+  tmux-integration-enable
 }
 
-map -docstring 'sidetree' global user <tab> ': sidetree<ret>'
+cork lib https://github.com/alexherbo2/lib.kak %{
+  # Indentation
+  set-indent global 2
+  enable-detect-indent
+  enable-auto-indent
+  # Disable indentation hooks
+  set global disabled_hooks '(?!auto)(?!detect)\K(.+)-(trim-indent|insert|indent)'
+}
 
-map -docstring 'Replace' global user r ': enter-replace-mode<ret>'
+# Auto-pairing of characters
+cork auto-pairs https://github.com/alexherbo2/auto-pairs.kak %{
+  enable-auto-pairs
+}
 
 nop cork kakoune-find https://github.com/occivink/kakoune-find %{
   define-command grep-apply-changes -docstring \
@@ -121,15 +94,42 @@ cork kakoune-mirror https://github.com/delapouite/kakoune-mirror %{
   map global normal "'" ': enter-user-mode -lock mirror<ret>'
 }
 
+# Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+map -docstring 'indent' global insert <tab> '<a-;><a-gt>'
+map -docstring 'deindent' global insert <s-tab> '<a-;><lt>' 
+
+# Normal mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
 map -docstring 'Surround mode' global user s ': surround-mode<ret>'
-map global normal <a-I> ': enter-insert-mode-with-main-selection<ret>'
+map -docstring 'Replace' global user r ': enter-replace-mode<ret>'
+
+map -docstring 'Enter inser mode with main selection' global normal <a-I> ': enter-insert-mode-with-main-selection<ret>'
+map -docstring 'Select all occurrences of current selection' global normal <a-L> '"aZ*%s<ret>"bZ"az"b<a-z>a'
+
+map -docstring 'Comment' global normal '#' ':comment-line<ret>'
+map -docstring 'Comment' global normal '<a-#>' ':comment-block<ret>'
+
+def sidetree -override %{ connect panel sidetree --select %val{buffile} }
+map -docstring 'sidetree' global user <tab> ': sidetree<ret>'
+
+# Prompt mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+map -docstring 'Search' global prompt <c-f> '<home>(?i)<end>'
+map -docstring 'Paste' global prompt <c-v> '<c-r>"'
+map -docstring 'Insert the directory name of the current buffer' global prompt <c-d> '%sh{dirname "$kak_bufname"}<a-!>/'
+
+# Personal scripts ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+set-option global makecmd 'make -j 8'
 
 load-conf lsp
 load-conf c++
-load-conf ide
 
-colorscheme %sh{ colorscheme-switch --current }
+load-conf ide
 ide-setup
+
+# Filetype hooks ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 hook global BufCreate .*\.bb(|class|append) %{
   set buffer filetype sh
@@ -137,3 +137,6 @@ hook global BufCreate .*\.bb(|class|append) %{
 hook global BufCreate .*\.conf %{
   set buffer filetype ini
 }
+
+# ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+colorscheme %sh{ colorscheme-switch --current }
