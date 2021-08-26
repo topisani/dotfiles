@@ -16,7 +16,7 @@ define-command file-delete -docstring "Delete current file" %{
 
 declare-user-mode files
 map global user  f ': enter-user-mode files<ret>'    -docstring 'Files...'
-map global files f ': fzf-file<ret>'                 -docstring 'List files'
+map global files f ': connect popup kcr fzf files<ret>'    -docstring 'List files'
 map global files t ': lf %reg[percent]<ret>'         -docstring 'File tree (current file)'
 map global files T ': lf .<ret>'                     -docstring 'File tree (current dir)'
 map global files w ': write<ret>'                    -docstring 'Write file' 

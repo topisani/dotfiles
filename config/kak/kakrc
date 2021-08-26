@@ -119,6 +119,12 @@ map -docstring 'Search' global prompt <c-f> '<home>(?i)<end>'
 map -docstring 'Paste' global prompt <c-v> '<c-r>"'
 map -docstring 'Insert the directory name of the current buffer' global prompt <c-d> '%sh{dirname "$kak_bufname"}<a-!>/'
 
+# Disable space autoselecting the next completion
+# Disable backspace exiting the prompt
+# https://github.com/mawww/kakoune/issues/4311
+map global prompt <space> '<a-;>: eval -save-regs a %{ set-register a " "; exec <lt>c-r<gt>a }<ret>'
+map global prompt <backspace> '<left><del>'
+
 # Personal scripts ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 set-option global makecmd 'make -j 8'

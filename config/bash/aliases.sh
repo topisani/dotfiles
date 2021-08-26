@@ -37,6 +37,11 @@ alias pud=pushd
 alias popd='popd > /dev/null'
 alias dirs='dirs -p'
 
+function mkcd {
+  mkdir -p "$1"
+  cd "$1"
+}
+
 # https://github.com/alexherbo2/kakoune.cr
 alias kcr-tmux="kcr env | jq -r 'to_entries[] | \"tmux setenv \(.key) \(.value)\"' | sh"
 alias k='kcr edit'
