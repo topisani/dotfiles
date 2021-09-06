@@ -20,3 +20,4 @@
 ~/.config/tmux;config/tmux
 ~/.config/colorschemes;config/colorschemes
 ~/.config/sway;config/sway
+~/.config/starship.toml;config/starship.toml

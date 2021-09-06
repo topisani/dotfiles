@@ -1,0 +1,32 @@
+add_newline = true
+format = '$username$hostname$shlvl$directory$git_branch$git_commit$git_status$git_state$hg_branch$docker_context$custom$time$line_break$cmd_duration$jobs$battery$status$shell$character'
+
+[directory]
+truncation_length = 3
+truncate_to_repo = false
+
+[character]
+success_symbol = '[❯](bold green)'
+
+[battery]
+disabled = true
+
+[[battery.display]]
+threshold = 100
+
+[git_status]
+disabled = true
+[custom.kakoune]
+symbol = ''
+command = 'kcr prompt'
+when = 'kcr prompt'
+shell = ['sh']
+description = 'The current Kakoune session and client'
+style = 'green'
+format = '[$symbol$output]($style) '
+
+[time]
+disabled = false
+
+[status]
+disabled = true
