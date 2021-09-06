@@ -42,14 +42,11 @@ stty -ixon -ixoff
 source ~/.config/bash/aliases.sh
 source ~/.config/bash/git.sh
 
-# broot
-source /home/topisani/.config/broot/launcher/bash/br
-
 # Node Version Manager
-source /usr/share/nvm/init-nvm.sh
+test -r /usr/share/nvm/init-nvm.sh && source /usr/share/nvm/init-nvm.sh
 
 # Opam: Ocaml package manager
-eval $(opam config env)
+command -v opam &> /dev/null && eval $(opam config env)
 
 # Starship prompt
 eval "$(starship init bash)"

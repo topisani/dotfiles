@@ -9,7 +9,6 @@ alias gp='git push'
 alias gd='git diff'
 # Provides ga, glo, gd, grh, gcf, gcb, gco, gss, gclean, grb, gfu
 FORGIT_COPY_CMD='clip'
-source ~/src/forgit/forgit.plugin.sh
 
 alias gc='git commit -v'
 alias gc!='git commit -v --amend'

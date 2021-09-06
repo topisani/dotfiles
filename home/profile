@@ -13,7 +13,7 @@
 PATH="$HOME/.bin:$HOME/.local/bin:/usr/local/bin:$HOME/.composer/vendor/bin:$PATH"
 PATH="$HOME/dev/flutter/bin:$PATH"
 
-PATH="$(ruby -rrubygems -e 'puts Gem.user_dir')/bin:$PATH"
+# PATH="$(ruby -rrubygems -e 'puts Gem.user_dir')/bin:$PATH"
 
 # Kill the GNU
 export CC=/usr/bin/clang
@@ -86,17 +86,11 @@ function start_agent {
     /usr/bin/ssh-add;
 }
 
-export DOT_REPO="https://github.com/topisani/dotfiles.git"
-export DOT_DIR="$HOME/.dotfiles"
-fpath=($HOME/.zsh/dot $fpath)  # <- for completion
-source $HOME/.zsh/dot/dot.sh
-
 export PATH="$PATH:/usr/lib/dart/bin"
 export PATH="$PATH:$HOME/dev/flutter/.pub-cache/bin"
 export PATH="$HOME/.ghcup/bin:$PATH"
 alias ghcup='TMPDIR=$HOME/.ghcup/tmp ghcup'
 alias ssh="TERM=xterm-256color ssh"
-alias google-chrome="google-chrome --force-dark-mode"
 
 export CPM_SOURCE_CACHE=$HOME/.cache/CPM
 
