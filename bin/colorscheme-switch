@@ -135,6 +135,11 @@ updateKak() {
     done
 }
 
+update_gnome() {
+    gsettings set org.gnome.desktop.interface gtk-theme $(xrdb -query | grep -Po "gtk-theme:\h*\K.*")
+    gsettings set org.gnome.desktop.interface icon-theme $(xrdb -query | grep -Po "icon-theme:\h*\K.*")
+}
+
 getColorschemePath() {
     local name=${1:-$(cat $COLORSCHEME_PATH/current)}
     find "${COLORSCHEME_PATH}/$name".*resources -type f
@@ -175,6 +180,7 @@ switch() {
         # updateTerminals
         # updateTermite
         update_kitty
+        update_gnome
         killall -sUSR1 polybar
     else
         exit 1

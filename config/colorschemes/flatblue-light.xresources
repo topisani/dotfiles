@@ -1,0 +1,61 @@
+! flatblue-light theme
+
+! special
+*.foreground:   #18191c
+*.background:   #ffffff
+*.cursorColor:  #1E1F21
+
+! black
+*.color0:       #fdf4df
+*.color8:       #d8d9d4
+! red
+*.color1:       #f24130
+*.color9:       #d92817
+! green
+*.color2:       #71ba51
+*.color10:      #3e871e
+! yellow
+*.color3:       #ffe000
+*.color11:      #f2bb13
+! blue
+*.color4:       #07b0ff
+*.color12:      #178ca6
+! magenta
+*.color5:       #ff465a
+*.color13:      #dd465a
+! cyan
+*.color6:       #67c5b4
+*.color14:      #249991
+! white
+*.color7:       #1E1F21
+*.color15:      #323037
+
+! Grays (dark to light)
+*.color232:    #F4F4F4
+*.color233:    #E9E9E9
+*.color234:    #DFDFDF
+*.color235:    #D5D5D5
+*.color236:    #CACACA
+*.color237:    #C0C0C0
+*.color238:    #B6B6B6
+*.color239:    #ACACAC
+*.color240:    #A1A1A1
+*.color241:    #979797
+*.color242:    #8D8D8D
+*.color243:    #838383
+*.color244:    #787878
+*.color245:    #6E6E6E
+*.color246:    #646464
+*.color247:    #5A5A5A
+*.color248:    #4F4F4F
+*.color249:    #454545
+*.color250:    #3B3B3B
+*.color251:    #313131
+*.color252:    #262626
+*.color253:    #1C1C1C
+*.color254:    #121212
+*.color255:    #080808
+
+! GNOME theme
+gtk-theme: Matcha-light-azul
+icon-theme: Papirus-Light

@@ -1,5 +1,5 @@
 #!/bin/bash
 
-cd ~/dev/tablecloth
+cd ~/dev/rice/tablecloth
 export ASAN_OPTIONS="new_delete_type_mismatch=0" 
 build/cloth-notifications/cloth-notifications

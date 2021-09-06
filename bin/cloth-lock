@@ -1,5 +1,5 @@
 #!/bin/bash
 
-ASAN_OPTIONS=new_delete_type_mismatch=0 /home/topisani/dev/tablecloth/build/cloth-lock/cloth-lock --css /home/topisani/dev/tablecloth/cloth-lock/resources/style.css &
+ASAN_OPTIONS=new_delete_type_mismatch=0 /home/topisani/dev/rice/tablecloth/build/cloth-lock/cloth-lock --css /home/topisani/dev/rice/tablecloth/cloth-lock/resources/style.css &
 sleep 0.2
 

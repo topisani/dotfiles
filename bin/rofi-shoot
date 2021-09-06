@@ -38,7 +38,8 @@ filename="${exit_msg##*$'\n'}"
 
 convert "$filename" -resize "512x512>" -quality 60 "$thumbnail"
 
-msg=$(dunstify -i $thumbnail \
+msg=$(dunstify \
+  -h string:image-path:"file://$thumbnail" \
   "Captured Screenshot" \
   "Saved as $filename" \
   -A "i,Open image")
