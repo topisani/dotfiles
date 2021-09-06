@@ -24,3 +24,4 @@
 ~/.config/rofi;config/rofi
 ~/.config/sidetree;config/sidetree
 ~/.inputrc;home/inputrc
+~/.config/waybar;config/waybar
