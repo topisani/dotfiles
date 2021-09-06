@@ -23,3 +23,4 @@
 ~/.config/starship.toml;config/starship.toml
 ~/.config/rofi;config/rofi
 ~/.config/sidetree;config/sidetree
+~/.inputrc;home/inputrc
