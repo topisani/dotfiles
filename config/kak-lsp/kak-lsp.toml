@@ -18,15 +18,16 @@ roots = ["Cargo.toml"]
 command = "sh"
 args = ["-c", "if command -v rustup >/dev/null; then $(rustup which rust-analyzer); else rust-analyzer; fi"]
 
-[language.rust.initialization_options]
-# If you get 'unresolved proc macro' warnings, you have two options
-# 1. The safe choice is two disable the warning:
-diagnostics.disabled = ["unresolved-proc-macro"]
-# 2. Or you can opt-in for proc macro support
-procMacro.enable = true
-cargo.loadOutDirsFromCheck = true
-# See https://github.com/rust-analyzer/rust-analyzer/issues/6448[language.crystal]
+# [language.rust.initialization_options]
+# # If you get 'unresolved proc macro' warnings, you have two options
+# # 1. The safe choice is two disable the warning:
+# diagnostics.disabled = ["unresolved-proc-macro"]
+# # 2. Or you can opt-in for proc macro support
+# procMacro.enable = true
+# cargo.loadOutDirsFromCheck = true
+# # See https://github.com/rust-analyzer/rust-analyzer/issues/6448[language.crystal]
 
+[language.crystal]
 filetypes = ["crystal"]
 roots = ["shard.yml"]
 command = "scry"
@@ -88,8 +89,8 @@ filetypes = ["java"]
 roots = ["pom.xml", "build.gradle"]
 command = "eclipse.jdt.ls"
 
-[language.java.initialization_options.settings.java.trace]
-server = "verbose"
+# # [language.java.initialization_options.settings.java.trace]
+# server = "verbose"
 
 [language.haskell]
 filetypes = ["haskell"]
@@ -128,8 +129,8 @@ roots = [".htaccess", "composer.json"]
 command = "intelephense"
 args = ["--stdio"]
 
-[language.php.initialization_options]
-storagePath = "/tmp/intelephense"
+# [language.php.initialization_options]
+# storagePath = "/tmp/intelephense"
 
 [language.nim]
 filetypes = ["nim"]
@@ -142,11 +143,11 @@ roots = ["elm.json"]
 command = "elm-language-server"
 args = ["--stdio"]
 
-[language.elm.initialization_options]
-runtime = "node"
-elmPath = "elm"
-elmFormatPath = "elm-format"
-elmTestPath = "elm-test"
+# [language.elm.initialization_options]
+# runtime = "node"
+# elmPath = "elm"
+# elmFormatPath = "elm-format"
+# elmTestPath = "elm-test"
 
 [language.latex]
 filetypes = ["latex"]
