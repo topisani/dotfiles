@@ -22,3 +22,4 @@
 ~/.config/sway;config/sway
 ~/.config/starship.toml;config/starship.toml
 ~/.config/rofi;config/rofi
+~/.config/sidetree;config/sidetree
