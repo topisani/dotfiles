@@ -33,7 +33,7 @@ input "2:10:TPPS/2_Elan_TrackPoint" {
     pointer_accel 1
 }
 
-default_border pixel 4
+default_border pixel 2
 hide_edge_borders smart
 
 gaps inner 5
@@ -255,7 +255,7 @@ mode "$mode_gaps_outer" {
 font Roboto 10
 # Theme colors
 # class                   border  backgr. text    indic.   child_border
-  client.focused          #076096 #076096 #feebec #FDF6E3  #076096
+  client.focused          #178ca6 #076096 #feebec #FDF6E3  #178ca6
   client.focused_inactive #343434 #343434 #feebec #454948  #343434 
   client.unfocused        #18191c #18191c #feebec #454948  #18191c
   client.urgent           #CB4B16 #FDF6E3 #feebec #268BD2  #CB4B16 
