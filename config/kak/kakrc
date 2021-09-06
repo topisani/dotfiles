@@ -25,6 +25,7 @@ set-option global modelinefmt '{{mode_info}} {magenta}%val{client}{default} at {
 hook global WinCreate .* %{
   addhl window/matching show-matching
   addhl window/show-whitespaces show-whitespaces
+  addhl window/numbers number-lines -hlcursor -separator ' '
 }
 
 # Leader / Filetype modes ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
@@ -84,10 +85,10 @@ cork fzf https://github.com/andreyorst/fzf.kak %{
   require-module fzf-buffer
 }
 
-cork number-toggle https://github.com/evanrelf/number-toggle.kak %{
-  require-module number-toggle
-  set global number_toggle_params -hlcursor -separator ' '
-}
+# cork number-toggle https://github.com/evanrelf/number-toggle.kak %{
+#   require-module number-toggle
+#   set global number_toggle_params -hlcursor -separator ' '
+# }
 
 cork kakoune-mirror https://github.com/delapouite/kakoune-mirror %{
   # Suggested mapping

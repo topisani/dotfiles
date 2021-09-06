@@ -13,8 +13,8 @@ export QT_QPA_PLATFORMTHEME="qt5ct"
 # Needed to fix a wxpython issue
 export MULLVAD_USE_GTK3=yes
 
-export XDG_CURRENT_DESKTOP=sway
+export XDG_CURRENT_DESKTOP=Unity
 export XDG_SESSION_TYPE=wayland
 
 export USING_X11=false
-sway &> /tmp/sway.log
+/usr/bin/sway &> /tmp/sway.log

@@ -6,4 +6,7 @@ if [[ -e "$target" ]]; then
 elif [[ ! "$target" =~ ^[a-zA-Z]+:// ]]; then
     target="http://$target"
 fi
-google-chrome --app="$target"
+
+chrome=google-chrome
+command -v $chrome || chrome=chromium
+$chrome --app="$target"

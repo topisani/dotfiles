@@ -29,8 +29,8 @@ input * {
 }
 
 input "2:10:TPPS/2_Elan_TrackPoint" {
-    accel_profile adaptive
-    pointer_accel -0.2
+    accel_profile flat
+    pointer_accel 1
 }
 
 default_border pixel 4
