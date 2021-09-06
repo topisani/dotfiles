@@ -1,0 +1,34 @@
+#!/usr/bin/bash
+
+JQ_SCRIPT=$(
+  cat <<'EOF'
+[null,.] |
+  recurse(.[1] as $parent | try (
+      .[1].nodes[]|[($parent|del(.nodes)),.]
+    ) catch empty) 
+  | select(.[1].focused) 
+  | { "con": .[1], "par": .[0] }
+  | (
+    if (.con | any | not) or (.con.fullscreen_mode != 0) or (.par.fullscreen_mode != 0) or (.par.layout == "tabbed") then
+      null
+    else
+      if (.con.rect.height > .con.rect.width) then
+        "splitv"
+      else
+        "splith"
+      end
+    end
+  )
+EOF
+)
+
+handle() {
+  swaymsg -t SUBSCRIBE "['window']" >> /dev/null
+  local layout=$(swaymsg -t get_tree | jq -r "$JQ_SCRIPT")
+  [[ $layout == null ]] && return
+  swaymsg $layout
+}
+
+while handle; do
+  sleep 0.01
+done

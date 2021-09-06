@@ -19,3 +19,4 @@
 ~/.config/kitty;config/kitty
 ~/.config/tmux;config/tmux
 ~/.config/colorschemes;config/colorschemes
+~/.config/sway;config/sway
