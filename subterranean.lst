@@ -21,3 +21,4 @@
 ~/.config/colorschemes;config/colorschemes
 ~/.config/sway;config/sway
 ~/.config/starship.toml;config/starship.toml
+~/.config/rofi;config/rofi
