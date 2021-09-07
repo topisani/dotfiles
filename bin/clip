@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ -n "$USING_X11" ]]; then
+if [[ -z "$WAYLAND_DISPLAY" ]]; then
   xclip -selection c "$@"
 else
   if [[ " $1 " =~ " -o " ]]; then

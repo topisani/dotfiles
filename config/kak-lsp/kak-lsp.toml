@@ -16,16 +16,17 @@ timeout = 1800 # seconds = 30 minutes
 filetypes = ["rust"]
 roots = ["Cargo.toml"]
 command = "sh"
-args = ["-c", "if command -v rustup >/dev/null; then $(rustup which rust-analyzer); else rust-analyzer; fi"]
+args = ["-c", "rust-analyzer"]
+settings_section = "rustanalyzer"
 
-# [language.rust.initialization_options]
-# # If you get 'unresolved proc macro' warnings, you have two options
-# # 1. The safe choice is two disable the warning:
-# diagnostics.disabled = ["unresolved-proc-macro"]
-# # 2. Or you can opt-in for proc macro support
-# procMacro.enable = true
-# cargo.loadOutDirsFromCheck = true
-# # See https://github.com/rust-analyzer/rust-analyzer/issues/6448[language.crystal]
+[language.rust.settings.rustanalyzer]
+# If you get 'unresolved proc macro' warnings, you have two options
+# 1. The safe choice is two disable the warning:
+diagnostics.disabled = ["unresolved-proc-macro"]
+# 2. Or you can opt-in for proc macro support
+procMacro.enable = true
+cargo.loadOutDirsFromCheck = true
+# See https://github.com/rust-analyzer/rust-analyzer/issues/6448
 
 [language.crystal]
 filetypes = ["crystal"]
@@ -82,7 +83,7 @@ offset_encoding = "utf-8"
 filetypes = ["c", "cpp"]
 roots = ["compile_commands.json"]
 command = "sh"
-args = ['-c', '/usr/local/bin/clangd --log=verbose --cross-file-rename --clang-tidy --query-driver=/home/topisani/**,/usr/**,arm-none-eabi-gcc,arm-none-eabi-*,arm-none-eabi-g++,** 2> clangd.log']
+args = ['-c', 'clangd --log=verbose --cross-file-rename --clang-tidy --query-driver=/home/topisani/**,/usr/**,arm-none-eabi-gcc,arm-none-eabi-*,arm-none-eabi-g++,** 2> clangd.log']
 
 [language.java]
 filetypes = ["java"]
