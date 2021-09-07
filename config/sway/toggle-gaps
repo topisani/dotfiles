@@ -11,10 +11,10 @@ if [[ -z "$mode" || "$mode" == "toggle" ]]; then
  
     # Get current workspace.
     workspace=$(swaymsg -t get_workspaces \
-            | jq -r '.[] | if .["focused"] then .["name"] else empty end')
+            | jq -r '.[] | if .focused then .id else empty end')
     # Get current inner gap size. (0 means default)
     inner_gaps=$(swaymsg -t get_tree \
-            | jq -r 'recurse(.nodes[]; .nodes != null) | if .type == "workspace" and .name == "'"$workspace"'" then .gaps.inner else empty end')
+            | jq -r 'recurse(.nodes[]; .nodes != null) | if .id == "'"$workspace"'" then .gaps.inner else empty end')
  
     if [[   "$inner_gaps" == 0 ]]; then
         mode="on"

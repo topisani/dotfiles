@@ -1,0 +1,28 @@
+#! /bin/bash
+
+_layout_office() {
+  echo "'Dell Inc. DELL U2518D 3C4YP9CSACXL' 0 0"
+  echo "eDP-1 320 1440"
+}
+
+_layout_single() {
+  echo "eDP-1 0 0"
+}
+
+_apply_sway() {
+  swaymsg "output * disable"
+  "_layout_$1" | while IFS="" read line; do
+    declare -a "arr=($line)"
+    name=${arr[0]}
+    x=${arr[1]}
+    y=${arr[2]}
+    swaymsg "output '$name' enable pos $x $y"
+  done
+}
+
+# Run
+
+method=sway
+layout=${1:-single}
+
+"_apply_$method" $layout
