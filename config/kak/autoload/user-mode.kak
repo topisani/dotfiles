@@ -15,17 +15,17 @@ define-command file-delete -docstring "Delete current file" %{
 }
 
 declare-user-mode files
-map global user  f ': enter-user-mode files<ret>'    -docstring 'Files...'
-map global files f ': connect popup kcr fzf files<ret>'    -docstring 'List files'
-map global files t ': lf %reg[percent]<ret>'         -docstring 'File tree (current file)'
-map global files T ': lf .<ret>'                     -docstring 'File tree (current dir)'
-map global files w ': write<ret>'                    -docstring 'Write file' 
-map global files c ': fzf-file ~/.config/kak/<ret>'  -docstring 'Open config dir'
-map global files d ': file-delete<ret>'              -docstring 'Delete current file'
+map global user  f ': enter-user-mode files<ret>'                 -docstring 'Files...'
+map global files f ': connect bottom-panel kcr fzf files<ret>'    -docstring 'List files'
+map global files t ': lf %reg[percent]<ret>'                      -docstring 'File tree (current file)'
+map global files T ': lf .<ret>'                                  -docstring 'File tree (current dir)'
+map global files w ': write<ret>'                                 -docstring 'Write file' 
+map global files c ': connect bottom-panel kcr fzf files ~/.config/kak/<ret>'               -docstring 'Open config dir'
+map global files d ': file-delete<ret>'                           -docstring 'Delete current file'
 
 declare-user-mode buffers
 map global user b    ': enter-user-mode buffers<ret>'  -docstring 'Buffers...'
-map global buffers b ': fzf-buffer<ret>'               -docstring "List Buffers" 
+map global buffers b ': connect bottom-panel kcr fzf buffers<ret>'               -docstring "List Buffers" 
 map global buffers n ': buffer-next<ret>'              -docstring "Next Buffer" 
 map global buffers p ': buffer-previous<ret>'          -docstring "Prev buffer" 
 map global buffers d ': delete-buffer<ret>'            -docstring "Delete buffer"

@@ -25,3 +25,4 @@
 ~/.config/sidetree;config/sidetree
 ~/.inputrc;home/inputrc
 ~/.config/waybar;config/waybar
+~/.cargo/config.toml;home/cargo/config.toml
