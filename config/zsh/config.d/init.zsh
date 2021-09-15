@@ -245,35 +245,35 @@ setopt share_history          # share history between simultaneously running she
 #}}}
 
 #{{{ Distrack and pushd
-setopt auto_pushd             # make cd push the old directory onto the directory stack.
-setopt pushd_ignore_dups      # don't push the same dir twice.
-DIRSTACKSIZE=20               # Max number of items on dirstack
-DIRSTACKFILE="$HOME/.zdirs"
+# setopt auto_pushd             # make cd push the old directory onto the directory stack.
+# setopt pushd_ignore_dups      # don't push the same dir twice.
+# DIRSTACKSIZE=20               # Max number of items on dirstack
+# DIRSTACKFILE="$HOME/.zdirs"
 
-function write_dirstack() {
-    (( $DIRSTACKSIZE <= 0 )) && return
-    [[ -z $DIRSTACKFILE ]] && return
+# function write_dirstack() {
+#     (( $DIRSTACKSIZE <= 0 )) && return
+#     [[ -z $DIRSTACKFILE ]] && return
 
-    # Array with unique values
-    typeset -aU dedup
-    dedup=( $PWD "${dirstack[@]}" )
+#     # Array with unique values
+#     typeset -aU dedup
+#     dedup=( $PWD "${dirstack[@]}" )
 
-    print -l $dedup >! $DIRSTACKFILE
-}
+#     print -l $dedup >! $DIRSTACKFILE
+# }
 
-autoload -U add-zsh-hook
-add-zsh-hook chpwd write_dirstack
+# autoload -U add-zsh-hook
+# add-zsh-hook chpwd write_dirstack
 
-if [[ -f ${DIRSTACKFILE} ]]; then
-    # Read dirstack from file and filter out all non-existing directories
-    # (f): split at newline
-    # ${^...}: set RC_EXPAND_PARAM. ${^var} becomes {$var[1],$var[2],...}
-    # (/N): / to filter directories. N for NULL_GLOB to silently ignore nonexisting dirs
-    dirstack=( ${^${(f)"$(< $DIRSTACKFILE)"}}(/N) )
+# if [[ -f ${DIRSTACKFILE} ]]; then
+#     # Read dirstack from file and filter out all non-existing directories
+#     # (f): split at newline
+#     # ${^...}: set RC_EXPAND_PARAM. ${^var} becomes {$var[1],$var[2],...}
+#     # (/N): / to filter directories. N for NULL_GLOB to silently ignore nonexisting dirs
+#     dirstack=( ${^${(f)"$(< $DIRSTACKFILE)"}}(/N) )
 
-    # Populate `cd -` behavior after startup
-    [[ -d $dirstack[1] ]] && cd -q $dirstack[1] && cd -q $OLDPWD
-fi
+#     # Populate `cd -` behavior after startup
+#     [[ -d $dirstack[1] ]] && cd -q $dirstack[1] && cd -q $OLDPWD
+# fi
 #}}}
 
 #{{{ Window title
