@@ -72,11 +72,11 @@ smart_gaps on
 
     bindsym $mod+p exec killall -SIGUSR1 waybar
 
-bindsym XF86AudioMute exec volume mute toggle
-bindsym XF86AudioRaiseVolume exec volume volume up
-bindsym XF86AudioLowerVolume exec volume volume down
-bindsym XF86MonBrightnessUp exec brightness up
-bindsym XF86MonBrightnessDown exec brightness down
+bindsym XF86AudioMute exec volume -n mute toggle
+bindsym XF86AudioRaiseVolume exec volume -n volume up
+bindsym XF86AudioLowerVolume exec volume -n volume down
+bindsym XF86MonBrightnessUp exec brightness -n up
+bindsym XF86MonBrightnessDown exec brightness -n down
 bindsym Print exec rofi-shoot
 #
 # Moving around:
@@ -315,21 +315,17 @@ for_window [class="Xfburn"] floating enable
 # switch to workspace with urgent window automatically
 for_window [urgent=latest] focus
 
-output DP-3 pos 0 0
-output DP-4 pos 0 0
-output DP-7 pos 0 0
-output eDP-1 pos 0 1440
-
-
 exec xrdb -load ~/.Xresources
 exec dunst &
 exec battery_notifyd &
 exec systemd-lock-handler cloth-lock &
 # exec dex --autostart &
 exec ~/.config/sway/autotile &
+exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 
 exec redshift -l 56:10 -m wayland &
 exec nm-applet
+exec screen-layout single
 
 set $gnomeschema org.gnome.desktop.interface
 

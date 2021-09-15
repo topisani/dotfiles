@@ -32,7 +32,7 @@ send_notification() {
         dunstify -u 0 -i $(vol_icon muted) Muted -r $dunst_id
     else
         vol=$(query_volume)
-        dunstify -u 0 -i $(vol_icon $vol) $vol% -r $dunst_id
+        dunstify -u 0 -i $(vol_icon $vol) -r $dunst_id "Volume: $vol%" -h int:value:"$vol"
     fi
 }
 
@@ -52,7 +52,7 @@ volume() {
 }
 
 notify=0
-while :; do
+while (( $# > 0 )); do
     case $1 in
         -h|--help|-\?)
             show_help
@@ -84,6 +84,6 @@ while :; do
     shift
 done
 
-if [[ $notify ]]; then
+if (( $notify )); then
     send_notification
 fi

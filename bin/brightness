@@ -27,7 +27,7 @@ icon() {
 
 send_notification() {
     val=$(query)
-    dunstify -u 0 -i $(icon $val) $val% -r $dunst_id
+    dunstify -u 0 -i $(icon $val) "Brightness: $val%" -r $dunst_id -h int:value:"$val"
 }
 
 brightness() {
@@ -40,7 +40,7 @@ brightness() {
 
 notify=0
 
-while :; do
+while (( $# )); do
     case $1 in
         -h|-\?|--help)
             show_help
@@ -64,6 +64,6 @@ while :; do
     shift
 done
 
-if [[ $notify ]]; then
+if (( $notify )); then
     send_notification
 fi

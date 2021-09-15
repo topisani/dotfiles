@@ -1,8 +1,15 @@
 #! /bin/bash
 
 _layout_office() {
-  echo "'Dell Inc. DELL U2518D 3C4YP9CSACXL' 0 0"
-  echo "eDP-1 320 1440"
+  echo "'Dell Inc. DELL U2719D 7NRBS83' 0 0 90"
+  echo "'Dell Inc. DELL U2719D CNRBS83' 1440 0"
+  echo "eDP-1 1440 1440"
+}
+
+_layout_office_dual_vert() {
+  echo "'Dell Inc. DELL U2719D 7NRBS83' 0 0 270"
+  echo "'Dell Inc. DELL U2719D CNRBS83' 1440 0 270"
+  # echo "eDP-1 320 2560"
 }
 
 _layout_single() {
@@ -16,7 +23,8 @@ _apply_sway() {
     name=${arr[0]}
     x=${arr[1]}
     y=${arr[2]}
-    swaymsg "output '$name' enable pos $x $y"
+    trans=${arr[3]:-normal}
+    swaymsg "output '$name' enable pos $x $y transform $trans"
   done
 }
 

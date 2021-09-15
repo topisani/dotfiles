@@ -1,0 +1,14 @@
+* {
+	width: 50;
+	lines: 14;
+	font: "Roboto 13";
+	bw: 0;
+	padding: 32;
+	separator-style: "none";
+	hide-scrollbar: false;
+	fullscreen: false;
+	color-normal: "#23252F, #FCFEFB, #23252F, #23252F, #178CA6";
+	color-urgent: "#23252F, #FCFEFB, #23252F, #23252F, #178CA6";
+	color-active: "#23252F, #FCFEFB, #23252F, #23252F, #178CA6";
+	color-window: "#23252F, #178CA6";
+}

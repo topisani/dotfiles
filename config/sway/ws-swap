@@ -2,7 +2,7 @@
 # requires jq
 
 action=${1:-swap}
-scrns=$(swaymsg -t get_outputs | jq -r '.[]|"\(.name):\(.current_workspace)"' | grep -v '^null:null$')
+scrns=$(swaymsg -t get_outputs | jq -r '.[]|"\(.name):\(.current_workspace)"' | grep -v ':null$')
 curscrn=$(swaymsg -t get_tree | jq -r 'recurse(.nodes[]?) | if .type == "output" and (recurse(.nodes[]?) | .focused ) then .name else empty end')
 prev=$(echo "$scrns" | tail -n1 | cut -d: -f1)
 echo "$prev"

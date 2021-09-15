@@ -2,7 +2,7 @@
 git-fetch-with-cli = true # use the `git` executable for git operations
 
 [build]
-jobs = 1
+jobs = 6
 
 [doc]
 browser = "webview"
