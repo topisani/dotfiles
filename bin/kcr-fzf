@@ -1,0 +1,54 @@
+#!/bin/sh
+
+kcr_fzf_files() {
+  fd --type file . "$@" |
+  sk --header='Select a file to open' --prompt='(f)>' |
+  # Open files
+  while read file; do
+    kcr edit "$file"
+  done
+}
+
+kcr_fzf_buffers() {
+  kcr get --raw --value buflist |
+  grep -F "$*" |
+  sk --header='Select a buffer to open' --prompt='(b)>' |
+  # Open buffers
+  while read name; do
+    kcr send buffer "$name"
+  done
+}
+
+kcr_fzf_grep() {
+  export PATHS_PATH=$(mktemp)
+  trap 'rm "$PATHS_PATH"' EXIT
+  for path do
+    echo "$path" >> "$PATHS_PATH"
+  done
+
+  fzf --phony --delimiter ':' --ansi --bind 'change:reload(while read path; do set -- "$@" "$path"; done < "$PATHS_PATH"; rg --color=always --column --with-filename --fixed-strings -- {q} "$@" || true),enter:execute(kcr edit {1} +{2}:{3})+abort' --preview 'highlight_line={2} line_range_begin=$((line = highlight_line - (FZF_PREVIEW_LINES / 4) && line < 1 ? 1 : line)) line_range_end=$((line_range_begin + FZF_PREVIEW_LINES)) && bat --style=numbers --color=always --line-range "$line_range_begin:$line_range_end" --highlight-line {2} {1} 2> /dev/null' --header='Select a file to open' --prompt='(g)>'
+}
+
+kcr_fzf_shell() {
+  set_environment() {
+    session=$1 client=${2#null} buffer_name=${3#null} working_directory=$4
+  }
+
+  # Run fzf with the session list
+  rows=$(
+    kcr list --raw |
+    fzf --header='Select a session to switch to' --prompt='(s)>'
+  )
+
+  IFS='
+  '
+  for row in $rows; do
+    IFS='	'
+    set_environment $row
+
+    # Start an interactive shell
+    KAKOUNE_SESSION=$session KAKOUNE_CLIENT=$client kcr shell "$@"
+  done
+}
+
+"kcr_fzf_$@"

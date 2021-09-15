@@ -20,7 +20,7 @@ map global files f ': connect bottom-panel kcr fzf files<ret>'    -docstring 'Li
 map global files t ': lf %reg[percent]<ret>'                      -docstring 'File tree (current file)'
 map global files T ': lf .<ret>'                                  -docstring 'File tree (current dir)'
 map global files w ': write<ret>'                                 -docstring 'Write file' 
-map global files c ': connect bottom-panel kcr fzf files ~/.config/kak/<ret>'               -docstring 'Open config dir'
+map global files c ": connect bottom-panel kcr fzf files %val{config}<ret>"               -docstring 'Open config dir'
 map global files d ': file-delete<ret>'                           -docstring 'Delete current file'
 
 declare-user-mode buffers
