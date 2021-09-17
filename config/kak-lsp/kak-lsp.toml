@@ -155,6 +155,12 @@ filetypes = ["latex"]
 roots = ["main.tex"]
 command = "texlab"
 
+[language.vue]
+filetypes = ["vue"]
+roots = ["package.json"]
+command = "vls"
+settings_section = "vls"
+
 # Semantic tokens support
 # See https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_semanticTokens
 # for the default list of tokens and modifiers.

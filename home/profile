@@ -10,8 +10,13 @@
 #umask 022
 
 # set PATH so it includes user's private bin directories
-PATH="$HOME/.bin:$HOME/.local/bin:/usr/local/bin:$HOME/.composer/vendor/bin:$PATH"
 PATH="$HOME/dev/flutter/bin:$PATH"
+PATH="$HOME/.cargo/bin:$PATH"
+PATH="$HOME/go/bin:$PATH"
+command -v yarn > /dev/null && PATH="$(yarn global bin):$PATH"
+
+PATH="$HOME/.bin:$HOME/.local/bin:/usr/local/bin:$PATH"
+export PATH
 
 # PATH="$(ruby -rrubygems -e 'puts Gem.user_dir')/bin:$PATH"
 
@@ -19,9 +24,6 @@ PATH="$HOME/dev/flutter/bin:$PATH"
 export CC=/usr/bin/clang
 export CXX=/usr/bin/clang++
 
-
-export PATH="$HOME/.cargo/bin:$PATH"
-export PATH="$HOME/go/bin:$PATH"
 alias termbin="nc termbin.com 9999"
 
 # Auto make flags

@@ -325,7 +325,7 @@ exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 
 exec redshift -l 56:10 -m wayland &
 exec nm-applet
-exec screen-layout single
+exec_always screen-layout single
 
 set $gnomeschema org.gnome.desktop.interface
 
@@ -336,5 +336,10 @@ exec {
 }
 
 # exec swayidle -w timeout 600 'cloth-lock' timeout 1200 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' before-sleep 'cloth-lock' &
+exec swayidle -w \
+     timeout 300 'swaylock -f -c 18191c' \
+     timeout 600 'swaymsg "output * dpms off"' \
+     resume 'swaymsg "output * dpms on"' \
+     before-sleep 'swaylock -f -c 000000' &
 
 # include /etc/sway/config.d/*
