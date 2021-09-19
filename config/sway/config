@@ -1,6 +1,7 @@
 # Read `man 5 sway` for a complete reference.
 ### Variables
 set $mod Mod4
+
 # Home row direction keys, like vim
 set $left h
 set $down j
@@ -11,8 +12,12 @@ set $term tmux-term
 # Your preferred application launcher
 set $menu rofi -show drun
 
+set $conf ~/.config/sway
+set $scripts $conf/scripts
+
 ### Output configuration
 output * bg #18191c solid_color
+output * enable dpms enable
 # You can get the names of your outputs by running: swaymsg -t get_outputs
 
 ### Input configuration
@@ -52,7 +57,7 @@ smart_gaps on
     bindsym $mod+Shift+c exec colorscheme-switch
 
     # kill focused window
-    bindsym $mod+q kill
+    # bindsym $mod+q kill
 
     # start your launcher
     bindsym $mod+Space exec $menu
@@ -83,11 +88,11 @@ bindsym Print exec rofi-shoot
 #
 
 
-    bindsym Mod1+tab exec swaymsg [con_id=$(swaymsg -t get_tree | ~/.config/sway/alttab t)] focus
-    bindsym Mod1+shift+tab exec swaymsg [con_id=$(swaymsg -t get_tree | ~/.config/sway/alttab f)] focus
+    bindsym Mod1+tab exec swaymsg [con_id=$(swaymsg -t get_tree | $scripts/alttab t)] focus
+    bindsym Mod1+shift+tab exec swaymsg [con_id=$(swaymsg -t get_tree | $scripts/alttab f)] focus
 
-    bindsym $mod+o exec ~/.config/sway/ws-swap focus
-    bindsym $mod+Shift+o exec ~/.config/sway/ws-swap swap
+    bindsym $mod+o exec $scripts/ws-swap focus
+    bindsym $mod+Shift+o exec $scripts/ws-swap swap
 
     # Move your focus around
     bindsym $mod+$left focus left
@@ -114,16 +119,16 @@ bindsym Print exec rofi-shoot
 # Workspaces:
 #
     # switch to workspace
-    bindsym $mod+1 workspace 1
-    bindsym $mod+2 workspace 2
-    bindsym $mod+3 workspace 3
-    bindsym $mod+4 workspace 4
-    bindsym $mod+5 workspace 5
-    bindsym $mod+6 workspace 6
-    bindsym $mod+7 workspace 7
-    bindsym $mod+8 workspace 8
-    bindsym $mod+9 workspace 9
-    bindsym $mod+0 workspace 10
+    bindsym $mod+1 exec sway-fade -t 0.15 ws 1
+    bindsym $mod+2 exec sway-fade -t 0.15 ws 2
+    bindsym $mod+3 exec sway-fade -t 0.15 ws 3
+    bindsym $mod+4 exec sway-fade -t 0.15 ws 4
+    bindsym $mod+5 exec sway-fade -t 0.15 ws 5
+    bindsym $mod+6 exec sway-fade -t 0.15 ws 6
+    bindsym $mod+7 exec sway-fade -t 0.15 ws 7
+    bindsym $mod+8 exec sway-fade -t 0.15 ws 8
+    bindsym $mod+9 exec sway-fade -t 0.15 ws 9
+    bindsym $mod+0 exec sway-fade -t 0.15 ws 10
     # move focused container to workspace
     bindsym $mod+Shift+1 move container to workspace 1
     bindsym $mod+Shift+2 move container to workspace 2
@@ -218,7 +223,7 @@ set $mode_gaps_outer Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)
 set $mode_gaps_inner Inner Gaps: +|-|0 (local), Shift + +|-|0 (global)
 bindsym $mod+Shift+g mode "$mode_gaps"
 
-bindsym $mod+g exec ~/.config/sway/toggle-gaps
+bindsym $mod+g exec $scripts/toggle-gaps
  
 mode "$mode_gaps" {
         bindsym o      mode "$mode_gaps_outer"
@@ -318,24 +323,25 @@ for_window [urgent=latest] focus
 exec xrdb -load ~/.Xresources
 exec dunst &
 exec battery_notifyd &
-exec systemd-lock-handler cloth-lock &
-# exec dex --autostart &
-exec ~/.config/sway/autotile &
+exec systemd-lock-handler swaylock &
+exec dex --autostart &
+exec $scripts/autotile &
 exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 
 exec redshift -l 56:10 -m wayland &
 exec nm-applet
-exec_always screen-layout single
 
-set $gnomeschema org.gnome.desktop.interface
 
-exec {
-  # gsettings set $gnomeschema gtk-theme 'Yaru'
-  # gsettings set $gnomeschema icon-theme 'Yaru'
-  # gsettings set $gnomeschema cursor-theme 'Yaru'
-}
+# For https://github.com/topisani/sway-fade
+# Install with cargo install sway-fade
+# Fade in
+for_window [app_id=.*] opacity 0
+for_window [app_id=.*] exec sway-fade -t 0.25 in
+for_window [app_id=.*] mark fade
 
-# exec swayidle -w timeout 600 'cloth-lock' timeout 1200 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' before-sleep 'cloth-lock' &
+# Fade out
+bindsym $mod+q mark quit; exec sway-fade out
+
 exec swayidle -w \
      timeout 300 'swaylock -f -c 18191c' \
      timeout 600 'swaymsg "output * dpms off"' \

@@ -84,6 +84,9 @@ face global SearchOccurrence            $fg,               default      +ib
 face global SnippetsOtherPlaceholders   default, $(alpha $green 40)
 face global SnippetsNextPlaceholders    default, $(alpha $green A0)
 
+# kakoune-focus
+face global FocusMarker                 $bg3,                           +fa
+
 # Lsp
 face global InlayHint     $blue_dark+i
 

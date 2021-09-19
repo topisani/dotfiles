@@ -27,3 +27,4 @@
 ~/.config/waybar;config/waybar
 ~/.cargo/config.toml;home/cargo/config.toml
 ~/.config/zsh;config/zsh
+~/.config/paru;config/paru

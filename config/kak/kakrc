@@ -11,13 +11,10 @@ def load-conf -params 1 %{
 
 # User interface ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-set-option -add global ui_options ncurses_status_on_top=false
-set-option -add global ui_options ncurses_assistant=none
-set-option -add global ui_options ncurses_set_title=no
-
 set-option -add global ui_options terminal_status_on_top=false
 set-option -add global ui_options terminal_assistant=none
 set-option -add global ui_options terminal_set_title=no
+
 
 set-option global modelinefmt '{{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {{context_info}} {cyan}U+%sh{printf ''%04x'' "$kak_cursor_char_value"}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default}'
 
@@ -25,7 +22,7 @@ set-option global modelinefmt '{{mode_info}} {magenta}%val{client}{default} at {
 hook global WinCreate .* %{
   addhl window/matching show-matching
   addhl window/show-whitespaces show-whitespaces
-  addhl window/numbers number-lines -hlcursor -separator ' '
+  # addhl window/numbers number-lines -hlcursor -separator ' '
 }
 
 # Leader / Filetype modes ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
@@ -51,7 +48,7 @@ cork tmux https://github.com/alexherbo2/tmux.kak %{
   tmux-integration-enable
 
   define-command -override tmux-terminal-bottom-panel -params .. -shell-completion -docstring 'tmux-terminal-bottom-panel <program> [arguments]: create a new terminal as a tmux bottom panel' %{
-    tmux split-window -v -l 20 -t '{bottom}' -c '#{PWD}' %arg{@}
+    tmux split-window -v -l 20 -t '{bottom}' -c %sh{pwd} %arg{@}
   }
   alias global bottom-panel tmux-terminal-bottom-panel
 }
@@ -90,15 +87,22 @@ cork fzf https://github.com/andreyorst/fzf.kak %{
   require-module fzf-buffer
 }
 
-# cork number-toggle https://github.com/evanrelf/number-toggle.kak %{
-#   require-module number-toggle
-#   set global number_toggle_params -hlcursor -separator ' '
-# }
+cork number-toggle https://github.com/evanrelf/number-toggle.kak %{
+  require-module number-toggle
+  set global number_toggle_params -hlcursor -separator ' '
+}
 
 cork kakoune-mirror https://github.com/delapouite/kakoune-mirror %{
   # Suggested mapping
   map global normal "'" ': enter-user-mode -lock mirror<ret>'
 }
+
+cork focus https://github.com/caksoylar/kakoune-focus %{
+  set global focus_context_lines 1
+  set global focus_separator "{FocusMarker}╞══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╡"
+  map global user o ': focus-toggle<ret>' -docstring "Toggle selection focus"
+}
+
 
 # Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 

@@ -6,38 +6,8 @@
 # Set ZDOTDIR to HOME, if not set
 : "${ZDOTDIR="$HOME"}"
 
-#{{{ Utility functions
-function check_prog() {
-     (( ${+commands[$1]} )) && return 0
-    return 1
-}
 
-function maybe_source() {
-    if test -r "$1"; then
-        source "$1"
-        return 0
-    fi
-    return 1
-}
-#}}}
-
-#{{{ Zsh Line Editor widgets
-# edit current command with $EDITOR
-autoload -Uz edit-command-line
-zle -N edit-command-line
-
-function slash-backward-kill-word () {
-    local WORDCHARS="${WORDCHARS:s@/@}"
-    # zle backward-word
-    zle backward-kill-word
-}
-zle -N slash-backward-kill-word
-#}}}
-
-#{{{ less and ls colors
-# color setup for ls:
-check_prog dircolors && eval $(dircolors -b)
-
+#{{{ less colors
 # support colors in less
 export LESS_TERMCAP_mb=$'\E[01;31m'
 export LESS_TERMCAP_md=$'\E[01;31m'
@@ -186,14 +156,14 @@ function setup_completion() {
     )
     zstyle ':completion:*:hosts' hosts $hosts
 }
-setup_completion
-unfunction setup_completion
+# setup_completion
+# unfunction setup_completion
 #}}}
 
 #{{{ Options
 
 # Report time stats of commands running longer than 20 sec
-REPORTTIME=20
+# REPORTTIME=20
 
 # in order to use #, ~ and ^ for filename generation grep word
 # *~(*.gz|*.bz|*.bz2|*.zip|*.Z) -> searches for word not in compressed files
@@ -231,6 +201,9 @@ setopt no_sh_word_split
 
 # don't error out when unset parameters are used
 setopt unset
+
+# free c-s and c-q
+setopt noflowcontrol
 #}}}
 
 #{{{ History settings
@@ -245,62 +218,9 @@ setopt share_history          # share history between simultaneously running she
 #}}}
 
 #{{{ Distrack and pushd
-# setopt auto_pushd             # make cd push the old directory onto the directory stack.
-# setopt pushd_ignore_dups      # don't push the same dir twice.
-# DIRSTACKSIZE=20               # Max number of items on dirstack
-# DIRSTACKFILE="$HOME/.zdirs"
-
-# function write_dirstack() {
-#     (( $DIRSTACKSIZE <= 0 )) && return
-#     [[ -z $DIRSTACKFILE ]] && return
-
-#     # Array with unique values
-#     typeset -aU dedup
-#     dedup=( $PWD "${dirstack[@]}" )
-
-#     print -l $dedup >! $DIRSTACKFILE
-# }
-
-# autoload -U add-zsh-hook
-# add-zsh-hook chpwd write_dirstack
-
-# if [[ -f ${DIRSTACKFILE} ]]; then
-#     # Read dirstack from file and filter out all non-existing directories
-#     # (f): split at newline
-#     # ${^...}: set RC_EXPAND_PARAM. ${^var} becomes {$var[1],$var[2],...}
-#     # (/N): / to filter directories. N for NULL_GLOB to silently ignore nonexisting dirs
-#     dirstack=( ${^${(f)"$(< $DIRSTACKFILE)"}}(/N) )
-
-#     # Populate `cd -` behavior after startup
-#     [[ -d $dirstack[1] ]] && cd -q $dirstack[1] && cd -q $OLDPWD
-# fi
-#}}}
-
-#{{{ Window title
-# adjust title of xterm compatible terminal
-# see http://www.faqs.org/docs/Linux-mini/Xterm-Title.html
-
-case $TERM in
-    (xterm*|rxvt*)
-        function _set_title() {
-            printf '%s' $'\e]0;'
-            printf '%s' "$*"
-            printf '%s' $'\a'
-        }
-
-        function _reset_title() {
-            _set_title ${(%):-"%n@%m: %~"}
-        }
-
-        function _set_command_title() {
-            _set_title "${(%):-"%n@%m:"}" "$1"
-        }
-
-        add-zsh-hook precmd _reset_title
-        add-zsh-hook preexec _set_command_title
-        ;;
-esac
-
+setopt auto_pushd             # make cd push the old directory onto the directory stack.
+setopt pushd_ignore_dups      # don't push the same dir twice.
+DIRSTACKSIZE=20               # Max number of items on dirstack
 #}}}
 
 #{{{ Keybindings
@@ -309,13 +229,17 @@ bindkey '^a' beginning-of-line
 bindkey '^e' end-of-line
 
 # alt+q to push current line and fetch again on next line
-bindkey '\eq' push-line
+# bindkey '\eq' push-line
 
 # show man page of current command with alt+h
 bindkey '\eh' run-help
 
+
+# alt+h, alt+l to move to next word
 # ctrl+left, ctrl+right to wo to next word
 # alt+left, alt+right to wo to next word
+bindkey '\eh' backward-word
+bindkey '\ej' forward-word
 bindkey '^[[1;5D' backward-word
 bindkey '^[[1;5C' forward-word
 bindkey '^[[1;3D' backward-word
@@ -386,24 +310,6 @@ function mkcd() {
     builtin cd "$1"
 }
 
-# Create temporary directory and cd to it
-function cdt() {
-    builtin cd "$(mktemp -d)"
-    builtin pwd
-}
-
-# A small wrapper for qrencode (https://fukuchi.org/works/qrencode/).
-# Wraps the output of qrencode to have high black and white contrast.
-# Usage:
-# - With pipes: xclip -o | mkqrcode
-# - With arguments: mkqrcode "hello world"
-function mkqrcode() {
-    data="$@"
-    [[ -z "$data" ]] && IFS='' read -rd '' data
-    echo "\e[48;5;231m\e[38;5;232m"
-    qrencode -t utf8i -o - "$data"
-    echo "\e[0m"
-}
 #}}}
 
 # vim:foldmethod=marker
