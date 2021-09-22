@@ -32,9 +32,6 @@ map -docstring 'leader' global normal <space> ': enter-user-mode user<ret>'
 map -docstring 'remove all sels except main' global normal <backspace> <space> 
 map -docstring 'remove main sel' global normal <a-backspace> <a-space> 
 
-# User Mode bindings
-map -docstring 'Open terminal' global user <ret> ': connect terminal<ret>'
-
 # Filetype mode from [,] or [c-f]
 declare-user-mode filetype
 unmap global normal ,
@@ -104,6 +101,12 @@ cork focus https://github.com/caksoylar/kakoune-focus %{
 }
 
 
+cork occivink-snippets https://github.com/occivink/kakoune-snippets %{
+  
+}
+
+cork emmet https://github.com/JJK96/kakoune-emmet
+
 # Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 map -docstring 'indent' global insert <tab> '<a-;><a-gt>'
@@ -111,14 +114,18 @@ map -docstring 'deindent' global insert <s-tab> '<a-;><lt>'
 
 # Normal mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-map -docstring 'Surround mode' global user s ': surround-mode<ret>'
-map -docstring 'Replace' global user r ': enter-replace-mode<ret>'
-
 map -docstring 'Enter inser mode with main selection' global normal <a-I> ': enter-insert-mode-with-main-selection<ret>'
 map -docstring 'Select all occurrences of current selection' global normal <a-L> '"aZ*%s<ret>"bZ"az"b<a-z>a'
 
 map -docstring 'Comment' global normal '#' ':comment-line<ret>'
 map -docstring 'Comment' global normal '<a-#>' ':comment-block<ret>'
+
+# User mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+map -docstring 'Open terminal' global user <ret> ': connect terminal<ret>'
+map -docstring 'Surround mode' global user s ': surround-mode<ret>'
+map -docstring 'Replace' global user r ': enter-replace-mode<ret>'
+map -docstring 'Popup Terminal' global user <c-p> ': connect popup<ret>'
 
 def sidetree -override %{ connect panel sidetree --select %val{buffile} }
 map -docstring 'sidetree' global user <tab> ': sidetree<ret>'

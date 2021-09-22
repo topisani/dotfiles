@@ -1,6 +1,9 @@
+addhl -override  shared/html/template_pug region '<template lang="pug">\K' '(?=</template>)' ref pug
+
 hook global WinSetOption filetype=vue %{
   require-module html
   addhl window/ ref html
+  
 
   # set window lsp_config %{
   #   [language.vue.settings.volar.typescript]
@@ -34,6 +37,12 @@ hook global WinSetOption filetype=vue %{
   
   lsp-setup
   lsp-enable-semantic-tokens
+
+  set window comment_line "//"
+  set window comment_block_begin "/*"
+  set window comment_block_end "*/"
+  
+  map global insert <c-e> "<esc>x: emmet<ret>"
 }
 
 hook global BufCreate .*[.](vue) %{

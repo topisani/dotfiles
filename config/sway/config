@@ -119,16 +119,26 @@ bindsym Print exec rofi-shoot
 # Workspaces:
 #
     # switch to workspace
-    bindsym $mod+1 exec sway-fade -t 0.15 ws 1
-    bindsym $mod+2 exec sway-fade -t 0.15 ws 2
-    bindsym $mod+3 exec sway-fade -t 0.15 ws 3
-    bindsym $mod+4 exec sway-fade -t 0.15 ws 4
-    bindsym $mod+5 exec sway-fade -t 0.15 ws 5
-    bindsym $mod+6 exec sway-fade -t 0.15 ws 6
-    bindsym $mod+7 exec sway-fade -t 0.15 ws 7
-    bindsym $mod+8 exec sway-fade -t 0.15 ws 8
-    bindsym $mod+9 exec sway-fade -t 0.15 ws 9
-    bindsym $mod+0 exec sway-fade -t 0.15 ws 10
+    # bindsym $mod+1 exec sway-fade -t 0.15 ws 1
+    # bindsym $mod+2 exec sway-fade -t 0.15 ws 2
+    # bindsym $mod+3 exec sway-fade -t 0.15 ws 3
+    # bindsym $mod+4 exec sway-fade -t 0.15 ws 4
+    # bindsym $mod+5 exec sway-fade -t 0.15 ws 5
+    # bindsym $mod+6 exec sway-fade -t 0.15 ws 6
+    # bindsym $mod+7 exec sway-fade -t 0.15 ws 7
+    # bindsym $mod+8 exec sway-fade -t 0.15 ws 8
+    # bindsym $mod+9 exec sway-fade -t 0.15 ws 9
+    # bindsym $mod+0 exec sway-fade -t 0.15 ws 10
+    bindsym $mod+1 workspace 1
+    bindsym $mod+2 workspace 2
+    bindsym $mod+3 workspace 3
+    bindsym $mod+4 workspace 4
+    bindsym $mod+5 workspace 5
+    bindsym $mod+6 workspace 6
+    bindsym $mod+7 workspace 7
+    bindsym $mod+8 workspace 8
+    bindsym $mod+9 workspace 9
+    bindsym $mod+0 workspace 10
     # move focused container to workspace
     bindsym $mod+Shift+1 move container to workspace 1
     bindsym $mod+Shift+2 move container to workspace 2
