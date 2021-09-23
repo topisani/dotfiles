@@ -1,8 +1,8 @@
-addhl -override  shared/html/template_pug region '<template lang="pug">\K' '(?=</template>)' ref pug
-
 hook global WinSetOption filetype=vue %{
   require-module html
   addhl window/ ref html
+  addhl -override  shared/html/template_pug region '<template lang="pug">\K' '(?=</template>)' ref pug
+
   
 
   # set window lsp_config %{
@@ -45,6 +45,6 @@ hook global WinSetOption filetype=vue %{
   map global insert <c-e> "<esc>x: emmet<ret>"
 }
 
-hook global BufCreate .*[.](vue) %{
-    set-option buffer filetype vue
+hook global WinCreate .*[.](vue) %{
+    set-option window filetype vue
 }

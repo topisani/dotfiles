@@ -38,7 +38,7 @@ input "2:10:TPPS/2_Elan_TrackPoint" {
     pointer_accel 1
 }
 
-default_border pixel 2
+default_border pixel 1
 hide_edge_borders smart
 
 gaps inner 5
