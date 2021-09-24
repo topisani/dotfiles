@@ -141,9 +141,20 @@ updateKak() {
     done
 }
 
-update_gnome() {
+update_gtk() {
     gsettings set org.gnome.desktop.interface gtk-theme $(xrdb -query | grep -Po "gtk-theme:\h*\K.*")
     gsettings set org.gnome.desktop.interface icon-theme $(xrdb -query | grep -Po "icon-theme:\h*\K.*")
+}
+
+toggle_gtk_dark() {
+    gtk_theme="Matcha-light-azul"
+    icon_theme="Papirus-Light"
+    if gsettings get org.gnome.desktop.interface gtk-theme | grep "$gtk_theme"; then
+        gtk_theme="Matcha-dark-azul"
+        icon_theme="Papirus-Dark"
+    fi
+    gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme"
+    gsettings set org.gnome.desktop.interface icon-theme "$icon_theme"
 }
 
 getColorschemePath() {
@@ -186,8 +197,8 @@ switch() {
         # updateTerminals
         # updateTermite
         update_kitty
-        update_gnome
-        killall -sUSR1 polybar
+        # update_gtk
+        # killall -sUSR1 polybar
     else
         exit 1
     fi
@@ -212,8 +223,8 @@ main() {
         -r | --reload)
             switch $(cat $COLORSCHEME_PATH/current);
             ;;
-        -t | --terminal)
-            #updateTerminal > $(tty)
+        -g | --gtk)
+            toggle_gtk_dark
             ;;
         -c | --current)
             cat $COLORSCHEME_PATH/current

@@ -55,6 +55,7 @@ smart_gaps on
     bindsym $mod+Return exec $term
     bindsym $mod+Shift+Return exec kitty -c ~/.config/kitty/kitty.conf -c ~/.config/kitty/leader.conf
     bindsym $mod+Shift+c exec colorscheme-switch
+    bindsym $mod+Ctrl+c exec colorscheme-switch -g
 
     # kill focused window
     # bindsym $mod+q kill
@@ -339,7 +340,6 @@ exec $scripts/autotile &
 exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 exec /usr/lib/xdg-desktop-portal -r & /usr/lib/xdg-desktop-portal-wlr &
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
-
 
 exec redshift -l 56:10 -m wayland &
 exec nm-applet

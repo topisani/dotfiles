@@ -85,7 +85,7 @@ else # WAYLAND - Use GRIM
   			fi
   			;;
   		-s)
-        grim_flags="$grim_flags -g '$(slurp)'"
+        grim_flags="$grim_flags -g '$(slurp -o)'"
   			;;
       -f)
   			shift
