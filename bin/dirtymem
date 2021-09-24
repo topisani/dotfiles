@@ -1,0 +1,12 @@
+#!/bin/bash
+
+_print() {
+  cat /proc/meminfo | grep Dirty
+}
+
+while :; do
+  _print
+  echo -e "\r\e[2A"
+  echo -e "\r\e[2A"
+  sleep 1 
+done
