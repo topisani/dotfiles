@@ -13,7 +13,30 @@ end)
 return {
   color_scheme_dirs = {wezterm.config_dir .. "/colors"},
   color_scheme = "flatblue-dark",
-  font = wezterm.font("JetBrains Mono");
+  bold_brightens_ansi_colors = false,
+  font_antialias = "None",
+  font = wezterm.font({"JetBrains Mono"}),
+  font_rules= {
+    {
+      italic = true,
+      font = wezterm.font("JetBrains Mono", {italic=true}),
+    },
+
+    {
+      italic = true,
+      intensity = "Bold",
+      font = wezterm.font("JetBrains Mono", {bold=true,italic=true}),
+    },
+
+    {
+      intensity = "Bold",
+      font = wezterm.font("JetBrains Mono", {bold=true}),
+    },
+  },
+
+  
+  freetype_load_flags = "NO_HINTING|MONOCHROME",
+  -- font = wezterm.font("JetBrains Mono");
   
   -- set to false to disable the tab bar completely
   enable_tab_bar = true,
@@ -60,8 +83,8 @@ return {
     {key="f", mods="LEADER", action=wezterm.action({Search={CaseSensitiveString=""}})},
     {key="x", mods="LEADER", action='ActivateCopyMode'},
     -- {key=" ", mods="LEADER", action='QuickSelect'},
-    {key='v', mods="LEADER", action=wezterm.action({SplitVertical={domain="CurrentPaneDomain"}})},
-    {key="s", mods="LEADER", action=wezterm.action({SplitHorizontal={domain="CurrentPaneDomain"}})},
+    {key='s', mods="LEADER", action=wezterm.action({SplitVertical={domain="CurrentPaneDomain"}})},
+    {key="v", mods="LEADER", action=wezterm.action({SplitHorizontal={domain="CurrentPaneDomain"}})},
     {key="LeftArrow", mods="CTRL|SHIFT|ALT", action=wezterm.action({AdjustPaneSize={"Left", 1}})},
     {key="RightArrow", mods="CTRL|SHIFT|ALT", action=wezterm.action({AdjustPaneSize={"Right", 1}})},
     {key="UpArrow", mods="CTRL|SHIFT|ALT", action=wezterm.action({AdjustPaneSize={"Up", 1}})},

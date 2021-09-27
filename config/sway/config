@@ -53,7 +53,7 @@ smart_gaps on
 #
     # start a terminal
     bindsym $mod+Return exec $term
-    bindsym $mod+Shift+Return exec kitty
+    bindsym $mod+Shift+Return exec kitty -c ~/.config/kitty/kitty.conf -c ~/.config/kitty/leader.conf
     bindsym $mod+Shift+c exec colorscheme-switch
 
     # kill focused window

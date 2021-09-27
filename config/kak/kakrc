@@ -14,6 +14,7 @@ def load-conf -params 1 %{
 set-option -add global ui_options terminal_status_on_top=false
 set-option -add global ui_options terminal_assistant=none
 set-option -add global ui_options terminal_set_title=no
+set-option -add global ui_options terminal_synchronized=true
 
 
 set-option global modelinefmt '{{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {{context_info}} {cyan}U+%sh{printf ''%04x'' "$kak_cursor_char_value"}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default}'
@@ -39,16 +40,9 @@ map global normal , ': enter-user-mode filetype<ret>'
 map global normal <c-f> ': enter-user-mode filetype<ret>'
 map global insert <c-f> ': enter-user-mode filetype<ret>'
 
+load-conf windowing
+
 # Plugins ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
-
-cork tmux https://github.com/alexherbo2/tmux.kak %{
-  tmux-integration-enable
-
-  define-command -override tmux-terminal-bottom-panel -params .. -shell-completion -docstring 'tmux-terminal-bottom-panel <program> [arguments]: create a new terminal as a tmux bottom panel' %{
-    tmux split-window -v -l 20 -t '{bottom}' -c %sh{pwd} %arg{@}
-  }
-  alias global bottom-panel tmux-terminal-bottom-panel
-}
 
 cork lib https://github.com/alexherbo2/lib.kak %{
   # Indentation

@@ -7,7 +7,7 @@ COLORSCHEME_PATH=$HOME/.config/colorschemes
 XRDB_CONF_PATH=$HOME/.Xresources
 
 getXrdbColor() {
-    echo xrdb -query | LANG=C grep -F "$@:" | cut -d '#' -f2
+    xrdb -query | LANG=C grep -F "$@:" | cut -d '#' -f2
 }
 
 updateXrdb() {
@@ -120,6 +120,12 @@ build_kitty_theme() {
             ;;
         esac
     done <<< $(xrdb -query)
+    echo "active_tab_foreground   #$(getXrdbColor color232)"
+    echo "active_tab_background   #$(getXrdbColor color12)"
+    echo "active_tab_font_style   bold"
+    echo "inactive_tab_foreground #$(getXrdbColor color7)"
+    echo "inactive_tab_background #$(getXrdbColor color232)"
+    echo "inactive_tab_font_style normal"
 }
 
 update_kitty() {
