@@ -103,11 +103,12 @@ else # WAYLAND - Use GRIM
     shift
   done
 
+  mkdir -p "$(dirname '$filename')"
   filename=$(date "+${filename/#\~/$HOME}")
   sleep $delay 
   eval grim "$grim_flags" "$filename"
   if [[ -f $filename ]]; then
-    xclip -selection c -t image/png -i -l 0 $filename > /dev/null
+    cat $filename | wl-copy -t image/png
     echo $filename
   else
     echo "grim failed to create image file"
