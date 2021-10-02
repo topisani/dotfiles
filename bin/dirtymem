@@ -4,9 +4,9 @@ _print() {
   cat /proc/meminfo | grep Dirty
 }
 
+echo ""
 while :; do
+  echo -e "\r\e[2A"
   _print
-  echo -e "\r\e[2A"
-  echo -e "\r\e[2A"
   sleep 1 
 done

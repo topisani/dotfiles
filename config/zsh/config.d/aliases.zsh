@@ -45,21 +45,9 @@ function mkcd {
   cd "$1"
 }
 
-# https://github.com/alexherbo2/kakoune.cr
-alias kcr-tmux="kcr env | jq -r 'to_entries[] | \"tmux setenv \(.key) \(.value)\"' | sh"
-alias k='kcr edit'
-alias K='kcr-fzf-shell'
-alias KK='K --working-directory .'
-alias ks='kcr shell --session'
-alias kl='kcr list'
-alias a='kcr attach'
-#alias :='kcr send'
-#alias :br='KK broot'
-#alias :cat='kcr cat --raw'
-
 alias st=subterranean
 
-export EDITOR='kcr edit'
+export EDITOR='kak'
 export FZF_DEFAULT_OPTS='--multi --layout=reverse --preview-window=down:60% --color=16'
 
 # Change the current directory for a tmux session, which determines
