@@ -170,6 +170,16 @@ _git() {
   GIT_WORK_TREE="$DOTFILES_FOLDER" GIT_DIR="$DOTFILES_FOLDER/.git" git "$@"
 }
 
+_push() {
+  _git add "$DOTFILES_FOLDER"
+  _git commit -v
+  _git push
+}
+
+_pull() {
+  _git pull
+}
+
 _main() {
   local cmd="${1-}"; shift
   case "${cmd}" in
@@ -179,7 +189,7 @@ _main() {
     edit)
       $EDITOR "$DOTFILES_FILE"
       ;;
-    install | add | remove | list | git)
+    install | add | remove | list | git | push | pull)
       _$cmd "$@"
       ;;
     *)
