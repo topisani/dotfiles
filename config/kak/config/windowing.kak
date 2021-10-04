@@ -1,10 +1,10 @@
 cork tmux https://github.com/alexherbo2/tmux.kak %{
   define-command -override tmux-terminal-bottom-panel -params .. -shell-completion -docstring 'tmux-terminal-bottom-panel <program> [arguments]: create a new terminal as a tmux bottom panel' %{
-    tmux split-window -v -l 20 -t '{bottom}' -c %sh{pwd} %arg{@}
+    tmux split-window -v -l 20 -c %sh{pwd} %arg{@}
   }
   define-command -override tmux-terminal-autosplit -params .. -shell-completion -docstring 'tmux-terminal-autosplit <program> [arguments]: create a new terminal as a tmux pane with autosplit' %{
     nop %sh{
-      tmux-autosplit -t '{bottom}' -c "$PWD" "$@"
+      tmux-autosplit -c "$PWD" "$@"
     }
   }
 }

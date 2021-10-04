@@ -1,16 +1,13 @@
 #!/bin/bash
 
-not_id=568492
+not_id=$(shuf -i 10000-100000 -n 1)
 
 last_bat=$(query_bat)
 while true; do
     bat=$(query_bat)
     sl=60
     if [[ $bat -lt 16 ]] && ! acpi | grep Charging; then
-	if [[ $bat != $last_bat ]] ; then
-            dunstify -u 2 -i /usr/share/icons/Yaru/scalable/status/battery-empty-symbolic.svg "Battery Low!" "$bat%" -r $not_id
-        fi
-        sl=10
+        dunstify -u 2 -i battery-empty-symbolic "Battery Low!" "$bat%" -r $not_id
     else
         dunstify -C $not_id
     fi
