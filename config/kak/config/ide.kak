@@ -32,18 +32,14 @@ def ide-perform-setup -hidden %{
       }
   }
 
-  hook global WinClose .* %{
-      eval %sh{
-          if [[ "$kak_client" == "$kak_opt_toolsclient" ]]; then
-              echo "ide-hide-tools"
-          fi
-      }
+  hook -group ide global ClientClose %opt[toolsclient] %{
+    ide-make-tools
   }
 
   hook global BufClose .* %{
       eval %sh{
           if [[ "$kak_client" == "$kak_opt_toolsclient" ]]; then
-              echo "ide-hide-tools"
+              echo "quit"
           fi
       }
   }
@@ -63,22 +59,9 @@ def -hidden ide-make-tools %{
   set global toolsclient tools
   eval %sh{
     TMUX=${kak_client_env_TMUX:-$TMUX}
-    tmux new-session -ds "kakoune-background" &> /dev/null
-    DEST=$(tmux new-window -P -t kakoune-background kak -c $kak_session -e 'rename-client tools')
+    DEST=$(tmux neww -dP -t :10 kak -c $kak_session -e 'rename-client tools' || tmux splitw -dP -t :10 kak -c $kak_session -e 'rename-client tools')
     [[ $? == 0 ]] && echo "set global toolsclient_tmux_pane '$DEST'"
   }
-}
-
-def ide-hide-tools %{
-    eval -client tools %{
-        buffer *debug*
-        eval %sh{
-            TMUX=${kak_client_env_TMUX:-$TMUX}
-            tmux new-session -ds "kakoune-background" &> /dev/null
-            pane=$(tmux break-pane -dP -t "kakoune-background:")
-            [[ $? == 0 ]] && echo "set global toolsclient_tmux_pane '$pane'"
-        }
-    }
 }
 
 def ide-show-tools %{
@@ -96,6 +79,10 @@ def ide-show-tools %{
         TMUX=$tmux tmux join-pane -fp 30 -vs "${kak_opt_toolsclient_tmux_pane}" < /dev/null > /dev/null 2>&1 &
     }
     focus %opt{toolsclient} 
+}
+
+def ide-hide-tools %{
+  eval -client %opt[toolsclient] quit
 }
 
 decl -docstring "Folder that paths in make buffer are relative to" str make_folder "."
