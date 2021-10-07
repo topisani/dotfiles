@@ -53,6 +53,10 @@ def -hidden -override lsp-show-error -params 1 -docstring "Render error" %{
   echo -markup " {Error}%arg{1}"
 }
 
+def -hidden -override lsp-show-code-actions -params .. %{
+  connect bottom-panel kcr-fzf menu %arg{@}
+}
+
 filetype-hook (css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex) %{
   lsp-setup
 }

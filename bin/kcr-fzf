@@ -29,4 +29,19 @@ krc_fzf_grep() {
   fzf --phony --delimiter ':' --ansi --bind 'change:reload(while read path; do set -- "$@" "$path"; done < "$PATHS_PATH"; rg --color=always --column --with-filename --fixed-strings -- {q} "$@" || true),enter:execute(krc edit {1} {2} {3})+abort' --preview 'highlight_line={2} line_range_begin=$((line = highlight_line - (FZF_PREVIEW_LINES / 4) && line < 1 ? 1 : line)) line_range_end=$((line_range_begin + FZF_PREVIEW_LINES)) && bat --style=numbers --color=always --line-range "$line_range_begin:$line_range_end" --highlight-line {2} {1} 2> /dev/null' --header='Select a file to open' --prompt='(g)>'
 }
 
+krc_fzf_menu() {
+  i=0
+  cmds=( )
+  labels=( )
+  while [[ "$#" -gt "0" ]]; do
+    labels+=( "$i: $1" ); shift
+    cmds+=( "$1" ); shift
+    i=$(( i + 1 ))
+  done
+  
+  selected=$(for label in "${labels[@]}"; do echo "$label"; done | sk | cut -d: -f1)
+  [[ -n "$selected" ]] || return 0
+  echo ${cmds[$selected]} | krc raw-send
+}
+
 "krc_fzf_$@"

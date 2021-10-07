@@ -50,6 +50,8 @@ cork lib https://github.com/alexherbo2/lib.kak %{
   enable-auto-indent
   # Disable indentation hooks
   set global disabled_hooks '(?!auto)(?!detect)\K(.+)-(trim-indent|insert|indent)'
+
+  make-directory-on-save
 }
 
 # Auto-pairing of characters
