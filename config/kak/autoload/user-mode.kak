@@ -17,6 +17,7 @@ define-command file-delete -docstring "Delete current file" %{
 declare-user-mode files
 map global user  f ': enter-user-mode files<ret>'                 -docstring 'Files...'
 map global files f ': connect bottom-panel kcr-fzf files<ret>'    -docstring 'List files'
+map global files F ': connect bottom-panel kcr-fzf files -uuu<ret>'    -docstring 'List files (including hidden)'
 map global files r ": connect popup ranger<ret>"                  -docstring 'Ranger'
 map global files w ': write<ret>'                                 -docstring 'Write file' 
 map global files c ": connect bottom-panel kcr-fzf files %val{config}<ret>"               -docstring 'Open config dir'
