@@ -29,3 +29,4 @@
 ~/.config/zsh;config/zsh
 ~/.config/paru;config/paru
 ~/.config/wezterm;config/wezterm
+~/.config/swayr;config/swayr

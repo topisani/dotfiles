@@ -62,7 +62,7 @@ bindsym $mod+c exec kitty --class="floating" -o window_padding_width=4 -o initia
 # bindsym $mod+q kill
 
 # start your launcher
-bindsym $mod+Space exec $menu
+bindsym $mod+d exec $menu
 
 # Drag floating windows by holding down $mod and left mouse button.
 # Resize them with right mouse button + $mod.
@@ -89,9 +89,6 @@ bindsym Print exec rofi-shoot
 # Moving around:
 #
 
-
-bindsym Mod1+tab exec swaymsg [con_id=$(swaymsg -t get_tree | $scripts/alttab t)] focus
-bindsym Mod1+shift+tab exec swaymsg [con_id=$(swaymsg -t get_tree | $scripts/alttab f)] focus
 
 bindsym $mod+o exec $scripts/ws-swap focus
 bindsym $mod+Shift+o exec $scripts/ws-swap swap
@@ -175,7 +172,7 @@ bindsym $mod+m fullscreen
 bindsym $mod+f floating toggle
 
 # Swap focus between the tiling area and the floating area
-bindsym $mod+tab focus mode_toggle
+# bindsym $mod+tab focus mode_toggle
 
 # move focus to the parent container
 bindsym $mod+a focus parent
@@ -234,45 +231,17 @@ bindsym $mod+Ctrl+Down resize grow height 10 px or 10 ppt
 bindsym $mod+Ctrl+Up resize shrink height 10 px or 10 ppt
 bindsym $mod+Ctrl+Right resize grow width 10 px or 10 ppt
 
-
-set $mode_gaps Gaps: (o) outer, (i) inner
-set $mode_gaps_outer Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)
-set $mode_gaps_inner Inner Gaps: +|-|0 (local), Shift + +|-|0 (global)
-bindsym $mod+Shift+g mode "$mode_gaps"
-
 bindsym $mod+g exec $scripts/toggle-gaps
- 
-mode "$mode_gaps" {
-        bindsym o      mode "$mode_gaps_outer"
-        bindsym i      mode "$mode_gaps_inner"
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
-}
- 
-mode "$mode_gaps_inner" {
-        bindsym plus  gaps inner current plus 5
-        bindsym minus gaps inner current minus 5
-        bindsym 0     gaps inner current set 0
- 
-        bindsym Shift+plus  gaps inner all plus 5
-        bindsym Shift+minus gaps inner all minus 5
-        bindsym Shift+0     gaps inner all set 0
- 
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
-}
-mode "$mode_gaps_outer" {
-        bindsym plus  gaps outer current plus 5
-        bindsym minus gaps outer current minus 5
-        bindsym 0     gaps outer current set 0
- 
-        bindsym Shift+plus  gaps outer all plus 5
-        bindsym Shift+minus gaps outer all minus 5
-        bindsym Shift+0     gaps outer all set 0
- 
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
-}
+
+# Swayr
+bindsym $mod+Space exec swayr switch-window
+bindsym $mod+Delete exec swayr quit-window
+bindsym Mod1+Tab exec swayr switch-to-urgent-or-lru-window
+bindsym $mod+Next exec swayr next-window
+bindsym $mod+Prior exec swayr prev-window
+bindsym $mod+Shift+Space exec swayr switch-workspace-or-window
+# bindsym $mod+c exec swayr execute-swaymsg-command
+# bindsym $mod+Shift+c exec swayr execute-swayr-command
 
 font Roboto 10
 # Theme colors
@@ -325,6 +294,11 @@ exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DE
 
 exec redshift -l 56:10 -m wayland &
 exec nm-applet
+
+
+# Start SWAYR
+# install with cargo install swayr
+exec env RUST_BACKTRACE=1 swayrd > /tmp/swayrd.log 2>&1
 
 
 # For https://github.com/topisani/sway-fade
