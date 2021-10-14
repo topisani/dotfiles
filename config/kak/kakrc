@@ -59,13 +59,7 @@ cork auto-pairs https://github.com/alexherbo2/auto-pairs.kak %{
   enable-auto-pairs
 }
 
-nop cork kakoune-find https://github.com/occivink/kakoune-find %{
-  define-command grep-apply-changes -docstring \
-    "grep-apply-changes: apply changes specified in current *grep* buffer to their respective files" \
-  %{ 
-    find-apply-changes -force 
-  }
-}
+cork grep-write https://github.com/JacobTravers/kakoune-grep-write
 
 cork kakoune-gdb https://github.com/occivink/kakoune-gdb
 

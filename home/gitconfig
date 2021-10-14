@@ -20,3 +20,5 @@
 	tool = vimdiff
 [interactive]
   diffFilter = (echo && diff-so-fancy)
+[pull]
+	rebase = true

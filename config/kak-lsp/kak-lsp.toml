@@ -16,16 +16,18 @@ timeout = 1800 # seconds = 30 minutes
 filetypes = ["rust"]
 roots = ["Cargo.toml"]
 command = "sh"
-args = ["-c", "rust-analyzer"]
+# args = ["-c", "rust-analyzer"]
+args = ["-c", "rust-analyzer -v -v -v -v -v -v -v -v --log-file /tmp/rust-analyzer.log"]
 settings_section = "rustanalyzer"
 
 [language.rust.settings.rustanalyzer]
 # If you get 'unresolved proc macro' warnings, you have two options
 # 1. The safe choice is two disable the warning:
-diagnostics.disabled = ["unresolved-proc-macro"]
+# diagnostics.disabled = ["unresolved-proc-macro"]
 # 2. Or you can opt-in for proc macro support
 procMacro.enable = true
 cargo.loadOutDirsFromCheck = true
+cargo.runBuildScripts = true
 # See https://github.com/rust-analyzer/rust-analyzer/issues/6448
 
 [language.crystal]
