@@ -20,7 +20,7 @@ icon_dirs = [
 ]
 
 [layout]
-auto_tile = true
+auto_tile = false
 auto_tile_min_window_width_per_output_width = [
     [
     1024,
@@ -44,7 +44,7 @@ auto_tile_min_window_width_per_output_width = [
 ],
     [
     1920,
-    920,
+    200,
 ],
     [
     2560,

@@ -7,6 +7,7 @@ set $left h
 set $down j
 set $up k
 set $right l
+floating_modifier $mod normal
 # Your preferred terminal emulator
 set $term tmux-term
 # Your preferred application launcher
@@ -28,7 +29,7 @@ input type:touchpad {
     middle_emulation enabled
 }
 input * {
-    xkb_layout dk,dk
+    xkb_layout us
     xkb_variant nodeadkeys,
     xkb_options ctrl:nocaps,compose:rctrl
 }
@@ -62,21 +63,20 @@ bindsym $mod+c exec kitty --class="floating" -o window_padding_width=4 -o initia
 # bindsym $mod+q kill
 
 # start your launcher
-bindsym $mod+d exec $menu
-
-# Drag floating windows by holding down $mod and left mouse button.
-# Resize them with right mouse button + $mod.
-# Despite the name, also works for non-floating windows.
-# Change normal to inverse to use left mouse button for resizing and right
-# mouse button for dragging.
-floating_modifier $mod normal
+bindsym $mod+Space exec $menu
+# swayr
+bindsym $mod+Shift+Space exec swayr switch-window
+bindsym $mod+Delete exec swayr quit-window
+bindsym Mod1+Tab exec swayr switch-to-urgent-or-lru-window
+bindsym $mod+Next exec swayr next-window
+bindsym $mod+Prior exec swayr prev-window
 
 # reload the configuration file
 bindsym $mod+Shift+r reload
-
 # exit sway (logs you out of your wayland session)
 bindsym $mod+Shift+e exit
 
+# Toggle waybar
 bindsym $mod+p exec killall -SIGUSR1 waybar
 
 bindsym XF86AudioMute exec volume -n mute toggle
@@ -233,13 +233,6 @@ bindsym $mod+Ctrl+Right resize grow width 10 px or 10 ppt
 
 bindsym $mod+g exec $scripts/toggle-gaps
 
-# Swayr
-bindsym $mod+Space exec swayr switch-window
-bindsym $mod+Delete exec swayr quit-window
-bindsym Mod1+Tab exec swayr switch-to-urgent-or-lru-window
-bindsym $mod+Next exec swayr next-window
-bindsym $mod+Prior exec swayr prev-window
-bindsym $mod+Shift+Space exec swayr switch-workspace-or-window
 # bindsym $mod+c exec swayr execute-swaymsg-command
 # bindsym $mod+Shift+c exec swayr execute-swayr-command
 
