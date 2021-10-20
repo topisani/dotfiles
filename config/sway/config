@@ -29,7 +29,7 @@ input type:touchpad {
     middle_emulation enabled
 }
 input * {
-    xkb_layout us
+    xkb_layout dk
     xkb_variant nodeadkeys,
     xkb_options ctrl:nocaps,compose:rctrl
 }
@@ -286,7 +286,7 @@ exec /usr/lib/xdg-desktop-portal -r & /usr/lib/xdg-desktop-portal-wlr &
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
 
 exec redshift -l 56:10 -m wayland &
-exec nm-applet
+exec nm-applet --indicator
 
 
 # Start SWAYR
