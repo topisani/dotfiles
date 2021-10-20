@@ -28,6 +28,9 @@ settings_section = "rustanalyzer"
 procMacro.enable = true
 cargo.loadOutDirsFromCheck = true
 cargo.runBuildScripts = true
+# default settings gives "can't find crate test" for no_std targets
+checkOnSave.allTargets = false
+checkOnSave.extraArgs = [ "--bins" ]
 # See https://github.com/rust-analyzer/rust-analyzer/issues/6448
 
 [language.crystal]
