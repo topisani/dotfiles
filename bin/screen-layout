@@ -21,8 +21,18 @@ _layout_single() {
   echo "eDP-1 0 0"
 }
 
+_layout_auto() {
+  serials=$(swaymsg -t get_outputs | jq '.[].serial')
+  lid=$(cat /proc/acpi/button/lid/*/state)
+  if echo "$serials" | grep 7NRBS83; then
+    [[ "$lid" =~ "closed" ]] && _layout_office_dual_vert_only || _layout_office_dual_vert
+  else
+    _layout_single
+  fi
+}
+
 _apply_sway() {
-  swaymsg "output * disable"
+  # swaymsg "output * disable"
   "_layout_$1" | while IFS="" read line; do
     declare -a "arr=($line)"
     name=${arr[0]}
@@ -33,9 +43,13 @@ _apply_sway() {
   done
 }
 
+_daemon() {
+  swaymsg -t subscribe "['workspace']"
+}
+
 # Run
 
 method=sway
-layout=${1:-single}
+layout=${1:-auto}
 
 "_apply_$method" $layout

@@ -44,15 +44,15 @@ load-conf windowing
 # Plugins ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 cork lib https://github.com/alexherbo2/lib.kak %{
-  # Indentation
+  make-directory-on-save
+}
+
+cork indent https://github.com/alexherbo2/indent.kak %{
   set-indent global 2
   enable-detect-indent
   enable-auto-indent
   # Disable indentation hooks
   set global disabled_hooks '(?!auto)(?!detect)\K(.+)-(trim-indent|insert|indent)'
-
-  make-directory-on-save
-
   hook global -group delete-indent-space InsertDelete ' ' %{
     try %{
       exec -draft 'hGh<a-K>[^ ]<ret>i <esc><lt>'
@@ -114,6 +114,22 @@ map -docstring 'Select all occurrences of current selection' global normal <a-L>
 
 map -docstring 'Comment' global normal '#' ':comment-line<ret>'
 map -docstring 'Comment' global normal '<a-#>' ':comment-block<ret>'
+
+
+map -docstring 'Move lines down' global normal '<a-down>' ': move-lines-down<ret>'
+define-command -override move-lines-down -docstring 'move line down' %{
+  execute-keys -draft '<a-x><a-_><a-:>Z;ezj<a-x>dzP'
+}
+
+map -docstring 'Move lines up' global normal '<a-up>' ': move-lines-up<ret>'
+define-command -override move-lines-up -docstring 'move line up' %{
+  execute-keys -draft '<a-x><a-_><a-:><a-;>Z;bzk<a-x>dzp'
+}
+
+map -docstring 'select all occurrences of current selection' global normal <a-percent> ': select-highlights<ret>'
+define-command -override select-highlights -docstring 'select all occurrences of current selection' %{
+  execute-keys '"aZ*%s<ret>"bZ"az"b<a-z>a'
+}
 
 # User mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 

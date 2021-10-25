@@ -29,8 +29,7 @@ input type:touchpad {
     middle_emulation enabled
 }
 input * {
-    xkb_layout dk,dk
-    xkb_variant nodeadkeys,
+    xkb_layout dk_topisani
     xkb_options ctrl:nocaps,compose:rctrl
 }
 

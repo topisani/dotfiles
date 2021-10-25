@@ -1,0 +1,12 @@
+default partial alphanumeric_keys
+xkb_symbols "basic" {
+
+    include "dk(nodeadkeys)"
+
+    name[Group1]="Danish nodeadkeys Topisani";
+
+    key <AC06>	{ [         h,          H,          Left,       Hstroke   ]	};
+    key <AC07>	{ [         j,          J,          Down,       dead_horn ]     };
+    key <AC08>	{ [         k,          K,          Up,         ampersand ]	};
+    key <AC09>	{ [         l,          L,          Right,      Lstroke   ]	};
+};

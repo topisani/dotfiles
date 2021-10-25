@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Bitwarden CLI wrapper
+
+SESSION_FILE=/tmp/bitwarden-session.key
+
+if ! [[ -e "$SESSION_FILE" ]]; then
+  bw unlock --raw > "$SESSION_FILE"
+fi
+BW_SESSION=$(cat "$SESSION_FILE");
+
+bw "$@"
