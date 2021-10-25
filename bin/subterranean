@@ -59,7 +59,7 @@ _submsg() {
   tput bold
   echo -n " -> "
   tput sgr0
-  # tput bold
+  tput setaf 8
   echo "$@"
   tput sgr0
 }
@@ -114,6 +114,7 @@ _remove() {
   local slpath=$(echo "$entry" | cut -d';' -f1)
   local dfpathrel=$(echo "$entry" | cut -d';' -f2)
   local dfpath="$DOTFILES_FOLDER/$dfpathrel"
+  local dfpath="$DOTFILES_FOLDER/$dfpathrel"
   slpath=${slpath/#~/$HOME}
   
   if [ -z "$slpath" ] || [ -z "$dfpath" ]; then
@@ -135,27 +136,33 @@ _install() {
     local dfpathrel=$(echo "$line" | cut -d';' -f2)
     local dfpath="$DOTFILES_FOLDER/$dfpathrel"
     slpath=${slpath/#~/$HOME}
-    _msg "Installing symlink $(_format_entry $slpath $dfpath)" 
     if [[ -e "$slpath" ]] || [[ -L "$slpath" ]]; then
       local linkpath=$(readlink -f "$slpath") targetpath=$(realpath "$slpath")
       if [[ -L "$slpath" ]] && [[ "$linkpath" == "$targetpath" ]]; then
-        _submsg "Symlink already exists"
+        _submsg "Symlink $(_format_path $slpath) -> $(_format_path $dfpath) already exists"
       else 
-        _suberr "Not overwriting existing file at '$slpath'"
+        _suberr "Not overwriting existing file at '$(_format_path $slpath)'"
       fi
     else
+      _msg "Installing symlink $(_format_entry $slpath $dfpath)" 
       mkdir -p $(dirname "$slpath")
       ln -s "$dfpath" "$slpath"
     fi
   done < "$DOTFILES_FILE" 
 }
 
+_format_path() {
+    local path=$1
+    local path=${path/#$HOME/\~}
+    echo -n "$path"
+}
+
 _format_entry() {
-  echo -n "$1" 
+  _format_path "$1"
   tput setaf 8
   echo -n " -> "
   tput sgr0
-  echo -n "$2"
+  _format_path "$2"
 }
 
 _list() {
@@ -177,7 +184,10 @@ _push() {
 }
 
 _pull() {
+  _msg "Updating git repository"
   _git pull
+  _msg "Installing new files"
+  _msg "Done"
 }
 
 _main() {
