@@ -285,7 +285,8 @@ exec /usr/lib/xdg-desktop-portal -r & /usr/lib/xdg-desktop-portal-wlr &
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
 
 exec redshift -l 56:10 -m wayland &
-exec nm-applet --indicator
+exec nm-applet --indicator &
+exec screen-layout -d &
 
 
 # Start SWAYR
