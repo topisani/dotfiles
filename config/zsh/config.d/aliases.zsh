@@ -19,7 +19,6 @@ alias llg='ll --grid'
 # alias cd='z'
 
 export BAT_THEME=base16
-alias cat=bat
 
 # Paru in the correct order
 alias paru='paru --bottomup'

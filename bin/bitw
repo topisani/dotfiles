@@ -4,9 +4,17 @@
 
 SESSION_FILE=/tmp/bitwarden-session.key
 
-if ! [[ -e "$SESSION_FILE" ]]; then
-  bw unlock --raw > "$SESSION_FILE"
-fi
-BW_SESSION=$(cat "$SESSION_FILE");
+_unlock() {
+  bw unlock --raw > "$SESSION_FILE" || rm "$SESSION_FILE"
+}
 
-bw "$@"
+if [[ ! -e "$SESSION_FILE" ]]; then
+  _unlock
+fi
+
+if [[ "$1" == "unlock" ]]; then
+  _unlock
+else
+  export BW_SESSION=$(cat "$SESSION_FILE")
+  bw "$@"
+fi

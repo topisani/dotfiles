@@ -15,36 +15,53 @@ _layout_office_dual_vert() {
 _layout_office_dual_vert_only() {
   echo "'Dell Inc. DELL U2719D 7NRBS83' 0 0 270"
   echo "'Dell Inc. DELL U2719D CNRBS83' 1440 0 90"
+  echo "eDP-1 off"
 }
 
 _layout_single() {
   echo "eDP-1 0 0"
 }
 
-_layout_auto() {
+_select_auto_layout() {
   serials=$(swaymsg -t get_outputs | jq '.[].serial')
   lid=$(cat /proc/acpi/button/lid/*/state)
-  if echo "$serials" | grep 7NRBS83; then
-    [[ "$lid" =~ "closed" ]] && _layout_office_dual_vert_only || _layout_office_dual_vert
+  if echo "$serials" | grep 7NRBS83 -q; then
+    [[ "$lid" =~ "closed" ]] && echo office_dual_vert_only || echo office_dual_vert
   else
-    _layout_single
+    echo single
   fi
 }
 
+_layout_auto() {
+  "_layout_$(_select_auto_layout)"
+}
+
 _apply_sway() {
-  # swaymsg "output * disable"
+  swaymsg "output '*' enable"
   "_layout_$1" | while IFS="" read line; do
     declare -a "arr=($line)"
     name=${arr[0]}
     x=${arr[1]}
     y=${arr[2]}
     trans=${arr[3]:-normal}
-    swaymsg "output '$name' enable pos $x $y transform $trans"
+    if [[ "$x" == "off" ]]; then
+      swaymsg "output '$name' disable"
+    else
+      swaymsg "output '$name' enable pos $x $y transform $trans"
+    fi
   done
 }
 
 _daemon() {
-  swaymsg -t subscribe "['workspace']"
+  layout=""
+  while true; do
+    new_layout=$(_select_auto_layout)
+    if [[ "$layout" != "$new_layout" ]]; then
+      layout="$new_layout"
+      _apply_sway "$layout"
+    fi
+    sleep 10
+  done
 }
 
 # Run
@@ -52,4 +69,8 @@ _daemon() {
 method=sway
 layout=${1:-auto}
 
-"_apply_$method" $layout
+if [[ " $@ " =~ " -d " ]]; then
+  _daemon
+else
+  "_apply_$method" $layout
+fi
