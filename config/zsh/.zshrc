@@ -30,7 +30,12 @@ export TMPDIR="/tmp"
     source "$file"
 done
 
-# Fix for foot terminfo not installed on most servers
+export SSH_AUTH_SOCK=~/.ssh/ssh-agent.$HOSTNAME.sock
+ssh-add -l 2>/dev/null >/dev/null
+if [ $? -ge 2 ]; then
+  ssh-agent -a "$SSH_AUTH_SOCK" >/dev/null
+fi
+
 alias ssh="TERM=xterm-256color ssh"
 
 eval "$(starship init zsh)"
