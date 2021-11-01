@@ -31,6 +31,7 @@ cargo.runBuildScripts = true
 # default settings gives "can't find crate test" for no_std targets
 checkOnSave.allTargets = false
 checkOnSave.extraArgs = [ "--bins" ]
+checkOnSave.command = "clippy"
 # See https://github.com/rust-analyzer/rust-analyzer/issues/6448
 
 [language.crystal]
