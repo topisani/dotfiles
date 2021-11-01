@@ -65,10 +65,14 @@ face global comment                     $gray,             default       +i
 face global identifier                  $yellow_dark,      default
 face global annotation                  $gray,             default
 
-face global DiagnosticWarning           $yellow,           default       +u
-face global DiagnosticError             $red,              default       +u
-face global LineFlagErrors              $red,              default       +b
-face global LineFlagWarnings            $yellow,           default       +b
+face global DiagnosticWarning           default, default,  $yellow       +c
+face global DiagnosticError             default, default,  $red          +c
+face global DiagnosticInfo              default, default,  $green        +c
+face global DiagnosticHint              default, default,  $gray         +c
+face global LineFlagError               $red,              default       +b
+face global LineFlagWarning             $yellow,           default       +b
+face global LineFlagInfo                $green,            default       +b
+face global LineFlagHint                $gray,             default       +b
 
 face global Reference                                                    '+b'
 face global ReferenceBind                                                '+bu'
@@ -101,4 +105,4 @@ decl str lsp_diagnostic_line_error_sign
 decl str lsp_diagnostic_line_warning_sign
 set global lsp_diagnostic_line_error_sign '{LineFlagErrors}!'
 set global lsp_diagnostic_line_warning_sign '{LineFlagWarnings}!'
-" | sed 's/, */,/;s/ *+/+/'
+" | sed 's/, */,/g;s/ *+/+/'
