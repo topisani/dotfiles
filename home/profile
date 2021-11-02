@@ -13,44 +13,29 @@
 PATH="$HOME/dev/flutter/bin:$PATH"
 PATH="$HOME/.cargo/bin:$PATH"
 PATH="$HOME/go/bin:$PATH"
-command -v yarn > /dev/null && PATH="$(yarn global bin):$PATH"
+command -v yarn > /dev/null && PATH="$(yarn --offline global bin):$PATH"
+
+PATH="$PATH:/usr/lib/dart/bin"
+PATH="$PATH:$HOME/dev/flutter/.pub-cache/bin"
+PATH="$HOME/.ghcup/bin:$PATH"
+
+# opam configuration
+test -r /home/topisani/.opam/opam-init/init.sh && . /home/topisani/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
 
 PATH="$HOME/.bin:$HOME/.local/bin:/usr/local/bin:$PATH"
-export PATH
 
-# PATH="$(ruby -rrubygems -e 'puts Gem.user_dir')/bin:$PATH"
+export PATH
 
 # Kill the GNU
 export CC=/usr/bin/clang
 export CXX=/usr/bin/clang++
 
-alias termbin="nc termbin.com 9999"
+# Global cache for cmake projects using CPM
+export CPM_SOURCE_CACHE=$HOME/.cache/CPM
 
 # Auto make flags
 export NUMCPUS=`grep -c '^processor' /proc/cpuinfo`
 export MAKEFLAGS="-j$NUMCPUS --load-average=$NUMCPUS"
-alias tb="nc termbin.com 9999"
-
-# Call less if there is only one argument and it is a filename. Otherwise, call ls
-less_or_ls() {
-    ([ "$#" -eq "1" ] && [ -f "$1" ] && bat $@ ) || ls $@
-}
-alias ls=less_or_ls
-
-mkcd() {
-    mkdir -p "$@"
-    cd "$@"
-}
-
-# Calculator
-calc() {
-    local IFS=' '
-    bc -l <<<"scale=10;$@"
-}
-
-export EDITOR=kak
-export VISUAL=kak
-export TERMINAL=tmux-term
 
 # Colors
 default=$(tput sgr0)
@@ -59,39 +44,14 @@ green=$(tput setaf 2)
 purple=$(tput setaf 5)
 orange=$(tput setaf 9)
 
-# Less colors for man pages
-export PAGER=less
-# Begin blinking
-export LESS_TERMCAP_mb=$red
-# Begin bold
-export LESS_TERMCAP_md=$orange
-# End mode
-export LESS_TERMCAP_me=$default
-# End standout-mode
-export LESS_TERMCAP_se=$default
-# Begin standout-mode - info box
-export LESS_TERMCAP_so=$purple
-# End underline
-export LESS_TERMCAP_ue=$default
-# Begin underline
-export LESS_TERMCAP_us=$green
-
-export PATH="$PATH:/usr/lib/dart/bin"
-export PATH="$PATH:$HOME/dev/flutter/.pub-cache/bin"
-export PATH="$HOME/.ghcup/bin:$PATH"
-alias ghcup='TMPDIR=$HOME/.ghcup/tmp ghcup'
-alias ssh="TERM=xterm-256color ssh"
-
-export CPM_SOURCE_CACHE=$HOME/.cache/CPM
-
-# opam configuration
-test -r /home/topisani/.opam/opam-init/init.sh && . /home/topisani/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
-# vim: ft=sh
-
-if [ -n "$DESKTOP_SESSION" ];then
-    eval $(gnome-keyring-daemon --start)
-    export SSH_AUTH_SOCK
-fi
+export PAGER=less # Less colors for man pages
+export LESS_TERMCAP_mb=$red # Begin blinking
+export LESS_TERMCAP_md=$orange # Begin bold
+export LESS_TERMCAP_me=$default # End mode
+export LESS_TERMCAP_se=$default # End standout-mode
+export LESS_TERMCAP_so=$purple # Begin standout-mode - info box
+export LESS_TERMCAP_ue=$default # End underline
+export LESS_TERMCAP_us=$green # Begin underline
 
 # if running bash
 if [ -n "$BASH_VERSION" ]; then

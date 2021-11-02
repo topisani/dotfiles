@@ -117,16 +117,6 @@ bindsym $mod+Shift+Right move right
 # Workspaces:
 #
 # switch to workspace
-# bindsym $mod+1 exec sway-fade -t 0.15 ws 1
-# bindsym $mod+2 exec sway-fade -t 0.15 ws 2
-# bindsym $mod+3 exec sway-fade -t 0.15 ws 3
-# bindsym $mod+4 exec sway-fade -t 0.15 ws 4
-# bindsym $mod+5 exec sway-fade -t 0.15 ws 5
-# bindsym $mod+6 exec sway-fade -t 0.15 ws 6
-# bindsym $mod+7 exec sway-fade -t 0.15 ws 7
-# bindsym $mod+8 exec sway-fade -t 0.15 ws 8
-# bindsym $mod+9 exec sway-fade -t 0.15 ws 9
-# bindsym $mod+0 exec sway-fade -t 0.15 ws 10
 bindsym $mod+1 workspace 1
 bindsym $mod+2 workspace 2
 bindsym $mod+3 workspace 3
@@ -275,39 +265,30 @@ for_window [app_id="floating"] floating enable
 for_window [urgent=latest] focus
 
 exec xrdb -load ~/.Xresources
-exec dunst &
-exec battery_notifyd &
-exec systemd-lock-handler swaylock &
-exec dex --autostart &
-exec $scripts/autotile &
-exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
-exec /usr/lib/xdg-desktop-portal -r & /usr/lib/xdg-desktop-portal-wlr &
+# exec dunst # Started by systemd
+exec battery_notifyd
+# exec dex --autostart
+exec $scripts/autotile
+exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+# exec /usr/lib/xdg-desktop-portal -r 
+# exec /usr/lib/xdg-desktop-portal-wlr
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
 
-exec redshift -l 56:10 -m wayland &
-exec nm-applet --indicator &
-exec screen-layout -d &
+exec redshift -l 56:10 -m wayland
+exec nm-applet --indicator
+exec screen-layout -d
 
 
-# Start SWAYR
-# install with cargo install swayr
-exec env RUST_BACKTRACE=1 swayrd > /tmp/swayrd.log 2>&1
+# # Start SWAYR
+# # install with cargo install swayr
+exec env RUST_BACKTRACE=1 swayrd > /var/log/swayrd.log 2>&1
 
-
-# For https://github.com/topisani/sway-fade
-# Install with cargo install sway-fade
-# Fade in
-for_window [app_id=.*] opacity 0
-for_window [app_id=.*] exec sway-fade -t 0.25 in
-for_window [app_id=.*] mark fade
-
-# Fade out
-bindsym $mod+q mark quit; exec sway-fade out
+bindsym $mod+q kill
 
 exec swayidle -w \
      timeout 300 'swaylock -f -c 18191c' \
      timeout 600 'swaymsg "output * dpms off"' \
      resume 'swaymsg "output * dpms on"' \
-     before-sleep 'swaylock -f -c 000000' &
+     before-sleep 'swaylock -f -c 18191c'
 
 # include /etc/sway/config.d/*

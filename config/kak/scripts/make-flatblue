@@ -35,7 +35,7 @@ face global MenuForeground              $bg2,              $blue
 face global MenuBackground              $fg,               $bg2
 face global MenuInfo                    $blue_light,       $bg2
 face global Information                 $bg,               $yellow
-face global Error                       $red,              default       +u
+face global Error                       $red,              default
 face global StatusLine                  $fg,               default
 face global StatusLineMode              $yellow,           default       +b
 face global StatusLineInfo              $purple,           default

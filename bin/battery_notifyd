@@ -6,7 +6,7 @@ last_bat=$(query_bat)
 while true; do
     bat=$(query_bat)
     sl=60
-    if [[ $bat -lt 16 ]] && ! acpi | grep Charging; then
+    if [[ "$bat" < 16 ]] && ! acpi | grep Charging; then
         dunstify -u 2 -i battery-empty-symbolic "Battery Low!" "$bat%" -r $not_id
     else
         dunstify -C $not_id

@@ -63,3 +63,25 @@ function ottobsp {
   source setup-environment build
   cd workspace/sources/otto-core
 }
+
+alias ghcup='TMPDIR=$HOME/.ghcup/tmp ghcup'
+alias ssh="TERM=xterm-256color ssh"
+alias tb="nc termbin.com 9999"
+alias termbin="nc termbin.com 9999"
+
+# Call less if there is only one argument and it is a filename. Otherwise, call ls
+less_or_ls() {
+    ([ "$#" -eq "1" ] && [ -f "$1" ] && bat $@ ) || ls $@
+}
+alias ls=less_or_ls
+
+mkcd() {
+    mkdir -p "$@"
+    cd "$@"
+}
+
+# Calculator
+calc() {
+    local IFS=' '
+    bc -l <<<"scale=10;$@"
+}
