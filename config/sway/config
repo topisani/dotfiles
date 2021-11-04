@@ -270,6 +270,7 @@ exec battery_notifyd
 # exec dex --autostart
 exec $scripts/autotile
 exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+exec pkill xdg-desktop-portal
 # exec /usr/lib/xdg-desktop-portal -r 
 # exec /usr/lib/xdg-desktop-portal-wlr
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway

@@ -100,7 +100,7 @@ cork occivink-snippets https://github.com/occivink/kakoune-snippets %{
   
 }
 
-cork emmet https://github.com/JJK96/kakoune-emmet
+cork kakoune-table https://github.com/listentolist/kakoune-table
 
 # Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 

@@ -89,7 +89,7 @@ offset_encoding = "utf-8"
 filetypes = ["c", "cpp"]
 roots = ["compile_commands.json"]
 command = "sh"
-args = ['-c', 'clangd --log=verbose --cross-file-rename --clang-tidy --query-driver=/home/topisani/**,/usr/**,arm-none-eabi-gcc,arm-none-eabi-*,arm-none-eabi-g++,** 2> clangd.log']
+args = ['-c', 'clangd --cross-file-rename --clang-tidy --query-driver=/home/topisani/**,/usr/**,arm-none-eabi-gcc,arm-none-eabi-*,arm-none-eabi-g++,**']
 
 [language.java]
 filetypes = ["java"]
@@ -166,6 +166,12 @@ filetypes = ["vue"]
 roots = ["package.json"]
 command = "vls"
 settings_section = "vls"
+
+[language.text]
+filetypes = ["markdown"]
+command = "unified-language-server"
+roots = []
+args = ["--parser=remark-parse", "--stdio"]
 
 # Semantic tokens support
 # See https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_semanticTokens

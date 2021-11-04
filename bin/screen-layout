@@ -18,8 +18,10 @@ _layout_office_dual_vert_only() {
   echo "eDP-1 off"
 }
 
-_layout_mirror() {
-  echo "'*' 0 0"
+_layout_cpi() {
+  echo "'Dell Inc. DELL U2412M 0FFXD45N5R8S' 0 0"
+  echo "'Dell Inc. DELL 2405FPW M675459U1TTS ' 1920 0"
+  echo "eDP-1 0 1200"
 }
 
 _layout_single() {
@@ -31,6 +33,8 @@ _select_auto_layout() {
   lid=$(cat /proc/acpi/button/lid/*/state)
   if echo "$serials" | grep 7NRBS83 -q; then
     [[ "$lid" =~ "closed" ]] && echo office_dual_vert_only || echo office_dual_vert
+  elif echo "$serials" | grep 0FFXD45N5R8S -q; then
+    echo cpi
   else
     echo single
   fi

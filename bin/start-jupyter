@@ -1,0 +1,12 @@
+#!/bin/bash
+
+PID_FILE="/tmp/start-jupyter.pid"
+
+PID=$(cat $PID_FILE)
+if ! ps -p $PID > /dev/null; then
+  jupyter-lab --port=8723 --no-browser &
+  PID=$!
+  echo $PID > "$PID_FILE"
+fi
+
+webview file://$HOME/.local/share/jupyter/runtime/jpserver-$PID-open.html

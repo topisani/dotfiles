@@ -148,12 +148,13 @@ cork-update() {
     if ! [ -d "$folder/repo" ]; then
       _msg "Installing plugin $name → $repo"
       git clone "$repo" "$folder/repo"
+      setup-load-file $name
       kak_send source "$folder/load.kak"
     else
       _msg "Updating plugin $name → $repo"
       (cd "$folder/repo"; git pull)
+      setup-load-file $name
     fi
-    setup-load-file $name
     echo ""
   done <<< $(cork-list)
 }
