@@ -2,15 +2,35 @@
 
 not_id=$(shuf -i 10000-100000 -n 1)
 
-last_bat=$(query_bat)
+# ACPI shows values of batteries of connected devices. 
+# This should only have the actual laptop battery
+source /sys/class/power_supply/BAT*/uevent
+# Example contents:
+# POWER_SUPPLY_NAME=BAT1
+# POWER_SUPPLY_TYPE=Battery
+# POWER_SUPPLY_STATUS=Discharging
+# POWER_SUPPLY_PRESENT=1
+# POWER_SUPPLY_TECHNOLOGY=Li-poly
+# POWER_SUPPLY_CYCLE_COUNT=0
+# POWER_SUPPLY_VOLTAGE_MIN_DESIGN=7680000
+# POWER_SUPPLY_VOLTAGE_NOW=7356000
+# POWER_SUPPLY_POWER_NOW=6986000
+# POWER_SUPPLY_ENERGY_FULL_DESIGN=70000000
+# POWER_SUPPLY_ENERGY_FULL=39710000
+# POWER_SUPPLY_ENERGY_NOW=10680000
+# POWER_SUPPLY_CAPACITY=26
+# POWER_SUPPLY_CAPACITY_LEVEL=Normal
+# POWER_SUPPLY_MODEL_NAME=BASE-BAT
+# POWER_SUPPLY_MANUFACTURER=Simplo
+# POWER_SUPPLY_SERIAL_NUMBER=123456789
+
 while true; do
-    bat=$(query_bat)
+    source /sys/class/power_supply/BAT*/uevent
     sl=60
-    if [[ "$bat" < 16 ]] && ! acpi | grep Charging; then
+    if [[ "$POWER_SUPPLY_CAPACITY" < 16 ]] && [[ $POWER_SUPPY_STATUS != Charging ]]; then
         dunstify -u 2 -i battery-empty-symbolic "Battery Low!" "$bat%" -r $not_id
     else
         dunstify -C $not_id
     fi
-    last_bat=$bat
     sleep $sl
 done
