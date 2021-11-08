@@ -34,7 +34,6 @@ face global LineNumbersWrapped          $bg,               default
 face global MenuForeground              $bg2,              $blue
 face global MenuBackground              $fg,               $bg2
 face global MenuInfo                    $blue_light,       $bg2
-face global Information                 $bg,               $yellow
 face global Error                       $red,              default
 face global StatusLine                  $fg,               default
 face global StatusLineMode              $yellow,           default       +b
@@ -45,6 +44,7 @@ face global Prompt                      $yellow,           default
 face global MatchingChar                                                '+b'
 face global BufferPadding               $bg2,              default
 face global Whitespace                  $bg2,              default      +f
+face global Information                 $fg2,               default
 
 face global GitBlame                    $fg2,              default
 
@@ -101,8 +101,33 @@ face global cppMacro       $purple_light,  default
 face global cppDependent   $aqua,  default
 face global disabledRegion $gray,          default
 
+# LSP Info box
+face global InfoDefault               Information
+face global InfoBlock                 @InfoDefault
+face global InfoBlockQuote            +i@InfoDefault
+face global InfoBullet                @InfoDefault
+face global InfoHeader                +b@InfoDefault
+face global InfoLink                  +i@InfoDefault
+face global InfoLinkMono              @InfoDefault
+face global InfoMono                  $gray@InfoDefault
+face global InfoRule                  $gray@InfoDefault
+face global InfoDiagnosticError       $red@InfoDefault
+face global InfoDiagnosticHint        $gray@InfoDefault
+face global InfoDiagnosticInformation $green@InfoDefault
+face global InfoDiagnosticWarning     $yellow@InfoDefault
+
+face global InlayDiagnosticWarning           $yellow       +d
+face global InlayDiagnosticError             $red          +d
+face global InlayDiagnosticInfo              $green        +d
+face global InlayDiagnosticHint              $gray         +d
+
 decl str lsp_diagnostic_line_error_sign
 decl str lsp_diagnostic_line_warning_sign
-set global lsp_diagnostic_line_error_sign '{LineFlagErrors}!'
-set global lsp_diagnostic_line_warning_sign '{LineFlagWarnings}!'
+decl str lsp_diagnostic_line_info_sign
+decl str lsp_diagnostic_line_hint_sign
+set global lsp_diagnostic_line_error_sign ' '
+set global lsp_diagnostic_line_warning_sign ' '
+set global lsp_diagnostic_line_info_sign ' '
+set global lsp_diagnostic_line_hint_sign ' '
+
 " | sed 's/, */,/g;s/ *+/+/'

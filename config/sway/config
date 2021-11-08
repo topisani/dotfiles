@@ -265,7 +265,7 @@ for_window [app_id="floating"] floating enable
 for_window [urgent=latest] focus
 
 exec xrdb -load ~/.Xresources
-# exec dunst # Started by systemd
+exec pkill dunst
 exec battery_notifyd
 # exec dex --autostart
 exec $scripts/autotile
