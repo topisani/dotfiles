@@ -44,7 +44,7 @@ face global Prompt                      $yellow,           default
 face global MatchingChar                                                '+b'
 face global BufferPadding               $bg2,              default
 face global Whitespace                  $bg2,              default      +f
-face global Information                 $fg2,               default
+face global Information                 $fg,               $(alpha $blue_dark 50)@Default
 
 face global GitBlame                    $fg2,              default
 
@@ -103,12 +103,12 @@ face global disabledRegion $gray,          default
 
 # LSP Info box
 face global InfoDefault               Information
-face global InfoBlock                 @InfoDefault
-face global InfoBlockQuote            +i@InfoDefault
-face global InfoBullet                @InfoDefault
-face global InfoHeader                +b@InfoDefault
-face global InfoLink                  +i@InfoDefault
-face global InfoLinkMono              @InfoDefault
+face global InfoBlock                 InfoDefault
+face global InfoBlockQuote            ,+i@InfoDefault
+face global InfoBullet                InfoDefault
+face global InfoHeader                ,+b@InfoDefault
+face global InfoLink                  ,+i@InfoDefault
+face global InfoLinkMono              InfoDefault
 face global InfoMono                  $gray@InfoDefault
 face global InfoRule                  $gray@InfoDefault
 face global InfoDiagnosticError       $red@InfoDefault
