@@ -172,5 +172,9 @@ hook global BufCreate .*\.conf %{
   set buffer filetype ini
 }
 
+hook global BufCreate .*Makefile\..* %{
+  set buffer filetype makefile
+}
+
 # ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 colorscheme %sh{ colorscheme-switch --current }
