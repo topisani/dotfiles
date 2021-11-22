@@ -39,14 +39,8 @@ filetypes = ["crystal"]
 roots = ["shard.yml"]
 command = "scry"
 
-[language.javascript]
-filetypes = ["javascript"]
-roots = ["package.json"]
-command = "flow"
-args = ["lsp"]
-
 [language.typescript]
-filetypes = ["typescript"]
+filetypes = ["typescript", "javascript"]
 roots = ["tsconfig.json", "package.json"]
 command = "typescript-language-server"
 args = ["--stdio"]
