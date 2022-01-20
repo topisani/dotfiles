@@ -12,12 +12,6 @@ _layout_office_dual_vert() {
   echo "eDP-1 320 2560"
 }
 
-_layout_office_dual_vert_only() {
-  echo "'Dell Inc. DELL U2719D 7NRBS83' 0 0 270"
-  echo "'Dell Inc. DELL U2719D CNRBS83' 1440 0 90"
-  echo "eDP-1 off"
-}
-
 _layout_cpi() {
   echo "'Dell Inc. DELL U2412M 0FFXD45N5R8S' 0 0"
   echo "'Dell Inc. DELL 2405FPW M675459U1TTS ' 1920 0"
@@ -28,13 +22,19 @@ _layout_single() {
   echo "eDP-1 0 0"
 }
 
+_layout_home() {
+  echo "'Philips Consumer Electronics Company Philips FTV 0x00000101' 0 0"
+  echo "eDP-1 960 2160"
+}
+
 _select_auto_layout() {
   serials=$(swaymsg -t get_outputs | jq '.[].serial')
-  lid=$(cat /proc/acpi/button/lid/*/state)
   if echo "$serials" | grep 7NRBS83 -q; then
-    [[ "$lid" =~ "closed" ]] && echo office_dual_vert_only || echo office_dual_vert
+    echo office_dual_vert
   elif echo "$serials" | grep 0FFXD45N5R8S -q; then
     echo cpi
+  elif echo "$serials" | grep 0x00000101 -q; then
+    echo home
   else
     echo single
   fi
@@ -46,12 +46,16 @@ _layout_auto() {
 
 _apply_sway() {
   swaymsg "output '*' enable"
+  lid=$(cat /proc/acpi/button/lid/*/state)
   "_layout_$1" | while IFS="" read line; do
     declare -a "arr=($line)"
     name=${arr[0]}
     x=${arr[1]}
     y=${arr[2]}
     trans=${arr[3]:-normal}
+    if [[ "$lid" =~ "closed" ]] && [[ "$name" =~ "eDP-1" ]]; then
+      x="off"
+    fi
     if [[ "$x" == "off" ]]; then
       swaymsg "output '$name' disable"
     else

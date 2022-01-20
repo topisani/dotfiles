@@ -6,7 +6,7 @@ def ide-perform-setup -hidden %{
 
   hook -group ide global ClientClose .* %{
       eval -client tools %sh{
-          if [[ ! " $kak_client_list " =~ \ client[0-9]+\  ]]; then
+          if ! echo " $kak_client_list " | grep ' client[0-9]+'; then
               echo "echo -debug '$kak_client_list'"
               echo "remove-hooks global ide"
               echo "quit"
@@ -14,7 +14,7 @@ def ide-perform-setup -hidden %{
       }
       try %{
         eval -client %opt[kaktreeclient] %sh{
-          if [[ ! " $kak_client_list " =~ \ client[0-9]+\  ]]; then
+          if ! echo " $kak_client_list " | grep ' client[0-9]+'; then
             echo "quit"
           fi
         }
@@ -23,7 +23,7 @@ def ide-perform-setup -hidden %{
 
   hook global WinDisplay .* %{
       eval %sh{
-          if [[ "$kak_client" == "$kak_opt_toolsclient" ]]; then
+          if [ "$kak_client" = "$kak_opt_toolsclient" ]; then
               echo ide-show-tools
               echo "map window my-tmux d ' :delete-buffer<ret> :ide-hide-tools<ret>'"
               echo "map window buffers d ' :delete-buffer<ret> :ide-hide-tools<ret>'"
@@ -38,7 +38,7 @@ def ide-perform-setup -hidden %{
 
   hook global BufClose .* %{
       eval %sh{
-          if [[ "$kak_client" == "$kak_opt_toolsclient" ]]; then
+          if [ "$kak_client" = "$kak_opt_toolsclient" ]; then
               echo "quit"
           fi
       }
@@ -59,8 +59,8 @@ def -hidden ide-make-tools %{
   set global toolsclient tools
   eval %sh{
     TMUX=${kak_client_env_TMUX:-$TMUX}
-    DEST=$(tmux neww -dP -t :10 kak -c $kak_session -e 'rename-client tools' || tmux splitw -dP -t :10 kak -c $kak_session -e 'rename-client tools')
-    [[ $? == 0 ]] && echo "set global toolsclient_tmux_pane '$DEST'"
+    DEST=$(tmux neww -dP -t :10 kak -c $kak_session -e 'rename-client tools' 2> /dev/null || tmux splitw -dP -t :10 kak -c $kak_session -e 'rename-client tools')
+    [ $? -eq 0 ] && echo "set global toolsclient_tmux_pane '$DEST'"
   }
 }
 
@@ -89,7 +89,7 @@ decl -docstring "Folder that paths in make buffer are relative to" str make_fold
 
 define-command -override -hidden make-open-error -params 4 %{ eval %sh{
   path=$1
-  [[ ! $path =~ ^/ ]] && path="$kak_opt_make_folder/$path"; 
+  echo "$path" | grep '^/' && path="$kak_opt_make_folder/$path"; 
   echo 'evaluate-commands -try-client %opt{jumpclient} %{'
   echo "edit -existing \"$path\" %arg{2} %arg{3}"
   echo 'echo -markup "{Information}%arg{4}"'

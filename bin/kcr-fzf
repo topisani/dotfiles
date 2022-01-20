@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 krc_fzf_files() {
   fd --type file . "$@" |

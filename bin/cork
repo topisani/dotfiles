@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 cork_script_path=$(realpath "$0")
 
@@ -88,7 +88,7 @@ kak_get_opt() {
 
 # Functions
 
-cork-help() {
+cork_help() {
   cat <<"EOF"
 
 A git-based plugin manager for kakoune.
@@ -125,7 +125,7 @@ Commands:
 EOF
 }
 
-setup-load-file() {
+setup_load_file() {
   name=$1
 
   folder="$install_path/$name"
@@ -137,29 +137,29 @@ setup-load-file() {
   echo "trigger-user-hook cork-loaded=$name" >> "$folder/load.kak"
 }
 
-cork-update() {
+cork_update() {
   kak_ensure_session
   install_path=$(kak_get_opt cork_install_path)
 
-  while read name repo; do
+  cork_list | while read name repo; do
     folder="$install_path/$name"
     mkdir -p "$folder"
 
     if ! [ -d "$folder/repo" ]; then
       _msg "Installing plugin $name → $repo"
       git clone "$repo" "$folder/repo"
-      setup-load-file $name
+      setup_load_file $name
       kak_send source "$folder/load.kak"
     else
       _msg "Updating plugin $name → $repo"
       (cd "$folder/repo"; git pull)
-      setup-load-file $name
+      setup_load_file $name
     fi
     echo ""
-  done <<< $(cork-list)
+  done 
 }
 
-cork-clean() {
+cork_clean() {
   kak_ensure_session
   install_path=$(kak_get_opt cork_install_path)
   if _confirm "Remove directory $install_path/$1?"; then
@@ -170,15 +170,15 @@ cork-clean() {
   fi
 }
 
-cork-interactive() {
+cork_interactive() {
   cmd=$1; shift
-  cork-$cmd "$@"
+  cork_$cmd "$@"
   echo ""
   echo "Done!"
   read -rsn1 -p"Press any key to exit"
 }
 
-cork-list() {
+cork_list() {
   kak_ensure_session
   kak_get_opt cork_repository_map | tr ' ' '\n' | while read name; do
     read repo
@@ -186,7 +186,7 @@ cork-list() {
   done
 }
 
-cork-init() {
+cork_init() {
   echo "declare-option -docstring 'cork script' str cork_script_path '$cork_script_path'"
   cat <<"EOF"
 # kakscript to initialize cork
@@ -239,4 +239,4 @@ EOF
 # Evaluate
 
 cmd=${1:-help}; shift
-cork-$cmd "$@"
+cork_$cmd "$@"

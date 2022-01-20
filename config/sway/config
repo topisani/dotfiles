@@ -52,6 +52,7 @@ smart_gaps on
 # Basics:
 bindsym $mod+Return exec $term
 bindsym $mod+Shift+Return exec kitty -c ~/.config/kitty/kitty.conf -c ~/.config/kitty/leader.conf
+bindsym $mod+Mod1+Return exec kitty -c ~/.config/kitty/kitty.conf
 bindsym $mod+Shift+c exec colorscheme-switch
 bindsym $mod+Ctrl+c exec colorscheme-switch -g
 bindsym $mod+c exec kitty --class="floating" -o window_padding_width=4 -o initial_window_width=400 -o initial_window_height=200 qalc

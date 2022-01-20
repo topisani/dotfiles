@@ -138,7 +138,7 @@ map -docstring 'Surround mode' global user s ': surround-mode<ret>'
 map -docstring 'Replace' global user r ': enter-replace-mode<ret>'
 map -docstring 'Popup Terminal' global user <c-p> ': connect popup<ret>'
 
-def sidetree -override %{ connect terminal-panel sidetree --select %val{buffile} }
+def sidetree -override %{ connect panel sidetree --select %val{buffile} }
 map -docstring 'sidetree' global user <tab> ': sidetree<ret>'
 
 # Prompt mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
@@ -160,6 +160,7 @@ set-option global makecmd 'make -j 8'
 load-conf lsp
 load-conf c++
 
+
 load-conf ide
 ide-setup
 
@@ -178,3 +179,30 @@ hook global BufCreate .*Makefile\..* %{
 
 # ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 colorscheme %sh{ colorscheme-switch --current }
+
+# Local Config ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+decl str local_config_dir
+
+def source-local-config -override -params ..1 %{
+  eval %sh{
+      upsearch () {
+          if test "$PWD" = "/"; then
+              return
+          elif test -e "$1"; then
+              echo "set buffer local_config_dir $PWD"
+              echo "source $PWD/$1"
+              return
+          else
+              cd ..
+              upsearch "$1"
+          fi
+      }
+      startdir=${1:-$(dirname $kak_buffile)}
+      [ -d "$startdir" ] && cd $startdir
+      upsearch ".local.kak"
+  }
+}
+
+hook global BufCreate .* source-local-config 
+hook global BufCreate .* modeline-parse

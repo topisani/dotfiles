@@ -3,9 +3,7 @@
 # Generate flatblue theme.
 
 alpha() {
-  echo -n "rgba:"
-  echo -n "${1/rgb:/}"
-  echo -n "$2"
+  echo -n "$1" | sed "s/rgb:\\(.*\\)/rgba:\\1$2/"
 }
 
 echo "

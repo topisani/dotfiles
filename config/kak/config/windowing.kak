@@ -26,6 +26,7 @@ eval %sh{
 }
 
 hook -group tmux-integration global User 'TMUX=(.+?),(.+?),(.+?)' %{
-    alias global bottom-panel tmux-terminal-bottom-panel
-    alias global terminal tmux-terminal-autosplit
+  alias global panel tmux-terminal-panel
+  alias global bottom-panel tmux-terminal-bottom-panel
+  alias global terminal tmux-terminal-autosplit
 }

@@ -114,7 +114,7 @@ filetype-hook (cpp|c) %{
   lsp-setup
   lsp-enable-semantic-tokens
 
-  map window filetype  d       ': enter-user-mode gdbrepeat -lock<ret>'  -docstring 'GDB...'
+  map window filetype  d       ': enter-user-mode -lock gdbrepeat<ret>'  -docstring 'GDB...'
   map window filetype  <tab>   ': other-or-alt<ret>'                     -docstring 'Other file'
   map window filetype  =       ': clang-format<ret>'                     -docstring 'clang-format selection'
   map window filetype  m       ': make<ret>'                             -docstring 'Make'
@@ -127,7 +127,7 @@ filetype-hook (cpp|c) %{
 
 
 filetype-hook (cmake|make) %{
-  map window filetype  d       ': enter-user-mode gdbrepeat -lock<ret>'  -docstring 'GDB...'
+  map window filetype  d       ': enter-user-mode -lock gdbrepeat<ret>'  -docstring 'GDB...'
   map window filetype  m       ': make<ret>'                             -docstring 'Make'
   map window filetype  M       ': make-ask<ret>'                         -docstring 'Make prompt'
   map window filetype  <c-f>   ': fzf-hpp-files<ret>'                    -docstring 'Find header files'

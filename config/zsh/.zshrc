@@ -41,4 +41,3 @@ alias ssh="TERM=xterm-256color ssh"
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 source <(kitty + complete setup zsh)
-eval "$(thefuck -a tf)"
