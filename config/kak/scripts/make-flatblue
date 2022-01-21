@@ -123,9 +123,13 @@ decl str lsp_diagnostic_line_error_sign
 decl str lsp_diagnostic_line_warning_sign
 decl str lsp_diagnostic_line_info_sign
 decl str lsp_diagnostic_line_hint_sign
-set global lsp_diagnostic_line_error_sign ' '
-set global lsp_diagnostic_line_warning_sign ' '
-set global lsp_diagnostic_line_info_sign ' '
-set global lsp_diagnostic_line_hint_sign ' '
+set global lsp_diagnostic_line_error_sign '●'
+set global lsp_diagnostic_line_warning_sign '●'
+set global lsp_diagnostic_line_info_sign '●'
+set global lsp_diagnostic_line_hint_sign '●'
+# set global lsp_diagnostic_line_error_sign ' '
+# set global lsp_diagnostic_line_warning_sign ' '
+# set global lsp_diagnostic_line_info_sign ' '
+# set global lsp_diagnostic_line_hint_sign ' '
 
 " | sed 's/, */,/g;s/ *+/+/'

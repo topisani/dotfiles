@@ -7,9 +7,9 @@ _layout_office() {
 }
 
 _layout_office_dual_vert() {
-  echo "'Dell Inc. DELL U2719D 7NRBS83' 0 0 270"
-  echo "'Dell Inc. DELL U2719D CNRBS83' 1440 0 90"
-  echo "eDP-1 320 2560"
+  echo "'Dell Inc. DELL U2719D 7NRBS83' 1920 0 270"
+  echo "'Dell Inc. DELL U2719D CNRBS83' 3360 0 90"
+  echo "eDP-1 0 840"
 }
 
 _layout_cpi() {

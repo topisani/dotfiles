@@ -5,6 +5,10 @@ if [[ ! -d ~/.zplug ]];then
 fi
 source ~/.zplug/init.zsh
 
+iscmd() {
+    command -v $1 > /dev/null
+}
+
 zplug "plugins/git",   from:oh-my-zsh
 zplug 'wfxr/forgit', defer:1
 zplug "zsh-users/zsh-autosuggestions"
@@ -41,3 +45,4 @@ alias ssh="TERM=xterm-256color ssh"
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 source <(kitty + complete setup zsh)
+iscmd kubectl && source <(kubectl completion zsh)

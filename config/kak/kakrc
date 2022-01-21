@@ -84,11 +84,6 @@ cork number-toggle https://github.com/evanrelf/number-toggle.kak %{
   set global number_toggle_params -hlcursor -separator ' '
 }
 
-cork kakoune-mirror https://github.com/delapouite/kakoune-mirror %{
-  # Suggested mapping
-  map global normal "'" ': enter-user-mode -lock mirror<ret>'
-}
-
 cork focus https://github.com/caksoylar/kakoune-focus %{
   set global focus_context_lines 1
   set global focus_separator "{FocusMarker}╞══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╡"
@@ -130,6 +125,8 @@ map -docstring 'select all occurrences of current selection' global normal <a-pe
 define-command -override select-highlights -docstring 'select all occurrences of current selection' %{
   execute-keys '"aZ*%s<ret>"bZ"az"b<a-z>a'
 }
+
+map -docstring 'lsp...' global normal "'" ': enter-user-mode lsp<ret>'
 
 # User mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
