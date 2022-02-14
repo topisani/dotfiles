@@ -1,42 +1,6 @@
 snippet_support = false
 verbosity = 2
 
-semantic_tokens = [
-  ["comment+documentation", "documentation"],
-  ["variable+readonly", "variable+d"],
-  ["variable+constant", "variable+d"],
-  ["+deprecated", "+u"],
-  ["+intraDocLink", "+u"],
-  ["type", "type"],
-  ["struct", "type"],
-  ["class", "type"],
-  ["interface", "type"],
-  ["typeAlias", "type"],
-  ["union", "type"],
-  ["variable", "variable"],
-  ["namespace", "module"],
-  ["function", "function"],
-  ["string", "string"],
-  ["keyword", "keyword"],
-  ["operator", "operator"],
-  ["comment", "comment"],
-  ["variable", "variable"],
-  ["parameter", "variable"],
-  ["function", "function"],
-  ["method", "memberFunction"],
-  ["member", "memberVariable"],
-  ["property", "memberVariable"],
-  ["enum", "type"],
-  ["enumMember", "variable" ], # nonstandard
-  ["dependent", "cppDependent" ], # nonstandard
-  ["namespace", "module"],
-  ["typeParameter", "type"],
-  ["concept", "cppConcept" ], # nonstandard
-  ["macro", "cppMacro"],
-  ["comment", "disabledRegion"],
-  ["formatSpecifier", "value"],
-]
-
 [server]
 # exit session if no requests were received during given period in seconds
 # works only in unix sockets mode (-s/--session)
@@ -290,3 +254,41 @@ args = ["--parser=remark-parse", "--stdio"]
 # reference
 # trait
 # unsafe
+
+
+[semantic_tokens]
+faces = [
+  {token="comment", modifiers=["documentation"], face="documentation"},
+  {token="variable", modifiers=["readonly"], face="variable+d"},
+  {token="variable", modifiers=["constant"], face="variable+d"},
+  {token="", modifiers=["deprecated"], face="+u"},
+  {token="", modifiers=["intraDocLink"], face="+u"},
+  {token="type", face="type"},
+  {token="struct", face="type"},
+  {token="class", face="type"},
+  {token="interface", face="type"},
+  {token="typeAlias", face="type"},
+  {token="union", face="type"},
+  {token="variable", face="variable"},
+  {token="namespace", face="module"},
+  {token="function", face="function"},
+  {token="string", face="string"},
+  {token="keyword", face="keyword"},
+  {token="operator", face="operator"},
+  {token="comment", face="comment"},
+  {token="variable", face="variable"},
+  {token="parameter", face="variable"},
+  {token="function", face="function"},
+  {token="method", face="memberFunction"},
+  {token="member", face="memberVariable"},
+  {token="property", face="memberVariable"},
+  {token="enum", face="type"},
+  {token="enumMember", face="variable" }, # nonstandard
+  {token="dependent", face="cppDependent" }, # nonstandard
+  {token="namespace", face="module"},
+  {token="typeParameter", face="type"},
+  {token="concept", face="cppConcept" }, # nonstandard
+  {token="macro", face="cppMacro"},
+  {token="comment", face="disabledRegion"},
+  {token="formatSpecifier", face="value"},
+]

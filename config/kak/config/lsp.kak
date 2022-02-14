@@ -32,6 +32,7 @@ map global lsp j ': lsp-next-symbol<ret>' -docstring 'Next symbol'
 map global lsp k ': lsp-previous-symbol<ret>' -docstring 'Prev symbol'
 map global lsp J ': lsp-next-function<ret>' -docstring 'Next function'
 map global lsp K ': lsp-previous-function<ret>' -docstring 'Prev function'
+map global lsp "'" ': lsp-code-actions<ret>'    -docstring 'Code Actions...'
 
 def lsp-setup %{
   map window filetype s   ': enter-user-mode lsp<ret>' -docstring 'lsp...'
@@ -60,9 +61,9 @@ def -hidden -override lsp-show-error -params 1 -docstring "Render error" %{
   echo -markup " {Error}%arg{1}"
 }
 
-# def -hidden -override lsp-perform-code-action -params .. %{
-#   connect bottom-panel kcr-fzf menu %arg{@}
-# }
+def -hidden -override lsp-perform-code-action -params .. %{
+  connect bottom-panel krc-fzf menu %arg{@}
+}
 
 filetype-hook (css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown) %{
   lsp-setup
