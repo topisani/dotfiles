@@ -1,0 +1,22 @@
+#!/usr/bin/bash
+
+handle() {
+  local event=$(i3-msg -t SUBSCRIBE '["window"]');
+  local con_par=$(i3-msg -t get_tree | jq -r '[null,.]|recurse(.[1] as $parent|try (.[1].nodes[]|[($parent),.]) catch empty) | select(.[1].focused)')
+  local con=$(jq .[1] <<< $con_par)
+  local parent=$(jq .[0] <<< $con_par)
+  [[ $(jq any <<< $con) == false ]] && return;
+  [[ $(jq -r .type <<< $parent) != workspace ]] && [[ $(jq .fullscreen_mode <<< $parent) != 0 ]] && return;
+  [[ $(jq .fullscreen_mode <<< $con) != 0 ]] && return;
+  [[ $(jq -r .layout <<< $parent) == tabbed ]] && return;
+  [[ $(jq -r .layout <<< $con) == tabbed ]] && return;
+  local height=$(jq .rect.height <<< $con)
+  local width=$(jq .rect.width <<< $con)
+  local layout=$( [[ $height -gt $width ]] && echo "splitv" || echo "splith")
+  i3-msg $layout
+  #echo $width $height $layout
+}
+
+while :; do
+  handle
+done

@@ -1,0 +1,33 @@
+#!/bin/bash
+
+win_ids=$(jq -n -r --argjson outputs "$(i3-msg -t get_outputs)" --argjson tree "$(i3-msg -t get_tree)" '
+($tree | recurse(.nodes[]?) | if .type == "output" and (recurse(.nodes[]?) | .focused) then .name else empty end)
+    as $cur_output
+| $cur_output
+| ($outputs | .[] | if .name == $cur_output then .current_workspace else empty end)
+    as $workspace
+| ($tree
+    | (recurse(.nodes[]?)
+      | if .type == "workspace" and .name == $workspace then . else empty end)
+    | [.nodes[] | recurse(.nodes[]?) | if .name != null then . else empty end]
+  ) as $windows
+| ($windows | length) as $win_len
+| if $win_len <= 1 then
+    null
+  else
+    $windows | [to_entries[] | if .value.focused then .key else empty end][0]
+      as $cur_idx
+    | $cur_idx + $win_len | {
+      "prev": $windows[(. - 1) % $win_len].id,
+      "next": $windows[(. + 1) % $win_len].id
+    }
+  end
+')
+
+echo $win_ids
+
+if [[ "$1" == "t" ]] || [[ "$1" == "T" ]]; then
+  i3-msg "[con_id=$(echo $win_ids | jq -r '.next')]" focus
+else
+  i3-msg "[con_id=$(echo $win_ids | jq -r '.prev')]" focus
+fi

@@ -36,5 +36,5 @@ evaluate-commands %sh{
 
     bluish_fg="rgb:033F4C"
 
-    source $HOME/.config/kak/scripts/make-flatblue
+    . "$HOME/.config/kak/scripts/make-flatblue"
 }

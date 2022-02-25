@@ -1,0 +1,22 @@
+#!/bin/bash
+# requires jq
+
+action=${1:-swap}
+scrns=$(i3-msg -t get_outputs | jq -r '.[]|"\(.name):\(.current_workspace)"' | grep -v ':null$')
+curscrn=$(i3-msg -t get_tree | jq -r 'recurse(.nodes[]?) | if .type == "output" and (recurse(.nodes[]?) | .focused ) then .name else empty end')
+prev=$(echo "$scrns" | tail -n1 | cut -d: -f1)
+echo "$prev"
+
+while IFS=: read -r name current_workspace; do
+  if [[ "$name" == "$curscrn" ]]; then
+    if [[ "$action" == "swap" ]]; then
+      echo "moving ${current_workspace} to $prev..."
+      i3-msg workspace "${current_workspace}"
+      i3-msg move workspace to output "$prev"
+    else
+      echo "moving focus to $prev"
+      i3-msg focus output "$prev"
+    fi
+  fi
+  prev=$name
+done <<< $scrns 

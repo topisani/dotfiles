@@ -9,12 +9,12 @@ def lsp-log %{
   eval "edit -scroll -fifo /tmp/kak-lsp-%val[session].log *lsp-log*"
 }
 
-# lsp-auto-hover-enable
+lsp-auto-hover-enable
 lsp-auto-signature-help-enable
 set global lsp_auto_highlight_references true
 
 set global lsp_hover_max_lines 20
-set global lsp_hover_anchor true
+set global lsp_hover_anchor false
 
 def -hidden lsp-insert-c-n %{
  try %{

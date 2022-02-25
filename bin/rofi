@@ -1,6 +1,10 @@
 #!/bin/sh
 
 ROFI_CMD="/usr/bin/rofi"
+if [ -z "$WAYLAND_DISPLAY" ]; then
+  exec $ROFI_CMD "$@" < /dev/stdin
+fi
+
 [ -e "$ROFI_CMD" ] || ROFI_CMD="/usr/local/bin/rofi"
 
 SCREEN_POS=$(swaymsg -t get_outputs \
