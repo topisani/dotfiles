@@ -11,7 +11,6 @@
 
 set $mod Mod4
 
-set $mod Mod4
 # Home row direction keys, like vim
 set $left h
 set $down j
@@ -36,7 +35,11 @@ font pango:Roboto 10
 #
 # start a terminal
 bindsym $mod+Return exec $term
-bindsym $mod+Shift+Return exec termite
+bindsym $mod+Shift+Return exec kitty -c ~/.config/kitty/kitty.conf -c ~/.config/kitty/leader.conf
+bindsym $mod+Mod1+Return exec kitty -c ~/.config/kitty/kitty.conf
+bindsym $mod+Shift+c exec colorscheme-switch
+bindsym $mod+Ctrl+c exec colorscheme-switch -g
+bindsym $mod+c exec kitty --class="floating" -o window_padding_width=4 -o initial_window_width=400 -o initial_window_height=200 qalc
 
 # kill focused window
 bindsym $mod+q kill
@@ -52,17 +55,17 @@ bindsym $mod+space exec $menu
 floating_modifier $mod
 
 # reload the configuration file
-bindsym $mod+Shift+c reload
+bindsym $mod+Shift+r reload
 
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exit
 bindsym $mod+p bar mode toggle
 
-bindsym XF86AudioMute exec volume mute toggle
-bindsym XF86AudioRaiseVolume exec volume volume up
-bindsym XF86AudioLowerVolume exec volume volume down
-bindsym XF86MonBrightnessUp exec brightness up
-bindsym XF86MonBrightnessDown exec brightness down
+bindsym XF86AudioMute exec --no-startup-id volume mute toggle -n
+bindsym XF86AudioRaiseVolume exec --no-startup-id volume volume up -n
+bindsym XF86AudioLowerVolume exec --no-startup-id volume volume down -n
+bindsym XF86MonBrightnessUp exec --no-startup-id brightness up -n
+bindsym XF86MonBrightnessDown exec --no-startup-id brightness down -n
 bindsym Print exec rofi-shoot
 
 # Use Mouse+$mod to drag floating windows to their wanted position
@@ -78,33 +81,19 @@ bindsym Mod1+shift+Tab exec ~/.config/i3/alttab f
 bindsym $mod+o exec ~/.config/i3/ws-swap focus
 bindsym $mod+Shift+o exec ~/.config/i3/ws-swap swap
 
-bindsym $mod+c exec wmcl center
+# bindsym $mod+c exec wmcl center
 
-# Move your focus around
 bindsym $mod+$left focus left
 bindsym $mod+$down focus down
 bindsym $mod+$up focus up
 bindsym $mod+$right focus right
-# or use $mod+[up|down|left|right]
-bindsym $mod+Left focus left
-bindsym $mod+Down focus down
-bindsym $mod+Up focus up
-bindsym $mod+Right focus right
 
-# _move_ the focused window with the same, but add Shift
 bindsym $mod+Shift+$left move left
 bindsym $mod+Shift+$down move down
 bindsym $mod+Shift+$up move up
 bindsym $mod+Shift+$right move right
-# ditto, with arrow keys
-bindsym $mod+Shift+Left move left
-bindsym $mod+Shift+Down move down
-bindsym $mod+Shift+Up move up
-bindsym $mod+Shift+Right move right
 #
 # Workspaces:
-#
-# switch to workspace
 bindsym $mod+1 workspace 1
 bindsym $mod+2 workspace 2
 bindsym $mod+3 workspace 3
@@ -115,7 +104,6 @@ bindsym $mod+7 workspace 7
 bindsym $mod+8 workspace 8
 bindsym $mod+9 workspace 9
 bindsym $mod+0 workspace 10
-# move focused container to workspace
 bindsym $mod+Shift+1 move container to workspace 1
 bindsym $mod+Shift+2 move container to workspace 2
 bindsym $mod+Shift+3 move container to workspace 3
@@ -126,76 +114,42 @@ bindsym $mod+Shift+7 move container to workspace 7
 bindsym $mod+Shift+8 move container to workspace 8
 bindsym $mod+Shift+9 move container to workspace 9
 bindsym $mod+Shift+0 move container to workspace 10
-# Note: workspaces can have any name you want, not just numbers.
-# We just use 1-10 as the default.
+
 #
 # Layout stuff:
-#
-    # You can "split" the current object of your focus with
-    # $mod+b or $mod+v, for horizontal and vertical splits
-    # respectively.
-    bindsym $mod+s splith
-    bindsym $mod+v splitv
+bindsym $mod+s splith
+bindsym $mod+v splitv
 
-    # Switch the current container between different layout styles
-    # bindsym $mod+s layout stacking
-    bindsym $mod+w layout tabbed
-    bindsym $mod+e layout toggle split
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
 
-    # Make the current focus fullscreen
-    bindsym $mod+m fullscreen
+bindsym $mod+m fullscreen
 
-    # Toggle the current focus between tiling and floating mode
-    bindsym $mod+f floating toggle
+bindsym $mod+f floating toggle
 
-    # Swap focus between the tiling area and the floating area
-    bindsym $mod+Tab focus mode_toggle
-
-    # move focus to the parent container
-    bindsym $mod+a focus parent
-    bindsym $mod+Shift+a focus child
+bindsym $mod+a focus parent
+bindsym $mod+Shift+a focus child
 #
 # Scratchpad:
 #
-    # Sway has a "scratchpad", which is a bag of holding for windows.
-    # You can send windows there and get them back later.
+# Move the currently focused window to the scratchpad
+bindsym $mod+minus move scratchpad
+# Show the next scratchpad window or hide the focused scratchpad window.
+# If there are multiple scratchpad windows, this command cycles through them.
+bindsym $mod+Shift+minus scratchpad show
 
-    # Move the currently focused window to the scratchpad
-    bindsym $mod+Shift+minus move scratchpad
-
-    # Show the next scratchpad window or hide the focused scratchpad window.
-    # If there are multiple scratchpad windows, this command cycles through them.
-    bindsym $mod+minus scratchpad show
 #
+# Dunst Notifications
+bindsym $mod+n exec dunstctl action
+bindsym $mod+Shift+n exec dunstctl context
+bindsym $mod+Ctrl+n exec dunstctl close
+bindsym $mod+Ctrl+Shift+n exec dunstctl history-pop
+
 # Resizing containers:
-#
-mode "resize" {
-    # left will shrink the containers width
-    # right will grow the containers width
-    # up will shrink the containers height
-    # down will grow the containers height
-    bindsym $left resize shrink width 10 px or 10 ppt
-    bindsym $down resize grow height 10 px or 10 ppt
-    bindsym $up resize shrink height 10 px or 10 ppt
-    bindsym $right resize grow width 10 px or 10 ppt
-
-    # ditto, with arrow keys
-    bindsym Left resize shrink width 10 px or 10 ppt
-    bindsym Down resize grow height 10 px or 10 ppt
-    bindsym Up resize shrink height 10 px or 10 ppt
-    bindsym Right resize grow width 10 px or 10 ppt
-
-    # return to default mode
-    bindsym Return mode "default"
-    bindsym Escape mode "default"
-}
-bindsym $mod+r mode "resize"
-
-
-bindsym $mod+Ctrl+$left resize shrink width 40 px or 5 ppt
-bindsym $mod+Ctrl+$down resize grow height 40 px or 5 ppt
-bindsym $mod+Ctrl+$up resize shrink height 40 px or 5 ppt
-bindsym $mod+Ctrl+$right resize grow width 40 px or 5 ppt
+bindsym $mod+Ctrl+$left resize shrink width 10 px or 10 ppt
+bindsym $mod+Ctrl+$down resize grow height 10 px or 10 ppt
+bindsym $mod+Ctrl+$up resize shrink height 10 px or 10 ppt
+bindsym $mod+Ctrl+$right resize grow width 10 px or 10 ppt
 
 # ditto, with arrow keys
 bindsym $mod+Ctrl+Left resize shrink width 10 px or 10 ppt
@@ -203,61 +157,27 @@ bindsym $mod+Ctrl+Down resize grow height 10 px or 10 ppt
 bindsym $mod+Ctrl+Up resize shrink height 10 px or 10 ppt
 bindsym $mod+Ctrl+Right resize grow width 10 px or 10 ppt
 
+bindsym $mod+g exec $scripts/toggle-gaps
 
-set $mode_gaps Gaps: (o) outer, (i) inner
-set $mode_gaps_outer Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)
-set $mode_gaps_inner Inner Gaps: +|-|0 (local), Shift + +|-|0 (global)
-bindsym $mod+Shift+g mode "$mode_gaps"
+# bindsym $mod+c exec swayr execute-swaymsg-command
+# bindsym $mod+Shift+c exec swayr execute-swayr-command
 
-bindsym $mod+g exec ~/.config/sway/toggle-gaps
- 
-mode "$mode_gaps" {
-        bindsym o      mode "$mode_gaps_outer"
-        bindsym i      mode "$mode_gaps_inner"
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
-}
- 
-mode "$mode_gaps_inner" {
-        bindsym plus  gaps inner current plus 5
-        bindsym minus gaps inner current minus 5
-        bindsym 0     gaps inner current set 0
- 
-        bindsym Shift+plus  gaps inner all plus 5
-        bindsym Shift+minus gaps inner all minus 5
-        bindsym Shift+0     gaps inner all set 0
- 
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
-}
-mode "$mode_gaps_outer" {
-        bindsym plus  gaps outer current plus 5
-        bindsym minus gaps outer current minus 5
-        bindsym 0     gaps outer current set 0
- 
-        bindsym Shift+plus  gaps outer all plus 5
-        bindsym Shift+minus gaps outer all minus 5
-        bindsym Shift+0     gaps outer all set 0
- 
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
-}
-
+font Roboto 10
 # Theme colors
-# class                   border  backgr. text    indic.   child_border
-  client.focused          #076096 #076096 #feebec #FDF6E3  #076096
-  client.focused_inactive #343434 #343434 #feebec #454948  #343434 
-  client.unfocused        #18191c #18191c #feebec #454948  #18191c
-  client.urgent           #CB4B16 #FDF6E3 #feebec #268BD2  #CB4B16 
-  client.placeholder      #000000 #0c0c0c #ffffff #000000  #000000 
+# class                 border  backgr. text    indic.   child_border
+client.focused          #178ca6 #076096 #feebec #FDF6E3  #178ca6
+client.focused_inactive #343434 #343434 #feebec #454948  #343434 
+client.unfocused        #18191c #18191c #feebec #454948  #18191c
+client.urgent           #CB4B16 #FDF6E3 #feebec #268BD2  #CB4B16 
+client.placeholder      #000000 #0c0c0c #ffffff #000000  #000000 
 
-  client.background       #18191c
+client.background       #18191c
 
-default_border pixel 4
+default_border pixel 1
 smart_borders on
 hide_edge_borders smart
 
-gaps inner 15
+gaps inner 10
 smart_gaps on
 
 # Start i3bar to display a workspace bar (plus the system information i3status
@@ -284,6 +204,7 @@ for_window [class="(?i)pavucontrol"] floating enable
 
 
 # Open specific applications in floating mode
+for_window [class="floating"] floating enable
 for_window [title="(?i)mullvad vpn"] floating enable border normal
 for_window [class="Clipgrab"] floating enable
 for_window [title="File Transfer*"] floating enable
@@ -314,11 +235,12 @@ for_window [urgent=latest] focus
 
 exec xrdb -load ~/.Xresources
 exec --no-startup-id redshift -l 56:10 &
-exec --no-startup-id dex --autostart &
+# exec --no-startup-id dex --autostart &
 exec --no-startup-id nm-applet
 exec --no-startup-id "hsetroot -solid '#18191c'"
 exec --no-startup-id "picom"
 exec --no-startup-id "dunst"
+exec --no-startup-id "feh --bg-fill .config/wallpaper.png"
 
 exec battery_notifyd &
 exec systemd-lock-handler cloth-lock &
