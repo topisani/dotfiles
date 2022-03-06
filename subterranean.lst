@@ -32,3 +32,4 @@
 ~/.config/swayr;config/swayr
 ~/.config/xkb;config/xkb
 ~/.config/i3;config/i3
+~/.config/xsettingsd;config/xsettingsd

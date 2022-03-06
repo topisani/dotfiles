@@ -153,8 +153,17 @@ toggle_gtk_dark() {
         gtk_theme="Matcha-dark-azul"
         icon_theme="Papirus-Dark"
     fi
+    
+    # gsettings works in wayland
     gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme"
     gsettings set org.gnome.desktop.interface icon-theme "$icon_theme"
+
+    # xsettingsd works in x
+    echo "Net/ThemeName \"$gtk_theme\"" > $HOME/.config/xsettingsd/xsettingsd.conf
+    echo "Net/IconThemeName \"$icon_theme\"" >> $HOME/.config/xsettingsd/xsettingsd.conf
+    
+    # Reload xsettingsd config
+    killall -SIGHUP xsettingsd
 }
 
 getColorschemePath() {

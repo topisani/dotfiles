@@ -162,7 +162,7 @@ bindsym $mod+g exec $scripts/toggle-gaps
 # bindsym $mod+c exec swayr execute-swaymsg-command
 # bindsym $mod+Shift+c exec swayr execute-swayr-command
 
-font Roboto 10
+# font Roboto 10
 # Theme colors
 # class                 border  backgr. text    indic.   child_border
 client.focused          #178ca6 #076096 #feebec #FDF6E3  #178ca6
@@ -206,6 +206,7 @@ for_window [class="(?i)pavucontrol"] floating enable
 # Open specific applications in floating mode
 for_window [class="floating"] floating enable
 for_window [title="(?i)mullvad vpn"] floating enable border normal
+for_window [title="(?i)BFA Looper"] floating enable
 for_window [class="Clipgrab"] floating enable
 for_window [title="File Transfer*"] floating enable
 for_window [class="Galculator"] floating enable border pixel 1
@@ -229,6 +230,7 @@ for_window [class="Skype"] floating enable border normal
 for_window [class="Timeset-gui"] floating enable border normal
 for_window [class="(?i)virtualbox"] floating enable border normal
 for_window [class="Xfburn"] floating enable
+for_window [class="(?i)qjackctl"] floating enable
 
 # switch to workspace with urgent window automatically
 for_window [urgent=latest] focus
@@ -241,15 +243,10 @@ exec --no-startup-id "hsetroot -solid '#18191c'"
 exec --no-startup-id "picom"
 exec --no-startup-id "dunst"
 exec --no-startup-id "feh --bg-fill .config/wallpaper.png"
+exec --no-startup-id "xsettingsd" # For switching themes
 
-exec battery_notifyd &
-exec systemd-lock-handler cloth-lock &
-
-set $gnomeschema org.gnome.desktop.interface
-
-exec --no-startup-id  gsettings set $gnomeschema gtk-theme 'Yaru'
-exec --no-startup-id  gsettings set $gnomeschema icon-theme 'Yaru'
-exec --no-startup-id  gsettings set $gnomeschema cursor-theme 'Yaru'
+exec --no-startup-id battery_notifyd &
+exec --no-startup-id systemd-lock-handler cloth-lock &
 
 # xss-lock grabs a logind suspend inhibit lock and will use i3lock to lock the
 # screen before suspend. Use loginctl lock-session to lock your screen.
