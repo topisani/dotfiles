@@ -259,10 +259,12 @@ args = ["--parser=remark-parse", "--stdio"]
 [semantic_tokens]
 faces = [
   {token="comment", modifiers=["documentation"], face="documentation"},
-  {token="variable", modifiers=["readonly"], face="variable+d"},
-  {token="variable", modifiers=["constant"], face="variable+d"},
+  # {token="variable", modifiers=["readonly"], face="+d@variable"},
+  # {token="variable", modifiers=["constant"], face="+d@variable"},
+  {token="variable", modifiers=["mutable"], face="+i@variable"},
   {token="", modifiers=["deprecated"], face="+u"},
   {token="", modifiers=["intraDocLink"], face="+u"},
+  {token="method", modifiers=["trait"], face="memberFunction"},
   {token="type", face="type"},
   {token="struct", face="type"},
   {token="class", face="type"},
@@ -279,9 +281,9 @@ faces = [
   {token="variable", face="variable"},
   {token="parameter", face="variable"},
   {token="function", face="function"},
-  {token="method", face="memberFunction"},
-  {token="member", face="memberVariable"},
-  {token="property", face="memberVariable"},
+  {token="member", face="variable"}, # Member
+  {token="property", face="variable"}, # member
+  {token="method", face="function"}, # member
   {token="enum", face="type"},
   {token="enumMember", face="variable" }, # nonstandard
   {token="dependent", face="cppDependent" }, # nonstandard
@@ -289,6 +291,6 @@ faces = [
   {token="typeParameter", face="type"},
   {token="concept", face="cppConcept" }, # nonstandard
   {token="macro", face="cppMacro"},
-  {token="comment", face="disabledRegion"},
+  {token="comment", face="comment"},
   {token="formatSpecifier", face="value"},
 ]

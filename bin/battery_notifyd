@@ -5,7 +5,6 @@ not_id=158283
 
 # ACPI shows values of batteries of connected devices. 
 # This should only have the actual laptop battery
-source /sys/class/power_supply/BAT*/uevent
 # Example contents:
 # POWER_SUPPLY_NAME=BAT1
 # POWER_SUPPLY_TYPE=Battery
@@ -25,8 +24,12 @@ source /sys/class/power_supply/BAT*/uevent
 # POWER_SUPPLY_MANUFACTURER=Simplo
 # POWER_SUPPLY_SERIAL_NUMBER=123456789
 
+get_bat() {
+    eval $(cat /sys/class/power_supply/BAT*/uevent | grep -P "POWER_SUPPLY_CAPACITY|POWER_SUPPLY_STATUS")
+}
+
 while true; do
-    source /sys/class/power_supply/BAT*/uevent
+    get_bat
     sl=60
     if (( $POWER_SUPPLY_CAPACITY < 16 )) && [[ "$POWER_SUPPLY_STATUS" != "Charging" ]]; then
         dunstify -u 2 -i battery-empty-symbolic "Battery Low!" "$POWER_SUPPLY_CAPACITY%" -r $not_id

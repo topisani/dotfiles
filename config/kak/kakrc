@@ -153,6 +153,8 @@ map global prompt <backspace> '<left><del>'
 # Personal scripts ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 set-option global makecmd 'make -j 8'
+# Use ripgrep
+set-option global grepcmd 'rg -Hn --no-heading'
 
 load-conf lsp
 load-conf c++
