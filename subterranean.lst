@@ -33,3 +33,4 @@
 ~/.config/xkb;config/xkb
 ~/.config/i3;config/i3
 ~/.config/xsettingsd;config/xsettingsd
+~/.config/qalculate/qalc.cfg;config/qalculate/qalc.cfg
