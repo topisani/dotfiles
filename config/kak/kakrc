@@ -90,12 +90,11 @@ cork focus https://github.com/caksoylar/kakoune-focus %{
   map global user o ': focus-toggle<ret>' -docstring "Toggle selection focus"
 }
 
-
-cork occivink-snippets https://github.com/occivink/kakoune-snippets %{
-  
-}
+cork occivink-snippets https://github.com/occivink/kakoune-snippets
 
 cork kakoune-table https://github.com/listentolist/kakoune-table
+
+cork kakoune-text-objects https://github.com/delapouite/kakoune-text-objects
 
 # Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 

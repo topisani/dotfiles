@@ -1,5 +1,6 @@
+# vim: ft=ini
 [user]
-	email = tobias.pisani@moveinnovation.dk
+	email = topisani@hamsterpoison.com
 	name = Tobias Pisani
 [credential]
 	helper = store
@@ -16,9 +17,22 @@
 	ignore = update-index --skip-worktree
 	unignore = update-index --no-skip-worktree
 	ignored = !git ls-files -v | grep \"^S\"
+	# git dft runs difftool, which runs difftastic, which gives a diff with semantic context
+	dft = difftool
 [diff]
-	tool = vimdiff
+	tool = difftastic
+
+[difftool]
+	prompt = false
+
+[difftool "difftastic"]
+	cmd = difft "$LOCAL" "$REMOTE"
+
+[pager]
+	difftool = true
+
 [interactive]
   diffFilter = (echo && diff-so-fancy)
 [pull]
 	rebase = true
+
