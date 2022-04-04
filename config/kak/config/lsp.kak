@@ -73,9 +73,9 @@ filetype-hook rust %{
   lsp-setup
   lsp-enable-semantic-tokens
   
-  hook window -group rust-inlay-hints BufReload .* rust-analyzer-inlay-hints
-  hook window -group rust-inlay-hints NormalIdle .* rust-analyzer-inlay-hints
-  hook window -group rust-inlay-hints InsertIdle .* rust-analyzer-inlay-hints
+  hook window -group lsp-inlay-hints BufReload .* lsp-experimental-inlay-hints
+  hook window -group lsp-inlay-hints NormalIdle .* lsp-experimental-inlay-hints
+  hook window -group lsp-inlay-hints InsertIdle .* lsp-experimental-inlay-hints
   
   hook -once -always window WinSetOption filetype=.* %{
     remove-hooks window rust-inlay-hints
