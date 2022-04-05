@@ -9,6 +9,7 @@ _layout_office() {
 _layout_office_dual_vert() {
   echo "'Dell Inc. DELL U2719D 7NRBS83' 1920 0 270"
   echo "'Dell Inc. DELL U2719D CNRBS83' 3360 0 90"
+  echo "'Dell Inc. DELL U2719D 5NRBS83' 4800 0 90"
   echo "eDP-1 0 840"
 }
 

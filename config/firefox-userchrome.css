@@ -1,13 +1,15 @@
 /* Autohide navigation bar. Gives some issue with omnibar placement sometimes */
 :root:not([customizing]) #navigator-toolbox:not(:hover):not(:focus-within) #nav-bar {
-  max-height: 0;
-  min-height: 0!important;
+  height: 0;
   margin-bottom: 0px;
   opacity: 0;
+  transition: all 250ms ease 500ms;
 }
 
 #nav-bar {
-  transition: all 250ms;
+  height: 34px;
+  min-height: 0!important;
+  transition: all 250ms ease 00ms;
 }
 
 #navigator-toolbox {
@@ -94,5 +96,5 @@
   transition: height 0ms steps(1) 80ms;
 }
 :where(#nav-bar){
-  border-inline: var(--uc-window-drag-space-width,0) solid var(--toolbar-bgcolor);
+  /*! border-inline: var(--uc-window-drag-space-width,0) solid var(--toolbar-bgcolor); */
 }

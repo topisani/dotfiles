@@ -65,6 +65,10 @@ def -hidden -override lsp-perform-code-action -params .. %{
   connect bottom-panel krc-fzf menu %arg{@}
 }
 
+def -hidden -override lsp-menu -params .. %{
+  connect bottom-panel krc-fzf menu %arg{@}
+}
+
 filetype-hook (css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown) %{
   lsp-setup
 }

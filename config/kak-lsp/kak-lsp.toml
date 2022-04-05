@@ -33,6 +33,8 @@ checkOnSave.allTargets = false
 checkOnSave.extraArgs = [ "--bins" ]
 checkOnSave.command = "clippy"
 # See https://github.com/rust-analyzer/rust-analyzer/issues/6448
+inlayHints.reborrowHints = true
+inlayHints.lifetimeEllisionHints.enable = "always"
 
 [language.crystal]
 filetypes = ["crystal"]
@@ -76,7 +78,8 @@ command = "ocamllsp"
 [language.python]
 filetypes = ["python"]
 roots = ["requirements.txt", "setup.py", ".git", ".hg"]
-command = "pyls"
+command = "pyright-langserver"
+args = ["--stdio"]
 offset_encoding = "utf-8"
 
 [language.c_cpp]
