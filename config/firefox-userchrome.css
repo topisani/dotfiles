@@ -7,8 +7,9 @@
   transition: all 250ms ease 500ms;
 }
 
-#urlbar[breakout] {
-	top: 4px !important;
+#urlbar {
+  /* Fix urlbar placement*/
+  --urlbar-toolbar-height: 34px !important;
 }
 
 #nav-bar {
