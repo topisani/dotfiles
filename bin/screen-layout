@@ -6,7 +6,7 @@ _layout_office() {
   echo "eDP-1 1440 1440"
 }
 
-_layout_office_dual_vert() {
+_layout_office_triple_vert() {
   echo "'Dell Inc. DELL U2719D 7NRBS83' 1920 0 270"
   echo "'Dell Inc. DELL U2719D CNRBS83' 3360 0 90"
   echo "'Dell Inc. DELL U2719D 5NRBS83' 4800 0 90"
@@ -28,38 +28,40 @@ _layout_home() {
   echo "eDP-1 960 2160"
 }
 
-_select_auto_layout() {
+_layout_auto() {
   serials=$(swaymsg -t get_outputs | jq '.[].serial')
-  if echo "$serials" | grep 7NRBS83 -q; then
-    echo office_dual_vert
-  elif echo "$serials" | grep 0FFXD45N5R8S -q; then
-    echo cpi
-  elif echo "$serials" | grep 0x00000101 -q; then
-    echo home
+  layout=$(
+    if echo "$serials" | grep 7NRBS83 -q; then
+      _layout_office_triple_vert
+    elif echo "$serials" | grep 0FFXD45N5R8S -q; then
+      _layout_cpi
+    elif echo "$serials" | grep 0x00000101 -q; then
+      _layout_home
+    else
+      _layout_single
+    fi
+  )
+  lid=$(cat /proc/acpi/button/lid/*/state)
+  if [[ "$lid" =~ "closed" ]]; then
+    echo "$layout" | sed '/^eDP-1/d';
+    echo "eDP-1 off"
   else
-    echo single
+    echo "$layout"
   fi
 }
 
-_layout_auto() {
-  "_layout_$(_select_auto_layout)"
-}
-
 _apply_sway() {
-  swaymsg "output '*' enable"
-  lid=$(cat /proc/acpi/button/lid/*/state)
-  "_layout_$1" | while IFS="" read line; do
+  while IFS="" read line; do
     declare -a "arr=($line)"
     name=${arr[0]}
     x=${arr[1]}
     y=${arr[2]}
     trans=${arr[3]:-normal}
-    if [[ "$lid" =~ "closed" ]] && [[ "$name" =~ "eDP-1" ]]; then
-      x="off"
-    fi
     if [[ "$x" == "off" ]]; then
+      echo swaymsg "output '$name' disable"
       swaymsg "output '$name' disable"
     else
+      echo swaymsg "output '$name' enable pos $x $y transform $trans"
       swaymsg "output '$name' enable pos $x $y transform $trans"
     fi
   done
@@ -68,12 +70,12 @@ _apply_sway() {
 _daemon() {
   layout=""
   while true; do
-    new_layout=$(_select_auto_layout)
+    new_layout=$(_layout_auto)
     if [[ "$layout" != "$new_layout" ]]; then
       layout="$new_layout"
-      _apply_sway "$layout"
+      echo "$layout" | "_apply_$method"
     fi
-    sleep 10
+    sleep 5
   done
 }
 

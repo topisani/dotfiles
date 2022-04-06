@@ -3,14 +3,20 @@
   height: 0;
   margin-bottom: 0px;
   opacity: 0;
+  min-height: 0!important;
   transition: all 250ms ease 500ms;
+}
+
+#urlbar[breakout] {
+	top: 4px !important;
 }
 
 #nav-bar {
   height: 34px;
-  min-height: 0!important;
   transition: all 250ms ease 00ms;
 }
+
+/* Smaller tabs */
 
 #navigator-toolbox {
   --tab-min-height: 24px !important;
