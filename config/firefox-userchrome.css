@@ -1,19 +1,21 @@
-/* Autohide navigation bar. Gives some issue with omnibar placement sometimes */
+/* Autohide navigation bar. Gives some issue with urlbar placement sometimes */
 :root:not([customizing]) #navigator-toolbox:not(:hover):not(:focus-within) #nav-bar {
-  height: 0;
+  max-height: 0;
   margin-bottom: 0px;
   opacity: 0;
   min-height: 0!important;
+  /* Wait 500ms before hiding the nav bar on unfocus */
   transition: all 250ms ease 500ms;
 }
 
 #urlbar {
-  /* Fix urlbar placement*/
-  --urlbar-toolbar-height: 34px !important;
+  /* Fix urlbar placement - Some calculation of this variable breaks on new windows */
+  --urlbar-toolbar-height: var(--urlbar-container-height) !important;
 }
 
 #nav-bar {
-  height: 34px;
+  /* 44px is the height in touch-density. Max height must be set here to be animated. Works in lower densities as well */
+  max-height: 44px;
   transition: all 250ms ease 00ms;
 }
 
