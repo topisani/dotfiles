@@ -6,6 +6,8 @@ COLORSCHEME_PATH=$HOME/.config/colorschemes
 # path to your xrdb config file
 XRDB_CONF_PATH=$HOME/.Xresources
 
+DEFAULT_COLORSCHEME=flatblue-dark
+
 getXrdbColor() {
     xrdb -query | LANG=C grep -F "$@:" | cut -d '#' -f2
 }
@@ -166,13 +168,19 @@ toggle_gtk_dark() {
     killall -SIGHUP xsettingsd
 }
 
+getCurrentColorscheme() {
+    local name=$(cat "$COLORSCHEME_PATH/current" 2> /dev/null)
+    [[ -z "$name" ]] && name="$DEFAULT_COLORSCHEME"
+    echo $name
+}
+
 getColorschemePath() {
-    local name=${1:-$(cat $COLORSCHEME_PATH/current)}
+    local name=${1:-$(getCurrentColorscheme)}
     find "${COLORSCHEME_PATH}/$name".*resources -type f
 }
 
 showColorschemes() {
-    find "${COLORSCHEME_PATH}/" -type f | sed 's/\..resources//g; s/.*\///g; /^current$/d'
+    ls "${COLORSCHEME_PATH}/" | sed 's/\..resources//g; s/.*\///g; /^current$/d'
 }
 
 showHelp() {
@@ -214,7 +222,7 @@ switch() {
 }
 
 swap() {
-  local cur=$(cat $COLORSCHEME_PATH/current)
+  local cur=$(getCurrentColorscheme)
   local next=$cur
   for col in $(showColorschemes); do
     ! [[ $col = $cur ]] && next=$col
@@ -230,13 +238,13 @@ main() {
     argument="${2-}"
     case "${option}" in
         -r | --reload)
-            switch $(cat $COLORSCHEME_PATH/current);
+            switch $(getCurrentColorscheme);
             ;;
         -g | --gtk)
             toggle_gtk_dark
             ;;
         -c | --current)
-            cat $COLORSCHEME_PATH/current
+            getCurrentColorscheme
             ;;
         -s | --switch)
             switch $argument

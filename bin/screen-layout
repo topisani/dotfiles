@@ -42,7 +42,7 @@ _layout_auto() {
     fi
   )
   lid=$(cat /proc/acpi/button/lid/*/state)
-  if [[ "$lid" =~ "closed" ]]; then
+  if [[ "$lid" =~ "closed" ]] &&  [[ $(echo "$serials" | wc -l ) -ge 2 ]]; then
     echo "$layout" | sed '/^eDP-1/d';
     echo "eDP-1 off"
   else
