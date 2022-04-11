@@ -10,8 +10,8 @@ def filetype-hook -params 2 %{
 map global normal -docstring "Comment line" '#' ': comment-line<ret>'
 map global normal -docstring "Comment block" '<a-#>' ': comment-block<ret>'
 
-define-command file-delete -docstring "Delete current file" %{
-   prompt "Delete file [Y/n]? " '%sh{ [[ "$kak_text" =~ [yY] ]] && rm $kak_buffile && echo "delete-buffer" }' 
+define-command file-delete -docstring "Delete current file" -override %{
+   prompt "Delete file [Y/n]? " '%sh{ ([ "$kak_text" = "y" ] || [ "$kak_text" = "Y" ])   && rm $kak_buffile && echo "delete-buffer" }' 
 }
 
 declare-user-mode files
