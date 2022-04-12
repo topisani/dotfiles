@@ -104,29 +104,26 @@ map -docstring 'deindent' global insert <s-tab> '<a-;><lt>'
 
 # Normal mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-map -docstring 'Enter inser mode with main selection' global normal <a-I> ': enter-insert-mode-with-main-selection<ret>'
 map -docstring 'Select all occurrences of current selection' global normal <a-L> '"aZ*%s<ret>"bZ"az"b<a-z>a'
 
-map -docstring 'Comment' global normal '#' ':comment-line<ret>'
-map -docstring 'Comment' global normal '<a-#>' ':comment-block<ret>'
+map -docstring 'Comment' global normal '#' ': comment-line<ret>'
+map -docstring 'Comment' global normal '<a-#>' ': comment-block<ret>'
 
-
-map -docstring 'Move lines down' global normal '<a-down>' ': move-lines-down<ret>'
-define-command -override move-lines-down -docstring 'move line down' %{
-  execute-keys -draft '<a-x><a-_><a-:>Z;ezj<a-x>dzP'
-}
-
-map -docstring 'Move lines up' global normal '<a-up>' ': move-lines-up<ret>'
-define-command -override move-lines-up -docstring 'move line up' %{
-  execute-keys -draft '<a-x><a-_><a-:><a-;>Z;bzk<a-x>dzp'
-}
-
-map -docstring 'select all occurrences of current selection' global normal <a-percent> ': select-highlights<ret>'
 define-command -override select-highlights -docstring 'select all occurrences of current selection' %{
   execute-keys '"aZ*%s<ret>"bZ"az"b<a-z>a'
 }
 
 map -docstring 'lsp...' global normal "'" ': enter-user-mode lsp<ret>'
+
+map -docstring 'Select next whole line' global normal <X> ': select-next-whole-line<ret>'
+define-command -override select-next-whole-line -docstring 'Performs the old <X> command from kakoune' %{
+  try %[
+    execute-keys '<a-k>^.*$<ret>'
+    execute-keys 'Jx'
+  ] catch %[
+    execute-keys 'x'
+  ]
+}
 
 # User mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 

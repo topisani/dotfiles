@@ -7,6 +7,7 @@ define-command -hidden setup-surround-pair -params 2 -override %{
 }
 
 define-command surround-mode -override %§
+  
   setup-surround-pair "(" ")"
   setup-surround-pair "[" "]"
   setup-surround-pair "<" ">"
@@ -15,10 +16,10 @@ define-command surround-mode -override %§
   setup-surround-pair '"' '"'
   setup-surround-pair '`' '`'
 
+  try disable-auto-pairs
   exec -with-hooks i
   
   hook window -group surround ModeChange pop:insert:.* %{
-    try disable-auto-pairs
     remove-hooks window surround
     try enable-auto-pairs
   }
