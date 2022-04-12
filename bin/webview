@@ -2,7 +2,7 @@
 
 target=$1
 if [[ -e "$target" ]]; then
-    target="file://$PWD/$target"
+    target="file://$(realpath -s $target)"
 elif [[ ! "$target" =~ ^[a-zA-Z]+:// ]]; then
     target="http://$target"
 fi

@@ -19,6 +19,7 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 #}}}
 
 #{{{ Completion
+fpath+=~/.zfunc
 COMPDUMPCACHEDIR=$ZDOTDIR/.zcompdumpcache/
 if ! (( $+functions[zplug] )); then
     COMPDUMPFILE=$ZDOTDIR/.zcompdump

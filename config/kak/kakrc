@@ -5,6 +5,7 @@ evaluate-commands %sh{
 }
 
 def load-conf -params 1 %{
+  echo -debug "[load-conf] Loading %arg{1}..."
   source "%val{config}/config/%arg{1}.kak"
 }
 
@@ -43,7 +44,7 @@ load-conf windowing
 
 # Plugins ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-cork lib https://github.com/alexherbo2/lib.kak %{
+cork tiny https://github.com/alexherbo2/tiny.kak %{
   make-directory-on-save
 }
 

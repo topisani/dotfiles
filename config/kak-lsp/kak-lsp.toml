@@ -80,7 +80,7 @@ command = "ocamllsp"
 
 [language.python]
 filetypes = ["python"]
-roots = ["requirements.txt", "setup.py", ".git", ".hg"]
+roots = ["requirements.txt", "setup.py", ".git", ".hg", "pyproject.toml"]
 command = "pyright-langserver"
 args = ["--stdio"]
 offset_encoding = "utf-8"

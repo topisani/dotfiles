@@ -62,3 +62,5 @@ if [ -n "$BASH_VERSION" ]; then
 fi
 
 # kak: filetype=sh
+
+export PATH="$HOME/.poetry/bin:$PATH"
