@@ -39,6 +39,8 @@ assist.importGranularity = "item"
 workspace.symbol.search.scope = "workspace_and_dependencies"
 workspace.symbol.search.kind = "all_symbols" # Otherwise: "only_types"
 
+diagnostics.disabled = ["type-mismatch"]
+
 [language.crystal]
 filetypes = ["crystal"]
 roots = ["shard.yml"]
