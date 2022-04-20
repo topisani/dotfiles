@@ -27,8 +27,8 @@ PATH="$HOME/.bin:$HOME/.local/bin:/usr/local/bin:$PATH"
 export PATH
 
 # Kill the GNU
-export CC=/usr/bin/clang
-export CXX=/usr/bin/clang++
+# export CC=/usr/bin/clang
+# export CXX=/usr/bin/clang++
 
 # Global cache for cmake projects using CPM
 export CPM_SOURCE_CACHE=$HOME/.cache/CPM

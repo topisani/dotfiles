@@ -200,6 +200,7 @@ Arguments:
     --switch = set a available colorscheme in xrdb and all terminals
     --reload = reload the current colorscheme
     --terminal = reload the current colorscheme just for the current terminal
+    --gtk = Toggle gtk dark/light theme
     --current = get the name of the current colorscheme
 EOF
 }

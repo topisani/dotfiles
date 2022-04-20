@@ -46,5 +46,3 @@ eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 source <(kitty + complete setup zsh)
 iscmd kubectl && source <(kubectl completion zsh)
-
-export PATH="$HOME/.poetry/bin:$PATH"
