@@ -209,16 +209,12 @@ exec redshift -l 56:10 -m wayland
 exec nm-applet --indicator
 exec screen-layout -d &
 
-
-# Start SWAYR
-# install with cargo install swayr
-exec env RUST_BACKTRACE=1 swayrd > /var/log/swayrd.log 2>&1 &
-
 exec swayidle -w \
      timeout 300 'swaylock -f -c 18191c' \
      timeout 600 'swaymsg "output * dpms off"' \
      resume 'swaymsg "output * dpms on"' \
-     before-sleep 'swaylock -f -c 18191c' &
+     before-sleep 'swaylock -f -c 18191c' \
+     idlehint 600 &
 
 exec_always killall waybar
 exec_always waybar &
