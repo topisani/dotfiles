@@ -41,7 +41,7 @@ face global StatusCursor                $bg,               $fg
 face global Prompt                      $yellow,           default
 face global MatchingChar                                                '+b'
 face global BufferPadding               $bg2,              default
-face global Whitespace                  $bg2,              default      +f
+face global Whitespace                  $bg1,              default      +f
 face global Information                 $fg,               $(alpha $blue_dark 50)@Default
 
 face global GitBlame                    $fg2,              default

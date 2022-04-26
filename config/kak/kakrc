@@ -30,6 +30,11 @@ hook global WinCreate .* %{
 
 # [space] [backspace] [ret]
 map -docstring 'leader' global normal <space> ': enter-user-mode user<ret>'  
+
+# for the kakoune breaking-cleanups branch
+# map -docstring 'remove all sels except main' global normal <backspace> , 
+# map -docstring 'remove main sel' global normal <a-backspace> <a-,> 
+
 map -docstring 'remove all sels except main' global normal <backspace> <space> 
 map -docstring 'remove main sel' global normal <a-backspace> <a-space> 
 
@@ -115,15 +120,19 @@ define-command -override select-highlights -docstring 'select all occurrences of
 
 map -docstring 'lsp...' global normal "'" ': enter-user-mode lsp<ret>'
 
-map -docstring 'Select next whole line' global normal <X> ': select-next-whole-line<ret>'
-define-command -override select-next-whole-line -docstring 'Performs the old <X> command from kakoune' %{
-  try %[
-    execute-keys '<a-k>^.*$<ret>'
-    execute-keys 'Jx'
-  ] catch %[
-    execute-keys 'x'
-  ]
-}
+# for the kakoune breaking-cleanups branch
+# map -docstring 'Select next whole line' global normal <X> ': select-next-whole-line<ret>'
+# define-command -override select-next-whole-line -docstring 'Performs the old <X> command from kakoune' %{
+#   try %[
+#     execute-keys '<a-k>^.*$<ret>'
+#     execute-keys 'Jx'
+#   ] catch %[
+#     execute-keys 'x'
+#   ]
+# }
+
+# Port from breaking-cleanups
+map -docstring "extend selection to whole lines" global normal x <a-x>
 
 # User mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 

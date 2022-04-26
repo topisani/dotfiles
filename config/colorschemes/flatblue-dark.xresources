@@ -1,6 +1,7 @@
 ! special
 *.foreground: #fcfefb
-*.background: #08090c
+! *.background: #08090c
+*.background: #000000
 
 ! black
 *.color0:     #232323

@@ -1,6 +1,7 @@
 # Setup kak-lsp
+
 eval %sh{ kak-lsp --kakoune -s $kak_session --log /tmp/kak-lsp-%val{session}.log }
-set global lsp_cmd "kak-lsp -s %val{session} --log /tmp/kak-lsp-%val{session}.log"
+
 hook -always global KakEnd .* %{ nop %sh{
   rm /tmp/kak-lsp-$kak_session.log
 }}
@@ -8,6 +9,7 @@ hook -always global KakEnd .* %{ nop %sh{
 def lsp-log %{
   eval "edit -scroll -fifo /tmp/kak-lsp-%val[session].log *lsp-log*"
 }
+
 
 lsp-auto-hover-enable
 lsp-auto-signature-help-enable
@@ -76,14 +78,7 @@ filetype-hook (css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml
 filetype-hook rust %{
   lsp-setup
   lsp-enable-semantic-tokens
-  
-  hook window -group lsp-inlay-hints BufReload .* lsp-experimental-inlay-hints
-  hook window -group lsp-inlay-hints NormalIdle .* lsp-experimental-inlay-hints
-  hook window -group lsp-inlay-hints InsertIdle .* lsp-experimental-inlay-hints
-  
-  hook -once -always window WinSetOption filetype=.* %{
-    remove-hooks window rust-inlay-hints
-  }
+  lsp-inlay-hints-enable window
 }
 
 def lsp-enable-semantic-tokens %{

@@ -1,9 +1,11 @@
 # flatblue-dark theme
 
 evaluate-commands %sh{
-    bg0="rgb:000000"
+    # bg0="rgb:000000"
+    bg0="rgb:08090c"
     #bg="rgb:18191c"
-    bg="rgb:08090c"
+    # bg="rgb:08090c"
+    bg="rgb:000000"
     bg1="rgb:1E1F21"
     bg2="rgb:212126"
     bg3="rgb:323037"
