@@ -36,3 +36,4 @@
 ~/.config/qalculate/qalc.cfg;config/qalculate/qalc.cfg
 ~/.ssh/config;home/ssh/config
 ~/.config/fontconfig;config/fontconfig
+~/.config/sov;config/sov

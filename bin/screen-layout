@@ -8,9 +8,9 @@ _layout_office() {
 
 _layout_office_triple_vert() {
   echo "'Dell Inc. DELL U2719D 7NRBS83' 1920 0 270"
-  echo "'Dell Inc. DELL U2719D CNRBS83' 3360 0 90"
-  echo "'Dell Inc. DELL U2719D 5NRBS83' 4800 0 90"
-  echo "eDP-1 0 840"
+  echo "'Dell Inc. DELL U2719D 5NRBS83' 3360 0 90"
+  echo "'Dell Inc. DELL U2719D CNRBS83' 4800 0 90"
+  echo "eDP-1 6240 1480"
 }
 
 _layout_cpi() {
@@ -87,5 +87,5 @@ layout=${1:-auto}
 if [[ " $@ " =~ " -d " ]]; then
   _daemon
 else
-  "_apply_$method" $layout
+  "_layout_$layout" | "_apply_$method"
 fi
