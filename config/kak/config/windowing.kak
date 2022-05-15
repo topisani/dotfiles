@@ -7,6 +7,12 @@ cork tmux https://github.com/alexherbo2/tmux.kak %{
       tmux-autosplit -c "$PWD" "$@"
     }
   }
+  
+  define-command -override tmux-terminal-popup -params .. -docstring 'tmux-terminal-popup [<program>] [<arguments>]: Creates a new terminal as a tmux popup.' %{
+    # TODO: Remove -d flag.
+    tmux_impl display-popup -e "KAKOUNE_SESSION=%val{session}" -e "KAKOUNE_CLIENT=%val{client}" -d %sh{pwd} -E %arg{@}
+  }
+
 }
 
 cork wezterm https://github.com/Anomalocaridid/wezterm.kak
@@ -29,4 +35,5 @@ hook -group tmux-integration global User 'TMUX=(.+?),(.+?),(.+?)' %{
   alias global panel tmux-terminal-panel
   alias global bottom-panel tmux-terminal-bottom-panel
   alias global terminal tmux-terminal-autosplit
+  alias global popup tmux-terminal-popup
 }

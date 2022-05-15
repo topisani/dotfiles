@@ -18,14 +18,14 @@ set global lsp_auto_highlight_references true
 set global lsp_hover_max_lines 20
 set global lsp_hover_anchor false
 
-def -hidden lsp-insert-c-n %{
- try %{
-   lsp-snippets-select-next-placeholders
-   exec '<a-;>d'
- } catch %{
-   exec -with-hooks '<c-n>'
- }
-}
+# def -hidden lsp-insert-c-n %{
+#  try %{
+#    lsp-snippets-select-next-placeholders
+#    exec '<a-;>d'
+#  } catch %{
+#    exec '<c-n>'
+#  }
+# }
 
 # map global lsp R ': lsp-rename-prompt<ret>'                          -docstring 'Rename at point'
 map global lsp n ': lsp-find-error -include-warnings<ret>'           -docstring 'Next diagnostic'
@@ -44,8 +44,16 @@ def lsp-setup %{
 
   lsp-enable-window
   lsp-inlay-diagnostics-enable window
-  
-  map window insert <c-n> "<a-;>: lsp-insert-c-n<ret>"
+
+  hook -group lsp window InsertCompletionShow .* %{
+    unmap window insert <c-n>
+  }
+  hook -group lsp window InsertCompletionHide .* %{
+    map window insert <c-n> '<a-;>: lsp-snippets-select-next-placeholders<ret>'
+  }
+  map window insert <c-n> '<a-;>: lsp-snippets-select-next-placeholders<ret>'
+  map window normal <c-n> ': lsp-snippets-select-next-placeholders<ret>'
+
   #set buffer idle_timeout 250
 }
 
@@ -70,6 +78,10 @@ def -hidden -override lsp-perform-code-action -params .. %{
 def -hidden -override lsp-menu -params .. %{
   connect bottom-panel krc-fzf menu %arg{@}
 }
+
+# def -hidden -override lsp-show-goto-choices -params 2 -docstring "Render goto choices" %{
+#   connect bottom-panel sh -c "echo '%arg{@}' | krc-fzf jump"
+# }
 
 filetype-hook (css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown) %{
   lsp-setup

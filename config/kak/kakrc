@@ -102,6 +102,16 @@ cork kakoune-table https://github.com/listentolist/kakoune-table
 
 cork kakoune-text-objects https://github.com/delapouite/kakoune-text-objects
 
+cork kakoune-interactively https://github.com/chambln/kakoune-interactively %{
+    alias global cd i-change-directory
+    alias global db i-delete-buffer
+    alias global q i-quit
+    alias global w i-write
+    set-option global yes_or_no_instant false
+}
+
+cork pipe.kak https://github.com/alexherbo2/pipe.kak
+
 # Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 map -docstring 'indent' global insert <tab> '<a-;><a-gt>'
