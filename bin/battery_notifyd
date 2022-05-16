@@ -25,7 +25,8 @@ not_id=158283
 # POWER_SUPPLY_SERIAL_NUMBER=123456789
 
 get_bat() {
-    eval $(cat /sys/class/power_supply/BAT*/uevent | grep -P "POWER_SUPPLY_CAPACITY|POWER_SUPPLY_STATUS")
+    POWER_SYPPLY_CAPACITY=$(cat /sys/class/power_supply/BAT*/uevent | grep -P "POWER_SUPPLY_CAPACITY=" | cut -d= -f2)
+    POWER_SYPPLY_STATUS=$(cat /sys/class/power_supply/BAT*/uevent | grep -P "POWER_SUPPLY_STATUS=" | cut -d= -f2)
 }
 
 while true; do

@@ -7,7 +7,7 @@ export QT_SCALE_FACTOR=1
 
 # Use gtk theme for qt
 export QT_QPA_PLATFORMTHEME="qt5ct"
-export QT_QPA_PLATFORMTHEME=gnome
+# export QT_QPA_PLATFORMTHEME=gnome
 
 # Use GTK3 for mullvad - See comments https://aur.archlinux.org/packages/mullvad
 # Needed to fix a wxpython issue
