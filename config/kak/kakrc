@@ -144,6 +144,10 @@ map -docstring 'lsp...' global normal "'" ': enter-user-mode lsp<ret>'
 # Port from breaking-cleanups
 map -docstring "extend selection to whole lines" global normal x <a-x>
 
+def -override bc %{
+  exec "|sed -e '$a\'|bc"
+}
+
 # User mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 map -docstring 'Open terminal' global user <ret> ': connect terminal<ret>'
