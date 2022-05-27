@@ -17,5 +17,7 @@ export XDG_CURRENT_DESKTOP=sway
 export XDG_SESSION_TYPE=wayland
 export MOZ_ENABLE_WAYLAND=1
 
+export BROWSER=firefox
+
 export USING_X11=false
 /usr/bin/sway &> /tmp/sway.log
