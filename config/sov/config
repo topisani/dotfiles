@@ -26,13 +26,13 @@ text_margin_size 7
 text_margin_top_size 4
 
 # title text size
-text_title_size 7
+text_title_size 9
 
 # title text color
 text_title_color #FFFFFFFF
 
 # description text size
-text_description_size 7
+text_description_size 9
 
 # description text color
 text_description_color #999999FF

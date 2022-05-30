@@ -221,7 +221,7 @@ exec_always waybar &
 exec_always screen-layout auto
 
 
-exec_always rm -f /tmp/sovpipe && mkfifo /tmp/sovpipe && tail -f /tmp/sovpipe | sov
+exec_always sh -c "killall sov; rm -f /tmp/sovpipe; mkfifo /tmp/sovpipe && tail -f /tmp/sovpipe | sov"
 
 
 bindsym --no-repeat $mod+1 workspace number 1; exec "echo 1 > /tmp/sovpipe"

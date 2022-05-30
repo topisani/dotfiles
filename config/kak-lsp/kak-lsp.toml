@@ -33,9 +33,9 @@ checkOnSave.allTargets = false
 checkOnSave.extraArgs = [ "--bins" ]
 checkOnSave.command = "clippy"
 # See https://github.com/rust-analyzer/rust-analyzer/issues/6448
-inlayHints.reborrowHints = true
+inlayHints.reborrowHints.enable = true
 inlayHints.lifetimeElisionHints.enable = "skip_trivial"
-assist.importGranularity = "item"
+imports.granularity.group = "item"
 workspace.symbol.search.scope = "workspace_and_dependencies"
 workspace.symbol.search.kind = "all_symbols" # Otherwise: "only_types"
 
