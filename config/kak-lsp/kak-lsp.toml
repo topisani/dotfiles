@@ -28,6 +28,7 @@ settings_section = "rustanalyzer"
 procMacro.enable = true
 cargo.loadOutDirsFromCheck = true
 cargo.runBuildScripts = true
+cargo.features = "all"
 # default settings gives "can't find crate test" for no_std targets
 checkOnSave.allTargets = false
 checkOnSave.extraArgs = [ "--bins" ]
@@ -35,7 +36,7 @@ checkOnSave.command = "clippy"
 # See https://github.com/rust-analyzer/rust-analyzer/issues/6448
 inlayHints.reborrowHints.enable = true
 inlayHints.lifetimeElisionHints.enable = "skip_trivial"
-imports.granularity.group = "item"
+imports.granularity.group = "module"
 workspace.symbol.search.scope = "workspace_and_dependencies"
 workspace.symbol.search.kind = "all_symbols" # Otherwise: "only_types"
 
@@ -84,7 +85,7 @@ command = "ocamllsp"
 [language.python]
 filetypes = ["python"]
 roots = ["requirements.txt", "setup.py", ".git", ".hg", "pyproject.toml"]
-command = "pylsp"
+command = "jedi-language-server"
 offset_encoding = "utf-8"
 
 [language.c_cpp]
