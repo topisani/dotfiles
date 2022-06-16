@@ -50,6 +50,11 @@ _layout_auto() {
   fi
 }
 
+_echorun() {
+  echo "$@"
+  "$@"
+}
+
 _apply_sway() {
   while IFS="" read line; do
     declare -a "arr=($line)"
@@ -58,11 +63,24 @@ _apply_sway() {
     y=${arr[2]}
     trans=${arr[3]:-normal}
     if [[ "$x" == "off" ]]; then
-      echo swaymsg "output '$name' disable"
-      swaymsg "output '$name' disable"
+      _echorun swaymsg "output '$name' disable"
     else
-      echo swaymsg "output '$name' enable pos $x $y transform $trans"
-      swaymsg "output '$name' enable pos $x $y transform $trans"
+      _echorun swaymsg "output '$name' enable pos $x $y transform $trans"
+    fi
+  done
+}
+
+_apply_hyprland() {
+  while IFS="" read line; do
+    declare -a "arr=($line)"
+    name=${arr[0]}
+    x=${arr[1]}
+    y=${arr[2]}
+    trans=${arr[3]:-normal}
+    if [[ "$x" == "off" ]]; then
+      _echorun hyprctl keyword monitor "'$name',"
+    else
+      _echorun swaymsg "output '$name' enable pos $x $y transform $trans"
     fi
   done
 }

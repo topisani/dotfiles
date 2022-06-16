@@ -38,3 +38,4 @@
 ~/.config/fontconfig;config/fontconfig
 ~/.config/sov;config/sov
 ~/.config/mimeapps.list;config/mimeapps.list
+~/.config/hypr;config/hypr

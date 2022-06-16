@@ -1,7 +1,9 @@
 [Added Associations]
 image/gif=firefox.desktop;sxiv.desktop;gimp.desktop;
+application/pdf=org.pwmt.zathura.desktop;
 
 [Default Applications]
+application/pdf=org.pwmt.zathura.desktop;
 text/html=firefox.desktop
 x-scheme-handler/http=firefox.desktop
 x-scheme-handler/https=firefox.desktop
