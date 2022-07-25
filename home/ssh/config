@@ -1,2 +1,28 @@
 AddKeysToAgent yes
+ 
+Host ssh.dev.azure.com
+  IdentitiesOnly yes
+  User git
+  HostkeyAlgorithms +ssh-rsa
+  PubkeyAcceptedAlgorithms +ssh-rsa
+  
+Host umag-as-move
+  Hostname ssh.dev.azure.com
+  IdentitiesOnly yes
+  User git
+  HostkeyAlgorithms +ssh-rsa
+  PubkeyAcceptedAlgorithms +ssh-rsa
 
+Host gitlab-as-move
+  HostName gitlab.com
+  IdentityFile ~/.ssh/id_rsa.topisani-move
+  
+Host gitlab-as-topisani
+  HostName gitlab.com
+  User git
+  IdentityFile ~/.ssh/id_rsa
+  IdentitiesOnly yes
+
+Host gitlab.com
+  IdentityFile ~/.ssh/id_rsa.topisani-move
+  IdentitiesOnly yes

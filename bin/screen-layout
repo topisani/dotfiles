@@ -78,7 +78,7 @@ _apply_hyprland() {
     y=${arr[2]}
     trans=${arr[3]:-normal}
     if [[ "$x" == "off" ]]; then
-      _echorun hyprctl keyword monitor "'$name',"
+      _echorun hyprctl keyword monitor "'$name',disable"
     else
       _echorun swaymsg "output '$name' enable pos $x $y transform $trans"
     fi

@@ -28,7 +28,7 @@ settings_section = "rustanalyzer"
 procMacro.enable = true
 cargo.loadOutDirsFromCheck = true
 cargo.runBuildScripts = true
-cargo.features = "all"
+# cargo.features = "all"
 # default settings gives "can't find crate test" for no_std targets
 checkOnSave.allTargets = false
 checkOnSave.extraArgs = [ "--bins" ]
