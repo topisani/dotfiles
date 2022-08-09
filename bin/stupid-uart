@@ -2,7 +2,7 @@
 
 if [ "$#" -lt "1" ]; then
   echo "Stupid serial communication."
-  echo "Sets baudrate, outputs from device, sends lines from stdin."
+  echo "Sets baudrate, outputs from device, sends lines from stdin. Thats it."
   echo ""
   echo "Usage: stupid-uart <device> [baudrate]"
   echo ""
@@ -18,11 +18,15 @@ trap "exit" INT TERM
 trap "kill 0" EXIT
 
 stty $BAUDRATE -F $DEVICE
+
+echo ""
+
 cat $DEVICE | while read line; do
-  # printf "\033[94m"
+  printf "\033[s" # Save cursor
+  printf "\033[0G" # Go to column 0
   tput setaf 12
-  printf "%s" "$line"
+  printf "%s\n" "$line"
   tput sgr0
-  echo
+  printf "\033[u" # Restore cursor
 done &
 cat >> $DEVICE
