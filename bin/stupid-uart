@@ -1,0 +1,28 @@
+#!/bin/sh
+
+if [ "$#" -lt "1" ]; then
+  echo "Stupid serial communication."
+  echo "Sets baudrate, outputs from device, sends lines from stdin."
+  echo ""
+  echo "Usage: stupid-uart <device> [baudrate]"
+  echo ""
+  echo "  <device>  : device path, fx: /dev/ttyUSB0"
+  echo "  <baudrate>: baudrate, defaults to 115200"
+  exit 1
+fi
+
+DEVICE=${1}
+BAUDRATE=${2:-115200}
+
+trap "exit" INT TERM
+trap "kill 0" EXIT
+
+stty $BAUDRATE -F $DEVICE
+cat $DEVICE | while read line; do
+  # printf "\033[94m"
+  tput setaf 12
+  printf "%s" "$line"
+  tput sgr0
+  echo
+done &
+cat >> $DEVICE
