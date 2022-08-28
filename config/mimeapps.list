@@ -1,11 +1,16 @@
 [Added Associations]
 image/gif=firefox.desktop;sxiv.desktop;gimp.desktop;
 application/pdf=org.pwmt.zathura.desktop;
+x-scheme-handler/mailto=userapp-Thunderbird-0XNXN1.desktop;
+x-scheme-handler/mid=userapp-Thunderbird-0XNXN1.desktop;
 
 [Default Applications]
 application/pdf=org.pwmt.zathura.desktop;
+message/rfc822=userapp-Thunderbird-0XNXN1.desktop
 text/html=firefox.desktop
+x-scheme-handler/about=firefox.desktop
 x-scheme-handler/http=firefox.desktop
 x-scheme-handler/https=firefox.desktop
-x-scheme-handler/about=firefox.desktop
+x-scheme-handler/mailto=userapp-Thunderbird-0XNXN1.desktop
+x-scheme-handler/mid=userapp-Thunderbird-0XNXN1.desktop
 x-scheme-handler/unknown=firefox.desktop
