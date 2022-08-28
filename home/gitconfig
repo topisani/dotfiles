@@ -42,3 +42,8 @@
 	defaultBranch = main
 [push]
 	autoSetupRemote = true
+
+# [url "git@ssh.dev.azure.com:"]
+# 	insteadOf = https://UMagSolutions@dev.azure.com/
+[push]
+	default = current

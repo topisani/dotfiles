@@ -151,7 +151,7 @@ update_gtk() {
 toggle_gtk_dark() {
     gtk_theme="Matcha-light-azul"
     icon_theme="Papirus-Light"
-    if gsettings get org.gnome.desktop.interface gtk-theme | grep "$gtk_theme"; then
+    if gsettings get org.gnome.desktop.interface gtk-theme | grep "'$gtk_theme'"; then
         gtk_theme="Matcha-dark-azul"
         icon_theme="Papirus-Dark"
     fi

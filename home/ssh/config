@@ -13,16 +13,14 @@ Host umag-as-move
   HostkeyAlgorithms +ssh-rsa
   PubkeyAcceptedAlgorithms +ssh-rsa
 
-Host gitlab-as-move
-  HostName gitlab.com
-  IdentityFile ~/.ssh/id_rsa.topisani-move
-  
 Host gitlab-as-topisani
   HostName gitlab.com
   User git
   IdentityFile ~/.ssh/id_rsa
   IdentitiesOnly yes
-
-Host gitlab.com
+  
+Host gitlab-as-move
+  User git
+  Hostname gitlab.com
+  IdentitiesOnly true
   IdentityFile ~/.ssh/id_rsa.topisani-move
-  IdentitiesOnly yes

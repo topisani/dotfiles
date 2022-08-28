@@ -63,10 +63,10 @@ face global comment                     $gray,             default       +i
 face global identifier                  $yellow_dark,      default
 face global annotation                  $gray,             default
 
-face global DiagnosticWarning           default, default,  $yellow       +c
-face global DiagnosticError             default, default,  $red          +c
-face global DiagnosticInfo              default, default,  $green        +c
-face global DiagnosticHint              default, default,  $gray         +c
+face global DiagnosticWarning           default, default,  $yellow       +ca
+face global DiagnosticError             default, default,  $red          +ca
+face global DiagnosticInfo              default, default,  $green        +ca
+face global DiagnosticHint              default, default,  $gray         +ca
 face global LineFlagError               $red,              default       +b
 face global LineFlagWarning             $yellow,           default       +b
 face global LineFlagInfo                $green,            default       +b
@@ -83,14 +83,14 @@ face global PrimarySelectionSearch      $fg,               $blue
 face global SearchBackground            $gray,              default
 face global SearchOccurrence            $fg,               default      +ib
 
-face global SnippetsOtherPlaceholders   default, $(alpha $green 40)
-face global SnippetsNextPlaceholders    default, $(alpha $green A0)
+face global SnippetsOtherPlaceholders   default, $(alpha $green 20)
+face global SnippetsNextPlaceholders    default, $(alpha $green 40)
 
 # kakoune-focus
 face global FocusMarker                 $bg3,                           +fa
 
 # Lsp
-face global InlayHint     $blue_dark+i
+face global InlayHint     $blue_dark+iF
 
 face global memberFunction '+i@function'
 face global cppConcept     '+i@type'
@@ -114,10 +114,10 @@ face global InfoDiagnosticHint        $gray@InfoDefault
 face global InfoDiagnosticInformation $green@InfoDefault
 face global InfoDiagnosticWarning     $yellow@InfoDefault
 
-face global InlayDiagnosticWarning           $yellow       +d
-face global InlayDiagnosticError             $red          +d
-face global InlayDiagnosticInfo              $green        +d
-face global InlayDiagnosticHint              $gray         +d
+face global InlayDiagnosticWarning           $yellow       +dF
+face global InlayDiagnosticError             $red          +dF
+face global InlayDiagnosticInfo              $green        +dF
+face global InlayDiagnosticHint              $gray         +dF
 
 decl str lsp_diagnostic_line_error_sign
 decl str lsp_diagnostic_line_warning_sign

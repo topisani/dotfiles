@@ -28,6 +28,12 @@ _layout_home() {
   echo "eDP-1 960 2160"
 }
 
+_layout_umag() {
+  echo "'Unknown MSI G241 0x000004CE' 0 0 270"
+  echo "'Unknown MSI G241 0x000004E1' 1080 0 90"
+  echo "eDP-1 120 1920"
+}
+
 _layout_auto() {
   serials=$(swaymsg -t get_outputs | jq '.[].serial')
   layout=$(
@@ -37,6 +43,8 @@ _layout_auto() {
       _layout_cpi
     elif echo "$serials" | grep 0x00000101 -q; then
       _layout_home
+    elif echo "$serials" | grep 0x000004CE -q; then
+      _layout_umag
     else
       _layout_single
     fi
