@@ -17,7 +17,7 @@ BAUDRATE=${2:-115200}
 trap "exit" INT TERM
 trap "kill 0" EXIT
 
-stty $BAUDRATE -F $DEVICE
+stty -echo $BAUDRATE -F $DEVICE
 
 echo ""
 
@@ -25,8 +25,9 @@ cat $DEVICE | while read line; do
   printf "\033[s" # Save cursor
   printf "\033[0G" # Go to column 0
   tput setaf 12
-  printf "%s\n" "$line"
+  printf "%s" "$line"
   tput sgr0
   printf "\033[u" # Restore cursor
+  echo ""
 done &
 cat >> $DEVICE
