@@ -131,18 +131,21 @@ define-command -override select-highlights -docstring 'select all occurrences of
 map -docstring 'lsp...' global normal "'" ': enter-user-mode lsp<ret>'
 
 # for the kakoune breaking-cleanups branch
-# map -docstring 'Select next whole line' global normal <X> ': select-next-whole-line<ret>'
-# define-command -override select-next-whole-line -docstring 'Performs the old <X> command from kakoune' %{
-#   try %[
-#     execute-keys '<a-k>^.*$<ret>'
-#     execute-keys 'Jx'
-#   ] catch %[
-#     execute-keys 'x'
-#   ]
-# }
+map -docstring 'Select next whole line' global normal <X> ': select-next-whole-line<ret>'
+define-command -override select-next-whole-line -docstring 'Performs the old <X> command from kakoune' %{
+  try %[
+    execute-keys '<a-k>^.*$<ret>'
+    execute-keys 'Jx'
+  ] catch %[
+    execute-keys 'x'
+  ]
+}
+
+map global normal <backspace> ,
+map global normal <a-backspace> <a-,>
 
 # Port from breaking-cleanups
-map -docstring "extend selection to whole lines" global normal x <a-x>
+# map -docstring "extend selection to whole lines" global normal x <a-x>
 
 def -override bc %{
   exec "|sed -e '$a\'|bc<ret>"

@@ -204,6 +204,10 @@ _main() {
     install | add | remove | list | git | push | pull)
       _$cmd "$@"
       ;;
+    shell)
+      cd "$DOTFILES_FOLDER"
+      $SHELL
+      ;;
     *)
       _usage
       exit 1
