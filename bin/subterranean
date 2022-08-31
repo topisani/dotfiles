@@ -131,6 +131,7 @@ _remove() {
 }
 
 _install() {
+  skip_existing=${1:false}
   while read line; do
     local slpath=$(echo "$line" | cut -d';' -f1)
     local dfpathrel=$(echo "$line" | cut -d';' -f2)
@@ -139,7 +140,7 @@ _install() {
     if [[ -e "$slpath" ]] || [[ -L "$slpath" ]]; then
       local linkpath=$(readlink -f "$slpath") targetpath=$(realpath "$slpath")
       if [[ -L "$slpath" ]] && [[ "$linkpath" == "$targetpath" ]]; then
-        _submsg "Symlink $(_format_path $slpath) -> $(_format_path $dfpath) already exists"
+        $skip_existing || _submsg "Symlink $(_format_path $slpath) -> $(_format_path $dfpath) already exists"
       else 
         _suberr "Not overwriting existing file at '$(_format_path $slpath)'"
       fi
@@ -187,6 +188,7 @@ _pull() {
   _msg "Updating git repository"
   _git pull
   _msg "Installing new files"
+  _install true
   _msg "Done"
 }
 
