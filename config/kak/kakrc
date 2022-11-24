@@ -141,15 +141,17 @@ define-command -override select-next-whole-line -docstring 'Performs the old <X>
   ]
 }
 
+# Move comma (remove selections) to backspace
 map global normal <backspace> ,
 map global normal <a-backspace> <a-,>
-
-# Port from breaking-cleanups
-# map -docstring "extend selection to whole lines" global normal x <a-x>
 
 def -override bc %{
   exec "|sed -e '$a\'|bc<ret>"
 }
+
+# Map 0 to :
+map global normal 0 %{:zero 'exec :'<ret>}
+def zero -hidden -params 1 %{ eval %sh{[ "$kak_count" -eq 0 ] && echo "$1" || echo "exec '${kak_count}0'"} }
 
 # User mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
@@ -181,7 +183,7 @@ set-option global grepcmd 'rg -Hn --no-heading'
 
 load-conf lsp
 load-conf c++
-
+load-conf rust
 
 load-conf ide
 ide-setup
@@ -197,6 +199,10 @@ hook global BufCreate .*\.conf %{
 
 hook global BufCreate .*Makefile\..* %{
   set buffer filetype makefile
+}
+
+hook global BufCreate .*\.yuck %{
+  set buffer filetype lisp
 }
 
 # ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈

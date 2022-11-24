@@ -23,7 +23,7 @@ _layout_single() {
   echo "eDP-1 0 0"
 }
 
-_layout_home() {
+_layout_tv() {
   echo "'Philips Consumer Electronics Company Philips FTV 0x00000101' 0 0"
   echo "eDP-1 960 2160"
 }
@@ -76,6 +76,9 @@ _apply_sway() {
       _echorun swaymsg "output '$name' enable pos $x $y transform $trans"
     fi
   done
+  
+  # Set scale of display at home
+  _echorun swaymsg "output 'Dell Inc. DELL S2721QS CH3CM43' scale 1.25"
 }
 
 _apply_hyprland() {

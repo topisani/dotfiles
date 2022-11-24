@@ -38,7 +38,7 @@ checkOnSave.command = "clippy"
 inlayHints.reborrowHints.enable = true
 inlayHints.lifetimeElisionHints.enable = "skip_trivial"
 imports.granularity.group = "item"
-workspace.symbol.search.scope = "workspace_and_dependencies"
+workspace.symbol.search.scope = "workspace"
 workspace.symbol.search.kind = "all_symbols" # Otherwise: "only_types"
 
 # These can fail on try blocks and similar syntax that is not implemented in RA

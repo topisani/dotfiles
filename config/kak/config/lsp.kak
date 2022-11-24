@@ -44,6 +44,7 @@ def lsp-setup %{
 
   lsp-enable-window
   lsp-inlay-diagnostics-enable window
+  lsp-inlay-code-lenses-enable window
 
   hook -group lsp window InsertCompletionShow .* %{
     unmap window insert <c-n>
@@ -53,6 +54,14 @@ def lsp-setup %{
   }
   map window insert <c-n> '<a-;>: lsp-snippets-select-next-placeholders<ret>'
   map window normal <c-n> ': lsp-snippets-select-next-placeholders<ret>'
+  
+  map window object a '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
+  map window object <a-a> '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
+  map window object e '<a-semicolon>lsp-object Function Method<ret>' -docstring 'LSP function or method'
+  map window object k '<a-semicolon>lsp-object Class Interface Struct<ret>' -docstring 'LSP class interface or struct'
+  map window object d '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>' -docstring 'LSP errors and warnings'
+  map window object D '<a-semicolon>lsp-diagnostic-object<ret>' -docstring 'LSP errors'
+ 
 
   #set buffer idle_timeout 250
 }
@@ -85,12 +94,6 @@ def -hidden -override lsp-menu -params .. %{
 
 filetype-hook (css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown) %{
   lsp-setup
-}
-
-filetype-hook rust %{
-  lsp-setup
-  lsp-enable-semantic-tokens
-  lsp-inlay-hints-enable window
 }
 
 def lsp-enable-semantic-tokens %{

@@ -32,7 +32,7 @@
 	difftool = true
 
 [interactive]
-  diffFilter = (echo && diff-so-fancy)
+  diffFilter = (diff-so-fancy --patch)
 [pull]
 	rebase = true
 

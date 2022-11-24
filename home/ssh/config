@@ -1,4 +1,5 @@
 AddKeysToAgent yes
+SendEnv LANG LC_*
  
 Host ssh.dev.azure.com
   IdentitiesOnly yes
