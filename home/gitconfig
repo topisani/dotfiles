@@ -39,11 +39,18 @@
 # [url "git@github.com:"]
 # 	insteadOf = https://github.com/
 [init]
-	defaultBranch = main
+	defaultBranch = master
 [push]
 	autoSetupRemote = true
 
-# [url "git@ssh.dev.azure.com:"]
-# 	insteadOf = https://UMagSolutions@dev.azure.com/
+[url "git@ssh.dev.azure.com:"]
+	insteadOf = https://UMagSolutions@dev.azure.com/
+	
+[url "gitlab-as-move:move-innovation/"]
+	insteadOf = https://gitlab.com/move-innovation/
+	
+[url "gitlab-as-move:move-innovation/"]
+	insteadOf = git@gitlab.com:move-innovation/
+	
 [push]
 	default = current
