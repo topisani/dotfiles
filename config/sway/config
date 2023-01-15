@@ -184,6 +184,8 @@ client.background       #18191c
 #
 # Rules
 for_window [app_id="pavucontrol"] floating enable
+for_window [class="OTTO Emulator"] floating enable
+for_window [class="OTTO"] floating enable
 # Custom app_id for foating
 for_window [app_id="floating"] floating enable
 

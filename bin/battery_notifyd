@@ -32,7 +32,6 @@ get_bat() {
 while true; do
     get_bat
     sl=60
-   
     if [ "$POWER_SUPPLY_CAPACITY" -lt 16 ] && [ "$POWER_SUPPLY_STATUS" != "Charging" ]; then
         dunstify -u 2 -i battery-empty-symbolic "Battery Low!" "$POWER_SUPPLY_CAPACITY%" -r $not_id
     else

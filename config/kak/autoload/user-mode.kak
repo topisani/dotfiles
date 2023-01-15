@@ -15,21 +15,21 @@ define-command file-delete -docstring "Delete current file" -override %{
 }
 
 declare-user-mode files
-map global user  f ': enter-user-mode files<ret>'                 -docstring 'Files...'
-map global files f ': connect bottom-panel krc-fzf files<ret>'    -docstring 'List files'
-map global files F ': connect bottom-panel krc-fzf files -uuu<ret>'    -docstring 'List files (including hidden)'
-map global files r ": connect popup ranger<ret>"                  -docstring 'Ranger'
-map global files w ': write<ret>'                                 -docstring 'Write file' 
-map global files c ": connect bottom-panel krc-fzf files %val{config}<ret>"               -docstring 'Open config dir'
-map global files d ': file-delete<ret>'                           -docstring 'Delete current file'
+map global user  f ': enter-user-mode files<ret>'                            -docstring 'Files...'
+map global files f ': connect bottom-panel krc-fzf files<ret>'               -docstring 'List files'
+map global files F ': connect bottom-panel krc-fzf files -uuu<ret>'          -docstring 'List files (including hidden)'
+map global files r ": connect popup ranger<ret>"                             -docstring 'Ranger'
+map global files w ': write<ret>'                                            -docstring 'Write file' 
+map global files c ": connect bottom-panel krc-fzf files %val{config}<ret>"  -docstring 'Open config dir'
+map global files d ': file-delete<ret>'                                      -docstring 'Delete current file'
 
 declare-user-mode buffers
-map global user b    ': enter-user-mode buffers<ret>'  -docstring 'Buffers...'
-map global buffers b ': connect bottom-panel krc-fzf buffers<ret>'               -docstring "List Buffers" 
-map global buffers n ': buffer-next<ret>'              -docstring "Next Buffer" 
-map global buffers p ': buffer-previous<ret>'          -docstring "Prev buffer" 
-map global buffers d ': delete-buffer<ret>'            -docstring "Delete buffer"
-map global buffers u ': buffer *debug*<ret>'           -docstring "Debug buffer"
+map global user b    ': enter-user-mode buffers<ret>'               -docstring 'Buffers...'
+map global buffers b ': connect bottom-panel krc-fzf buffers<ret>'  -docstring "List Buffers" 
+map global buffers n ': buffer-next<ret>'                           -docstring "Next Buffer" 
+map global buffers p ': buffer-previous<ret>'                       -docstring "Prev buffer" 
+map global buffers d ': delete-buffer<ret>'                         -docstring "Delete buffer"
+map global buffers u ': buffer *debug*<ret>'                        -docstring "Debug buffer"
 
 def tmux-new-vertical -params .. -command-completion %{
   tmux-terminal-vertical kak -c %val{session} -e "%arg{@}"
