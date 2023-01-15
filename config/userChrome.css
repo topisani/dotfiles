@@ -50,39 +50,14 @@
 
 #titlebar{ -moz-appearance: none !important; }
 #TabsToolbar{
-  min-height: 0px !important;
   transition: all 250ms;
 }
 
-#tabbrowser-tabs, #tabbrowser-tabs > .tabbrowser-arrowscrollbox, #tabbrowser-arrowscrollbox{ min-height: 0 !important; }
-
-:root:not([customizing]) #tabbrowser-tabs .tabs-newtab-button,
-:root:not([customizing]) #tabs-newtab-button,
-:root:not([customizing]) #TabsToolbar-customization-target > .toolbarbutton-1,
-:root:not([customizing]) #TabsToolbar .titlebar-button{
-  -moz-appearance: none !important;
-  height: 0px;
-  padding-top: 0px !important;
-  padding-bottom: 0px !important;
-  -moz-box-align: stretch;
-  margin: 0 !important;
-}
-
-.accessibility-indicator,
-.private-browsing-indicator{ 
-  height: unset !important;
-}
-.accessibility-indicator > hbox{ padding-block: 0 !important }
-
 #tabbrowser-tabs .tabbrowser-tab{ height: calc(var(--tab-min-height) + 2 * var(--tab-block-margin,0px)) }
 
-#tabbrowser-tabs .tabbrowser-tab[first-visible-tab="true"][last-visible-tab="true"] {
-  visibility: collapse !important;
-}
-
 /* Requires layout.css.has-selector.enabled in about:config */
-#TabsToolbar:has(.tabbrowser-tab[first-visible-tab="true"][last-visible-tab="true"]) {
-  visibility: collapse !important;
+#TabsToolbar:has(#tabbrowser-tabs .tabbrowser-tab[first-visible-tab="true"][last-visible-tab="true"]) {
+  visibility: none !important;
 }
 
 /* Button re-styling */

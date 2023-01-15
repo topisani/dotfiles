@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Use podman instead of docker
+podman "$@"
