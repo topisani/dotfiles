@@ -40,3 +40,4 @@
 ~/.config/mimeapps.list;config/mimeapps.list
 ~/.config/hypr;config/hypr
 ~/.config/xdg-desktop-portal-wlr;config/xdg-desktop-portal-wlr
+~/.config/alacritty;config/alacritty

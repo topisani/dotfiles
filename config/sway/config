@@ -55,8 +55,7 @@ smart_gaps on
 #
 # Basics:
 bindsym $mod+Return exec $term
-bindsym $mod+Shift+Return exec kitty -c ~/.config/kitty/kitty.conf -c ~/.config/kitty/leader.conf
-bindsym $mod+Mod1+Return exec kitty -c ~/.config/kitty/kitty.conf
+bindsym $mod+Shift+Return exec alacritty
 bindsym $mod+Shift+c exec colorscheme-switch
 bindsym $mod+Ctrl+c exec colorscheme-switch -g
 bindsym $mod+c exec kitty --class="floating" -o window_padding_width=4 -o initial_window_width=400 -o initial_window_height=200 qalc
@@ -66,12 +65,6 @@ bindsym $mod+q kill
 
 # start your launcher
 bindsym $mod+Space exec $menu
-# swayr
-bindsym $mod+Shift+Space exec swayr switch-window
-bindsym $mod+Delete exec swayr quit-window
-bindsym Mod1+Tab exec swayr switch-to-urgent-or-lru-window
-bindsym $mod+Next exec swayr next-window
-bindsym $mod+Prior exec swayr prev-window
 
 # reload the configuration file
 bindsym $mod+Shift+r reload
@@ -202,14 +195,14 @@ for_window [urgent=latest] focus
 exec xrdb -load ~/.Xresources
 exec pkill dunst
 exec battery_notifyd
-exec $scripts/autotile
+# exec $scripts/autotile
 exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec pkill xdg-desktop-portal
 # exec /usr/lib/xdg-desktop-portal -r 
 # exec /usr/lib/xdg-desktop-portal-wlr
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
 
-exec redshift -l 56:10 -m wayland
+# exec redshift -l 56:10 -m wayland
 exec nm-applet --indicator
 exec screen-layout -d &
 
