@@ -8,8 +8,8 @@
 #
 # All imports must either be absolute paths starting with `/`, or paths relative
 # to the user's home directory starting with `~/`.
-#import:
-#  - /path/to/alacritty.yml
+import:
+  - ~/.config/alacritty/theme.yml
 
 # Any items in the `env` entry below will be added as
 # environment variables. Some entries may override variables
@@ -187,9 +187,9 @@ font:
 # Colors (Tomorrow Night)
 colors:
   # Default colors
-  primary:
-    background: '#000000'
-    foreground: '#fcfefb'
+  # primary:
+  #   background: '#000000'
+  #   foreground: '#fcfefb'
 
     # Bright and dim foreground colors
     #
@@ -281,26 +281,26 @@ colors:
   #  background: CellForeground
 
   # Normal colors
-  normal:
-    black:   '#232323'
-    red:     '#d92817'
-    green:   '#3e871e'
-    yellow:  '#f39c12'
-    blue:    '#005973'
-    magenta: '#7e3661'
-    cyan:    '#249991'
-    white:   '#d9d7cc'
+  # normal:
+  #   black:   '#232323'
+  #   red:     '#d92817'
+  #   green:   '#3e871e'
+  #   yellow:  '#f39c12'
+  #   blue:    '#005973'
+  #   magenta: '#7e3661'
+  #   cyan:    '#249991'
+  #   white:   '#d9d7cc'
 
   # Bright colors
-  bright:
-    black:   '#828087'
-    red:     '#ff6350'
-    green:   '#71ba51'
-    yellow:  '#f2bb13'
-    blue:    '#178ca6'
-    magenta: '#ff465a'
-    cyan:    '#67c5b4'
-    white:   '#fcfefb'
+  # bright:
+  #   black:   '#828087'
+  #   red:     '#ff6350'
+  #   green:   '#71ba51'
+  #   yellow:  '#f2bb13'
+  #   blue:    '#178ca6'
+  #   magenta: '#ff465a'
+  #   cyan:    '#67c5b4'
+  #   white:   '#fcfefb'
 
   # Dim colors
   #
