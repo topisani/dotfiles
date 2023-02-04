@@ -46,7 +46,7 @@ function mkcd {
 
 alias st=subterranean
 
-export EDITOR='kak'
+export EDITOR='nvim'
 export FZF_DEFAULT_OPTS='--multi --layout=reverse --preview-window=down:60% --color=16'
 
 # Change the current directory for a tmux session, which determines
