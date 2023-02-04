@@ -46,5 +46,4 @@ alias ssh="TERM=xterm-256color ssh"
 
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
-iscmd kitty && source <(kitty + complete setup zsh)
 iscmd kubectl && source <(kubectl completion zsh)
