@@ -298,6 +298,12 @@ local theme = lush(function(injected_functions)
     TelescopeBorder({ fg = c.blue_dark.mix(c.bg, 30), bg = c.bg_float }),
     TelescopeNormal({ fg = c.fg, bg = c.bg_float }),
 
+    -- Leap
+    LeapMatch({ bg = c.purple, fg = c.bg }),
+    LeapLabelPrimary({ fg = c.purple, bold = true }),
+    LeapLabelSecondary({ fg = c.green, bold = true }),
+    LeapBackdrop({ fg = c.blue_dark }),
+
     -- Alpha
     AlphaShortcut({ fg = c.orange }),
     AlphaHeader({ fg = c.blue }),

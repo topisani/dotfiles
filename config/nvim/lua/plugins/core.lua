@@ -78,9 +78,7 @@ return {
     config = true,
   },
 
-  {
-    "mg979/vim-visual-multi",
-  },
+  { "mg979/vim-visual-multi" },
 
   -- add pyright to lspconfig
   {
@@ -102,17 +100,18 @@ return {
   -- add more treesitter parsers
   {
     "nvim-treesitter/nvim-treesitter",
-    opts = {
-      ensure_installed = {},
-    },
-  },
-
-  -- since `vim.tbl_deep_extend`, can only merge tables and not lists, the code above
-  -- would overwrite `ensure_installed` with the new value.
-  -- If you'd rather extend the default config, use the code below instead:
-  {
-    "nvim-treesitter/nvim-treesitter",
     opts = function(_, opts)
+      opts = vim.tbl_deep_extend("force", opts, {
+        incremental_selection = {
+          enable = true,
+          keymaps = {
+            init_selection = "<C-e>",
+            node_incremental = "<C-e>",
+            scope_incremental = "<nop>",
+            node_decremental = "<bs>",
+          },
+        },
+      })
       -- add tsx and treesitter
       vim.list_extend(opts.ensure_installed, {
         "bash",
@@ -138,11 +137,6 @@ return {
 
   {
     "folke/zen-mode.nvim",
-    init = function()
-      require("zen-mode").setup({
-        --
-      })
-    end,
     keys = {
       {
         "<leader>z",
@@ -154,11 +148,48 @@ return {
   },
   {
     "folke/twilight.nvim",
-    init = function()
-      require("zen-mode").setup({
-        --
+    lazy = true,
+    cmd = { "Twilight", "TwilightEnable", "TwilightDisable" },
+  },
+
+  {
+    "TimUntersberger/neogit",
+    cmd = { "Neogit" },
+    lazy = true,
+    keys = {
+      { "<leader>gg", "<cmd>Neogit<CR>", desc = "Neogit" },
+    },
+  },
+
+  {
+    "glepnir/lspsaga.nvim",
+    dependencies = { { "nvim-tree/nvim-web-devicons" } },
+    cmd = { "Lspsaga" },
+    config = function()
+      require("lspsaga").setup({
+        symbol_in_winbar = {
+          enable = false,
+        },
+
+        ui = {
+          -- Currently, only the round theme exists
+          title = true,
+          winblend = 0,
+          expand = "",
+          collapse = "",
+          preview = " ",
+          code_action = "",
+          diagnostic = "",
+          incoming = " ",
+          outgoing = " ",
+          hover = " ",
+        },
       })
     end,
+    keys = {
+      { "gj", "<cmd>Lspsaga lsp_finder<CR>", desc = "LSP Jump" },
+      { "<leader>ca", "<cmd>Lspsaga code_actions<CR>", desc = "LSP Code actions" },
+    },
   },
 
   -- add jsonls and schemastore ans setup treesitter for json, json5 and jsonc
@@ -214,6 +245,13 @@ return {
         end, { "i", "s" }),
       })
     end,
+  },
+
+  {
+    "ggandor/leap.nvim",
+    opts = {
+      highlight_unlabeled_phase_one_targets = true,
+    },
   },
 
   {
