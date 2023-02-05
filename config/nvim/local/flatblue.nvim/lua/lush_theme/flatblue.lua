@@ -79,21 +79,21 @@ local theme = lush(function(injected_functions)
     -- See :h highlight-groups
     --
     -- ColorColumn  { }, -- Columns set with 'colorcolumn'
-    -- Conceal      { }, -- Placeholder characters substituted for concealed text (see 'conceallevel')
+    Conceal({ fg = c.fg3 }), -- Placeholder characters substituted for concealed text (see 'conceallevel')
     Cursor({}), -- Character under the cursor
     -- lCursor      { }, -- Character under the cursor when |language-mapping| is used (see 'guicursor')
     -- CursorIM     { }, -- Like Cursor, but used when in IME mode |CursorIM|
     CursorColumn({ bg = c.bg1 }), -- Screen-column at the cursor, when 'cursorcolumn' is set.
     CursorLine({ bg = c.bg1 }), -- Screen-line at the cursor, when 'cursorline' is set. Low-priority if foreground (ctermfg OR guifg) is not set.
     Directory({ fg = c.blue, gui = "bold" }), -- Directory names (and other special names in listings)
-    DiffAdd({ fg = c.green.mix(c.bg, 50) }), -- Diff mode: Added line |diff.txt|
-    DiffChange({ fg = c.blue.mix(c.bg, 50) }), -- Diff mode: Changed line |diff.txt|
+    DiffAdd({ fg = c.green.mix(c.bg, 20) }), -- Diff mode: Added line |diff.txt|
+    DiffChange({ fg = c.blue.mix(c.bg, 20) }), -- Diff mode: Changed line |diff.txt|
     DiffDelete({ fg = c.red }), -- Diff mode: Deleted line |diff.txt|
     DiffText({ fg = c.red }), -- Diff mode: Changed text within a changed line |diff.txt|
     EndOfBuffer({ fg = c.bg }), -- Filler lines (~) after the end of the buffer. By default, this is highlighted like |hl-NonText|.
     -- TermCursor   { }, -- Cursor in a focused terminal
     -- TermCursorNC { }, -- Cursor in an unfocused terminal
-    -- ErrorMsg     { }, -- Error messages on the command line
+    ErrorMsg({ fg = c.red }), -- Error messages on the command line
     VertSplit({ fg = c.bg2 }), -- Column separating vertically split windows
     Folded({ bg = colors.bg2, gui = "italic" }), -- Line used for closed folds
     FoldColumn({ bg = colors.bg1, gui = "italic" }), -- 'foldcolumn'
@@ -124,14 +124,14 @@ local theme = lush(function(injected_functions)
     -- SpellLocal   { }, -- Word that is recognized by the spellchecker as one that is used in another region. |spell| Combined with the highlighting used otherwise.
     -- SpellRare    { }, -- Word that is recognized by the spellchecker as one that is hardly ever used. |spell| Combined with the highlighting used otherwise.
     -- StatusLine   { }, -- Status line of current window
-    -- StatusLineNC { }, -- Status lines of not-current windows. Note: If this is equal to "StatusLine" Vim will use "^^^" in the status line of the current window.
-    -- TabLine      { }, -- Tab pages line, not active tab page label
-    -- TabLineFill  { }, -- Tab pages line, where there are no labels
-    -- TabLineSel   { }, -- Tab pages line, active tab page label
+    -- StatusLineNC({}), -- Status lines of not-current windows. Note: If this is equal to "StatusLine" Vim will use "^^^" in the status line of the current window.
+    TabLine({ fg = c.fg }), -- Tab pages line, not active tab page label
+    TabLineFill({ fg = c.fg }), -- Tab pages line, where there are no labels
+    TabLineSel({ fg = c.bg3, gui = "bold" }), -- Tab pages line, active tab page label
     Title({ fg = c.green, gui = "bold" }), -- Titles for output from ":set all", ":autocmd" etc.
     Visual({ bg = c.blue_dark.mix(c.bg, 40) }), -- Visual mode selection
     VisualNOS({ Visual }), -- Visual mode selection when vim is "Not Owning the Selection".
-    -- WarningMsg   { }, -- Warning messages
+    WarningMsg({ fg = c.yellow }), -- Warning messages
     Whitespace({ fg = c.bg3 }), -- "nbsp", "space", "tab" and "trail" in 'listchars'
     Winseparator({ VertSplit }), -- Separator between window splits. Inherts from |hl-VertSplit| by default, which it will replace eventually.
     -- WildMenu     { }, -- Current match in 'wildmenu' completion
@@ -146,12 +146,12 @@ local theme = lush(function(injected_functions)
 
     Comment({ fg = c.gray, gui = "italic" }), -- Any comment
 
-    Constant({ fg = c.purple }), -- (*) Any constant
+    Constant({ fg = c.aqua_dark }), -- (*) Any constant
     String({ fg = c.green }), --   A string constant: "this is a string"
     -- Character      { }, --   A character constant: 'c', '\n'
-    -- Number         { }, --   A number constant: 234, 0xff
-    -- Boolean        { }, --   A boolean constant: TRUE, false
-    -- Float          { }, --   A floating point constant: 2.3e10
+    Number({ fg = c.purple_dark }), --   A number constant: 234, 0xff
+    Boolean({ fg = c.purple_dark }), --   A boolean constant: TRUE, false
+    Float({ fg = c.purple_dark }), --   A floating point constant: 2.3e10
 
     Identifier({ fg = c.aqua_dark }), -- (*) Any variable name
     Function({ fg = c.yellow_light }), --   Function name (also: methods for classes)
@@ -164,14 +164,14 @@ local theme = lush(function(injected_functions)
     Keyword({ fg = c.red }), --   any other keyword
     -- Exception      { }, --   try, catch, throw
 
-    PreProc({ fg = c.meta }), -- (*) Generic Preprocessor
+    PreProc({ fg = c.orange }), -- (*) Generic Preprocessor
     -- Include        { }, --   Preprocessor #include
     -- Define         { }, --   Preprocessor #define
-    Macro({ fg = c.purple_light }), --   Same as Define
+    Macro({ fg = c.purple }), --   Same as Define
     -- PreCondit      { }, --   Preprocessor #if, #else, #endif, etc.
 
     Type({ fg = c.blue_light }), -- (*) int, long, char, etc.
-    -- StorageClass   { }, --   static, register, volatile, etc.
+    StorageClass({ Keyword }), --   static, register, volatile, etc.
     -- Structure      { }, --   struct, union, enum, etc.
     -- Typedef        { }, --   A typedef
 
@@ -249,7 +249,7 @@ local theme = lush(function(injected_functions)
     -- sym"@text.underline"    { }, -- Underlined
     -- sym"@text.todo"         { }, -- Todo
     -- sym"@comment"           { }, -- Comment
-    -- sym"@punctuation"       { }, -- Delimiter
+    sym("@punctuation")({}), -- Delimiter
     -- sym"@constant"          { }, -- Constant
     -- sym"@constant.builtin"  { }, -- Special
     -- sym"@constant.macro"    { }, -- Define
@@ -271,7 +271,7 @@ local theme = lush(function(injected_functions)
     -- sym"@field"             { }, -- Identifier
     -- sym"@property"          { }, -- Identifier
     -- sym"@constructor"       { }, -- Special
-    -- sym"@conditional"       { }, -- Conditional
+    sym("@conditional.ternary")({ Normal }), -- Conditional
     -- sym"@repeat"            { }, -- Repeat
     -- sym"@label"             { }, -- Label
     -- sym"@operator"          { }, -- Operator
@@ -280,13 +280,19 @@ local theme = lush(function(injected_functions)
     -- sym"@variable"          { }, -- Identifier
     -- sym"@type"              { }, -- Type
     -- sym"@type.definition"   { }, -- Typedef
-    -- sym"@storageclass"      { }, -- StorageClass
+    sym("@storageclass")({ StorageClass }), -- StorageClass
+    sym("@type.qualifier")({ Keyword }),
     -- sym"@structure"         { }, -- Structure
-    -- sym"@namespace"         { }, -- Identifier
-    -- sym"@include"           { }, -- Include
+    sym("@namespace")({ fg = c.orange }), -- Identifier
+    -- sym("@include")({ Include }), -- Include
     -- sym"@preproc"           { }, -- PreProc
     -- sym"@debug"             { }, -- Debug
     -- sym"@tag"               { }, -- Tag
+    sym("@attribute")({ fg = c.gray }),
+    sym("@classScope")({ gui = "italic" }),
+    sym("@trait")({ gui = "italic" }),
+    sym("@concept")({ gui = "italic" }),
+    sym("@documentation")({ fg = c.green, gui = "noitalic" }),
 
     -- Telescope
     TelescopeBorder({ fg = c.blue_dark.mix(c.bg, 30), bg = c.bg_float }),
@@ -297,7 +303,7 @@ local theme = lush(function(injected_functions)
     AlphaHeader({ fg = c.blue }),
     AlphaHeaderLabel({ fg = c.orange }),
     AlphaFooter({ fg = c.yellow, italic = true }),
-    AlphaButtons({ fg = c.cyan }),
+    AlphaButtons({ fg = c.aqua }),
 
     -- WhichKey
     WhichKey({ fg = c.aqua }),
@@ -336,8 +342,8 @@ local theme = lush(function(injected_functions)
     NavicIconsEvent({ fg = c.orange, bg = c.none }),
     NavicIconsOperator({ fg = c.fg, bg = c.none }),
     NavicIconsTypeParameter({ fg = c.green, bg = c.none }),
-    NavicText({ fg = c.fg2, bg = c.none }),
-    NavicSeparator({ fg = c.fg, bg = c.none }),
+    NavicText({ fg = c.fg3, bg = c.none }),
+    NavicSeparator({ fg = c.fg3, bg = c.none }),
   }
 end)
 

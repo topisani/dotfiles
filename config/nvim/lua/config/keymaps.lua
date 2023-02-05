@@ -11,8 +11,8 @@ end
 -- Editing commands
 -- m to match like kakoune
 map({ "v", "n" }, "m", "%")
-map({ "v", "n" }, "gh", "g0")
-map({ "v", "n" }, "gl", "g$")
+map({ "v", "n" }, "gh", "^")
+map({ "v", "n" }, "gl", "$")
 
 -- tabs
 unmap("n", "<leader><tab>l")
@@ -24,7 +24,9 @@ unmap("n", "<leader><tab>[")
 
 -- Leader keys
 map("n", "<leader><cr>", "<cmd>terminal<cr>")
-map("n", "<leader><tab>", "<cmd>Neotree<cr>", { desc = "File tree" })
+map("n", "<leader><tab>", function()
+  require("neo-tree.command").execute({ dir = require("lazyvim.util").get_root() })
+end, { desc = "File tree" })
 
 map("n", "<leader>tl", "<cmd>tablast<cr>", { desc = "Last Tab" })
 map("n", "<leader>tf", "<cmd>tabfirst<cr>", { desc = "First Tab" })
