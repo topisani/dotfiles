@@ -31,7 +31,7 @@ local colors = {
   bg2 = hsl("#212126"),
   bg3 = hsl("#323037"),
   bg4 = hsl("#3c383c"),
-  bg_float = hsl("#05060c"),
+  bg_float = hsl("#06070d"),
 
   fg0 = hsl("#ffffdf"),
   fg = hsl("#fdf4d1"),
@@ -61,6 +61,19 @@ local colors = {
   bluish_fg = hsl("#9EEEFF"),
 }
 
+colors.border = colors.blue_dark.mix(colors.bg, 30)
+colors.gitSigns = {
+  add = colors.green.mix(colors.bg, 20),
+  change = colors.blue.mix(colors.bg, 20),
+  delete = colors.red.mix(colors.bg, 20),
+}
+
+colors.diff = {
+  add = colors.green.mix(colors.bg, 70),
+  change = colors.blue.mix(colors.bg, 70),
+  delete = colors.red.mix(colors.bg, 70),
+}
+
 -- LSP/Linters mistakenly show `undefined global` errors in the spec, they may
 -- support an annotation like the following. Consult your server documentation.
 ---@diagnostic disable: undefined-global
@@ -86,30 +99,30 @@ local theme = lush(function(injected_functions)
     CursorColumn({ bg = c.bg1 }), -- Screen-column at the cursor, when 'cursorcolumn' is set.
     CursorLine({ bg = c.bg1 }), -- Screen-line at the cursor, when 'cursorline' is set. Low-priority if foreground (ctermfg OR guifg) is not set.
     Directory({ fg = c.blue, gui = "bold" }), -- Directory names (and other special names in listings)
-    DiffAdd({ fg = c.green.mix(c.bg, 20) }), -- Diff mode: Added line |diff.txt|
-    DiffChange({ fg = c.blue.mix(c.bg, 20) }), -- Diff mode: Changed line |diff.txt|
-    DiffDelete({ fg = c.red }), -- Diff mode: Deleted line |diff.txt|
+    DiffAdd({ bg = c.diff.add }), -- Diff mode: Added line |diff.txt|
+    DiffChange({ bg = c.diff.change }), -- Diff mode: Changed line |diff.txt|
+    DiffDelete({ bg = c.diff.delete }), -- Diff mode: Deleted line |diff.txt|
     DiffText({ fg = c.red }), -- Diff mode: Changed text within a changed line |diff.txt|
     EndOfBuffer({ fg = c.bg }), -- Filler lines (~) after the end of the buffer. By default, this is highlighted like |hl-NonText|.
     -- TermCursor   { }, -- Cursor in a focused terminal
     -- TermCursorNC { }, -- Cursor in an unfocused terminal
     ErrorMsg({ fg = c.red }), -- Error messages on the command line
     VertSplit({ fg = c.bg2 }), -- Column separating vertically split windows
-    Folded({ bg = colors.bg2, gui = "italic" }), -- Line used for closed folds
-    FoldColumn({ bg = colors.bg1, gui = "italic" }), -- 'foldcolumn'
+    Folded({ fg = c.blue_dark, bg = colors.bg_float, gui = "italic" }), -- Line used for closed folds
+    FoldColumn({ fg = c.blue_dark, gui = "italic" }), -- 'foldcolumn'
     SignColumn({}), -- Column where |signs| are displayed
     -- IncSearch    { }, -- 'incsearch' highlighting; also used for the text replaced with ":s///c"
     -- Substitute   { }, -- |:substitute| replacement text highlighting
     LineNr({ fg = c.bg4 }), -- Line number for ":number" and ":#" commands, and when 'number' or 'relativenumber' option is set.
     CursorLineNr({ fg = c.fg3, bg = c.bg1 }), -- Like LineNr when 'cursorline' or 'relativenumber' is set for the cursor line.
     MatchParen({ fg = c.purple, gui = "bold" }), -- Character under the cursor or just before it, if it is a paired bracket, and its match. |pi_paren.txt|
-    ModeMsg({ fg = c.bg, gui = "bold" }), -- 'showmode' message (e.g., "-- INSERT -- ")
+    ModeMsg({ fg = c.blue_dark, gui = "bold" }), -- 'showmode' message (e.g., "-- INSERT -- ")
     -- MsgArea      { }, -- Area for messages and cmdline
     -- MsgSeparator { }, -- Separator for scrolled messages, `msgsep` flag of 'display'
     -- MoreMsg      { }, -- |more-prompt|
     NonText({ fg = c.fg3 }), -- '@' at the end of the window, characters from 'showbreak' and other characters that do not really exist in the text (e.g., ">" displayed when a double-wide character doesn't fit at the end of the line). See also |hl-EndOfBuffer|.
     Normal({ bg = c.bg0, fg = c.fg }), -- Normal text
-    NormalFloat({ bg = c.bg0, fg = c.fg }), -- Normal text in floating windows.
+    NormalFloat({ bg = c.bg_float, fg = c.fg }), -- Normal text in floating windows.
     NormalNC({ bg = c.bg }), -- normal text in non-current windows
     Pmenu({ bg = c.bg2 }), -- Popup menu: Normal item.
     PmenuSel({ bg = c.blue }), -- Popup menu: Selected item.
@@ -295,7 +308,7 @@ local theme = lush(function(injected_functions)
     sym("@documentation")({ fg = c.green, gui = "noitalic" }),
 
     -- Telescope
-    TelescopeBorder({ fg = c.blue_dark.mix(c.bg, 30), bg = c.bg_float }),
+    TelescopeBorder({ fg = colors.border, bg = c.bg_float }),
     TelescopeNormal({ fg = c.fg, bg = c.bg_float }),
 
     -- Leap
@@ -350,6 +363,15 @@ local theme = lush(function(injected_functions)
     NavicIconsTypeParameter({ fg = c.green, bg = c.none }),
     NavicText({ fg = c.fg3, bg = c.none }),
     NavicSeparator({ fg = c.fg3, bg = c.none }),
+
+    -- Cmp
+    CmpDocumentation({ fg = c.fg, bg = c.bg_float }),
+    CmpDocumentationBorder({ fg = c.border, bg = c.bg_float }),
+
+    -- GitSigns
+    GitSignsAdd({ fg = c.gitSigns.add }), -- diff mode: Added line |diff.txt|
+    GitSignsChange({ fg = c.gitSigns.change }), -- diff mode: Changed line |diff.txt|
+    GitSignsDelete({ fg = c.gitSigns.delete }), -- diff mode: Deleted line |diff.txt|
   }
 end)
 

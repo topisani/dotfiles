@@ -290,4 +290,10 @@ return {
       return dashboard
     end,
   },
+
+  {
+    "sindrets/diffview.nvim",
+    cmd = { "DiffviewOpen" },
+  },
+  { "akinsho/git-conflict.nvim" },
 }

@@ -5,14 +5,20 @@
 local map = vim.keymap.set
 
 local function unmap(mode, lhs)
-  vim.api.nvim_del_keymap(mode, lhs)
+  pcall(vim.api.nvim_del_keymap, mode, lhs)
 end
 
 -- Editing commands
 -- m to match like kakoune
 map({ "v", "n" }, "m", "%")
-map({ "v", "n" }, "gh", "^")
+
+-- Start & end of line
+map({ "v", "n" }, "gh", "0")
 map({ "v", "n" }, "gl", "$")
+
+-- Move macros from q to <C-@>
+unmap("n", "q")
+map("n", "<C>", "q")
 
 -- tabs
 unmap("n", "<leader><tab>l")
