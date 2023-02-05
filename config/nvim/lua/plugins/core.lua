@@ -1,5 +1,4 @@
 -- since this is just an example spec, don't actually load anything here and return an empty spec
--- stylua: ignore
 
 -- every spec file under config.plugins will be loaded automatically by lazy.nvim
 --
@@ -10,10 +9,12 @@
 
 return {
 
+  { dir = "~/.config/nvim/local/flatblue.nvim", dependencies = "rktjmp/lush.nvim" },
+
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "tokyonight-night",
+      colorscheme = "flatblue",
     },
   },
 
@@ -48,6 +49,38 @@ return {
     end,
   },
 
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    opts = {
+      lsp = {
+        override = {
+          ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+          ["vim.lsp.util.stylize_markdown"] = true,
+        },
+      },
+      cmdline = {
+        view = "cmdline",
+      },
+      popupmenu = {
+        backend = "cmp",
+      },
+      presets = {
+        bottom_search = true,
+        command_palette = false,
+        long_message_to_split = true,
+      },
+    },
+    -- stylua: ignore
+    keys = {
+      { "<S-Enter>", function() require("noice").redirect(vim.fn.getcmdline()) end, mode = "c", desc = "Redirect Cmdline" },
+      { "<leader>snl", function() require("noice").cmd("last") end, desc = "Noice Last Message" },
+      { "<leader>snh", function() require("noice").cmd("history") end, desc = "Noice History" },
+      { "<leader>sna", function() require("noice").cmd("all") end, desc = "Noice All" },
+      { "<c-f>", function() if not require("noice.lsp").scroll(4) then return "<c-f>" end end, silent = true, expr = true, desc = "Scroll forward" },
+      { "<c-b>", function() if not require("noice.lsp").scroll(-4) then return "<c-b>" end end, silent = true, expr = true, desc = "Scroll backward"},
+    },
+  },
   -- add symbols-outline
   {
     "simrat39/symbols-outline.nvim",
@@ -57,7 +90,7 @@ return {
   },
 
   {
-    "mg979/vim-visual-multi"
+    "mg979/vim-visual-multi",
   },
 
   -- add pyright to lspconfig
@@ -80,6 +113,7 @@ return {
       "jose-elias-alvarez/typescript.nvim",
       init = function()
         require("lazyvim.util").on_attach(function(_, buffer)
+
           -- stylua: ignore
           vim.keymap.set( "n", "<leader>co", "TypescriptOrganizeImports", { buffer = buffer, desc = "Organize Imports" })
           vim.keymap.set("n", "<leader>cR", "TypescriptRenameFile", { desc = "Rename File", buffer = buffer })
@@ -116,9 +150,7 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     opts = {
-      ensure_installed = {
-        
-      },
+      ensure_installed = {},
     },
   },
 
@@ -146,7 +178,32 @@ return {
         "vim",
         "yaml",
         "rust",
-        "cpp"
+        "cpp",
+      })
+    end,
+  },
+
+  {
+    "folke/zen-mode.nvim",
+    init = function()
+      require("zen-mode").setup({
+        --
+      })
+    end,
+    keys = {
+      {
+        "<leader>z",
+        "<cmd>ZenMode<CR>",
+        mode = "n",
+        desc = "Zen Mode",
+      },
+    },
+  },
+  {
+    "folke/twilight.nvim",
+    init = function()
+      require("zen-mode").setup({
+        --
       })
     end,
   },
@@ -202,6 +259,69 @@ return {
             fallback()
           end
         end, { "i", "s" }),
+      })
+    end,
+  },
+
+  {
+    "goolord/alpha-nvim",
+    event = "VimEnter",
+    opts = function()
+      local dashboard = require("alpha.themes.dashboard")
+      local logo = [[
+███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗
+████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║
+██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║
+██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║
+██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║
+╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝
+    ]]
+
+      dashboard.section.header.val = vim.split(logo, "\n")
+      dashboard.section.buttons.val = {
+        dashboard.button("f", " " .. " Find file", ":Telescope find_files <CR>"),
+        dashboard.button("n", " " .. " New file", ":ene <BAR> startinsert <CR>"),
+        dashboard.button("r", " " .. " Recent files", ":Telescope oldfiles <CR>"),
+        dashboard.button("g", " " .. " Find text", ":Telescope live_grep <CR>"),
+        dashboard.button("c", " " .. " Config", ":e $MYVIMRC <CR>"),
+        dashboard.button("s", "勒" .. " Restore Session", [[:lua require("persistence").load() <cr>]]),
+        dashboard.button("l", "鈴" .. " Lazy", ":Lazy<CR>"),
+        dashboard.button("q", " " .. " Quit", ":qa<CR>"),
+      }
+      for _, button in ipairs(dashboard.section.buttons.val) do
+        button.opts.hl = "AlphaButtons"
+        button.opts.hl_shortcut = "AlphaShortcut"
+      end
+      dashboard.section.footer.opts.hl = "Type"
+      dashboard.section.header.opts.hl = "AlphaHeader"
+      dashboard.section.buttons.opts.hl = "AlphaButtons"
+      dashboard.opts.layout[1].val = 8
+      return dashboard
+    end,
+    config = function(_, dashboard)
+      vim.b.miniindentscope_disable = true
+
+      -- close Lazy and re-open when the dashboard is ready
+      if vim.o.filetype == "lazy" then
+        vim.cmd.close()
+        vim.api.nvim_create_autocmd("User", {
+          pattern = "AlphaReady",
+          callback = function()
+            require("lazy").show()
+          end,
+        })
+      end
+
+      require("alpha").setup(dashboard.opts)
+
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "LazyVimStarted",
+        callback = function()
+          local stats = require("lazy").stats()
+          local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
+          dashboard.section.footer.val = "⚡ Neovim loaded " .. stats.count .. " plugins in " .. ms .. "ms"
+          pcall(vim.cmd.AlphaRedraw)
+        end,
       })
     end,
   },
