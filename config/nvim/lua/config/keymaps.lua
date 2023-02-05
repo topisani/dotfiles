@@ -10,7 +10,7 @@ end
 
 -- Editing commands
 -- m to match like kakoune
-map({ "v", "n" }, "m", "%")
+map({ "v", "n", "x" }, "m", "%")
 
 -- Start & end of line
 map({ "v", "n" }, "gh", "0")

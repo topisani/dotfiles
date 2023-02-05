@@ -7,6 +7,8 @@
 -- * disable/enabled LazyVim plugins
 -- * override the configuration of LazyVim plugins
 
+local utils = Config.utils
+
 return {
 
   { dir = "~/.config/nvim/local/flatblue.nvim", dependencies = "rktjmp/lush.nvim" },
@@ -159,6 +161,38 @@ return {
     keys = {
       { "<leader>gg", "<cmd>Neogit<CR>", desc = "Neogit" },
     },
+    opts = {
+      disable_signs = false,
+      disable_hint = true,
+      disable_context_highlighting = false,
+      disable_builtin_notifications = true,
+      status = {
+        recent_commit_count = 10,
+      },
+      -- customize displayed signs
+      signs = {
+        -- { CLOSED, OPENED }
+        section = { "", "" },
+        item = { "", "" },
+        hunk = { "", "" },
+      },
+      integrations = {
+        diffview = true,
+      },
+      sections = {
+        recent = {
+          folded = false,
+        },
+      },
+      -- override/add mappings
+      mappings = {
+        -- modify status buffer mappings
+        status = {
+          -- Adds a mapping with "B" as key that does the "BranchPopup" command
+          ["B"] = "BranchPopup",
+        },
+      },
+    },
   },
 
   {
@@ -294,6 +328,57 @@ return {
   {
     "sindrets/diffview.nvim",
     cmd = { "DiffviewOpen" },
+    keys = {
+      { "<leader>gd", "<cmd>DiffviewOpen<CR>", "Diff view" },
+    },
+    opts = {
+      enhanced_diff_hl = true,
+      hooks = {
+        ---@param view StandardView
+        view_opened = function(view)
+          -- Highlight 'DiffChange' as 'DiffDelete' on the left, and 'DiffAdd' on
+          -- the right.
+          local function post_layout()
+            utils.tbl_ensure(view, "winopts.diff2.a")
+            utils.tbl_ensure(view, "winopts.diff2.b")
+            view.winopts.diff2.a = utils.tbl_union_extend(view.winopts.diff2.a, {
+              winhl = {
+                "DiffChange:DiffDelete",
+                "DiffText:DiffDeleteText",
+              },
+            })
+            view.winopts.diff2.b = utils.tbl_union_extend(view.winopts.diff2.b, {
+              winhl = {
+                "DiffChange:DiffAdd",
+                "DiffText:DiffAddText",
+              },
+            })
+          end
+
+          view.emitter:on("post_layout", post_layout)
+          post_layout()
+        end,
+      },
+    },
   },
+
   { "akinsho/git-conflict.nvim" },
+
+  {
+    "Apeiros-46B/qalc.nvim",
+    cmd = { "Qalc" },
+    opts = {
+      set_ft = "qalc",
+    },
+    config = function(_, opts)
+      require("qalc").setup(opts)
+
+      vim.api.nvim_create_autocmd("Filetype", {
+        pattern = { "qalc" },
+        callback = function()
+          require("cmp").setup.buffer({ enabled = false })
+        end,
+      })
+    end,
+  },
 }

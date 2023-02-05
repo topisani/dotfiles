@@ -62,6 +62,8 @@ local colors = {
 }
 
 colors.border = colors.blue_dark.mix(colors.bg, 30)
+colors.bg_statusline = colors.bg_float
+
 colors.gitSigns = {
   add = colors.green.mix(colors.bg, 20),
   change = colors.blue.mix(colors.bg, 20),
@@ -72,7 +74,16 @@ colors.diff = {
   add = colors.green.mix(colors.bg, 70),
   change = colors.blue.mix(colors.bg, 70),
   delete = colors.red.mix(colors.bg, 70),
+
+  add_hl = colors.green.mix(colors.bg, 50),
+  change_hl = colors.blue.mix(colors.bg, 50),
+  delete_hl = colors.red.mix(colors.bg, 50),
 }
+
+colors.warning = colors.yellow
+colors.error = colors.red
+colors.info = colors.green
+colors.comment = colors.gray
 
 -- LSP/Linters mistakenly show `undefined global` errors in the spec, they may
 -- support an annotation like the following. Consult your server documentation.
@@ -102,7 +113,9 @@ local theme = lush(function(injected_functions)
     DiffAdd({ bg = c.diff.add }), -- Diff mode: Added line |diff.txt|
     DiffChange({ bg = c.diff.change }), -- Diff mode: Changed line |diff.txt|
     DiffDelete({ bg = c.diff.delete }), -- Diff mode: Deleted line |diff.txt|
-    DiffText({ fg = c.red }), -- Diff mode: Changed text within a changed line |diff.txt|
+    DiffText({ fg = c.diff.change_hl }), -- Diff mode: Changed text within a changed line |diff.txt|
+    DiffAddText({ bg = c.diff.add_hl }),
+    DiffDeleteText({ bg = c.diff.delete_hl }),
     EndOfBuffer({ fg = c.bg }), -- Filler lines (~) after the end of the buffer. By default, this is highlighted like |hl-NonText|.
     -- TermCursor   { }, -- Cursor in a focused terminal
     -- TermCursorNC { }, -- Cursor in an unfocused terminal
@@ -372,6 +385,25 @@ local theme = lush(function(injected_functions)
     GitSignsAdd({ fg = c.gitSigns.add }), -- diff mode: Added line |diff.txt|
     GitSignsChange({ fg = c.gitSigns.change }), -- diff mode: Changed line |diff.txt|
     GitSignsDelete({ fg = c.gitSigns.delete }), -- diff mode: Deleted line |diff.txt|
+
+    -- Neogit
+    NeogitBranch({ fg = c.purple_light }),
+    NeogitRemote({ fg = c.purple }),
+    NeogitHunkHeader({ bg = c.bg1, fg = c.fg }),
+    NeogitHunkHeaderHighlight({ bg = c.bg1, fg = c.blue }),
+    NeogitDiffContextHighlight({ bg = c.fg2.mix(c.bg, 50), fg = c.bg1 }),
+    NeogitDiffDeleteHighlight({ bg = c.diff.delete }),
+    NeogitDiffAddHighlight({ bg = c.diff.add }),
+
+    -- Mini
+    MiniTablineCurrent({ fg = c.fg, bg = c.bg1 }),
+    MiniTablineFill({ bg = c.black }),
+    MiniTablineHidden({ fg = c.dark5, bg = c.bg_statusline }),
+    MiniTablineModifiedCurrent({ fg = c.warning, bg = c.bg3 }),
+    MiniTablineModifiedHidden({ bg = c.bg_statusline, fg = c.warning.mix(c.bg, 70) }),
+    MiniTablineModifiedVisible({ fg = c.warning, bg = c.bg_statusline }),
+    MiniTablineTabpagesection({ bg = c.bg_statusline, fg = c.none }),
+    MiniTablineVisible({ fg = c.fg, bg = c.bg_statusline }),
   }
 end)
 
