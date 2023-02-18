@@ -22,9 +22,7 @@ PATH="$HOME/.ghcup/bin:$PATH"
 # opam configuration
 test -r /home/topisani/.opam/opam-init/init.sh && . /home/topisani/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
 
-PATH="$HOME/.bin:$HOME/.local/bin:/usr/local/bin:$PATH"
-
-export PATH
+export PATH="$HOME/.bin:$HOME/.local/bin:/usr/local/bin:$PATH"
 
 # Kill the GNU
 # export CC=/usr/bin/clang
@@ -73,3 +71,5 @@ if [ $? -ge 2 ]; then
   ssh-agent -a "$SSH_AUTH_SOCK" >/dev/null
 fi
 
+# use docker buildkit
+export DOCKER_BUILDKIT=1

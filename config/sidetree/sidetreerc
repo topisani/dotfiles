@@ -21,6 +21,9 @@ set highlight_style +r
 map <c-c> quit
 map H cd ..
 map L cd
+map o mk
+map c rename
+map d rm
 
 map r shell 'tmux display-popup ranger $(dirname "$1")'
 

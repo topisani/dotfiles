@@ -58,7 +58,7 @@ bindsym $mod+Return exec $term
 bindsym $mod+Shift+Return exec alacritty
 bindsym $mod+Shift+c exec colorscheme-switch
 bindsym $mod+Ctrl+c exec colorscheme-switch -g
-bindsym $mod+c exec kitty --class="floating" -o window_padding_width=4 -o initial_window_width=400 -o initial_window_height=200 qalc
+bindsym $mod+c exec alacritty --class floating -o window.dimensions.columns=60 -o window.dimensions.lines=15 -o window.padding.x=7 -o window.padding.y=7 -e qalc
 
 # kill focused window
 bindsym $mod+q kill

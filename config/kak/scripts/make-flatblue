@@ -132,4 +132,27 @@ set global lsp_diagnostic_line_hint_sign '●'
 # set global lsp_diagnostic_line_info_sign ' '
 # set global lsp_diagnostic_line_hint_sign ' '
 
+
+# Switch cursor color in insert mode
+face global PrimaryCursorNormal              $bg0,              $(alpha $bluish_fg e0)
+face global PrimaryCursorEolNormal           $bg0,              $fg0      +f
+
+face global PrimaryCursorInsert $bg0,              $(alpha $yellow e0)
+face global PrimaryCursorEolInsert PrimaryCursorInsert
+
+face global PrimaryCursorEol PrimaryCursorEolNormal
+face global PrimaryCursor PrimaryCursorNormal
+
+hook -group flatblue global ModeChange (push|pop):.*insert %{
+  set-face window PrimaryCursor PrimaryCursorInsert
+  set-face window PrimaryCursorEol PrimaryCursorEolInsert
+  face global StatusLineMode              $yellow,           default       +b
+}
+
+hook global ModeChange (push|pop):insert:.* %{
+  set-face window PrimaryCursor PrimaryCursorNormal
+  set-face window PrimaryCursorEol PrimaryCursorEolNormal
+  face global StatusLineMode              $blue_light,           default       +b
+}
+
 " | sed 's/, */,/g;s/ *+/+/'
