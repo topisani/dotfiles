@@ -81,11 +81,11 @@ def -hidden -override lsp-show-error -params 1 -docstring "Render error" %{
 }
 
 def -hidden -override lsp-perform-code-action -params .. %{
-  connect bottom-panel krc-fzf menu %arg{@}
+  popup -title "Code Actions" -h 15 -w 80 krc-fzf menu %arg{@}
 }
 
 def -hidden -override lsp-menu -params .. %{
-  connect bottom-panel krc-fzf menu %arg{@}
+  popup krc-fzf menu %arg{@}
 }
 
 # def -hidden -override lsp-show-goto-choices -params 2 -docstring "Render goto choices" %{

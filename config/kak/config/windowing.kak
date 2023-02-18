@@ -8,9 +8,52 @@ cork tmux https://github.com/alexherbo2/tmux.kak %{
     }
   }
   
-  define-command -override tmux-terminal-popup -params .. -docstring 'tmux-terminal-popup [<program>] [<arguments>]: Creates a new terminal as a tmux popup.' %{
-    # TODO: Remove -d flag.
-    tmux_impl display-popup -e "KAKOUNE_SESSION=%val{session}" -e "KAKOUNE_CLIENT=%val{client}" -d %sh{pwd} -E %arg{@}
+  define-command -override tmux-terminal-popup -params .. -docstring 'tmux-terminal-popup [options] [<program>] [<arguments>]: Creates a new terminal as a tmux popup.
+Options:
+  -title <title>
+  -w width: Width of popup, in characters or percentage
+  -h height: Height of popup, in characters or percentage
+  -x x: X Position
+  -y y: Y Position' %{
+    nop %sh{
+      popup_args=""
+      title=""
+      while true; do
+        case $1 in
+          -title)
+            shift
+            title=" $1 "
+            shift
+            ;;
+          -w)
+            shift
+            popup_args="$popup_args -w $1"
+            shift
+            ;;
+          -h)
+            shift
+            popup_args="$popup_args -h $1"
+            shift
+            ;;
+          -x)
+            shift
+            popup_args="$popup_args -x $1"
+            shift
+            ;;
+          -y)
+            shift
+            popup_args="$popup_args -y $1"
+            shift
+            ;;
+          *)
+            break
+            ;;
+        esac
+      done
+      TMUX=$kak_client_env_TMUX TMUX_PANE=$kak_client_env_TMUX_PANE nohup tmux \
+        display-popup -e "KAKOUNE_SESSION=$kak_session" -e "KAKOUNE_CLIENT=$kak_client" -d $PWD -T "$title" $popup_args -E "$@" \
+        < /dev/null > /dev/null 2>&1 &
+    }
   }
 
 }
