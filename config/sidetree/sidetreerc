@@ -25,7 +25,7 @@ map o mk
 map c rename
 map d rm
 
-map r shell 'tmux display-popup ranger $(dirname "$1")'
+map r shell 'tmux display-popup -E ranger $(dirname "$1")'
 
 # Example Integrations ─────────────────────────────────────────────────────────
 

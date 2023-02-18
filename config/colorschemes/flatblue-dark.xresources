@@ -4,7 +4,7 @@
 *.background: #000000
 
 ! black
-*.color0:     #232323
+*.color0:     #010207
 *.color8:     #828087
 
 ! red
@@ -37,7 +37,7 @@
 
 
 ! Grays (dark to light)
-*.color232:     #0d1011
+*.color232:     #06070d
 *.color233:     #252727
 *.color234:     #353736
 *.color235:     #464845

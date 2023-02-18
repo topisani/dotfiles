@@ -7,7 +7,7 @@ colors:
     background: '#000000'
     foreground: '#fcfefb'
   normal:
-    black:   '#232323'
+    black:   '#010207'
     red:     '#d92817'
     green:   '#3e871e'
     yellow:  '#f39c12'
@@ -27,7 +27,7 @@ colors:
     white:   '#fcfefb'
 
   indexed_colors:
-    - { index: 232, color: '#0d1011' }
+    - { index: 232, color: '#06070d' }
     - { index: 233, color: '#252727' }
     - { index: 234, color: '#353736' }
     - { index: 235, color: '#464845' }

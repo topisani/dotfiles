@@ -1,6 +1,7 @@
 # flatblue-light theme
 
 evaluate-commands %sh{
+    bg_unfocused="rgb:fbf8f8"
     bg0="rgb:fdf4df"
     bg="rgb:ffffff"
     bg1="rgb:f4f4fd"
@@ -35,6 +36,7 @@ evaluate-commands %sh{
     orange_dark="rgb:fe8019"
 
     bluish_fg="rgb:033F4C"
+    float_bg="rgb:d2e7ff"
 
     . "$HOME/.config/kak/scripts/make-flatblue"
 }
