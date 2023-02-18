@@ -23,7 +23,7 @@ set-option global modelinefmt '{{mode_info}} {magenta}%val{client}{default} at {
 hook global WinCreate .* %{
   addhl window/matching show-matching
   addhl window/show-whitespaces show-whitespaces
-  # addhl window/numbers number-lines -hlcursor -separator ' '
+  addhl window/numbers number-lines -hlcursor -separator ' '
 }
 
 # Leader / Filetype modes ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
@@ -83,11 +83,6 @@ cork fzf https://github.com/andreyorst/fzf.kak %{
   require-module fzf-vcs
   #set-option global fzf_git_command "fd . --type f --follow"
   require-module fzf-buffer
-}
-
-cork number-toggle https://github.com/evanrelf/number-toggle.kak %{
-  require-module number-toggle
-  set global number_toggle_params -hlcursor -separator ' '
 }
 
 cork focus https://github.com/caksoylar/kakoune-focus %{

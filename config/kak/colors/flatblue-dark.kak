@@ -6,7 +6,7 @@ evaluate-commands %sh{
     #bg="rgb:18191c"
     # bg="rgb:08090c"
     bg="rgb:010207"
-    bg1="rgb:171d21"
+    bg1="rgb:0a0b15"
     bg2="rgb:112126"
     bg3="rgb:323037"
     bg4="rgb:3c383c"

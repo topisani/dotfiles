@@ -19,7 +19,6 @@ face global bullet                      $purple,               default
 face global list                        $purple,               default
 
 face global Reference                   $fg,               default       +b
-face global Default                     $fg,               $bg0
 face global PrimarySelection            default,           $(alpha $blue_light 30)
 face global SecondarySelection          default,           $(alpha $blue 30)
 face global PrimaryCursor               $bg0,              $(alpha $bluish_fg e0)
@@ -29,9 +28,9 @@ face global SecondaryCursorEol          $bg3,              $fg3      +f
 face global LineNumbers                 $bg4,              default
 face global LineNumberCursor            $fg3,              $bg1
 face global LineNumbersWrapped          $bg,               default
-face global MenuForeground              $bg2,              $blue
-face global MenuBackground              $fg,               $bg2
-face global MenuInfo                    $blue_light,       $bg2
+face global MenuForeground              $bg1,              $blue
+face global MenuBackground              $fg,               $bg1
+face global MenuInfo                    $blue_light,       $bg1
 face global Error                       $red,              default
 face global StatusLine                  $fg,               default
 face global StatusLineMode              $bg,               $yellow,       +b
@@ -131,6 +130,7 @@ set global lsp_diagnostic_line_hint_sign '●'
 # set global lsp_diagnostic_line_warning_sign ' '
 # set global lsp_diagnostic_line_info_sign ' '
 # set global lsp_diagnostic_line_hint_sign ' '
+set -add global ui_options 'terminal_padding_char= '
 
 
 # Switch cursor color in insert mode
@@ -147,6 +147,7 @@ face global StatusLineMode                $blue_light,           default       +
 
 face global DefaultFocused $fg,$bg
 face global DefaultUnfocused $fg,$bg_unfocused
+face global Default DefaultFocused
 
 rmhooks global flatblue
 
