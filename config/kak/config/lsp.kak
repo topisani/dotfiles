@@ -1,6 +1,6 @@
 # Setup kak-lsp
 
-eval %sh{ kak-lsp --kakoune -s $kak_session --log /tmp/kak-lsp-%val{session}.log }
+eval %sh{ kak-lsp --kakoune -s $kak_session --log /tmp/kak-lsp-$kak_session.log }
 
 hook -always global KakEnd .* %{ nop %sh{
   rm /tmp/kak-lsp-$kak_session.log

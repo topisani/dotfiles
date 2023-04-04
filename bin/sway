@@ -19,5 +19,8 @@ export MOZ_ENABLE_WAYLAND=1
 
 export BROWSER=firefox
 
+# May fix monitor detection issues
+export WLR_DRM_NO_MODIFIERS=1
+
 export USING_X11=false
 /usr/bin/sway &> /tmp/sway.log

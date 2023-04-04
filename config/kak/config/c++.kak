@@ -113,6 +113,7 @@ def make-ask %{
 filetype-hook (cpp|c) %{
   lsp-setup
   lsp-enable-semantic-tokens
+  lsp-inlay-hints-enable window
 
   map window filetype  d       ': enter-user-mode -lock gdbrepeat<ret>'  -docstring 'GDB...'
   map window filetype  <tab>   ': other-or-alt<ret>'                     -docstring 'Other file'
