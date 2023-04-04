@@ -93,7 +93,7 @@ cork focus https://github.com/caksoylar/kakoune-focus %{
 
 cork occivink-snippets https://github.com/occivink/kakoune-snippets
 
-cork kakoune-table https://github.com/listentolist/kakoune-table
+cork kakoune-table https://gitlab.com/listentolist/kakoune-table
 
 cork kakoune-text-objects https://github.com/delapouite/kakoune-text-objects
 
