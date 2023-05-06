@@ -41,11 +41,18 @@ window#waybar.chromium {
     color: #AAA;
 }
 
+#workspaces button.active {
+    color: #ffffff;
+    border-bottom: 0px solid #ffffff;
+    background: #178ca6
+}
+
 #workspaces button.focused {
     color: #ffffff;
     border-bottom: 0px solid #ffffff;
     background: #178ca6
 }
+
 
 #workspaces button.urgent {
     background: #d92817

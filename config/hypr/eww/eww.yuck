@@ -1,0 +1,14 @@
+(defwindow workspace-indicator
+           :monitor 0
+           :geometry (geometry :x "20px"
+                               :y "20px"
+                               :width "30px"
+                               :height "30px"
+                               :anchor "bottom left")
+           :stacking "fg"
+           ; :reserve (struts :distance "40px" :side "top")
+           :windowtype "dock"
+           :wm-ignore true
+           :active false
+  "Workspace 1")
+

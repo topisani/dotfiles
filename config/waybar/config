@@ -4,26 +4,14 @@
     "height": 21, // Waybar height (to be removed for auto height)
     // "width": 1280, // Waybar width
     // Choose the order of the modules
-    "modules-left": ["sway/workspaces", "sway/mode"],
-    "modules-center": ["sway/window"],
+    "modules-left": ["wlr/workspaces", "wlr/mode"],
+    "modules-center": ["hyprland/window"],
     "modules-right": ["cpu", "memory", "idle_inhibitor", "pulseaudio", "battery", "clock", "tray"],
     // Modules configuration
-    // "sway/workspaces": {
-    //     "disable-scroll": true,
-    //     "all-outputs": true,
-    //     "format": "{name}: {icon}",
-    //     "format-icons": {
-    //         "1": "",
-    //         "2": "",
-    //         "3": "",
-    //         "4": "",
-    //         "5": "",
-    //         "urgent": "",
-    //         "focused": "",
-    //         "default": ""
-    //     }
-    // },
-    "sway/mode": {
+    "wlr/workspaces": {
+        "sort-by-number": true
+    },
+    "wlr/mode": {
         "format": "<span style=\"italic\">{}</span>"
     },
     "mpd": {

@@ -42,3 +42,4 @@
 ~/.config/xdg-desktop-portal-wlr;config/xdg-desktop-portal-wlr
 ~/.config/alacritty;config/alacritty
 ~/.config/nvim;config/nvim
+~/.config/wofi;config/wofi
