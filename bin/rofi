@@ -7,9 +7,9 @@ fi
 
 [ -e "$ROFI_CMD" ] || ROFI_CMD="/usr/local/bin/rofi"
 
-SCREEN_POS=$(swaymsg -t get_outputs \
+SCREEN_POS=$(hyprctl -j monitors \
   | jq -r \
-  '.[] | select(.focused).rect | "\(.width)x\(.height)\\+\(.x)\\+\(.y)"')
+  '.[] | select(.focused) | "\(.width)x\(.height)\\+\(.x)\\+\(.y)"')
 
 XWAYLAND_OUTPUT=$(xrandr | grep -oP "[A-Z]+[0-9]+(?= connected $SCREEN_POS)")
 

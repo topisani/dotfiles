@@ -28,6 +28,7 @@ window {
 #inner-box {
     margin: 4px;
     border: 10px solid #0a0b15;
+    outline: none;
     color: #178ca6;
     font-weight: bold;
     background-color: #0a0b15;
@@ -62,6 +63,7 @@ window {
 #entry {
     margin: 0px 0px;
     border: none;
+    outline: none;
     border-radius: 15px;
     background-color: transparent;
 }
@@ -75,4 +77,8 @@ window {
     border: none;
     border-radius: 15px;
     background: linear-gradient(45deg, #178ca6 0%, #07b0ff 100%);
+}
+
+undershoot {
+	background: none;
 }

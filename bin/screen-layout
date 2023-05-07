@@ -1,47 +1,55 @@
 #! /bin/bash
 
-_layout_office() {
-  echo "'Dell Inc. DELL U2719D 7NRBS83' 0 0 90"
-  echo "'Dell Inc. DELL U2719D CNRBS83' 1440 0"
-  echo "eDP-1 1440 1440"
-}
-
 _layout_office_triple_vert() {
-  echo "'Dell Inc. DELL U2719D 7NRBS83' 1920 0 270"
-  echo "'Dell Inc. DELL U2719D 5NRBS83' 3360 0 90"
-  echo "'Dell Inc. DELL U2719D CNRBS83' 4800 0 90"
-  echo "eDP-1 6240 1480"
+  echo "desc:Dell Inc. DELL U2719D 7NRBS83,highres,1920x0,1,transform,3"
+  echo "desc:Dell Inc. DELL U2719D 5NRBS83,highres,3360x0,1,transform,1"
+  echo "desc:Dell Inc. DELL U2719D CNRBS83,highres,4800x0,1,transform,1"
+  echo "eDP-1,highres,6240x1480,1"
 }
 
 _layout_cpi() {
-  echo "'Dell Inc. DELL U2412M 0FFXD45N5R8S' 0 0"
-  echo "'Dell Inc. DELL 2405FPW M675459U1TTS ' 1920 0"
-  echo "eDP-1 0 1200"
+  echo "desc:Dell Inc. DELL U2412M 0FFXD45N5R8S',highres,0x0,1"
+  echo "desc:Dell Inc. DELL 2405FPW M675459U1TTS',highres,1920x0,1"
+  echo "eDP-1,highres,0x1200,1"
 }
 
 _layout_single() {
-  echo "eDP-1 0 0"
+  echo "eDP-1,highres,0x0,1"
 }
 
 _layout_tv() {
-  echo "'Philips Consumer Electronics Company Philips FTV 0x00000101' 0 0"
-  echo "eDP-1 960 2160"
+  echo "'desc:Philips Consumer Electronics Company Philips FTV 0x00000101' 0 0"
+  echo "eDP-1,highres,960x2160,1"
 }
 
 _layout_umag() {
-  echo "'Unknown MSI G241 0x000004CE' 0 0 270"
-  echo "'Unknown MSI G241 0x000004E1' 1080 0 90"
-  echo "eDP-1 120 1920"
+  echo "'desc:Unknown MSI G241 0x000004CE',highres,0x0,1,transform,3"
+  echo "'desc:Unknown MSI G241 0x000004E1',highres,1080x0,1,transform,1"
+  echo "eDP-1,highres,120x1920,1"
+}
+
+_layout_home() {
+  echo 'desc:Dell Inc. DELL S2721QS CH3CM43,highres,0x0,1.25'
+  echo 'eDP-1,highres,960x2160,1'
+}
+
+_layout_mirror() {
+  echo 'eDP-1,highres,0x0,1'
+  hyprctl monitors -j | jq -r '.[].name | select(. != "eDP-1")' |
+    while read name; do
+      [[ -n "$name" ]] && echo "$name,preferred,auto,1,mirror,eDP-1"
+    done
 }
 
 _layout_auto() {
-  serials=$(swaymsg -t get_outputs | jq '.[].serial')
+  serials=$(hyprctl monitors -j | jq '.[].serial')
+  echo "$serials" > /dev/stderr
   layout=$(
     if echo "$serials" | grep 7NRBS83 -q; then
       _layout_office_triple_vert
     elif echo "$serials" | grep 0FFXD45N5R8S -q; then
       _layout_cpi
-    elif echo "$serials" | grep 0x00000101 -q; then
+    elif echo "$serials" | grep CH3CM43 -q; then
       _layout_home
     elif echo "$serials" | grep 0x000004CE -q; then
       _layout_umag
@@ -51,8 +59,7 @@ _layout_auto() {
   )
   lid=$(cat /proc/acpi/button/lid/*/state)
   if [[ "$lid" =~ "closed" ]] &&  [[ $(echo "$serials" | wc -l ) -ge 2 ]]; then
-    echo "$layout" | sed '/^eDP-1/d';
-    echo "eDP-1 off"
+    echo "eDP-1,disable"
   else
     echo "$layout"
   fi
@@ -63,36 +70,27 @@ _echorun() {
   "$@"
 }
 
-_apply_sway() {
-  while IFS="" read line; do
-    declare -a "arr=($line)"
-    name=${arr[0]}
-    x=${arr[1]}
-    y=${arr[2]}
-    trans=${arr[3]:-normal}
-    if [[ "$x" == "off" ]]; then
-      _echorun swaymsg "output '$name' disable"
-    else
-      _echorun swaymsg "output '$name' enable pos $x $y transform $trans"
-    fi
-  done
+# _apply_sway() {
+#   while IFS="" read line; do
+#     declare -a "arr=($line)"
+#     name=${arr[0]}
+#     x=${arr[1]}
+#     y=${arr[2]}
+#     trans=${arr[3]:-normal}
+#     if [[ "$x" == "off" ]]; then
+#       _echorun swaymsg "output '$name' disable"
+#     else
+#       _echorun swaymsg "output '$name' enable pos $x $y transform $trans"
+#     fi
+#   done
   
-  # Set scale of display at home
-  _echorun swaymsg "output 'Dell Inc. DELL S2721QS CH3CM43' scale 1.25"
-}
+#   # Set scale of display at home
+#   _echorun swaymsg "output 'Dell Inc. DELL S2721QS CH3CM43' scale 1.25"
+# }
 
 _apply_hyprland() {
   while IFS="" read line; do
-    declare -a "arr=($line)"
-    name=${arr[0]}
-    x=${arr[1]}
-    y=${arr[2]}
-    trans=${arr[3]:-normal}
-    if [[ "$x" == "off" ]]; then
-      _echorun hyprctl keyword monitor "'$name',disable"
-    else
-      _echorun swaymsg "output '$name' enable pos $x $y transform $trans"
-    fi
+    _echorun hyprctl keyword monitor "$line"
   done
 }
 
@@ -110,7 +108,7 @@ _daemon() {
 
 # Run
 
-method=sway
+method=hyprland
 layout=${1:-auto}
 
 if [[ " $@ " =~ " -d " ]]; then
