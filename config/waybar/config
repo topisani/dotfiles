@@ -4,7 +4,7 @@
     "height": 21, // Waybar height (to be removed for auto height)
     // "width": 1280, // Waybar width
     // Choose the order of the modules
-    "modules-left": ["wlr/workspaces", "wlr/mode"],
+    "modules-left": ["wlr/workspaces", "hyprland/submap"],
     "modules-center": ["hyprland/window"],
     "modules-right": ["cpu", "memory", "idle_inhibitor", "pulseaudio", "battery", "clock", "tray"],
     // Modules configuration
@@ -13,6 +13,9 @@
     },
     "wlr/mode": {
         "format": "<span style=\"italic\">{}</span>"
+    },
+    "hyprland/window": {
+        "separate-outputs": true
     },
     "mpd": {
         "format": "{stateIcon} {consumeIcon}{randomIcon}{repeatIcon}{singleIcon}{artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ",
