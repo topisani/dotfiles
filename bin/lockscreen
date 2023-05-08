@@ -15,10 +15,46 @@ _wallpapers() {
      else
        output=${output##desc:}
        output=$(_get_display_id_from_desc "$output")
-       echo -n "-i $output:$wallpaper "
+       [[ -n "$output" ]] && echo -n "-i $output:$wallpaper "
      fi
    done
 }
 
 # _get_display_id_from_desc 5NRBS83
-swaylock -f $(_wallpapers)
+cmd="
+swaylock -fe $(_wallpapers) 
+--fade-in 1 
+--clock 
+--indicator
+--indicator-radius 100
+--line-uses-inside
+--inside-color 00000060
+--ring-color 71ba5150
+--key-hl-color 71ba51
+--bs-hl-color f24130
+--separator-color 71ba5150
+--text-color ffffffB0
+--ring-ver-color 00597350
+--inside-ver-color 00293850
+--text-ver-color FFFFFFB0
+--ring-clear-color 00597350
+--inside-clear-color 00293850
+--text-clear-color FFFFFFB0
+--ring-wrong-color f2413050
+--inside-wrong-color d9281750
+--text-wrong-color FFFFFFB0
+--effect-vignette 0.2:1 --grace 5
+"
+echo $cmd
+$cmd
+
+#--ring-color <color>              \
+# --ring-clear-color <color>        \
+# --ring-caps-lock-color <color>    \
+# --ring-ver-color <color>          \
+# --ring-wrong-color <color>        \
+# --separator-color <color>         \
+# --text-clear-color <color>        \
+# --text-caps-lock-color <color>    \
+# --text-ver-color <color>          \
+# --text-wrong-color <color>        \
