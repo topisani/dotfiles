@@ -20,6 +20,7 @@ _wallpapers() {
    done
 }
 
+
 # _get_display_id_from_desc 5NRBS83
 cmd="
 swaylock -fe $(_wallpapers) 
@@ -46,6 +47,8 @@ swaylock -fe $(_wallpapers)
 --effect-vignette 0.2:1 --grace 5
 "
 echo $cmd
+
+killall swaylock
 $cmd
 
 #--ring-color <color>              \
