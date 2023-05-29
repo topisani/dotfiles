@@ -1,114 +1,84 @@
 /* Autohide navigation bar. Gives some issue with urlbar placement sometimes */
-:root:not([customizing]) #navigator-toolbox:not(:hover):not(:focus-within) #nav-bar {
-  max-height: 0;
-  margin-bottom: 0px;
-  opacity: 0;
-  min-height: 0!important;
-  /* Wait 500ms before hiding the nav bar on unfocus */
-  transition: all 250ms ease 500ms;
+:root[sessionrestored]:not([customizing]) #navigator-toolbox:not(:hover):not(:focus-within) #nav-bar {
+    max-height: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden;
+    /*margin-bottom: 0px;
+    opacity: 0;
+    /* Wait 500ms before hiding the nav bar on unfocus */
+    transition: all 250ms ease 500ms;
 }
 
-#urlbar {
-  /* Fix urlbar placement - Some calculation of this variable breaks on new windows */
-  --urlbar-toolbar-height: 28.5px !important;
-}
-
-#nav-bar {
-  /* 44px is the height in touch-density. Max height must be set here to be animated. Works in lower densities as well */
-  max-height: 44px;
-  transition: all 250ms ease 00ms;
+:root[sessionrestored] #nav-bar {
+    /* Max height must be set to something here to be animated */
+    max-height: 100px;
+    min-height: 0;
+    transition: all 250ms ease 00ms;
 }
 
 /* Smaller tabs */
+@media (min-width: 0px) {
 
-#navigator-toolbox {
-  --tab-min-height: 24px !important;
-  --tab-border-radius: 0px;
-}
-#navigator-toolbox tab {
-  max-height: var(--tab-min-height);
-}
+    #navigator-toolbox {
+      --tab-min-height: 24px !important;
+      --tab-border-radius: 0px;
+    }
+    #navigator-toolbox tab {
+      max-height: var(--tab-min-height);
+    }
 
-#navigator-toolbox .tab-background {
-  margin: 0px !important;
-  border-radius: 0px !important;
-}
+    #navigator-toolbox .tab-background {
+      margin: 0px !important;
+      border-radius: 0px !important;
+    }
 
-.tab-throbber-tabslist, .tab-throbber, .tab-icon-pending, .tab-icon-image, .tab-sharing-icon-overlay, .tab-icon-overlay {
-  height: 12px !important;
-  width: 12px !important;;
-}
+    .tab-throbber-tabslist, .tab-throbber, .tab-icon-pending, .tab-icon-image, .tab-sharing-icon-overlay, .tab-icon-overlay {
+      height: 14px !important;
+      width: 14px !important;;
+    }
 
-:root[sizemode="maximized"] .tabbrowser-tab {
-  font-size: 13px;
-}
-
-/* Makes tabs toolbar items zero-height initially and sets enlarge them to fill up space equal to tab-min-height set on tabs. Optionally use privatemode_indicator_as_menu_button.css to replace main menu icon with private browsing indicator while tabs are hidden. */
-/* Firefox 65+ only */
-
-:root[sizemode="normal"] #nav-bar{ --uc-window-drag-space-width: 20px }
-
-#titlebar{ -moz-appearance: none !important; }
-#TabsToolbar{
-  min-height: 0px !important;
-  transition: all 250ms;
-}
-
-#tabbrowser-tabs, #tabbrowser-tabs > .tabbrowser-arrowscrollbox, #tabbrowser-arrowscrollbox{ min-height: 0 !important; }
-
-:root:not([customizing]) #tabbrowser-tabs .tabs-newtab-button,
-:root:not([customizing]) #tabs-newtab-button,
-:root:not([customizing]) #TabsToolbar-customization-target > .toolbarbutton-1,
-:root:not([customizing]) #TabsToolbar .titlebar-button{
-  -moz-appearance: none !important;
-  height: 0px;
-  padding-top: 0px !important;
-  padding-bottom: 0px !important;
-  -moz-box-align: stretch;
-  margin: 0 !important;
+    .tabbrowser-tab {
+      font-size: 13px;
+    }
+    
+    .tabbrowser-tab[usercontextid] > .tab-stack > .tab-background > .tab-context-line {
+        height: 1px !important;
+        margin:  0 !important;
+        bottom: 0px;
+        position: absolute;
+        width: 100%;
+        opacity: 0.65;
+    }
 }
 
-.accessibility-indicator,
-.private-browsing-indicator{ 
-  height: unset !important;
-}
-.accessibility-indicator > hbox{ padding-block: 0 !important }
+/* Hide Tabs toolbar when there is only one (unpinned) tab */
+/* Disabled, as it depends on https://bugzilla.mozilla.org/show_bug.cgi?id=1792501 being fixed */
+@media (max-width: 0px /* Set to min-width to enable */) {
+    :root[sessionrestored]:not([customizing]) 
+        #navigator-toolbox:not(:focus-within):not(:hover)
+        #TabsToolbar:has(.tabbrowser-tab[first-visible-unpinned-tab]:last-of-type)/**/ {
+        max-height: 0px !important;
+        background-color: green !important;
+        transition: all 250ms ease 500ms;
 
-#tabbrowser-tabs .tabbrowser-tab{ height: calc(var(--tab-min-height) + 2 * var(--tab-block-margin,0px)) }
+    }
+    
+    #TabsToolbar {
+        max-height: 100px !important;
+    }
+    
+    /* 5px mouse area at top of page to show hidden navbar */
+    
+    :root[sessionrestored]:not([customizing]) #navigator-toolbox:not(:hover):not(:focus-within) {
+        transition: all 250ms ease 500ms;
+        border-bottom: 5px solid transparent !important;
+    }
+    :root[sessionrestored] #navigator-toolbox {
+        transition: all 250ms ease 00ms;
+    }
 
-#tabbrowser-tabs .tabbrowser-tab[first-visible-tab="true"][last-visible-tab="true"] {
-  visibility: collapse !important;
-}
-
-/* Requires layout.css.has-selector.enabled in about:config */
-#TabsToolbar:has(.tabbrowser-tab[first-visible-tab="true"][last-visible-tab="true"]) {
-  visibility: collapse !important;
-}
-
-/* Button re-styling */
-#tabs-newtab-button{ transform: scale(0.8); }
-#tabs-newtab-button:hover{
-  background-color: var(--toolbarbutton-hover-background);
-  border-radius: var(--tab-border-radius);
-}
-
-#tabs-newtab-button > .toolbarbutton-icon{
-  padding: 0 !important;
-  transform: scale(0.6);
-  background-color: transparent !important;
-}
-/* Extra top padding  in maximized window */
-@media  (-moz-platform: windows),
-        (-moz-os-version: windows-win7),
-        (-moz-os-version: windows-win10){
-  :root[tabsintitlebar][sizemode="maximized"] #navigator-toolbox{
-    padding-top:2px !important;
-  }
-}
-/* Fix window controls not being clickable */
-:root[tabsintitlebar] #toolbar-menubar[autohide="true"][inactive]{
-  transition: height 0ms steps(1) 80ms;
-}
-:where(#nav-bar){
-  /*! border-inline: var(--uc-window-drag-space-width,0) solid var(--toolbar-bgcolor); */
+    :root[sessionrestored] #navigator-toolbox {
+        margin-bottom: -5px;
+        z-index: 100;
+    }
 }

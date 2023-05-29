@@ -3,6 +3,7 @@ window {
     border: 5px solid #0a0b15;
     background-color: #0a0b15;
     border-radius: 15px;
+    /*opacity: 0.9;*/
 }
 
 #input {
