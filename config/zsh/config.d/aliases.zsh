@@ -45,6 +45,7 @@ function mkcd {
 }
 
 alias st=subterranean
+alias j=just
 
 alias nv=nvim
 export EDITOR='kak'

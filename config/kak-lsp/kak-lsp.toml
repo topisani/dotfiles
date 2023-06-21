@@ -94,7 +94,7 @@ offset_encoding = "utf-8"
 filetypes = ["c", "cpp"]
 roots = ["compile_commands.json"]
 command = "sh"
-args = ['-c', 'TMPDIR=~/.cache/clangd/ clangd --cross-file-rename --clang-tidy --query-driver=/home/topisani/**,/usr/**,arm-none-eabi-gcc,arm-none-eabi-*,arm-none-eabi-g++,**']
+args = ['-c', 'TMPDIR=~/.cache/clangd/ clangd --cross-file-rename --query-driver=/home/topisani/**,/usr/**,arm-none-eabi-gcc,arm-none-eabi-*,arm-none-eabi-g++,**']
 
 [language.java]
 filetypes = ["java"]

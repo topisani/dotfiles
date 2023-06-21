@@ -54,10 +54,9 @@ alias a='kcr attach'
 #alias :br='KK broot'
 #alias :cat='kcr cat --raw'
 
-alias st=subterranean
-
 export EDITOR='kcr edit'
 export FZF_DEFAULT_OPTS='--multi --layout=reverse --preview-window=down:60% --color=16'
+
 
 # Change the current directory for a tmux session, which determines
 # the starting dir for new windows/panes:
@@ -66,6 +65,10 @@ function tmux-cwd {
 }
 
 alias tcd='tmux-cwd'
+
+# Tools
+alias j=just
+alias st=subterranean
 
 # Projects
 function ottobsp {
