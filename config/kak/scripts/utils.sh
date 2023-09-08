@@ -6,8 +6,8 @@ map_mode() {
   run=": $command<ret>"
   scope="global"
   repeat=''
-  [[ ! "$1" =~ ^- ]] && docstring=$1 && shift
-  while [[ ! $# == 0 ]]; do
+  [ "$1" = "${1#-}" ] && docstring=$1 && shift
+  while [ $# != 0 ]; do
     case $1 in
       -scope)
         shift
@@ -33,22 +33,22 @@ map_mode() {
 map_all() {
   mode=$1; shift
   flags=''
-  while [[ $# > 1 ]]; do
+  while [ $# > 1 ]; do
     flags="$flags $1"; shift
   done
   while read line; do
-  	[[ -n "$line" ]] || continue
+  	[ -n "$line" ] || continue
   	echo map-mode $mode "$line" $flags
   done <<< "$1"
 }
 
 new_mode() {
   name=$1; shift
-  key=${1:-}; [ ! $# == 0 ] && shift
+  key=${1:-}; [ $# != 0 ] && shift
   docstring="$name..."
   parent="user"
   scope="global"
-  while [[ ! $# == 0 ]] && [[ "$1" =~ "^-" ]]; do
+  while ! [ $# == 0 ] && ! [ "$1" = "${1#-}" ]; do
     case $1 in
       -scope)
         shift
@@ -66,6 +66,6 @@ new_mode() {
     shift
   done
   echo declare-user-mode $name
-  [[ -n "$key" ]] && echo map $scope $parent $key %{: enter-user-mode $name\<ret\>} -docstring %{$docstring}
-  [[ $# != 0 ]] && map_all $name -scope $scope "$*"
+  [ -n "$key" ] && echo map $scope $parent $key %{: enter-user-mode $name\<ret\>} -docstring %{$docstring}
+  [ $# != 0 ] && map_all $name -scope $scope "$*"
 }

@@ -140,7 +140,7 @@ def other-or-alt -docstring \
 If the current buffer has an 'other_file' option, use that.
 Otherwise, calls :alt" \
 %{ eval %sh{
-  if [[ -n "$kak_opt_other_file" ]]; then
+  if [ -n "$kak_opt_other_file" ]; then
     echo "try %[ edit -existing '$(dirname $kak_buffile)/$kak_opt_other_file' ] catch %[ alt ]"
   else
     echo alt

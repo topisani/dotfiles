@@ -55,19 +55,19 @@ map global my-tmux s     ': tmux-new-vertical<ret>'              -docstring 'Spl
 map global my-tmux v     ': tmux-new-horizontal<ret>'            -docstring 'Split vertically'
 map global my-tmux d     ': quit<ret>'                           -docstring 'Delete pane'
 
-def git-blame-toggle %{
-  try %[
-    addhl window/git-blame flag_lines Info git_blame_flags
-    rmhl window/git-blame
-    git blame
-  ] catch %[
-    git hide-blame
-  ]
-}
+# def git-blame-toggle %{
+#   try %[
+#     addhl window/git-blame flag_lines Info git_blame_flags
+#     rmhl window/git-blame
+#     git blame
+#   ] catch %[
+#     git hide-blame
+#   ]
+# }
 
-declare-user-mode git
-map global user   g ': enter-user-mode git<ret>'   -docstring "Git..."
-map global git    g ': connect terminal tig<ret>'  -docstring 'Open tig'
-map global git    f ': fzf-git<ret>'               -docstring 'Open files in repo'
-map global git    p ':git '                        -docstring 'Open git prompt'
-map global git    b ': git-blame-toggle<ret>'      -docstring 'Toggle git blame'
+# declare-user-mode git
+# map global user   g ': enter-user-mode git<ret>'   -docstring "Git..."
+# map global git    g ': connect terminal tig<ret>'  -docstring 'Open tig'
+# map global git    f ': fzf-git<ret>'               -docstring 'Open files in repo'
+# map global git    p ':git '                        -docstring 'Open git prompt'
+# map global git    b ': git-blame-toggle<ret>'      -docstring 'Toggle git blame'

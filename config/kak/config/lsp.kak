@@ -1,6 +1,6 @@
 # Setup kak-lsp
 
-eval %sh{ kak-lsp --kakoune -s $kak_session --log /tmp/kak-lsp-$kak_session.log }
+eval %sh{ kak-lsp --kakoune -s $kak_session -v -v -v -v -v --log /tmp/kak-lsp-$kak_session.log }
 
 hook -always global KakEnd .* %{ nop %sh{
   rm /tmp/kak-lsp-$kak_session.log
@@ -80,13 +80,13 @@ def -hidden -override lsp-show-error -params 1 -docstring "Render error" %{
   echo -markup " {Error}%arg{1}"
 }
 
-def -hidden -override lsp-perform-code-action -params .. %{
-  popup -title "Code Actions" -h 15 -w 80 krc-fzf menu %arg{@}
-}
+# def -hidden -override lsp-perform-code-action -params .. %{
+#   popup -title "Code Actions" -h 15 -w 80 krc-fzf menu %arg{@}
+# }
 
-def -hidden -override lsp-menu -params .. %{
-  popup krc-fzf menu %arg{@}
-}
+# def -hidden -override lsp-menu -params .. %{
+#   popup krc-fzf menu %arg{@}
+# }
 
 # def -hidden -override lsp-show-goto-choices -params 2 -docstring "Render goto choices" %{
 #   connect bottom-panel sh -c "echo '%arg{@}' | krc-fzf jump"

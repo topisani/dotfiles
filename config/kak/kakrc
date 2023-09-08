@@ -105,7 +105,29 @@ cork kakoune-interactively https://github.com/chambln/kakoune-interactively %{
     set-option global yes_or_no_instant false
 }
 
-cork pipe.kak https://github.com/alexherbo2/pipe.kak
+cork kakoune-git-mode 'https://github.com/jordan-yee/kakoune-git-mode' %{
+    # Set structured commit message options here
+    # set-option global git_mode_use_structured_quick_commit true
+    # set-option git_mode_commit_prefixes 'feat::fix::docs::refactor::build::test::style::BREAKING CHANGE::'
+    # set-option git_mode_branch_label_regex 'SCRUM-[0-9]+'
+
+    # Declare git mode with default set of mappings
+    declare-git-mode
+
+    # Suggested user mode mapping
+    map global user g ': enter-user-mode git<ret>' -docstring "git mode"
+
+    # I find this quite nice to open the lazygit client.
+    map global git o ': tmux-terminal-window lazygit<ret>' -docstring "open lazygit in new window"
+    
+    hook global WinCreate .* %{ evaluate-commands %sh{
+        if [ $kak_buffile != $kak_bufname ] && git ls-files --error-unmatch "$kak_buffile" > /dev/null 2>&1; then
+            echo "git-mode-show-diff"
+        fi
+    }}
+    hook global BufWritePost .* git-mode-update-diff
+    hook global BufReload .* git-mode-update-diff
+}
 
 # Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
