@@ -5,6 +5,10 @@ if [[ ! -d ~/.zplug ]];then
 fi
 source ~/.zplug/init.zsh
 
+if [ -z "$_HOME_DOT_PROFILE_INCLUDED" ]; then
+    source ~/.profile
+fi
+
 iscmd() {
     command -v $1 > /dev/null
 }

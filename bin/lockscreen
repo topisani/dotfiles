@@ -20,13 +20,12 @@ _wallpapers() {
    done
 }
 
+_wallpapers
+
 
 # _get_display_id_from_desc 5NRBS83
 cmd="
 swaylock -fe $(_wallpapers) 
---fade-in 1 
---clock 
---indicator
 --indicator-radius 100
 --line-uses-inside
 --inside-color 00000060
@@ -44,12 +43,18 @@ swaylock -fe $(_wallpapers)
 --ring-wrong-color f2413050
 --inside-wrong-color d9281750
 --text-wrong-color FFFFFFB0
---effect-vignette 0.2:1 --grace 5
 "
+# --fade-in 1 
+# --effect-vignette 0.2:1 --grace 5
+# --clock 
+#--indicator
 echo $cmd
 
-killall swaylock
-$cmd
+if pgrep swaylock > /dev/null; then
+  echo "Lockscreen already started"
+else 
+  $cmd
+fi
 
 #--ring-color <color>              \
 # --ring-clear-color <color>        \

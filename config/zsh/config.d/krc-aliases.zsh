@@ -4,27 +4,27 @@ function kak {
     test -n "$KAKOUNE_SESSION" && krc attach "$@" || command kak "$@"
 }
 
-function kman { test -n "$KAKOUNE_SESSION" && krc send-fg man "$@" || kak -e "man $*"; }
-function edit { krc send-fg edit "$@"; }
+function krc-man { test -n "$KAKOUNE_SESSION" && krc send-fg man "$@" || kak -e "man $*"; }
+function krc-edit { krc send-fg edit "$@"; }
 
-function val { krc get "%val[$1]"; }
-function opt { krc get "%opt[$1]"; }
-function reg { krc get "%reg[$1]"; }
+function krc-val { krc get "%val[$1]"; }
+function krc-opt { krc get "%opt[$1]"; }
+function krc-reg { krc get "%reg[$1]"; }
 
-function setw { krc send-sync set window "$@"; }
-function setb { krc send-sync set buffer "$@"; }
-function setg { krc send-sync set global "$@"; }
+function krc-setw { krc send-sync set window "$@"; }
+function krc-setb { krc send-sync set buffer "$@"; }
+function krc-setg { krc send-sync set global "$@"; }
 
-function send { krc send "$@"; }
-function :send { krc send-fg "$@"; }
-function send-sync { krc send-sync "$@"; }
+function krc-send { krc send "$@"; }
+function krc-:send { krc send-fg "$@"; }
+function krc-send-sync { krc send-sync "$@"; }
 
-function buffers {
-    eval set -- $(krc get -quoting shell %val[buflist])
+function krc-buffers {
+    eval set -- $(krc get '%val[buflist]')
     printf "%s\n" "$@"
 }
 
-function fifo {
+function krc-fifo {
     # Send output of argument command, or read stdin, to a fifo buffer.
     d=$(mktemp -d --suffix=-krc-fifo)
     fifo="$d/fifo"
@@ -39,6 +39,7 @@ function fifo {
 }
 
 alias k=kak
-alias e=edit
-alias b=buffers
-alias ke='eval $(krc-choose-env)'
+alias ke=krc-edit
+alias kb=krc-buffers
+alias kman=krc-man
+alias krc-env='eval $(krc-choose-env)'

@@ -73,3 +73,5 @@ fi
 
 # use docker buildkit
 export DOCKER_BUILDKIT=1
+
+export _HOME_DOT_PROFILE_INCLUDED=1

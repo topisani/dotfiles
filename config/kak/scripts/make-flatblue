@@ -132,6 +132,11 @@ set global lsp_diagnostic_line_hint_sign '●'
 # set global lsp_diagnostic_line_hint_sign ' '
 set -add global ui_options 'terminal_padding_char= '
 
+# Todo Highlights
+face global MarkerTodo    $yellow+b
+face global MarkerNote    $blue_light+b
+face global MarkerFixme   $purple_light+b
+
 
 # Switch cursor color in insert mode
 face global PrimaryCursorNormal              $bg0,              $(alpha $bluish_fg e0)

@@ -16,7 +16,6 @@ set-option -add global ui_options terminal_assistant=none
 set-option -add global ui_options terminal_set_title=no
 set-option -add global ui_options terminal_synchronized=false
 
-
 set-option global modelinefmt '{{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {{context_info}} {cyan}U+%sh{printf ''%04x'' "$kak_cursor_char_value"}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default}'
 
 # Window-based settings
@@ -220,6 +219,27 @@ hook global BufCreate .*Makefile\..* %{
 
 hook global BufCreate .*\.yuck %{
   set buffer filetype lisp
+}
+
+# openocd files
+hook global BufCreate .*\.ocd %{
+  set buffer filetype sh
+}
+
+# Global highlighter ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+def -override hl-todo-enable %{
+  hl-todo-disable
+  addhl window/hl-todo regex "\b(?:(TODO)|(FIXME)|(NOTE))\b" 1:MarkerTodo 2:MarkerFixme 3:MarkerNote
+}
+
+def -override hl-todo-disable %{
+  rmhl window/hl-todo
+}
+
+# Do it here so it hopefully runs after all other language-specific highlighters
+filetype-hook .* %{
+  hl-todo-enable
 }
 
 # ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈

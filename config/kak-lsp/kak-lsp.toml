@@ -86,9 +86,13 @@ command = "ocamllsp"
 
 [language.python]
 filetypes = ["python"]
-roots = ["requirements.txt", "setup.py", ".git", ".hg", "pyproject.toml"]
-command = "jedi-language-server"
-offset_encoding = "utf-8"
+roots = ["requirements.txt", "setup.py", ".git", ".hg"]
+command = "pylsp"
+settings_section = "_"
+[language.python.settings._]
+# See https://github.com/python-lsp/python-lsp-server#configuration
+# pylsp.configurationSources = ["flake8"]
+pylsp.plugins.jedi_completion.include_params = true
 
 [language.c_cpp]
 filetypes = ["c", "cpp"]

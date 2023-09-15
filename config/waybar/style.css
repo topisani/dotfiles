@@ -29,10 +29,10 @@ window#waybar.solo {
 
 window#waybar.termite {
 }
-
+/*
 window#waybar.firefox {
     border-bottom: 2px solid orange;
-}
+}*/
 
 /* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
 #workspaces button {

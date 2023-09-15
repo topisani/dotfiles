@@ -61,4 +61,7 @@ then
   _bcpp --defaults
 fi
 
-source <(kitty + complete setup bash)
+if [ -z "$_HOME_DOT_PROFILE_INCLUDED" ]; then
+    source ~/.profile
+fi
+

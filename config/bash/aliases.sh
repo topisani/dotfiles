@@ -44,8 +44,8 @@ function mkcd {
 
 # https://github.com/alexherbo2/kakoune.cr
 alias kcr-tmux="kcr env | jq -r 'to_entries[] | \"tmux setenv \(.key) \(.value)\"' | sh"
-alias k='kcr edit'
-alias K='kcr-fzf-shell'
+alias k='krc edit'
+alias K='krc-fzf-shell'
 alias KK='K --working-directory .'
 alias ks='kcr shell --session'
 alias kl='kcr list'

@@ -73,7 +73,7 @@ alias termbin="nc termbin.com 9999"
 
 # Call less if there is only one argument and it is a filename. Otherwise, call ls
 less_or_ls() {
-    ([ "$#" -eq "1" ] && [ -f "$1" ] && bat $@ ) || ls $@
+    ([ "$#" -eq "1" ] && [ -f "$1" ] && bat "$@" ) || ls "$@"
 }
 alias ls=less_or_ls
 
@@ -87,3 +87,15 @@ calc() {
     local IFS=' '
     bc -l <<<"scale=10;$@"
 }
+
+git_release() {
+    version=${1//v}; shift &> /dev/null
+    if [ -z "$version" ]; then
+      echo "Usage: $0 <version> [git tag options...]"
+      return 1
+    fi
+    git tag -a v$version -m "Release $version" "$@" && echo "Created tag v$version"
+}
+
+alias grel=git_release
+

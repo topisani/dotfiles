@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ "$#" -lt "1" ]; then
   echo "Stupid serial communication."
@@ -11,23 +11,18 @@ if [ "$#" -lt "1" ]; then
   exit 1
 fi
 
-DEVICE=${1}
-BAUDRATE=${2:-115200}
+DEVICE=${1}; shift
+BAUDRATE=${2:-115200}; shift
 
 trap "exit" INT TERM
 trap "kill 0" EXIT
 
-stty -echo $BAUDRATE -F $DEVICE
-
 echo ""
 
 cat $DEVICE | while read line; do
-  printf "\033[s" # Save cursor
-  printf "\033[0G" # Go to column 0
-  tput setaf 12
-  printf "%s" "$line"
-  tput sgr0
-  printf "\033[u" # Restore cursor
-  echo ""
+  echo "$line"
 done &
+
+stty -F $DEVICE -echo raw $BAUDRATE "$@"
+
 cat >> $DEVICE

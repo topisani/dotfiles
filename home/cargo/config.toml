@@ -6,3 +6,6 @@ jobs = 6
 
 [doc]
 browser = "webview"
+
+[registries.carates-io]
+protocol = "sparse"
