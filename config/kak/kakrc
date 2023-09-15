@@ -58,18 +58,15 @@ define-command -override make-directory-on-save -docstring 'make directory on sa
   hook -group make-directory-on-save global BufWritePre '.*' mkdir
 }
 
-# cork indent https://github.com/alexherbo2/indent.kak %{
-#   set-indent global 4
-#   enable-detect-indent
-#   enable-auto-indent
-#   # Disable indentation hooks
-#   set global disabled_hooks '(?!auto)(?!detect)\K(.+)-(trim-indent|insert|indent)'
-#   hook global -group delete-indent-space InsertDelete ' ' %{
-#     try %{
-#       exec -draft 'hGh<a-K>[^ ]<ret>i <esc><lt>'
-#     }
-#   }
-# }
+remove-hooks global delete-indent-space
+hook global -group delete-indent-space InsertDelete ' ' %{
+  exec -draft 'i '
+  try %{
+    eval -draft "exec ';hGh<a-k>^([ ]{%opt[indentwidth]})+\z<ret><lt>'"
+  } catch %{
+      exec -draft 'i<backspace>'
+  }
+}
 
 # Auto-pairing of characters
 cork auto-pairs https://github.com/alexherbo2/auto-pairs.kak %{
@@ -203,7 +200,6 @@ set-option global makecmd 'make -j 8'
 # Use ripgrep
 set-option global grepcmd 'rg -Hn --no-heading'
 
-# load-conf tree-sitter
 load-conf lsp
 load-conf c++
 load-conf rust
