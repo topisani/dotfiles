@@ -48,22 +48,28 @@ load-conf windowing
 
 # Plugins ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-cork tiny https://github.com/alexherbo2/tiny.kak %{
-  make-directory-on-save
+define-command -override mkdir -docstring 'make directory for the current buffer' %{
+  nop %sh(mkdir -p -- "$(dirname -- "$kak_buffile")")
 }
 
-cork indent https://github.com/alexherbo2/indent.kak %{
-  set-indent global 4
-  enable-detect-indent
-  enable-auto-indent
-  # Disable indentation hooks
-  set global disabled_hooks '(?!auto)(?!detect)\K(.+)-(trim-indent|insert|indent)'
-  hook global -group delete-indent-space InsertDelete ' ' %{
-    try %{
-      exec -draft 'hGh<a-K>[^ ]<ret>i <esc><lt>'
-    }
-  }
+# Ensure the buffer directory exists when saving.
+define-command -override make-directory-on-save -docstring 'make directory on save' %{
+  remove-hooks global make-directory-on-save
+  hook -group make-directory-on-save global BufWritePre '.*' mkdir
 }
+
+# cork indent https://github.com/alexherbo2/indent.kak %{
+#   set-indent global 4
+#   enable-detect-indent
+#   enable-auto-indent
+#   # Disable indentation hooks
+#   set global disabled_hooks '(?!auto)(?!detect)\K(.+)-(trim-indent|insert|indent)'
+#   hook global -group delete-indent-space InsertDelete ' ' %{
+#     try %{
+#       exec -draft 'hGh<a-K>[^ ]<ret>i <esc><lt>'
+#     }
+#   }
+# }
 
 # Auto-pairing of characters
 cork auto-pairs https://github.com/alexherbo2/auto-pairs.kak %{
@@ -197,6 +203,7 @@ set-option global makecmd 'make -j 8'
 # Use ripgrep
 set-option global grepcmd 'rg -Hn --no-heading'
 
+# load-conf tree-sitter
 load-conf lsp
 load-conf c++
 load-conf rust
