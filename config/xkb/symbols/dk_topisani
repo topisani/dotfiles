@@ -1,3 +1,7 @@
+// The danish keyboard layout is weird, but ive gotten rather used to some parts of it.
+// When using an external keyboard, i do this in QMK, but with this, i can still use an
+// integrated laptop keyboard.
+
 default partial alphanumeric_keys
 xkb_symbols "basic" {
 
@@ -5,8 +9,39 @@ xkb_symbols "basic" {
 
     name[Group1]="Danish nodeadkeys Topisani";
 
-    key <AC06>	{ [         h,          H,          Left,       Hstroke   ]	};
-    key <AC07>	{ [         j,          J,          Down,       dead_horn ] };
-    key <AC08>	{ [         k,          K,          Up,         ampersand ]	};
-    key <AC09>	{ [         l,          L,          Right,      Lstroke   ]	};
+    // Vim arrow keys everywhere with AltGr
+    key <AC06>  { [         h,          H,          Left,       Left   ]     };
+    key <AC07>  { [         j,          J,          Down,       Down ] };
+    key <AC08>  { [         k,          K,          Up,         Up ]     };
+    key <AC09>  { [         l,          L,          Right,      Right   ]     };
+
+    // For compatibility with ANSI layouts that are missing the extra key next to z,
+    // I add less than and backslash to other keys
+    key <AB08>  { [     comma,  semicolon,      less,       U2022 ]}; // bullet
+    key <AB09>  { [    period,      colon,      greater,    periodcentered ]};
+    key <AB01>  { [         z,          Z, backslash,        less ]     };
+
+    // Consider more mods here:
+    // key <AB10>       { [     minus, underscore, dead_belowdot, dead_abovedot ] };
+    // key <AB10>       { [     minus, underscore, dead_belowdot, dead_abovedot ] };
+
+    // key <AC10>       {[        ae,        AE, dead_acute, dead_doubleacute]};
+    // key <AC11>       {[    oslash,    Oslash, dead_circumflex, dead_caron ]};
+    // key <BKSL>       {[apostrophe,  asterisk, dead_doubleacute,  multiply ]};
+
+    // Add dead_greek. This is more useful to me than eng
+    key <AC05>  { [         g,          G,          dead_greek,          ENG ]  };
+
+    // Backtick (grave) on first level (instead of acute)
+    key <AE12>	{[     grave,      grave,          bar,       ogonek ]};
+
+    // Who the hell decided we needed a dedicated ½ key?
+    // I move escape here, and dont worry about the other layers for now
+    key <TLDE>	{[  Escape,   section, threequarters,    paragraph ]};
+
+    // Compose key
+    key <RCTRL> { [  Multi_key ] };
+
+    include "ctrl(nocaps)"
 };
+

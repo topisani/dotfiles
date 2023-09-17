@@ -131,6 +131,8 @@ cork kakoune-git-mode 'https://github.com/jordan-yee/kakoune-git-mode' %{
     hook global BufReload .* git-mode-update-diff
 }
 
+cork kakoune-sudo-write 'https://github.com/occivink/kakoune-sudo-write'
+
 # Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 map -docstring 'indent' global insert <tab> '<a-;><a-gt>'
