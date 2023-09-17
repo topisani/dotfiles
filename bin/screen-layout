@@ -1,40 +1,46 @@
 #! /bin/bash
 
+EDP1_SCALE=1
+
+if hyprctl monitors -j | jq -e '.[] | select(.name == "eDP-1") | .width > 1920'; then
+    EDP1_SCALE=1.5
+fi
+
 _layout_office_triple_vert() {
   echo "desc:Dell Inc. DELL U2719D 7NRBS83,highres,1920x0,1,transform,1"
   echo "desc:Dell Inc. DELL U2719D 5NRBS83,highres,3360x0,1,transform,3"
   echo "desc:Dell Inc. DELL U2719D CNRBS83,highres,4800x0,1,transform,3"
-  echo "eDP-1,highres,6240x1480,1"
+  echo "eDP-1,highres,6240x1480,$EDP1_SCALE"
 }
 
 _layout_cpi() {
   echo "desc:Dell Inc. DELL U2412M 0FFXD45N5R8S',highres,0x0,1"
   echo "desc:Dell Inc. DELL 2405FPW M675459U1TTS',highres,1920x0,1"
-  echo "eDP-1,highres,0x1200,1"
+  echo "eDP-1,highres,0x1200,$EDP1_SCALE"
 }
 
 _layout_single() {
-  echo "eDP-1,highres,0x0,1"
+  echo "eDP-1,highres,0x0,$EDP1_SCALE"
 }
 
 _layout_tv() {
   echo "'desc:Philips Consumer Electronics Company Philips FTV 0x00000101' 0 0"
-  echo "eDP-1,highres,960x2160,1"
+  echo "eDP-1,highres,960x2160,$EDP1_SCALE"
 }
 
 _layout_umag() {
   echo "'desc:Unknown MSI G241 0x000004CE',highres,0x0,1,transform,3"
   echo "'desc:Unknown MSI G241 0x000004E1',highres,1080x0,1,transform,1"
-  echo "eDP-1,highres,120x1920,1"
+  echo "eDP-1,highres,120x1920,$EDP1_SCALE"
 }
 
 _layout_home() {
   echo 'desc:Dell Inc. DELL S2721QS CH3CM43,highres,0x0,1.25'
-  echo 'eDP-1,highres,960x2160,1'
+  echo "eDP-1,highres,960x2160,$EDP1_SCALE"
 }
 
 _layout_mirror() {
-  echo 'eDP-1,highres,0x0,1'
+  echo "eDP-1,highres,0x0,$EDP1_SCALE"
   hyprctl monitors -j | jq -r '.[].name | select(. != "eDP-1")' |
     while read name; do
       [[ -n "$name" ]] && echo "$name,preferred,auto,1,mirror,eDP-1"

@@ -86,7 +86,7 @@ command = "ocamllsp"
 
 [language.python]
 filetypes = ["python"]
-roots = ["requirements.txt", "setup.py", ".git", ".hg"]
+roots = ["requirements.txt", "setup.py", ".git", ".hg", "pyproject.toml"]
 command = "pylsp"
 settings_section = "_"
 [language.python.settings._]
