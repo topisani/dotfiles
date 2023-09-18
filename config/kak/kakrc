@@ -108,6 +108,7 @@ cork kakoune-interactively https://github.com/chambln/kakoune-interactively %{
 }
 
 cork kakoune-git-mode 'https://github.com/jordan-yee/kakoune-git-mode' %{
+    load-conf git
     # Set structured commit message options here
     # set-option global git_mode_use_structured_quick_commit true
     # set-option git_mode_commit_prefixes 'feat::fix::docs::refactor::build::test::style::BREAKING CHANGE::'
