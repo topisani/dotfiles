@@ -124,12 +124,13 @@ cork kakoune-git-mode 'https://github.com/jordan-yee/kakoune-git-mode' %{
     map global git o ': tmux-terminal-window lazygit<ret>' -docstring "open lazygit in new window"
     
     hook global WinCreate .* %{ evaluate-commands %sh{
-        if [ $kak_buffile != $kak_bufname ] && git ls-files --error-unmatch "$kak_buffile" > /dev/null 2>&1; then
+        cd "$(dirname $kak_buffile)" 2>&1 > /dev/null
+        if (git ls-files --error-unmatch "$kak_buffile") > /dev/null 2>&1; then
             echo "git-mode-show-diff"
+            echo "hook window BufWritePost .* git-mode-update-diff"
+            echo "hook window BufReload .* git-mode-update-diff"
         fi
     }}
-    hook global BufWritePost .* git-mode-update-diff
-    hook global BufReload .* git-mode-update-diff
 }
 
 cork kakoune-sudo-write 'https://github.com/occivink/kakoune-sudo-write'
