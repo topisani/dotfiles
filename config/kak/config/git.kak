@@ -44,6 +44,11 @@
 # declare-option -hidden line-specs git_diff_flags
 # declare-option -hidden int-list git_hunk_list
 
+declare-option -hidden str git_diff_flag_added "{green}▎"
+declare-option -hidden str git_diff_flag_modified "{blue}▎"
+declare-option -hidden str git_diff_flag_deleted_before "{red}🭗"
+declare-option -hidden str git_diff_flag_deleted_after "{red}🬼"
+
 define-command -params 1.. \
     -override \
     -docstring %{
@@ -181,43 +186,43 @@ define-command -params 1.. \
                     if ($from_count == 0 and $to_count > 0) {
                         for $i (0..$to_count - 1) {
                             $line = $to_line + $i;
-                            $flags .= " $line|\{green\}▎";
+                            $flags .= " $line|%opt\{git_diff_flag_added\}";
                         }
                     }
                     elsif ($from_count > 0 and $to_count == 0) {
                         if ($to_line == 0) {
-                            $flags .= " 1|\{red\}🭗";
+                            $flags .= " 1|%opt\{git_diff_flag_deleted_before\}";
                         } else {
-                            $flags .= " $to_line|\{red\}🬼";
+                            $flags .= " $to_line|%opt\{git_diff_flag_deleted_after\}";
                         }
                     }
                     elsif ($from_count > 0 and $from_count == $to_count) {
                         for $i (0..$to_count - 1) {
                             $line = $to_line + $i;
-                            $flags .= " $line|\{blue\}▎";
+                            $flags .= " $line|%opt\{git_diff_flag_modified\}";
                         }
                     }
                     elsif ($from_count > 0 and $from_count < $to_count) {
                         for $i (0..$from_count - 1) {
                             $line = $to_line + $i;
-                            $flags .= " $line|\{blue\}▎";
+                            $flags .= " $line|%opt\{git_diff_flag_modified\}";
                         }
                         for $i ($from_count..$to_count - 1) {
                             $line = $to_line + $i;
-                            $flags .= " $line|\{green\}▎";
+                            $flags .= " $line|%opt\{git_diff_flag_added\}";
                         }
                     }
                     elsif ($to_count > 0 and $from_count > $to_count) {
                         for $i (0..$to_count - 2) {
                             $line = $to_line + $i;
-                            $flags .= " $line|\{blue\}▎";
+                            $flags .= " $line|%opt\{git_diff_flag_modified\}";
                         }
                         $last = $to_line + $to_count - 1;
-                        $flags .= " $last|\{blue+u\}▎";
+                        $flags .= " $last|%opt\{git_diff_flag_modified\}";
                     }
                 }
             }
-            print "set-option buffer git_diff_flags $flags"
+            print "eval \"set-option buffer git_diff_flags $flags\""
         ' )
     }
 

@@ -132,6 +132,11 @@ set global lsp_diagnostic_line_hint_sign '●'
 # set global lsp_diagnostic_line_hint_sign ' '
 set -add global ui_options 'terminal_padding_char= '
 
+set global git_diff_flag_added '{$green}▎'
+set global git_diff_flag_modified '{$blue}▎'
+set global git_diff_flag_deleted_before '{$red}🭗'
+set global git_diff_flag_deleted_after '{$red}🬼'
+
 # Todo Highlights
 face global MarkerTodo    $yellow+b
 face global MarkerNote    $blue_light+b
