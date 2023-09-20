@@ -2,8 +2,6 @@
 # ~/.bashrc
 #
 
-[[ $- != *i* ]] && return
-
 [ -r /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
 
 export TMPDIR="/tmp"
@@ -48,6 +46,13 @@ test -r /usr/share/nvm/init-nvm.sh && source /usr/share/nvm/init-nvm.sh
 # Opam: Ocaml package manager
 command -v opam &> /dev/null && eval $(opam config env)
 
+if [ -z "$_HOME_DOT_PROFILE_INCLUDED" ]; then
+    source ~/.profile
+fi
+
+# Only continue for interactive shells
+[[ $- != *i* ]] && return
+
 # Starship prompt
 eval "$(starship init bash)"
 
@@ -59,9 +64,5 @@ if [ -s "$HOME/.config/bash-complete-partial-path/bash_completion" ]
 then
   source "$HOME/.config/bash-complete-partial-path/bash_completion"
   _bcpp --defaults
-fi
-
-if [ -z "$_HOME_DOT_PROFILE_INCLUDED" ]; then
-    source ~/.profile
 fi
 

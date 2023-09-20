@@ -77,15 +77,15 @@ cork grep-write https://github.com/JacobTravers/kakoune-grep-write
 
 cork kakoune-gdb https://github.com/occivink/kakoune-gdb
 
-cork fzf https://github.com/andreyorst/fzf.kak %{
-  require-module fzf
-  require-module fzf-file
-  set-option global fzf_file_command "fd . --type f -uu --follow"
-  set-option global fzf_file_preview false
-  require-module fzf-vcs
-  #set-option global fzf_git_command "fd . --type f --follow"
-  require-module fzf-buffer
-}
+# cork fzf https://github.com/andreyorst/fzf.kak %{
+#   require-module fzf
+#   require-module fzf-file
+#   set-option global fzf_file_command "fd . --type f -uu --follow"
+#   set-option global fzf_file_preview false
+#   require-module fzf-vcs
+#   #set-option global fzf_git_command "fd . --type f --follow"
+#   require-module fzf-buffer
+# }
 
 cork focus https://github.com/caksoylar/kakoune-focus %{
   set global focus_context_lines 1

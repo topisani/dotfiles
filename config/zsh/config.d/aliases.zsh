@@ -48,8 +48,6 @@ alias st=subterranean
 alias j=just
 
 alias nv=nvim
-export EDITOR='kak'
-export FZF_DEFAULT_OPTS='--multi --layout=reverse --preview-window=down:60% --color=16'
 
 # Change the current directory for a tmux session, which determines
 # the starting dir for new windows/panes:
