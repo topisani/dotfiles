@@ -97,3 +97,10 @@ git_release() {
 
 alias grel=git_release
 
+
+whichpkg() (
+    set -e
+    file=$(which $1)
+    la "$file"
+    pacman -Qo "$file"
+)

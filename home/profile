@@ -52,7 +52,8 @@ export LESS_TERMCAP_ue=$default # End underline
 export LESS_TERMCAP_us=$green # Begin underline
 
 export EDITOR='kak'
-export FZF_DEFAULT_OPTS='--preview-window=right,border-left,<30(up,30%,border-bottom) --color=16'
+# Breaks forgit
+# export FZF_DEFAULT_OPTS='--preview-window=right,border-left,<30(up,30%,border-bottom)'
 
 # if running bash
 if [ -n "$BASH_VERSION" ]; then

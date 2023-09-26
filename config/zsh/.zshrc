@@ -14,6 +14,7 @@ iscmd() {
 }
 
 export FORGIT_COPY_CMD=clip
+export FORGIT_FZF_DEFAULT_OPTS="--reverse"
 
 zplug "plugins/git",   from:oh-my-zsh
 zplug 'wfxr/forgit', defer:1

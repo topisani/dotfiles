@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Run command in the "correct" environment for the current path
+
+if [ $# = 0 ]; then
+    cat <<EOF
+Usage: python-env-run <cmd> [args...]
+
+Run <cmd> [args...] in the local environment.
+If the current directory contains a poetry project, the environment will be activated
+for the command. Otherwise, run in the global environment.
+EOF
+    exit 1
+fi
+
+if poetry env info -q; then
+    exec poetry run "$@"
+fi
+
+# Could support other things than poetry if needed
+
+ exec "$@"
