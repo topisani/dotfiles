@@ -86,7 +86,7 @@ command = "ocamllsp"
 
 [language.python]
 filetypes = ["python"]
-roots = ["requirements.txt", "setup.py", ".git", ".hg", "pyproject.toml"]
+roots = ["pyproject.toml", "requirements.txt", "setup.py", ".git", ".hg"]
 command = "python-env-run"
 args = ["pylsp"]
 settings_section = "_"

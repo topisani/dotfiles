@@ -20,6 +20,7 @@ zplug "plugins/git",   from:oh-my-zsh
 zplug 'wfxr/forgit', defer:1
 zplug "zsh-users/zsh-autosuggestions"
 zplug "zsh-users/zsh-syntax-highlighting", defer:2
+zplug "xPMo/zsh-toggle-command-prefix"
 
 if ! zplug check --verbose; then
     printf "Install? [y/N]: "
