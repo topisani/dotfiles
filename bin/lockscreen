@@ -44,10 +44,17 @@ swaylock -fe $(_wallpapers)
 --inside-wrong-color d9281750
 --text-wrong-color FFFFFFB0
 "
-# --fade-in 1 
-# --effect-vignette 0.2:1 --grace 5
-# --clock 
-#--indicator
+
+# If swaylock-effects is installed, add the extra flags
+if swaylock --help 2>&1 | grep -q -- "--clock"; then
+    cmd="$cmd
+--fade-in 1 
+--effect-vignette 0.2:1 --grace 5
+--clock 
+--indicator
+    "
+fi
+
 echo $cmd
 
 if pgrep swaylock > /dev/null; then

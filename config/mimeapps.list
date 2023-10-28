@@ -14,3 +14,4 @@ x-scheme-handler/https=firefox.desktop
 x-scheme-handler/mailto=userapp-Thunderbird-0XNXN1.desktop
 x-scheme-handler/mid=userapp-Thunderbird-0XNXN1.desktop
 x-scheme-handler/unknown=firefox.desktop
+TerminalEmulator=alacritty.desktop

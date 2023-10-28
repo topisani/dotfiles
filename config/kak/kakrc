@@ -58,16 +58,6 @@ define-command -override make-directory-on-save -docstring 'make directory on sa
   hook -group make-directory-on-save global BufWritePre '.*' mkdir
 }
 
-remove-hooks global delete-indent-space
-hook global -group delete-indent-space InsertDelete ' ' %{
-  exec -draft 'i '
-  try %{
-    eval -draft "exec ';hGh<a-k>^([ ]{%opt[indentwidth]})+\z<ret><lt>'"
-  } catch %{
-      exec -draft 'i<backspace>'
-  }
-}
-
 # Auto-pairing of characters
 cork auto-pairs https://github.com/alexherbo2/auto-pairs.kak %{
   enable-auto-pairs
@@ -137,8 +127,9 @@ cork kakoune-sudo-write 'https://github.com/occivink/kakoune-sudo-write'
 
 # Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-map -docstring 'indent' global insert <tab> '<a-;><a-gt>'
-map -docstring 'deindent' global insert <s-tab> '<a-;><lt>' 
+load-conf indent
+enable-auto-indent
+enable-detect-indent
 
 # Normal mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 

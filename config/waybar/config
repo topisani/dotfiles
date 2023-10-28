@@ -5,7 +5,7 @@
     // "width": 1280, // Waybar width
     // Choose the order of the modules
     "modules-left": ["hyprland/workspaces", "hyprland/submap"],
-    "modules-center": ["hyprland/window"],
+    "modules-center": ["custom/window"],
     "modules-right": ["cpu", "memory", "idle_inhibitor", "pulseaudio", "battery", "clock", "tray"],
     // Modules configuration
     "hyprland/workspaces": {
@@ -16,6 +16,12 @@
     },
     "hyprland/window": {
         "separate-outputs": true
+    },
+    "custom/window": {
+        "exec": "$HOME/.config/hypr/groupnav.sh bar",
+        "return-type": "json",
+        "on-scroll-up": "$HOME/.config/hypr/groupnav.sh group f",
+        "on-scroll-down": "$HOME/.config/hypr/groupnav.sh group b",
     },
     "mpd": {
         "format": "{stateIcon} {consumeIcon}{randomIcon}{repeatIcon}{singleIcon}{artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ",

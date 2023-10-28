@@ -51,7 +51,7 @@ alias nv=nvim
 
 # Change the current directory for a tmux session, which determines
 # the starting dir for new windows/panes:
-function tmux-cwd {
+tmux-cwd() {
   tmux command-prompt -I $PWD -p "New session dir:" "attach -c %1"
 }
 
