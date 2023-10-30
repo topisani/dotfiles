@@ -17,6 +17,8 @@ if poetry env info -q; then
     exec poetry run "$@"
 fi
 
+$(pdm venv activate)
+
 # Could support other things than poetry if needed
 
  exec "$@"

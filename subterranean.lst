@@ -44,3 +44,5 @@
 ~/.config/nvim;config/nvim
 ~/.config/wofi;config/wofi
 ~/.config/wallpapers;config/wallpapers
+~/.config/kak-tree-sitter;config/kak-tree-sitter
+~/.config/git;config/git

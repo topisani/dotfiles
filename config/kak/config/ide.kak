@@ -76,7 +76,7 @@ def ide-show-tools %{
             echo "echo -markup '{Error}This command is only available in a tmux session'"
             exit
         fi
-        TMUX=$tmux tmux join-pane -fp 30 -vs "${kak_opt_toolsclient_tmux_pane}" < /dev/null > /dev/null 2>&1 &
+        TMUX=$tmux tmux join-pane -p 30 -vs "${kak_opt_toolsclient_tmux_pane}" < /dev/null > /dev/null 2>&1 &
     }
     focus %opt{toolsclient} 
 }

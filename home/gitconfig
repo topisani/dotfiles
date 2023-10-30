@@ -56,3 +56,5 @@
 	
 [push]
 	default = current
+[commit]
+	template = /home/topisani/.config/git/gitmessage.txt

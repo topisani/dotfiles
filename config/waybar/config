@@ -18,7 +18,7 @@
         "separate-outputs": true
     },
     "custom/window": {
-        "exec": "$HOME/.config/hypr/groupnav.sh bar",
+        "exec": "$HOME/.config/hypr/groupnav.sh bar $WAYBAR_MONITOR",
         "return-type": "json",
         "on-scroll-up": "$HOME/.config/hypr/groupnav.sh group f",
         "on-scroll-down": "$HOME/.config/hypr/groupnav.sh group b",
