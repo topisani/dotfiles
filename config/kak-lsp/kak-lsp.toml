@@ -7,20 +7,14 @@ verbosity = 2
 # set to 0 to disable
 timeout = 1800 # seconds = 30 minutes
 
-# [language.rust]
-# filetypes = ["rust"]
-# roots = ["Cargo.toml"]
-# command = "rls"
-
 [language.rust]
 filetypes = ["rust"]
 roots = ["Cargo.toml"]
 command = "sh"
-# args = ["-c", "rust-analyzer"]
-args = ["-c", "rust-analyzer -v -v -v -v -v -v -v -v --log-file /tmp/rust-analyzer.log"]
-settings_section = "rustanalyzer"
+args = [ "-c", "rust-analyzer -v -v -v -v -v -v -v -v --log-file /tmp/rust-analyzer.log" ]
+settings_section = "_"
 
-[language.rust.settings.rustanalyzer]
+[language.rust.settings._]
 # If you get 'unresolved proc macro' warnings, you have two options
 # 1. The safe choice is two disable the warning:
 # diagnostics.disabled = ["unresolved-proc-macro"]
@@ -32,7 +26,7 @@ cargo.runBuildScripts = true
 cargo.features = "all"
 # default settings gives "can't find crate test" for no_std targets
 checkOnSave.allTargets = true
-checkOnSave.extraArgs = [ "--bins" ]
+checkOnSave.extraArgs = ["--bins"]
 checkOnSave.command = "clippy"
 # See https://github.com/rust-analyzer/rust-analyzer/issues/6448
 inlayHints.expressionAdjustmentHints.enable = false
@@ -40,8 +34,7 @@ inlayHints.closureReturnTypeHints.enable = true
 inlayHints.lifetimeElisionHints.enable = "skip_trivial"
 imports.granularity.group = "item"
 workspace.symbol.search.scope = "workspace"
-workspace.symbol.search.kind = "all_symbols" # Otherwise: "only_types"
-
+workspace.symbol.search.kind = "all_symbols"
 # These can fail on try blocks and similar syntax that is not implemented in RA
 # diagnostics.disabled = ["type-mismatch"]
 
@@ -102,7 +95,7 @@ pylsp.plugins.rope_autoimport.memory = true
 filetypes = ["c", "cpp"]
 roots = ["compile_commands.json", ".clangd"]
 command = "sh"
-args = ['-c', 'TMPDIR=~/.cache/clangd/ clangd --cross-file-rename --query-driver=/home/topisani/**,/usr/**,arm-none-eabi-gcc,arm-none-eabi-*,arm-none-eabi-g++,**']
+args = [ '-c', 'TMPDIR=~/.cache/clangd/ clangd --cross-file-rename --query-driver=/home/topisani/**,/usr/**,arm-none-eabi-gcc,arm-none-eabi-*,arm-none-eabi-g++,**']
 
 [language.java]
 filetypes = ["java"]
@@ -186,6 +179,12 @@ command = "unified-language-server"
 roots = []
 args = ["--parser=remark-parse", "--stdio"]
 
+[language.toml]
+filetypes = ["toml"]
+command = "taplo"
+args = ["lsp", "stdio"]
+roots = [""]
+
 # Semantic tokens support
 # See https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_semanticTokens
 # for the default list of tokens and modifiers.
@@ -194,7 +193,6 @@ args = ["--parser=remark-parse", "--stdio"]
 # Examples:
 # - TypeScript: https://github.com/microsoft/vscode-languageserver-node/blob/2645fb54ea1e764aff71dee0ecc8aceff3aabf56/client/src/common/semanticTokens.ts#L58
 # - Rust Analyzer: https://github.com/rust-analyzer/rust-analyzer/blob/f6da603c7fe56c19a275dc7bab1f30fe1ad39707/crates/ide/src/syntax_highlighting.rs#L42
-
 
 
 # Tokens:
@@ -277,39 +275,49 @@ args = ["--parser=remark-parse", "--stdio"]
 
 [semantic_tokens]
 faces = [
-  {token="comment", modifiers=["documentation"], face="documentation"},
-  # {token="variable", modifiers=["readonly"], face="+d@variable"},
-  # {token="variable", modifiers=["constant"], face="+d@variable"},
-  {token="variable", modifiers=["mutable"], face="+i@variable"},
-  {token="", modifiers=["deprecated"], face="+u"},
-  {token="", modifiers=["intraDocLink"], face="+u"},
-  {token="method", modifiers=["trait"], face="memberFunction"},
-  {token="type", face="type"},
-  {token="struct", face="type"},
-  {token="class", face="type"},
-  {token="interface", face="type"},
-  {token="typeAlias", face="type"},
-  {token="union", face="type"},
-  {token="variable", face="variable"},
-  {token="namespace", face="module"},
-  {token="function", face="function"},
-  {token="string", face="string"},
-  {token="keyword", face="keyword"},
-  {token="operator", face="operator"},
-  {token="comment", face="comment"},
-  {token="variable", face="variable"},
-  {token="parameter", face="variable"},
-  {token="function", face="function"},
-  {token="member", face="variable"}, # Member
-  {token="property", face="variable"}, # member
-  {token="method", face="function"}, # member
-  {token="enum", face="type"},
-  {token="enumMember", face="variable" }, # nonstandard
-  {token="dependent", face="cppDependent" }, # nonstandard
-  {token="namespace", face="module"},
-  {token="typeParameter", face="type"},
-  {token="concept", face="cppConcept" }, # nonstandard
-  {token="macro", face="cppMacro"},
-  {token="comment", face="comment"},
-  {token="formatSpecifier", face="value"},
+        { token = "comment", modifiers = [
+                "documentation",
+        ], face = "documentation" },
+        # {token="variable", modifiers=["readonly"], face="+d@variable"},
+        # {token="variable", modifiers=["constant"], face="+d@variable"},
+        { token = "variable", modifiers = [
+                "mutable",
+        ], face = "+i@variable" },
+        { token = "", modifiers = [
+                "deprecated",
+        ], face = "+u" },
+        { token = "", modifiers = [
+                "intraDocLink",
+        ], face = "+u" },
+        { token = "method", modifiers = [
+                "trait",
+        ], face = "memberFunction" },
+        { token = "type", face = "type" },
+        { token = "struct", face = "type" },
+        { token = "class", face = "type" },
+        { token = "interface", face = "type" },
+        { token = "typeAlias", face = "type" },
+        { token = "union", face = "type" },
+        { token = "variable", face = "variable" },
+        { token = "namespace", face = "module" },
+        { token = "function", face = "function" },
+        { token = "string", face = "string" },
+        { token = "keyword", face = "keyword" },
+        { token = "operator", face = "operator" },
+        { token = "comment", face = "comment" },
+        { token = "variable", face = "variable" },
+        { token = "parameter", face = "variable" },
+        { token = "function", face = "function" },
+        { token = "member", face = "variable" }, # Member
+        { token = "property", face = "variable" }, # member
+        { token = "method", face = "function" }, # member
+        { token = "enum", face = "type" },
+        { token = "enumMember", face = "variable" }, # nonstandard
+        { token = "dependent", face = "cppDependent" }, # nonstandard
+        { token = "namespace", face = "module" },
+        { token = "typeParameter", face = "type" },
+        { token = "concept", face = "cppConcept" }, # nonstandard
+        { token = "macro", face = "cppMacro" },
+        { token = "comment", face = "comment" },
+        { token = "formatSpecifier", face = "value" },
 ]

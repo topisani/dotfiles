@@ -12,13 +12,6 @@ def ide-perform-setup -hidden %{
               echo "quit"
           fi
       }
-      try %{
-        eval -client %opt[kaktreeclient] %sh{
-          if ! echo " $kak_client_list " | grep ' client[0-9]+'; then
-            echo "quit"
-          fi
-        }
-      }
   }
 
   hook global WinDisplay .* %{
@@ -57,6 +50,7 @@ def -hidden ide-make-tools %{
     }
   }
   set global toolsclient tools
+  # set global docsclient tools
   eval %sh{
     TMUX=${kak_client_env_TMUX:-$TMUX}
     DEST=$(tmux neww -dP -t :10 kak -c $kak_session -e 'rename-client tools' 2> /dev/null || tmux splitw -dP -t :10 kak -c $kak_session -e 'rename-client tools')

@@ -1,6 +1,6 @@
 # Setup kak-lsp
 
-eval %sh{ kak-lsp --kakoune -s $kak_session -v -v -v -v -v --log /tmp/kak-lsp-$kak_session.log }
+eval %sh{ kak-lsp --kakoune -s $kak_session -vvvvv --log /tmp/kak-lsp-$kak_session.log }
 
 hook -always global KakEnd .* %{ nop %sh{
   rm /tmp/kak-lsp-$kak_session.log
@@ -92,7 +92,7 @@ def -hidden -override lsp-show-error -params 1 -docstring "Render error" %{
 #   connect bottom-panel sh -c "echo '%arg{@}' | krc-fzf jump"
 # }
 
-filetype-hook (css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown) %{
+filetype-hook (css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml) %{
   lsp-setup
 }
 
@@ -104,4 +104,14 @@ def lsp-enable-semantic-tokens %{
   hook -once -always window WinSetOption filetype=.* %{
     remove-hooks window semantic-tokens
   }
+}
+
+# Modeline progress
+declare-option -hidden str modeline_lsp_progress ""
+define-command -hidden -params 6 -override lsp-handle-progress %{
+    set global modeline_lsp_progress %sh{
+        if ! "$6"; then
+            echo "$2${5:+" ($5%)"}${4:+": $4"} "
+        fi
+    }
 }

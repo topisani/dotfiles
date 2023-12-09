@@ -14,8 +14,8 @@ define-command file-delete -docstring "Delete current file" -override %{
    prompt "Delete file [Y/n]? " '%sh{ ([ "$kak_text" = "y" ] || [ "$kak_text" = "Y" ])   && rm $kak_buffile && echo "delete-buffer" }' 
 }
 
-def -hidden my-fzf-config-popup %{
-    popup -title "Config Files" krc-fzf files %val{config} ~/.config/kak-lsp
+def -hidden -override my-fzf-config-popup %{
+    popup -title "Config Files" krc-fzf files %val{config} %sh{printf '%s' "$HOME/.config/kak-lsp"}
 }
 
 declare-user-mode files

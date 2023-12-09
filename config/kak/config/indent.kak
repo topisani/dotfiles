@@ -1,6 +1,6 @@
 define-command -override set-indent -params 2..3 -docstring 'set-indent <scope> <width>: set indent in <scope> to <width>' %{
   eval %sh{
-    if [ "$2" == "tabs" ]; then
+    if [ "$2" = "tabs" ]; then
       echo "set-option $1 tabstop ${3}"
       echo "set-option $1 indentwidth 0"
       echo "echo -debug 'set-indent: tabs=$3'"

@@ -16,7 +16,7 @@ set-option -add global ui_options terminal_assistant=none
 set-option -add global ui_options terminal_set_title=no
 set-option -add global ui_options terminal_synchronized=false
 
-set-option global modelinefmt '{{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {{context_info}} {cyan}U+%sh{printf ''%04x'' "$kak_cursor_char_value"}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default}'
+set-option global modelinefmt '{gray}%opt{modeline_lsp_progress} {{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {{context_info}} {cyan}U+%sh{printf ''%04x'' "$kak_cursor_char_value"}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default}'
 
 # Window-based settings
 hook global WinCreate .* %{
@@ -207,9 +207,6 @@ ide-setup
 hook global BufCreate .*\.bb(|class|append) %{
   set buffer filetype sh
 }
-hook global BufCreate .*\.conf %{
-  set buffer filetype ini
-}
 
 hook global BufCreate .*Makefile\..* %{
   set buffer filetype makefile
@@ -222,6 +219,10 @@ hook global BufCreate .*\.yuck %{
 # openocd files
 hook global BufCreate .*\.ocd %{
   set buffer filetype sh
+}
+
+hook global BufCreate .*\.conf %{
+  set buffer filetype conf
 }
 
 # Global highlighter ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈

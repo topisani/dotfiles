@@ -123,7 +123,7 @@ filetype-hook (cpp|c) %{
   map window filetype  <c-f>   ': fzf-hpp-files<ret>'                    -docstring 'Find header files'
   map window filetype  <C-S-F> ': fzf-cpp-files<ret>'                    -docstring 'Find cpp files'
 
-	set-indent window 2
+  set-indent window 2
 }
 
 
