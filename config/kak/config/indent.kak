@@ -13,8 +13,8 @@ define-command -override set-indent -params 2..3 -docstring 'set-indent <scope> 
 }
 
 define-command -override enable-trim-trailing-whitespace -docstring 'enable-trim-trailing-whitespace: Enable automatic trailing whitespace trim on save' %{
-  remove-hooks buffer trim-trailing-whitespace
-  hook buffer BufWritePre -group trim-trailing-whitespace %{
+  remove-hooks window trim-trailing-whitespace
+  hook window -group trim-trailing-whitespace BufWritePre '.*' %{
     try %{
       execute-keys -draft "%s\h+$|\n+\z<ret>d"
     }
@@ -22,7 +22,7 @@ define-command -override enable-trim-trailing-whitespace -docstring 'enable-trim
 }
 
 define-command -override disable-trim-trailing-whitespace -docstring 'disable-trim-trailing-whitespace: Disable automatic trailing whitespace trim on save' %{
-  remove-hooks buffer trim-trailing-whitespace
+  remove-hooks window trim-trailing-whitespace
 }
 
 define-command editorconfig-load -override -params ..1 -docstring "editorconfig-load [file]: set formatting behavior according to editorconfig" %{
@@ -43,22 +43,22 @@ define-command editorconfig-load -override -params ..1 -docstring "editorconfig-
 
           END {
             if (indent_style == "tab") {
-              print "set-option buffer indentwidth 0"
+              print "set-option window indentwidth 0"
             }
             if (indent_style == "space") {
-              print "set-option buffer indentwidth " indent_size
+              print "set-option window indentwidth " indent_size
             }
             if (indent_size || tab_width) {
-              print "set-option buffer tabstop " (tab_width ? tab_width : indent_size)
+              print "set-option window tabstop " (tab_width ? tab_width : indent_size)
             }
             if (end_of_line == "lf" || end_of_line == "crlf") {
-              print "set-option buffer eolformat " end_of_line
+              print "set-option window eolformat " end_of_line
             }
             if (charset == "utf-8-bom") {
-              print "set-option buffer BOM utf8"
+              print "set-option window BOM utf8"
             }
             if (trim_trailing_whitespace == "true") {
-              print enable-trim-trailing-whitespace
+              print "enable-trim-trailing-whitespace"
             }
             if (max_line_length && max_line_length != "off") {
               # print "set window autowrap_column " max_line_length
@@ -76,17 +76,15 @@ define-command -override detect-indent -docstring 'detect indent' %{
   try %{
     editorconfig-load
   } catch %{
-    try %{
-      evaluate-commands -draft %{
-        try %{
-          execute-keys 'gg/^\t<ret>'
-          unset-option buffer tabstop
-          set-indent buffer tabs %opt{tabstop}
-        } catch %{
-          # Search the first indent level
-          execute-keys 'gg/^[ ]{2,8}+<ret>'
-          set-indent buffer %val{selection_length}
-        }
+    evaluate-commands -draft %{
+      try %{
+        execute-keys 'gg/^\t<ret>'
+        unset-option window tabstop
+        set-indent window tabs %opt{tabstop}
+      } catch %{
+        # Search the first indent level
+        execute-keys 'gg/^([ ]{2,8})+<ret>'
+        set-indent window %val{selection_length}
       }
     }
   }
@@ -94,15 +92,16 @@ define-command -override detect-indent -docstring 'detect indent' %{
 
 define-command -override enable-detect-indent -docstring 'enable detect indent' %{
   remove-hooks global detect-indent
-  hook -group detect-indent global BufOpenFile '.*' detect-indent
+  hook -group detect-indent global WinCreate '.*' detect-indent
   hook -group detect-indent global BufWritePost '.*' detect-indent
+  hook -group detect-indent global BufReload '.*' detect-indent
 }
 
 define-command -override disable-detect-indent -docstring 'disable detect indent' %{
   remove-hooks global detect-indent
   evaluate-commands -buffer '*' %{
-    unset-option buffer tabstop
-    unset-option buffer indentwidth
+    unset-option window tabstop
+    unset-option window indentwidth
   }
 }
 
