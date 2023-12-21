@@ -225,6 +225,10 @@ hook global BufCreate .*\.conf %{
   set buffer filetype conf
 }
 
+hook global BufCreate .*\.surql %{
+  set buffer filetype sql
+}
+
 # Global highlighter ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 def -override hl-todo-enable %{
