@@ -13,11 +13,13 @@ EOF
     exit 1
 fi
 
+echo "$PWD" >&2
+
 if poetry env info -q; then
     exec poetry run "$@"
 fi
 
-$(pdm venv activate)
+# $(pdm venv activate)
 
 # Could support other things than poetry if needed
 

@@ -7,14 +7,14 @@ verbosity = 2
 # set to 0 to disable
 timeout = 1800 # seconds = 30 minutes
 
-[language.rust]
+[language_server.rust]
 filetypes = ["rust"]
 roots = ["Cargo.toml"]
 command = "sh"
 args = [ "-c", "rust-analyzer -v -v -v -v -v -v -v -v --log-file /tmp/rust-analyzer.log" ]
 settings_section = "_"
 
-[language.rust.settings._]
+[language_server.rust.settings._]
 # If you get 'unresolved proc macro' warnings, you have two options
 # 1. The safe choice is two disable the warning:
 # diagnostics.disabled = ["unresolved-proc-macro"]
@@ -38,74 +38,101 @@ workspace.symbol.search.kind = "all_symbols"
 # These can fail on try blocks and similar syntax that is not implemented in RA
 # diagnostics.disabled = ["type-mismatch"]
 
-[language.crystal]
+[language_server.sql]
+filetypes = ["sql"]
+roots = [".git"]
+command = "postgres_lsp"
+
+[language_server.crystal]
 filetypes = ["crystal"]
 roots = ["shard.yml"]
 command = "scry"
 
-[language.typescript]
+[language_server.typescript]
 filetypes = ["typescript", "javascript"]
 roots = ["tsconfig.json", "package.json"]
 command = "typescript-language-server"
 args = ["--stdio"]
 
-[language.json]
+[language_server.json]
 filetypes = ["json"]
 roots = ["package.json"]
 command = "json-languageserver"
 args = ["--stdio"]
 
-[language.css]
+[language_server.css]
 filetypes = ["css", "scss", "sass", "less"]
 roots = ["package.json"]
 command = "css-languageserver"
 args = ["--stdio"]
 
-[language.html]
+[language_server.html]
 filetypes = ["html"]
 roots = ["package.json"]
 command = "html-languageserver"
 args = ["--stdio"]
 
-[language.ocaml]
+[language_server.ocaml]
 filetypes = ["ocaml"]
 roots = ["Makefile", "opam", "*.opam"]
 command = "ocamllsp"
 
-[language.reason]
+[language_server.reason]
 filetypes = ["reason"]
 roots = ["package.json", "Makefile", ".git", ".hg"]
 command = "ocamllsp"
 
-[language.python]
+# [language_server.pylsp]
+# filetypes = ["python"]
+# roots = ["pyproject.toml", "requirements.txt", "setup.py", ".git", ".hg"]
+# command = "python-env-run"
+# args = ["pylsp"]
+# settings_section = "_"
+
+# [language_server.pylsp.settings._]
+# # See https://github.com/python-lsp/python-lsp-server#configuration
+# # pylsp.configurationSources = ["flake8"]
+# pylsp.plugins.jedi_completion.include_params = true
+# pylsp.plugins.jedi_completion.fuzzy = true
+# pylsp.plugins.rope_autoimport.enabled = true
+# pylsp.plugins.rope_autoimport.memory = true
+
+[language_server.pyright]
 filetypes = ["python"]
 roots = ["pyproject.toml", "requirements.txt", "setup.py", ".git", ".hg"]
 command = "python-env-run"
-args = ["pylsp"]
-settings_section = "_"
-[language.python.settings._]
-# See https://github.com/python-lsp/python-lsp-server#configuration
-# pylsp.configurationSources = ["flake8"]
-pylsp.plugins.jedi_completion.include_params = true
-pylsp.plugins.jedi_completion.fuzzy = true
-pylsp.plugins.rope_autoimport.enabled = true
-pylsp.plugins.rope_autoimport.memory = true
+args = ["pyright-langserver", "--stdio"]
+settings_section = "pyright"
 
-[language.c_cpp]
+[language_server.pyright.settings._]
+
+
+[language_server.ruff]
+filetypes = ["python"]
+roots = ["requirements.txt", "setup.py", ".git", ".hg", "pyproject.toml"]
+command = "python-env-run"
+args = ["ruff-lsp"]
+settings_section = "_"
+
+[language_server.ruff.settings._.globalSettings]
+organizeImports = true
+fixAll = true
+
+[language_server.c_cpp]
 filetypes = ["c", "cpp"]
 roots = ["compile_commands.json", ".clangd"]
 command = "sh"
 args = [ '-c', 'TMPDIR=~/.cache/clangd/ clangd --cross-file-rename --query-driver=/home/topisani/**,/usr/**,arm-none-eabi-gcc,arm-none-eabi-*,arm-none-eabi-g++,**']
 
-[language.java]
+[language_server.java]
 filetypes = ["java"]
 roots = ["pom.xml", "build.gradle"]
 command = "eclipse.jdt.ls"
 
-# # [language.java.initialization_options.settings.java.trace]
+# # [language_server.java.initialization_options.settings.java.trace]
 # server = "verbose"
 
-[language.haskell]
+[language_server.haskell]
 filetypes = ["haskell"]
 roots = ["Setup.hs", "stack.yaml", "*.cabal"]
 command = "haskell-language-server-wrapper"
@@ -113,73 +140,73 @@ args = ["--lsp"]
 #command = "hie-wrapper"
 #args = ["--lsp"]
 
-[language.go]
+[language_server.go]
 filetypes = ["go"]
 roots = ["Gopkg.toml", "go.mod", ".git", ".hg"]
 command = "gopls"
 offset_encoding = "utf-8"
 
-[language.bash]
+[language_server.bash]
 filetypes = ["sh"]
 roots = [".git", ".hg"]
 command = "bash-language-server"
 args = ["start"]
 
-[language.dart]
+[language_server.dart]
 filetypes = ["dart"]
 roots = ["pubspec.yaml", ".git"]
 command = "dart"
 args = ["/opt/dart-sdk/bin/snapshots/analysis_server.dart.snapshot", "--lsp"]
 
-[language.d]
+[language_server.d]
 filetypes = ["d", "di"]
 roots = [".git", "dub.sdl", "dub.json"]
 command = "dls"
 
-[language.php]
+[language_server.php]
 filetypes = ["php"]
 roots = [".htaccess", "composer.json"]
 command = "intelephense"
 args = ["--stdio"]
 
-# [language.php.initialization_options]
+# [language_server.php.initialization_options]
 # storagePath = "/tmp/intelephense"
 
-[language.nim]
+[language_server.nim]
 filetypes = ["nim"]
 roots = ["*.nimble", ".git"]
 command = "nimlsp"
 
-[language.elm]
+[language_server.elm]
 filetypes = ["elm"]
 roots = ["elm.json"]
 command = "elm-language-server"
 args = ["--stdio"]
 
-# [language.elm.initialization_options]
+# [language_server.elm.initialization_options]
 # runtime = "node"
 # elmPath = "elm"
 # elmFormatPath = "elm-format"
 # elmTestPath = "elm-test"
 
-[language.latex]
+[language_server.latex]
 filetypes = ["latex"]
 roots = ["main.tex"]
 command = "texlab"
 
-[language.vue]
+[language_server.vue]
 filetypes = ["vue"]
 roots = ["package.json"]
 command = "vls"
 settings_section = "vls"
 
-[language.text]
+[language_server.text]
 filetypes = ["markdown"]
 command = "unified-language-server"
 roots = []
 args = ["--parser=remark-parse", "--stdio"]
 
-[language.toml]
+[language_server.toml]
 filetypes = ["toml"]
 command = "taplo"
 args = ["lsp", "stdio"]
