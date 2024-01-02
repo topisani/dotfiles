@@ -99,7 +99,7 @@ command = "ocamllsp"
 
 [language_server.pyright]
 filetypes = ["python"]
-roots = ["pyproject.toml", "requirements.txt", "setup.py", ".git", ".hg"]
+roots = ["pyproject.toml", "requirements.txt", ".git"]
 command = "python-env-run"
 args = ["pyright-langserver", "--stdio"]
 settings_section = "pyright"
@@ -109,7 +109,7 @@ settings_section = "pyright"
 
 [language_server.ruff]
 filetypes = ["python"]
-roots = ["requirements.txt", "setup.py", ".git", ".hg", "pyproject.toml"]
+roots = ["requirements.txt", ".git", "pyproject.toml"]
 command = "python-env-run"
 args = ["ruff-lsp"]
 settings_section = "_"

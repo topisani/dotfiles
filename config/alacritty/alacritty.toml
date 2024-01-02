@@ -1,0 +1,16 @@
+import = ["~/.config/alacritty/theme.toml"]
+
+[font]
+builtin_box_drawing = true
+size = 9.0
+
+[font.glyph_offset]
+x = 0
+y = 0
+
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+
+[font.offset]
+x = 0
+y = -1

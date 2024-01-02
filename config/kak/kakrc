@@ -177,6 +177,14 @@ map -docstring 'Popup Terminal' global user <c-p> ': connect popup<ret>'
 def sidetree -override %{ connect panel sidetree --select %val{buffile} }
 map -docstring 'sidetree' global user <tab> ': sidetree<ret>'
 
+declare-user-mode undo
+map -docstring "undo last change" global undo u 'u'
+map -docstring "redo last change" global undo U 'U'
+map -docstring "move forward in changes history" global undo j '<c-j>'
+map -docstring "move backward in changes history" global undo k '<c-k>'
+
+map -docstring 'undo...' global user u ': enter-user-mode undo<ret>'
+
 # Prompt mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 map -docstring 'Search' global prompt <c-f> '<home>(?i)<end>'
