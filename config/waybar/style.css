@@ -119,6 +119,10 @@ label:focus {
     min-width: 100px;
 }
 
+#custom-agenda {
+    color: gray
+}
+
 .custom-spotify {
 }
 

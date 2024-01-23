@@ -92,10 +92,6 @@ def -hidden -override lsp-show-error -params 1 -docstring "Render error" %{
 #   connect bottom-panel sh -c "echo '%arg{@}' | krc-fzf jump"
 # }
 
-filetype-hook (css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml) %{
-  lsp-setup
-}
-
 def lsp-enable-semantic-tokens %{
   hook window -group semantic-tokens BufReload .* lsp-semantic-tokens
   hook window -group semantic-tokens NormalIdle .* lsp-semantic-tokens
@@ -106,6 +102,12 @@ def lsp-enable-semantic-tokens %{
   }
 }
 
+filetype-hook (css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml) %{
+  lsp-setup
+  lsp-enable-semantic-tokens
+}
+
+
 # Modeline progress
 declare-option -hidden str modeline_lsp_progress ""
 define-command -hidden -params 6 -override lsp-handle-progress %{
@@ -114,4 +116,9 @@ define-command -hidden -params 6 -override lsp-handle-progress %{
             echo "$2${5:+" ($5%)"}${4:+": $4"} "
         fi
     }
+}
+
+
+define-command tsserver-organize-imports -docstring "Ask the typescript language server to organize imports in the buffer" %{
+    lsp-execute-command _typescript.organizeImports """[\""%val{buffile}\""]"""
 }

@@ -6,7 +6,7 @@ alpha() {
   echo -n "$1" | sed "s/rgb:\\(.*\\)/rgba:\\1$2/"
 }
 
-echo "
+sed 's/, */,/g;s/ *+/+/' <<EOF
 # Markdown highlighting
 face global title                       $green,                default       +b
 face global header                      $blue,                 default       +b
@@ -54,10 +54,10 @@ face global function                    $yellow_light,     default
 face global string                      $green,            default
 face global documentation               $green,            default
 face global keyword                     $red,              default
-face global operator                    $fg,               default
+face global operator                    $fg,               default       +d
 face global attribute                   $red,              default
 face global meta                        $orange,           default
-face global builtin                     $red_dark,         default
+face global builtin                     $purple,           default
 face global comment                     $gray,             default       +i
 face global identifier                  $yellow_dark,      default
 face global annotation                  $gray,             default
@@ -80,13 +80,13 @@ face global Search                      $fg,               $bg3
 face global PrimarySelectionDefault     $fg,               $blue
 face global PrimarySelectionSearch      $fg,               $blue
 face global SearchBackground            $gray,             default
-face global SearchOccurrence            $fg,               default      +ib
+face global SearchOccurrence            $fg,               default        +ib
 
 face global SnippetsOtherPlaceholders   default,           $(alpha $green 20)
 face global SnippetsNextPlaceholders    default,           $(alpha $green 40)
 
 # kakoune-focus
-face global FocusMarker                 $bg3,                           +fa
+face global FocusMarker                 $bg3,                             +fa
 
 # Lsp
 face global InlayHint                 $blue_dark+iF
@@ -181,4 +181,109 @@ hook -group flatblue global FocusOut .* %{
   face window Default DefaultUnfocused
 }
 
-" | sed 's/, */,/g;s/ *+/+/'
+
+# kak-tree-sitter
+
+# set-face global ts_unknown                      "$bg,$red+ub"
+set-face global ts_unknown                      ""
+set-face global ts_attribute                    "variable"
+set-face global ts_comment                      "comment"
+set-face global ts_comment_block                "ts_comment"
+set-face global ts_comment_line                 "ts_comment"
+set-face global ts_conceal                      "+i@keyword"
+set-face global ts_constant                     "variable"
+set-face global ts_constant_builtin             "builtin"
+set-face global ts_constant_builtin_boolean     "builtin"
+set-face global ts_constant_character           "value"
+set-face global ts_constant_character_escape    "$yellow_dark"
+set-face global ts_constant_macro               "cppMacro"
+set-face global ts_constant_numeric             "value"
+set-face global ts_constant_numeric_float       "ts_constant_numeric"
+set-face global ts_constant_numeric_integer     "ts_constant_numeric"
+set-face global ts_constructor                  "function"
+set-face global ts_diff_plus                    "$green"
+set-face global ts_diff_minus                   "$red"
+set-face global ts_diff_delta                   "$blue"
+set-face global ts_diff_delta_moved             "$blue_light"
+set-face global ts_error                        "error"
+set-face global ts_function                     "function"
+set-face global ts_function_builtin             "function"
+set-face global ts_function_macro               "cppMacro"
+set-face global ts_function_method              "+i@ts_function"
+set-face global ts_function_special             "+i@ts_function"
+set-face global ts_hint                         "MarkerTodo"
+set-face global ts_info                         "MarkerNote"
+set-face global ts_keyword                      "keyword"
+set-face global ts_keyword_control              "ts_keyword"
+set-face global ts_keyword_conditional          "+i@keyword"
+set-face global ts_keyword_control_conditional  "+i@keyword"
+set-face global ts_keyword_control_directive    "+i@keyword"
+set-face global ts_keyword_control_import       "+i@keyword"
+set-face global ts_keyword_control_repeat       "ts_keyword"
+set-face global ts_keyword_control_return       "ts_keyword"
+set-face global ts_keyword_control_except       "ts_keyword"
+set-face global ts_keyword_control_exception    "ts_keyword"
+set-face global ts_keyword_directive            "$orange+i"
+set-face global ts_keyword_function             "ts_keyword"
+set-face global ts_keyword_operator             "ts_keyword"
+set-face global ts_keyword_special              "ts_keyword" 
+set-face global ts_keyword_storage              "ts_keyword" 
+set-face global ts_keyword_storage_modifier     "ts_keyword" 
+set-face global ts_keyword_storage_modifier_mut "ts_keyword" 
+set-face global ts_keyword_storage_modifier_ref "operator" 
+set-face global ts_keyword_storage_type         "ts_keyword" 
+set-face global ts_label                        "$orange+i"
+set-face global ts_markup_bold                  "bold"
+set-face global ts_markup_heading               "header"
+set-face global ts_markup_heading_1             "title"
+set-face global ts_markup_heading_2             "header"
+set-face global ts_markup_heading_3             "+i@header"
+set-face global ts_markup_heading_4             "+i@header"
+set-face global ts_markup_heading_5             "+i@header"
+set-face global ts_markup_heading_6             "+i@header"
+set-face global ts_markup_heading_marker        "comment"
+set-face global ts_markup_italic                "italic"
+set-face global ts_markup_list_checked          "$green"
+set-face global ts_markup_list_numbered         "list"
+set-face global ts_markup_list_unchecked        "list"
+set-face global ts_markup_list_unnumbered       "bullet"
+set-face global ts_markup_link_label            "link"
+set-face global ts_markup_link_url              "+u@link"
+set-face global ts_markup_link_uri              "+u@link"
+set-face global ts_markup_link_text             "link"
+set-face global ts_markup_quote                 "block"
+set-face global ts_markup_raw                   "mono"
+set-face global ts_markup_raw_block             "mono"
+set-face global ts_markup_raw_inline            "mono"
+set-face global ts_markup_strikethrough         "+s@comment"
+set-face global ts_namespace                    "module"
+set-face global ts_operator                     "operator"
+set-face global ts_property                     "variable"
+set-face global ts_punctuation                  "operator"
+set-face global ts_punctuation_bracket          "ts_punctuation"
+set-face global ts_punctuation_delimiter        "ts_punctuation"
+set-face global ts_punctuation_special          "ts_punctuation"
+set-face global ts_special                      "cppMacro"
+set-face global ts_spell                        "error"
+set-face global ts_string                       "string"
+set-face global ts_string_regex                 "$yellow_dark"
+set-face global ts_string_regexp                "$yellow_dark"
+set-face global ts_string_escape                "$orange"
+set-face global ts_string_special               "$blue"
+set-face global ts_string_special_path          "$orange"
+set-face global ts_string_special_symbol        "$orange"
+set-face global ts_string_symbol                "$purple_light"
+set-face global ts_tag                          "$red"
+set-face global ts_tag_error                    "error"
+set-face global ts_text                         "default"
+set-face global ts_text_title                   "title"
+set-face global ts_type                         "type"
+set-face global ts_type_builtin                 "ts_type"
+set-face global ts_type_enum_variant            "variable"
+set-face global ts_variable                     "variable"
+set-face global ts_variable_builtin             "builtin"
+set-face global ts_variable_other_member        "+i@variable"
+set-face global ts_variable_parameter           "$aqua"
+set-face global ts_warning                      "$orange+b"
+
+EOF

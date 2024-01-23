@@ -15,7 +15,7 @@ define-command file-delete -docstring "Delete current file" -override %{
 }
 
 def -hidden -override my-fzf-config-popup %{
-    popup -title "Config Files" krc-fzf files %val{config} %sh{printf '%s' "$HOME/.config/kak-lsp"}
+    popup -title "Config Files" krc-fzf files %val{config} %sh{printf '%s' "$HOME/.config/kak-lsp"} %sh{printf '%s' "$HOME/.config/kak-tree-sitter"}
 }
 
 declare-user-mode files

@@ -302,23 +302,13 @@ roots = [""]
 
 [semantic_tokens]
 faces = [
-        { token = "comment", modifiers = [
-                "documentation",
-        ], face = "documentation" },
+        { token = "", modifiers = [ "documentation", ], face = "documentation" },
         # {token="variable", modifiers=["readonly"], face="+d@variable"},
         # {token="variable", modifiers=["constant"], face="+d@variable"},
-        { token = "variable", modifiers = [
-                "mutable",
-        ], face = "+i@variable" },
-        { token = "", modifiers = [
-                "deprecated",
-        ], face = "+u" },
-        { token = "", modifiers = [
-                "intraDocLink",
-        ], face = "+u" },
-        { token = "method", modifiers = [
-                "trait",
-        ], face = "memberFunction" },
+        { token = "variable", modifiers = [ "mutable" ], face = "+i@variable" },
+        { token = "", modifiers = [ "deprecated" ], face = "+u" },
+        { token = "", modifiers = [ "intraDocLink" ], face = "+u" },
+        { token = "method", modifiers = [ "trait" ], face = "memberFunction" },
         { token = "type", face = "type" },
         { token = "struct", face = "type" },
         { token = "class", face = "type" },
@@ -328,23 +318,23 @@ faces = [
         { token = "variable", face = "variable" },
         { token = "namespace", face = "module" },
         { token = "function", face = "function" },
-        { token = "string", face = "string" },
-        { token = "keyword", face = "keyword" },
-        { token = "operator", face = "operator" },
-        { token = "comment", face = "comment" },
-        { token = "variable", face = "variable" },
-        { token = "parameter", face = "variable" },
-        { token = "function", face = "function" },
-        { token = "member", face = "variable" }, # Member
-        { token = "property", face = "variable" }, # member
-        { token = "method", face = "function" }, # member
-        { token = "enum", face = "type" },
+        # { token = "string", face = "string" },
+        # { token = "keyword", face = "keyword" },
+        # { token = "operator", face = "operator" },
+        # { token = "comment", face = "comment" },
+        # { token = "variable", face = "variable" },
+        # { token = "parameter", face = "variable" },
+        # { token = "function", face = "function" },
+        # { token = "member", face = "+i@variable" }, # Member
+        # { token = "property", face = "variable" }, # member
+        { token = "method", face = "memberFunction" }, # member
+        # { token = "enum", face = "type" },
         { token = "enumMember", face = "variable" }, # nonstandard
         { token = "dependent", face = "cppDependent" }, # nonstandard
         { token = "namespace", face = "module" },
         { token = "typeParameter", face = "type" },
         { token = "concept", face = "cppConcept" }, # nonstandard
         { token = "macro", face = "cppMacro" },
-        { token = "comment", face = "comment" },
+        # { token = "comment", face = "comment" },
         { token = "formatSpecifier", face = "value" },
 ]

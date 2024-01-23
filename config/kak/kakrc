@@ -87,7 +87,7 @@ cork occivink-snippets https://github.com/occivink/kakoune-snippets
 
 cork kakoune-table https://gitlab.com/listentolist/kakoune-table
 
-cork kakoune-text-objects https://github.com/delapouite/kakoune-text-objects
+# cork kakoune-text-objects https://github.com/delapouite/kakoune-text-objects
 
 cork kakoune-interactively https://github.com/chambln/kakoune-interactively %{
     alias global cd i-change-directory
@@ -130,6 +130,7 @@ cork kakoune-sudo-write 'https://github.com/occivink/kakoune-sudo-write'
 load-conf indent
 enable-auto-indent
 enable-detect-indent
+set-indent global 4
 
 # Normal mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
@@ -203,12 +204,32 @@ set-option global makecmd 'make -j 8'
 # Use ripgrep
 set-option global grepcmd 'rg -Hn --no-heading'
 
+load-conf tree-sitter
 load-conf lsp
 load-conf c++
 load-conf rust
 
 load-conf ide
 ide-setup
+
+def -override debughl %{
+    echo -to-file "/tmp/kak-debughl.txt" "%opt[kts_highlighter_ranges] %opt[lsp_semantic_tokens]"
+    info %sh{
+        line=$kak_cursor_line
+        col=$kak_cursor_column
+        awk -vRS='[ \n]' -F'[,|.]' -vl=$line -vc=$col '(l >= $1 && c >= $2) && (l <= $3 && c <= $4) { print $0 }' "/tmp/kak-debughl.txt"
+        rm -f "/tmp/kak-debughl.txt" > /dev/null
+    }
+}
+
+def -override debughl-enable %{
+    rmhooks global debughl
+    hook global -group debughl NormalIdle .* debughl
+}
+
+def -override debughl-disable %{
+    rmhooks global debughl
+}
 
 # Filetype hooks ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 

@@ -1,6 +1,6 @@
 filetype-hook rust %{
   lsp-setup
-  lsp-enable-semantic-tokens
+  # lsp-enable-semantic-tokens
   lsp-inlay-hints-enable window
   
   set window gdb_program rust-gdb

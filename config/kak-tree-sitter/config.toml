@@ -86,7 +86,6 @@ highlight.groups = [
   "special",
   "string",
   "string.escape",
-  "string.regex",
   "string.regexp",
   "string.special",
   "string.special.path",
@@ -100,7 +99,6 @@ highlight.groups = [
   "type.enum.variant",
   "variable",
   "variable.builtin",
-  "variable.other.member",
   "variable.other.member",
   "variable.parameter",
   "warning",
@@ -199,7 +197,21 @@ path = "runtime/queries/c"
 # TODO
 
 # cmake
-# TODO
+[language.cmake.grammar]
+url = "https://github.com/uyha/tree-sitter-cmake"
+pin = "6e51463ef3052dd3b328322c22172eda093727ad"
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "../parser.c", "../scanner.cc", "-I", ".."]
+compile_flags = ["-O3", "-flto=auto", "-march=native"]
+link = "cc"
+link_args = ["-shared", "-fpic", "parser.o", "scanner.o", "-o", "cmake.so"]
+link_flags = ["-O3", "-lstdc++", "-flto=auto"]
+
+[language.cmake.queries]
+url = "https://github.com/helix-editor/helix"
+pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+path = "runtime/queries/cmake"
 
 # comment
 [language.comment.grammar]
@@ -339,7 +351,21 @@ path = "runtime/queries/diff"
 # TODO
 
 # fish
-# TODO
+[language.fish.grammar]
+url = "https://github.com/ram02z/tree-sitter-fish"
+pin = "84436cf24c2b3176bfbb220922a0fdbd0141e406"
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "../parser.c", "../scanner.c", "-I", ".."]
+compile_flags = ["-O3", "-march=native", "-flto=auto"]
+link = "cc"
+link_args = ["-shared", "-fpic", "parser.o", "scanner.o", "-o", "fish.so"]
+link_flags = ["-O3", "-flto=auto"]
+
+[language.fish.queries]
+url = "https://github.com/helix-editor/helix"
+pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+path = "runtime/queries/fish"
 
 # fortran
 # TODO
@@ -543,7 +569,21 @@ url = "https://github.com/phaazon/kak-tree-sitter"
 path = "runtime/queries/jsx"
 
 # julia
-# TODO
+[language.julia.grammar]
+url = "https://github.com/tree-sitter/tree-sitter-julia"
+pin = "2f885efd38a6a6abfefc81d53ecdd99812dcde69"
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "../scanner.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "scanner.o", "-o", "julia.so"]
+link_flags = ["-O3"]
+
+[language.julia.queries]
+url = "https://github.com/helix-editor/helix"
+pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+path = "runtime/queries/julia"
 
 # just
 # TODO
@@ -733,7 +773,21 @@ path = "runtime/queries/nu"
 # TODO
 
 # purescript
-# TODO
+[language.purescript.grammar]
+url = "https://github.com/postsolar/tree-sitter-purescript/"
+pin = "1615ac3b9c3b572259bce7a30c14cb06d6c2f2ff"
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "../parser.c", "../scanner.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "parser.o", "scanner.o", "-o", "purescript.so"]
+link_flags = ["-O3"]
+
+[language.purescript.queries]
+url = "https://github.com/postsolar/tree-sitter-purescript"
+pin = "1615ac3b9c3b572259bce7a30c14cb06d6c2f2ff"
+path = "queries"
 
 # python
 [language.python.grammar]
@@ -783,7 +837,21 @@ path = "runtime/queries/python"
 # TODO
 
 # ruby
-# TODO
+[language.ruby.grammar]
+url = "https://github.com/tree-sitter/tree-sitter-ruby"
+pin = "206c7077164372c596ffa8eaadb9435c28941364"
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "../scanner.cc", "../parser.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "c++"
+link_args = ["-shared", "-fpic", "scanner.o", "parser.o", "-o", "ruby.so"]
+link_flags = ["-O3", "-lstdc++"]
+
+[language.ruby.queries]
+url = "https://github.com/helix-editor/helix"
+pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+path = "runtime/queries/ruby"
 
 # rust
 [language.rust.grammar]
@@ -935,7 +1003,20 @@ path = "runtime/queries/typescript"
 # TODO
 
 # verilog
-# TODO
+[language.verilog.grammar]
+url = "https://github.com/tree-sitter/tree-sitter-verilog"
+pin = "902031343056bc0b11f3e47b33f036a9cf59f58d"
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "../parser.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "parser.o", "-o", "verilog.so"]
+link_flags = ["-O3"]
+
+[language.verilog.queries]
+url = "https://github.com/helix-editor/helix"
+path = "runtime/queries/verilog"
 
 # vhdl
 # TODO

@@ -45,9 +45,6 @@
 [push]
 	autoSetupRemote = true
 
-[url "git@ssh.dev.azure.com:"]
-	insteadOf = https://UMagSolutions@dev.azure.com/
-	
 [url "gitlab-as-move:move-innovation/"]
 	insteadOf = https://gitlab.com/move-innovation/
 	
