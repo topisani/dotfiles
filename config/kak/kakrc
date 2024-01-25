@@ -258,6 +258,10 @@ hook global BufCreate .*\.surql %{
   set buffer filetype sql
 }
 
+hook global BufCreate .*\.dts %{
+  set buffer filetype devicetree
+}
+
 # Global highlighter ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 def -override hl-todo-enable %{

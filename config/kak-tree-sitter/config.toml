@@ -10,6 +10,7 @@ highlight.groups = [
   "comment",
   "comment.block",
   "comment.line",
+  "comment.documentation",
   "constant",
   "constant.builtin",
   "constant.builtin.boolean",
@@ -286,7 +287,21 @@ path = "runtime/queries/css"
 # TODO
 
 # devicetree
-# TODO
+[language.devicetree.grammar]
+url = "https://github.com/joelspadin/tree-sitter-devicetree"
+pin = "877adbfa0174d25894c40fa75ad52d4515a36368"
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "../parser.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "parser.o", "-o", "devicetree.so"]
+link_flags = ["-O3"]
+
+[language.devicetree.queries]
+url = "https://github.com/helix-editor/helix"
+pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+path = "runtime/queries/devicetree"
 
 # dhall
 # TODO
