@@ -82,29 +82,29 @@ filetypes = ["reason"]
 roots = ["package.json", "Makefile", ".git", ".hg"]
 command = "ocamllsp"
 
-# [language_server.pylsp]
-# filetypes = ["python"]
-# roots = ["pyproject.toml", "requirements.txt", "setup.py", ".git", ".hg"]
-# command = "python-env-run"
-# args = ["pylsp"]
-# settings_section = "_"
-
-# [language_server.pylsp.settings._]
-# # See https://github.com/python-lsp/python-lsp-server#configuration
-# # pylsp.configurationSources = ["flake8"]
-# pylsp.plugins.jedi_completion.include_params = true
-# pylsp.plugins.jedi_completion.fuzzy = true
-# pylsp.plugins.rope_autoimport.enabled = true
-# pylsp.plugins.rope_autoimport.memory = true
-
-[language_server.pyright]
+[language_server.pylsp]
 filetypes = ["python"]
-roots = ["pyproject.toml", "requirements.txt", ".git"]
+roots = ["pyproject.toml", "requirements.txt", "setup.py", ".git", ".hg"]
 command = "python-env-run"
-args = ["pyright-langserver", "--stdio"]
-settings_section = "pyright"
+args = ["pylsp"]
+settings_section = "_"
 
-[language_server.pyright.settings._]
+[language_server.pylsp.settings._]
+# See https://github.com/python-lsp/python-lsp-server#configuration
+# pylsp.configurationSources = ["flake8"]
+pylsp.plugins.jedi_completion.include_params = true
+pylsp.plugins.jedi_completion.fuzzy = true
+pylsp.plugins.rope_autoimport.enabled = true
+pylsp.plugins.rope_autoimport.memory = true
+
+# [language_server.pyright]
+# filetypes = ["python"]
+# roots = ["pyproject.toml", "requirements.txt", ".git"]
+# command = "python-env-run"
+# args = ["pyright-langserver", "--stdio"]
+# settings_section = "pyright"
+
+# [language_server.pyright.settings._]
 
 
 [language_server.ruff]

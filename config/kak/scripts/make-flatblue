@@ -9,7 +9,7 @@ alpha() {
 sed 's/, */,/g;s/ *+/+/' <<EOF
 # Markdown highlighting
 face global title                       $green,                default       +b
-face global header                      $blue,                 default       +b
+face global header                      $blue_light,                 default       +b
 face global bold                        $fg,                   default       +b
 face global italic                      $fg3,                  default       +i
 face global mono                        $fg3,                  default
@@ -248,14 +248,14 @@ set-face global ts_markup_list_checked          "$green"
 set-face global ts_markup_list_numbered         "list"
 set-face global ts_markup_list_unchecked        "list"
 set-face global ts_markup_list_unnumbered       "bullet"
-set-face global ts_markup_link_label            "link"
-set-face global ts_markup_link_url              "+u@link"
-set-face global ts_markup_link_uri              "+u@link"
-set-face global ts_markup_link_text             "link"
+set-face global ts_markup_link_label            "$green_dark+b"
+set-face global ts_markup_link_url              "$aqua_dark+u"
+set-face global ts_markup_link_uri              "$aqua_dark+u"
+set-face global ts_markup_link_text             "$green_dark+b"
 set-face global ts_markup_quote                 "block"
 set-face global ts_markup_raw                   "mono"
 set-face global ts_markup_raw_block             "mono"
-set-face global ts_markup_raw_inline            "mono"
+set-face global ts_markup_raw_inline            "$fg3,$bg3"
 set-face global ts_markup_strikethrough         "+s@comment"
 set-face global ts_namespace                    "module"
 set-face global ts_operator                     "operator"

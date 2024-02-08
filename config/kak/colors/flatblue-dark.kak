@@ -41,7 +41,7 @@ evaluate-commands %sh{
     red="rgb:f24130"
     red_dark="rgb:d92817"
     green="rgb:71ba51"
-    green_dark="rgb:4e773e"
+    green_dark="rgb:00af5f"
     yellow_light="rgb:ffe000"
     yellow="rgb:f2bb13"
     yellow_dark="rgb:f39c12"
