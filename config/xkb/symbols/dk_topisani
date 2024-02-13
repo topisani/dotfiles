@@ -7,7 +7,7 @@ xkb_symbols "basic" {
 
     include "dk(nodeadkeys)"
 
-    name[Group1]="Danish nodeadkeys Topisani";
+    name[Group1]="Danish Topisani";
 
     // Vim arrow keys everywhere with AltGr
     key <AC06>  { [         h,          H,          Left,       Left   ]     };

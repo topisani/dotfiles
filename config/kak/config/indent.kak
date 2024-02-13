@@ -73,20 +73,19 @@ define-command editorconfig-load -override -params ..1 -docstring "editorconfig-
 complete-command editorconfig-load file
 
 define-command -override detect-indent -docstring 'detect indent' %{
-  try %{
-    editorconfig-load
-  } catch %{
-    evaluate-commands -draft %{
-      try %{
-        execute-keys 'gg/^\t<ret>'
-        unset-option window tabstop
-        set-indent window tabs %opt{tabstop}
-      } catch %{
-        # Search the first indent level
-        execute-keys 'gg/^([ ]{2,8})+<ret>'
-        set-indent window %val{selection_length}
-      }
+  evaluate-commands -draft %{
+    try %{
+      execute-keys 'gg/^\t<ret>'
+      unset-option window tabstop
+      set-indent window tabs %opt{tabstop}
+    } catch %{
+      # Search the first indent level
+      execute-keys 'gg/^([ ]{2,8})+<ret>'
+      set-indent window %val{selection_length}
+    } catch %{
+      
     }
+    editorconfig-load
   }
 }
 

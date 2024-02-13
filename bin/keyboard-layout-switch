@@ -1,0 +1,31 @@
+#!/bin/sh
+
+dunst_id=230458
+
+_send_notification() {
+  name=$(_current_layout)
+  icon=/usr/share/icons/Papirus-Dark/symbolic/actions/keyboard-layout-filled-symbolic.svg
+  dunstify -u 0 -i $icon -r $dunst_id "Keyboard Layout" "$name"
+}
+
+_next_layout() {
+  hyprctl \
+    --batch "$(
+      hyprctl devices -j |
+        jq -r '.keyboards[] | .name' |
+        while IFS= read -r keyboard; do
+          printf '%s %s %s;' 'switchxkblayout' "${keyboard}" 'next'
+        done
+    )"
+  _send_notification
+}
+
+_current_layout() {
+  hyprctl devices -j |
+    jq -r '.keyboards[] | .active_keymap' |
+    head -n1 
+    # cut -c1-2 |
+    # tr 'a-z' 'A-Z'
+}
+
+_next_layout

@@ -132,10 +132,10 @@ set global lsp_diagnostic_line_hint_sign '●'
 # set global lsp_diagnostic_line_hint_sign ' '
 set -add global ui_options 'terminal_padding_char= '
 
-set global git_diff_flag_added '{$green}▎'
-set global git_diff_flag_modified '{$blue}▎'
-set global git_diff_flag_deleted_before '{$red}🭗'
-set global git_diff_flag_deleted_after '{$red}🬼'
+set global git_diff_add_char "{$green}▎"
+set global git_diff_mod_char "{$blue}▎"
+set global git_diff_del_char "{$red}🬼"
+set global git_diff_top_char "{$red}🭗"
 
 # Todo Highlights
 face global MarkerTodo    $yellow+b
@@ -287,4 +287,9 @@ set-face global ts_variable_other_member        "+i@variable"
 set-face global ts_variable_parameter           "$aqua"
 set-face global ts_warning                      "$orange+b"
 
+set-face global ts_punctuation_special_link     "$bg3"
+set-face global ts_punctuation_bracket_link     "$bg3"
+set-face global ts_markup_link_url_image        "$purple+u"
+
+# kak-tree-sitter-highlight-submit-faces
 EOF

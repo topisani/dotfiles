@@ -6,7 +6,7 @@
     // Choose the order of the modules
     "modules-left": ["hyprland/workspaces", "hyprland/submap"],
     "modules-center": ["custom/window"],
-    "modules-right": ["custom/agenda","idle_inhibitor", "pulseaudio", "battery", "clock", "tray"],
+    "modules-right": ["custom/agenda", "hyprland/language", "idle_inhibitor", "pulseaudio", "battery", "clock", "tray"],
     // Modules configuration
     "hyprland/workspaces": {
         "sort-by-number": true,
@@ -16,6 +16,12 @@
     },
     "hyprland/window": {
         "separate-outputs": true,
+    },
+    "hyprland/language": {
+        "format": "{}",
+        "format-dk-topisani": "DA",
+        "format-da": "DA",
+        "format-dk": "DA",
     },
     "custom/window": {
         "exec": "$HOME/.config/hypr/groupnav.sh bar $WAYBAR_MONITOR",
@@ -149,4 +155,4 @@
         "exec": "$HOME/.config/waybar/mediaplayer.sh 2> /dev/null", // Script in resources folder
     }
 }
-// vim: ft=javascript
+// vim: ft=json

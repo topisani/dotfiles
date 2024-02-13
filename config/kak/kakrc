@@ -16,23 +16,35 @@ set-option -add global ui_options terminal_assistant=none
 set-option -add global ui_options terminal_set_title=no
 set-option -add global ui_options terminal_synchronized=false
 
-set-option global modelinefmt '{gray}%opt{modeline_lsp_progress} {{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {{context_info}} {cyan}U+%sh{printf ''%04x'' "$kak_cursor_char_value"}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default}'
+set-option global modelinefmt '{gray}%opt{modeline_lsp_progress} {{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {{context_info}} {cyan}U+%sh{printf ''%04x'' "$kak_cursor_char_value"}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default}+{cyan}%val{selection_length}{default}'
+
+def toggle-numbers -override %{
+  try %{
+    addhl window/numbers number-lines -hlcursor -separator ' '
+  } catch %{
+    rmhl window/numbers
+  }
+
+  git hide-diff
+  try %{
+    git show-diff
+    rmhooks window git-diff
+    hook -group git-diff window BufWritePost .* git update-diff
+    hook -group git-diff window BufReload .* git update-diff
+  }
+}
 
 # Window-based settings
 hook global WinCreate .* %{
   addhl window/matching show-matching
   addhl window/show-whitespaces show-whitespaces
-  addhl window/numbers number-lines -hlcursor -separator ' '
+  toggle-numbers
 }
 
 # Leader / Filetype modes ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 # [space] [backspace] [ret]
 map -docstring 'leader' global normal <space> ': enter-user-mode user<ret>'  
-
-# for the kakoune breaking-cleanups branch
-# map -docstring 'remove all sels except main' global normal <backspace> , 
-# map -docstring 'remove main sel' global normal <a-backspace> <a-,> 
 
 map -docstring 'remove all sels except main' global normal <backspace> <space> 
 map -docstring 'remove main sel' global normal <a-backspace> <a-space> 
@@ -59,7 +71,7 @@ define-command -override make-directory-on-save -docstring 'make directory on sa
 }
 
 # Auto-pairing of characters
-cork auto-pairs https://github.com/alexherbo2/auto-pairs.kak %{
+cork auto-pairs https://github.com/zxto/auto-pairs.kak %{
   enable-auto-pairs
 }
 
@@ -97,32 +109,6 @@ cork kakoune-interactively https://github.com/chambln/kakoune-interactively %{
     set-option global yes_or_no_instant false
 }
 
-cork kakoune-git-mode 'https://github.com/jordan-yee/kakoune-git-mode' %{
-    load-conf git
-    # Set structured commit message options here
-    # set-option global git_mode_use_structured_quick_commit true
-    # set-option git_mode_commit_prefixes 'feat::fix::docs::refactor::build::test::style::BREAKING CHANGE::'
-    # set-option git_mode_branch_label_regex 'SCRUM-[0-9]+'
-
-    # Declare git mode with default set of mappings
-    declare-git-mode
-
-    # Suggested user mode mapping
-    map global user g ': enter-user-mode git<ret>' -docstring "git mode"
-
-    # I find this quite nice to open the lazygit client.
-    map global git o ': tmux-terminal-window lazygit<ret>' -docstring "open lazygit in new window"
-    
-    hook global WinCreate .* %{ evaluate-commands %sh{
-        cd "$(dirname $kak_buffile)" 2>&1 > /dev/null
-        if (git ls-files --error-unmatch "$kak_buffile") > /dev/null 2>&1; then
-            echo "git-mode-show-diff"
-            echo "hook window BufWritePost .* git-mode-update-diff"
-            echo "hook window BufReload .* git-mode-update-diff"
-        fi
-    }}
-}
-
 cork kakoune-sudo-write 'https://github.com/occivink/kakoune-sudo-write'
 
 # Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
@@ -134,14 +120,14 @@ set-indent global 4
 
 # Normal mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-map -docstring 'Select all occurrences of current selection' global normal <a-L> '"aZ*%s<ret>"bZ"az"b<a-z>a'
+# map -docstring 'Select all occurrences of current selection' global normal <a-L> '"aZ*%s<ret>"bZ"az"b<a-z>a'
 
 map -docstring 'Comment' global normal '#' ': comment-line<ret>'
 map -docstring 'Comment' global normal '<a-#>' ': comment-block<ret>'
 
-define-command -override select-highlights -docstring 'select all occurrences of current selection' %{
-  execute-keys '"aZ*%s<ret>"bZ"az"b<a-z>a'
-}
+# define-command -override select-highlights -docstring 'select all occurrences of current selection' %{
+#   execute-keys '"aZ*%s<ret>"bZ"az"b<a-z>a'
+# }
 
 map -docstring 'lsp...' global normal "'" ': enter-user-mode lsp<ret>'
 
