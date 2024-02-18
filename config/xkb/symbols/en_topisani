@@ -1,0 +1,42 @@
+default partial alphanumeric_keys
+xkb_symbols "basic" {
+
+    include "us"
+    name[Group1]= "English (intl., with AltGr dead keys)";
+    name[Group1]="EN Topisani";
+
+    // Vim arrow keys everywhere with AltGr
+    key <AC06>  { [h,           H,          Left,           Left]     };
+    key <AC07>  { [j,           J,          Down,           Down] };
+    key <AC08>  { [k,           K,          Up,             Up]     };
+    key <AC09>  { [l,           L,          Right,          Right]     };
+    
+    key <AE01> { [1,            exclam,     exclamdown,     onesuperior] };
+    key <AE08> { [8,            asterisk,   periodcentered, multiply]};
+    key <AD12> { [equal,        plus,       multiply,       division] };
+    key <AD11> { [slash,        question,   questiondown,   dead_hook] };
+ 
+    // Danish æ ø å on level3 on the keys where they are on the danish keyboard
+    key <AC10>  { [semicolon,   colon,      ae,             AE] };
+    key <AC11>  { [apostrophe,  quotedbl,   oslash,         Oslash]};
+    key <AD11>  { [bracketleft, braceleft,  aring,          Aring] };
+
+    // Danish æ ø å on level3 on more sensible keys
+    key <AD03> { [e,            E,          ae,             AE] };
+    key <AD09> { [o,            O,          oslash,         Oslash] };
+    key <AC01> { [a,            A,          aring,          Aring] };
+
+    // Add dead_greek. This is more useful to me than eng
+    key <AC05>  { [g,           G,          dead_greek,     ENG]  };
+
+    // Escape on third level of TILDE for keyboard that lack the FN row
+    key <TLDE>  { [grave,       asciitilde, Escape,         Escape]};
+
+    // Compose key
+    // key <RCTRL> { [  Multi_key ] };
+     
+    include "eurosign(5)"
+    include "ctrl(nocaps)"
+    include "compose(rctrl)"
+    include "level3(ralt_switch)"
+};

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+for branch in main master
+do
+	if git rev-parse --revs-only--verify origin/$branch >/dev/null 2>&1; then
+		echo origin/$branch
+		exit 0
+	fi
+done
+
+echo @{upstream}

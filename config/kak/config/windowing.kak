@@ -1,5 +1,5 @@
 load-conf tmux
-cork wezterm https://github.com/Anomalocaridid/wezterm.kak
+# cork wezterm https://github.com/Anomalocaridid/wezterm.kak
 
 # Kitty from autoload
 

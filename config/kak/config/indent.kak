@@ -131,22 +131,35 @@ define-command -override -hidden insert-mode-tab -params 1 %{
     # 1: Indent if at start of line
     exec -draft ";Gh<a-k>^\h*.\z<ret><a-%arg{1}>"
   } catch %{
-    exec "<tab>"
+    lsp-snippets-select-next-placeholders
+  } catch %{
+    exec -with-hooks "<tab>"
   }
 }
 
-map -docstring 'Increase indent' global insert <tab> '<a-;>: insert-mode-tab gt<ret>'
-map -docstring 'Decrease indent' global insert <s-tab> '<a-;>: insert-mode-tab lt<ret>'
+map global insert <tab> '<a-;>: insert-mode-tab gt<ret>' -docstring 'Increase indent' 
+map global insert <s-tab> '<a-;>: insert-mode-tab lt<ret>' -docstring 'Decrease indent' 
 
-remove-hooks global tab-complete
-hook global -group tab-complete InsertCompletionShow .* %{
-  map window insert <tab> '<c-n>'
-  map window insert <s-tab> '<c-p>'
-}
-
-hook global -group tab-complete InsertCompletionHide .* %{
-  unmap window insert <tab> 
-  unmap window insert <s-tab>
+hook global InsertCompletionShow .* %{
+  try %{
+    # this command temporarily removes cursors preceded by whitespace;
+    # if there are no cursors left, it raises an error, does not
+    # continue to execute the mapping commands, and the error is eaten
+    # by the `try` command so no warning appears.
+    execute-keys -draft 'h<a-K>\h<ret>'
+    
+    map window insert <tab>   <c-n>
+    map window insert <s-tab> <c-p>
+    hook -once -group tabcomplete-impl window RawKey '<tab>|<s-tab>' %{
+      map window insert <ret> <c-o>
+    }
+    hook -once -always window InsertCompletionHide .* %{
+      remove-hooks window tabcomplete-impl
+      unmap window insert <tab> <c-n>
+      unmap window insert <s-tab> <c-p>
+      unmap window insert <ret> <c-o>
+    }
+  }
 }
 
 remove-hooks global delete-indent-space

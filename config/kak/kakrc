@@ -8,6 +8,12 @@ def load-conf -params 1 %{
   echo -debug "[load-conf] Loading %arg{1}..."
   source "%val{config}/config/%arg{1}.kak"
 }
+def filetype-hook -params 2 %{ 
+  hook global WinSetOption "filetype=%arg{1}" %arg{2}
+}
+def filetype-assign -params 2 %{
+  hook global BufCreate %arg{1} "set buffer filetype %arg{2}"
+}
 
 # User interface ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
@@ -40,21 +46,6 @@ hook global WinCreate .* %{
   addhl window/show-whitespaces show-whitespaces
   toggle-numbers
 }
-
-# Leader / Filetype modes ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
-
-# [space] [backspace] [ret]
-map -docstring 'leader' global normal <space> ': enter-user-mode user<ret>'  
-
-map -docstring 'remove all sels except main' global normal <backspace> <space> 
-map -docstring 'remove main sel' global normal <a-backspace> <a-space> 
-
-# Filetype mode from [,] or [c-f]
-declare-user-mode filetype
-unmap global normal ,
-map global normal , ': enter-user-mode filetype<ret>'
-map global normal <c-f> ': enter-user-mode filetype<ret>'
-map global insert <c-f> ': enter-user-mode filetype<ret>'
 
 load-conf windowing
 
@@ -111,6 +102,8 @@ cork kakoune-interactively https://github.com/chambln/kakoune-interactively %{
 
 cork kakoune-sudo-write 'https://github.com/occivink/kakoune-sudo-write'
 
+cork kakoune-cargo https://gitlab.com/Screwtapello/kakoune-cargo
+
 # Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 load-conf indent
@@ -120,20 +113,23 @@ set-indent global 4
 
 # Normal mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-# map -docstring 'Select all occurrences of current selection' global normal <a-L> '"aZ*%s<ret>"bZ"az"b<a-z>a'
+# Leader / Filetype modes ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-map -docstring 'Comment' global normal '#' ': comment-line<ret>'
-map -docstring 'Comment' global normal '<a-#>' ': comment-block<ret>'
+# Filetype mode from [,] or [c-f]
+declare-user-mode filetype
+unmap global normal ,
+map global normal , ': enter-user-mode filetype<ret>'
+map global normal <c-f> ': enter-user-mode filetype<ret>'
+map global insert <c-f> ': enter-user-mode filetype<ret>'
 
-# define-command -override select-highlights -docstring 'select all occurrences of current selection' %{
-#   execute-keys '"aZ*%s<ret>"bZ"az"b<a-z>a'
-# }
+map global normal '#' ': comment-line<ret>' -docstring "Comment line"
+map global normal '<a-#>' ': comment-block<ret>' -docstring "Comment block"
 
-map -docstring 'lsp...' global normal "'" ': enter-user-mode lsp<ret>'
+map global normal "'" ': enter-user-mode lsp<ret>' -docstring 'lsp...' 
 
-# for the kakoune breaking-cleanups branch
-map -docstring 'Select next whole line' global normal <X> ': select-next-whole-line<ret>'
-define-command -override select-next-whole-line -docstring 'Performs the old <X> command from kakoune' %{
+# Restores old kakoune behavior that i liked
+map global normal <X> ': select-next-whole-line<ret>' -docstring 'Select next whole line' 
+define-command -hidden -override select-next-whole-line -docstring 'Performs the old <X> command from kakoune' %{
   try %[
     execute-keys '<a-k>^.*$<ret>'
     execute-keys 'Jx'
@@ -150,33 +146,31 @@ def -override bc %{
   exec "|sed -e '$a\'|bc<ret>"
 }
 
-# Map 0 to :
-map global normal 0 %{:zero 'exec :'<ret>}
-def zero -hidden -params 1 %{ eval %sh{[ "$kak_count" -eq 0 ] && echo "$1" || echo "exec '${kak_count}0'"} }
+map global view u '<esc>:execute-keys %sh{echo $(($kak_window_height / 2))} vkv<ret>' -docstring 'scroll half page up'
+map global view d '<esc>:execute-keys %sh{echo $(($kak_window_height / 2))} vjv<ret>' -docstring 'scroll half page down'
+map global view <c-b> '<esc>:execute-keys %val{window_height} vkv<ret>' -docstring 'scroll one page up'
+map global view <c-f> '<esc>:execute-keys %val{window_height} vjv<ret>' -docstring 'scroll one page down'
 
-# User mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+# Merge all current selections into one
+define-command -hidden -override my-hull %{
+    evaluate-commands -save-regs ^ %{
+        evaluate-commands -save-regs ab %{
+            execute-keys %exp{%reg{hash}()}
+            execute-keys '"aZ'
+            execute-keys ,"bZ"az(,"b<a-z>u
+            execute-keys -save-regs '' Z
+        }
+        execute-keys z
+    }
+}
 
-map -docstring 'Open terminal' global user <ret> ': connect terminal<ret>'
-map -docstring 'Surround mode' global user s ': surround-mode<ret>'
-map -docstring 'Replace' global user r ': enter-replace-mode<ret>'
-map -docstring 'Popup Terminal' global user <c-p> ': connect popup<ret>'
-
-def sidetree -override %{ connect panel sidetree --select %val{buffile} }
-map -docstring 'sidetree' global user <tab> ': sidetree<ret>'
-
-declare-user-mode undo
-map -docstring "undo last change" global undo u 'u'
-map -docstring "redo last change" global undo U 'U'
-map -docstring "move forward in changes history" global undo j '<c-j>'
-map -docstring "move backward in changes history" global undo k '<c-k>'
-
-map -docstring 'undo...' global user u ': enter-user-mode undo<ret>'
+map global normal <a-%> ':my-hull<ret>'
 
 # Prompt mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-map -docstring 'Search' global prompt <c-f> '<home>(?i)<end>'
-map -docstring 'Paste' global prompt <c-v> '<c-r>"'
-map -docstring 'Insert the directory name of the current buffer' global prompt <c-d> '%sh{dirname "$kak_bufname"}<a-!>/'
+map global prompt <c-f> '<home>(?i)<end>' -docstring 'Search'
+map global prompt <c-v> '<c-r>"' -docstring 'Paste'
+map global prompt <c-d> '%sh{dirname "$kak_bufname"}<a-!>/' -docstring 'Insert the directory name of the current buffer'
 
 # Disable space autoselecting the next completion
 # Disable backspace exiting the prompt
@@ -188,8 +182,10 @@ map global prompt <backspace> '<left><del>'
 
 set-option global makecmd 'make -j 8'
 # Use ripgrep
-set-option global grepcmd 'rg -Hn --no-heading'
+set-option global grepcmd 'rg -Hn --no-heading --vimgrep'
 
+load-conf git
+load-conf loclist
 load-conf tree-sitter
 load-conf lsp
 load-conf c++
@@ -217,35 +213,37 @@ def -override debughl-disable %{
     rmhooks global debughl
 }
 
+# Set the session name to the Git repo or the CWD unless we already
+# have a session name that doesn't look like a PID (via "kak -s").
+evaluate-commands %sh{
+  expr -- "$kak_session" : '^[0-9]*$' >/dev/null || exit
+  root="$(git rev-parse --show-toplevel 2>/dev/null)"
+  root=${root##*/}
+  root="${root:-$PWD}"
+  session_name="$(printf %s "$root" | sed s/[^a-zA-Z0-9_-]/_/g)"
+  echo "try %{ rename-session $session_name }"
+}
+
+
 # Filetype hooks ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-hook global BufCreate .*\.bb(|class|append) %{
-  set buffer filetype sh
+filetype-assign .*\.bb(|class|append) sh
+filetype-assign .*Makefile\..* makefile
+filetype-assign .*\.yuck lisp
+filetype-assign .*\.ocd sh
+filetype-assign .*\.conf conf
+filetype-assign .*\.surql sql
+filetype-assign .*\.dts devicetree
+filetype-assign "xkb/symbols/[\w/]$" xkb_symbols
+filetype-assign .*\.kdl kdl
+
+filetype-hook xkb_symbols %{
+  addhl window/comment regex '//[^\n]*' 0:comment
+  set window comment_line '//'
 }
 
-hook global BufCreate .*Makefile\..* %{
-  set buffer filetype makefile
-}
-
-hook global BufCreate .*\.yuck %{
-  set buffer filetype lisp
-}
-
-# openocd files
-hook global BufCreate .*\.ocd %{
-  set buffer filetype sh
-}
-
-hook global BufCreate .*\.conf %{
-  set buffer filetype conf
-}
-
-hook global BufCreate .*\.surql %{
-  set buffer filetype sql
-}
-
-hook global BufCreate .*\.dts %{
-  set buffer filetype devicetree
+filetype-hook kdl %{
+  set window comment_line '//'
 }
 
 # Global highlighter ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
@@ -264,6 +262,17 @@ filetype-hook .* %{
   hl-todo-enable
 }
 
+# kakscript filetype improvements┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+filetype-hook kak %{
+  try %{
+    addhl shared/kakrc/code/map regex '^\h*map\h+(global|window|buffer)\h+([\w-]+)' 2:variable
+    addhl shared/kakrc/code/user-mode regex '^\h*declare-user-mode\h+([\w-]+)' 1:variable
+  }
+
+  map buffer filetype v ':evaluate-commands -- %reg{.}<ret>'
+}
+
 # ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 colorscheme %sh{ colorscheme-switch --current }
 
@@ -271,5 +280,7 @@ colorscheme %sh{ colorscheme-switch --current }
 # ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 def -override markdown-live %{
-    tmux-terminal-autosplit mdlive %val[buffile]
+    terminal mdlive %val[buffile]
 }
+
+load-conf user-mode

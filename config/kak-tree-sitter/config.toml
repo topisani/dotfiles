@@ -607,7 +607,24 @@ path = "runtime/queries/julia"
 # TODO
 
 # kdl
-# TODO
+[language.kdl]
+remove_default_highlighter = false
+
+[language.kdl.grammar]
+url = "https://github.com/amaanq/tree-sitter-kdl"
+pin = "3ca569b9f9af43593c24f9e7a21f02f43a13bb88"
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "../scanner.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "scanner.o", "-o", "kdl.so"]
+link_flags = ["-O3"]
+
+[language.kdl.queries]
+url = "https://github.com/helix-editor/helix"
+pin = "78c34194b5c83beb26ca04f12bf9d53fd5aba801"
+path = "runtime/queries/kdl"
 
 # kotlin
 # TODO

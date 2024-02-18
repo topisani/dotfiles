@@ -137,6 +137,11 @@ set global git_diff_mod_char "{$blue}▎"
 set global git_diff_del_char "{$red}🬼"
 set global git_diff_top_char "{$red}🭗"
 
+set-face global GitBlameLineRef     $yellow,$bg2
+set-face global GitBlameLineSummary $green,$bg2
+set-face global GitBlameLineAuthor  $blue_light,$bg2
+set-face global GitBlameLineTime    default,$bg2@comment
+
 # Todo Highlights
 face global MarkerTodo    $yellow+b
 face global MarkerNote    $blue_light+b
