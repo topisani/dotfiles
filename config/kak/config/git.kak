@@ -243,6 +243,7 @@ eval %{
   define-command -override my-git -params 1.. %{ evaluate-commands -draft %{
     nop %sh{
       (
+        export KAKOUNE_SESSION=$kak_session KAKOUNE_CLIENT=$kak_client
         response=my-git-log-default
         prepend_git=true
         while true; do {
@@ -263,7 +264,6 @@ eval %{
         escape2() { printf %s "$*" | sed "s/'/''''/g"; }
         escape3() { printf %s "$*" | sed "s/'/''''''''/g"; }
         if output=$(
-          EDITOR="kak-remote-edit.sh ${kak_session} ${kak_client} --wait" \
           "$@" 2>&1
         ); then {
           response="'
@@ -455,27 +455,28 @@ eval %{
   }
 }
 
-declare-user-mode git
-declare-user-mode git-am
-declare-user-mode git-apply
-declare-user-mode git-bisect
-declare-user-mode git-blame
-declare-user-mode git-branchstack
-declare-user-mode git-cherry-pick
-declare-user-mode git-commit
-declare-user-mode git-diff
-declare-user-mode git-fetch
-declare-user-mode git-merge
-declare-user-mode git-push
-declare-user-mode git-rebase
-declare-user-mode git-reset
-declare-user-mode git-revert
-declare-user-mode git-revise
-declare-user-mode git-yank
-declare-user-mode git-stash
-declare-user-mode git-gl
+try %{ declare-user-mode git }
+try %{ declare-user-mode git-am }
+try %{ declare-user-mode git-apply }
+try %{ declare-user-mode git-bisect }
+try %{ declare-user-mode git-blame }
+try %{ declare-user-mode git-branchstack }
+try %{ declare-user-mode git-cherry-pick }
+try %{ declare-user-mode git-commit }
+try %{ declare-user-mode git-diff }
+try %{ declare-user-mode git-fetch }
+try %{ declare-user-mode git-merge }
+try %{ declare-user-mode git-push }
+try %{ declare-user-mode git-rebase }
+try %{ declare-user-mode git-reset }
+try %{ declare-user-mode git-revert }
+try %{ declare-user-mode git-revise }
+try %{ declare-user-mode git-yank }
+try %{ declare-user-mode git-stash }
+try %{ declare-user-mode git-gl }
 
 map global object m %{c^[<lt>=|]{4\,}[^\n]*\n,^[<gt>=|]{4\,}[^\n]*\n<ret>} -docstring 'conflict markers'
+
 # map global normal <c-h> %{:my-git-enter<ret>}
 
 map global git    g ':connect terminal tig<ret>'  -docstring 'Open tig'

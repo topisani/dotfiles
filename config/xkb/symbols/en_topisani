@@ -13,8 +13,8 @@ xkb_symbols "basic" {
     
     key <AE01> { [1,            exclam,     exclamdown,     onesuperior] };
     key <AE08> { [8,            asterisk,   periodcentered, multiply]};
-    key <AD12> { [equal,        plus,       multiply,       division] };
-    key <AD11> { [slash,        question,   questiondown,   dead_hook] };
+    key <AE12> { [equal,        plus,       multiply,       division] };
+    key <AB10> { [slash,        question,   questiondown,   dead_hook] };
  
     // Danish æ ø å on level3 on the keys where they are on the danish keyboard
     key <AC10>  { [semicolon,   colon,      ae,             AE] };

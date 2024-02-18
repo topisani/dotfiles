@@ -42,7 +42,7 @@ define-command ide-setup %{
       }
   }
 
-  hook global WinDisplay "(^$)|(^%opt{loclist_buffer_regex}$|^\*git\*|\*cargo\*)|.*" %{
+  hook global WinDisplay "(^$)|(^%opt{locations_buffer_regex}$|^\*git\*|\*cargo\*)|.*" %{
       eval %sh{
           if [ "$kak_client" = "$kak_opt_toolsclient" ]; then
               if [ -n "$kak_hook_param_capture_2" ]; then

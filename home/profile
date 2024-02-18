@@ -53,7 +53,7 @@ export LESS_TERMCAP_so=$purple # Begin standout-mode - info box
 export LESS_TERMCAP_ue=$default # End underline
 export LESS_TERMCAP_us=$green # Begin underline
 
-export EDITOR='krc attach'
+export EDITOR='kak'
 # Breaks forgit
 # export FZF_DEFAULT_OPTS='--preview-window=right,border-left,<30(up,30%,border-bottom)'
 

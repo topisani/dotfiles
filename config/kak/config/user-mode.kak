@@ -24,6 +24,10 @@ def -hidden -override my-fzf-config-popup %{
     winplace popup terminal -title "Config Files" krc-fzf files %val{config} %sh{printf '%s' "$HOME/.config/kak-lsp"} %sh{printf '%s' "$HOME/.config/kak-tree-sitter"}
 }
 
+def -hidden -override my-fzf-cork-popup %{
+    winplace popup terminal -title "Plugin Files" krc-fzf files %val{config} %sh{printf '%s' "$HOME/.local/share/kak/cork/plugins"}
+}
+
 def my-sidetree -override %{ winplace panel connect terminal sidetree --select %val{buffile} }
 
 declare-user-mode my-tmux
@@ -41,6 +45,7 @@ map global files F ':winplace popup terminal -title "Open file (all)..." krc-fzf
 map global files r ":winplace popup terminal -title 'Ranger' ranger<ret>"                          -docstring 'Ranger'
 map global files w ':w<ret>'                                                     -docstring 'Write file' 
 map global files c ":my-fzf-config-popup<ret>"                                   -docstring 'Open config dir'
+map global files C ":my-fzf-cork-popup<ret>"                                   -docstring 'Open config dir'
 map global files d ':my-file-delete<ret>'                                        -docstring 'Delete current file'
 map global files r ':my-file-rename<ret>'                                        -docstring 'Rename current file'
 
@@ -48,6 +53,7 @@ map global buffers b ':winplace popup terminal -title "Buffers" krc-fzf buffers<
 map global buffers n ':buffer-next<ret>'                                         -docstring "Next Buffer" 
 map global buffers p ':buffer-previous<ret>'                                     -docstring "Prev buffer" 
 map global buffers d ':delete-buffer<ret>'                                       -docstring "Delete buffer"
+map global buffers D ':delete-buffer!<ret>'                                       -docstring "Delete buffer (force)"
 map global buffers u ':buffer *debug*<ret>'                                      -docstring "Debug buffer"
 map global buffers m ':buffer *make*<ret>'                                       -docstring "*make*"
 map global buffers M ':buffer make<ret>'                                         -docstring "make"
@@ -95,9 +101,9 @@ map global my-tmux <c-T>     ':ide-hide-tools<ret>'              -docstring 'Hid
 try %{ set-option global autocomplete insert|prompt|no-regex-prompt }
 # alias global m my-make
 # alias global f my-find
-alias global g loclist-grep
-map global normal <c-n> %{:loclist-jump next<ret>} -docstring 'next Location'
-map global normal <c-p> %{:loclist-jump previous<ret>} -docstring 'previous Location'
+alias global g boost-grep
+map global normal <c-n> %{:locations-next<ret>} -docstring 'next Location'
+map global normal <c-p> %{:locations-previous<ret>} -docstring 'previous Location'
 map global normal <c-r> %{:buffers-pop<ret>} -docstring 'pop grep/git buffer'
 
 

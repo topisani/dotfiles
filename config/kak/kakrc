@@ -106,6 +106,10 @@ cork kakoune-cargo https://gitlab.com/Screwtapello/kakoune-cargo
 
 cork kak-ansi https://github.com/eraserhd/kak-ansi
 
+cork kakoune-boost https://github.com/krobelus/kakoune-boost %{
+  load-conf ide
+}
+
 # Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 load-conf indent
@@ -186,15 +190,12 @@ set-option global makecmd 'make -j 8'
 # Use ripgrep
 set-option global grepcmd 'rg -Hn --no-heading --vimgrep'
 
-load-conf git
-load-conf loclist
+# load-conf git
 load-conf tree-sitter
 load-conf lsp
 load-conf c++
 load-conf rust
 
-load-conf ide
-ide-setup
 
 def -override debughl %{
     echo -to-file "/tmp/kak-debughl.txt" "%opt[kts_highlighter_ranges] %opt[lsp_semantic_tokens]"
