@@ -48,7 +48,7 @@ define-command ide-setup %{
               if [ -n "$kak_hook_param_capture_2" ]; then
                   echo ide-show-tools
                   echo "focus $kak_opt_toolsclient"
-              else
+              # else
                   # kakoune crashes if this isnt defered somehow
                   # echo "hook -once global NormalIdle .* %{ try %{ eval -client %opt{jumpclient} %{ buffer '$kak_hook_param' } } } "
                   # echo ide-hide-tools

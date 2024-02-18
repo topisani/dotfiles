@@ -104,6 +104,8 @@ cork kakoune-sudo-write 'https://github.com/occivink/kakoune-sudo-write'
 
 cork kakoune-cargo https://gitlab.com/Screwtapello/kakoune-cargo
 
+cork kak-ansi https://github.com/eraserhd/kak-ansi
+
 # Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 load-conf indent
