@@ -1,12 +1,60 @@
 #!/bin/bash
+COPY_PROVIDERS="tmux osc52 wl-copy"
+PASTE_PROVIDERS="wl-copy tmux"
+TTY=$( (tty || tty </proc/$PPID/fd/0) 2>/dev/null | grep /dev/)
 
-if [[ -z "$WAYLAND_DISPLAY" ]]; then
-  xclip -selection c "$@"
-else
-  if [[ " $1 " =~ " -o " ]]; then
-    shift
-    wl-paste "$@"
-  else
-    wl-copy "$@"
-  fi
-fi
+action=copy
+[ "$1" == paste ] && action=paste && shift
+[ "$1" == -o ] && action=paste && shift
+[ "$1" == -- ] && shift
+
+main() {
+	declare p status=99
+
+	case $action in
+	copy)
+		stdin=$(cat /dev/stdin; echo .)
+		stdin=${stdin%.}
+		buffer=$(echo "$stdin" | base64); 
+		for p in $COPY_PROVIDERS; do
+			$p-provider copy && status=0
+		done
+		;;
+
+	paste)
+		for p in $PASTE_PROVIDERS; do
+			$p-provider paste && status=0 && break
+		done
+		;;
+	esac
+
+	exit $status
+}
+
+# N.B. buffer is global for simplicity
+
+tmux-provider() {
+	[[ -n $TMUX ]] || return
+	case $action in
+	copy) printf %s "$stdin"| tmux load-buffer -w - ;;
+	paste) tmux save-buffer - ;;
+	esac
+}
+
+osc52-provider() {
+	case $action in
+	copy) [[ -n "$TTY" ]] && printf $'\e]52;c;%s\a' "$buffer" >"$TTY" ;;
+	paste) return 1 ;;
+	esac
+}
+
+wl-copy-provider() {
+	[ "$SSH_TTY" ] && exit 1
+	! command wl-copy && exit 1
+	case $action in
+	copy) printf %s "$stdin"| wl-copy --type text/plain;;
+	paste) exec wl-paste --no-newline ;;
+	esac
+}
+
+main "$@"
