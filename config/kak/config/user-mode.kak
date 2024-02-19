@@ -25,7 +25,7 @@ def -hidden -override my-fzf-config-popup %{
 }
 
 def -hidden -override my-fzf-cork-popup %{
-    winplace popup terminal -title "Plugin Files" krc-fzf files %val{config} %sh{printf '%s' "$HOME/.local/share/kak/cork/plugins"}
+    winplace popup terminal -title "Plugin Files" krc-fzf files %sh{printf '%s' "$HOME/.local/share/cork/plugins"}
 }
 
 def my-sidetree -override %{ winplace panel connect terminal sidetree --select %val{buffile} }

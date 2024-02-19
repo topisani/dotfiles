@@ -1,8 +1,14 @@
 # kakoune.cr
 evaluate-commands %sh{
   krc kak-defs
-  cork init
+  # We're assuming the default bundle_path here...
+  plugins="$kak_config/bundle"
+  mkdir -p "$plugins"
+  [ ! -e "$plugins/kak-bundle" ] && \
+    git clone -q https://github.com/jdugan6240/kak-bundle "$plugins/kak-bundle"
+  printf "%s\n" "source '$plugins/kak-bundle/rc/kak-bundle.kak'"
 }
+bundle-noload kak-bundle https://github.com/jdugan6240/kak-bundle
 
 def load-conf -params 1 %{
   echo -debug "[load-conf] Loading %arg{1}..."
@@ -62,15 +68,15 @@ define-command -override make-directory-on-save -docstring 'make directory on sa
 }
 
 # Auto-pairing of characters
-cork auto-pairs https://github.com/zxto/auto-pairs.kak %{
+bundle auto-pairs.kak https://github.com/xzto/auto-pairs.kak %{
   enable-auto-pairs
 }
 
-cork grep-write https://github.com/JacobTravers/kakoune-grep-write
+bundle kakoune-grep-write https://github.com/JacobTravers/kakoune-grep-write
 
-cork kakoune-gdb https://github.com/occivink/kakoune-gdb
+bundle kakoune-gdb https://github.com/occivink/kakoune-gdb
 
-# cork fzf https://github.com/andreyorst/fzf.kak %{
+# bundle fzf.kak https://github.com/andreyorst/fzf.kak %{
 #   require-module fzf
 #   require-module fzf-file
 #   set-option global fzf_file_command "fd . --type f -uu --follow"
@@ -80,19 +86,19 @@ cork kakoune-gdb https://github.com/occivink/kakoune-gdb
 #   require-module fzf-buffer
 # }
 
-cork focus https://github.com/caksoylar/kakoune-focus %{
+bundle kakoune-focus https://github.com/caksoylar/kakoune-focus %{
   set global focus_context_lines 1
   set global focus_separator "{FocusMarker}╞══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╡"
   map global user o ': focus-toggle<ret>' -docstring "Toggle selection focus"
 }
 
-cork occivink-snippets https://github.com/occivink/kakoune-snippets
+bundle kakoune-snippets https://github.com/occivink/kakoune-snippets
 
-cork kakoune-table https://gitlab.com/listentolist/kakoune-table
+bundle kakoune-table https://gitlab.com/listentolist/kakoune-table
 
-# cork kakoune-text-objects https://github.com/delapouite/kakoune-text-objects
+# bundle kakoune-text-objects https://github.com/delapouite/kakoune-text-objects
 
-cork kakoune-interactively https://github.com/chambln/kakoune-interactively %{
+bundle kakoune-interactively https://github.com/chambln/kakoune-interactively %{
     alias global cd i-change-directory
     alias global db i-delete-buffer
     alias global q i-quit
@@ -100,13 +106,13 @@ cork kakoune-interactively https://github.com/chambln/kakoune-interactively %{
     set-option global yes_or_no_instant false
 }
 
-cork kakoune-sudo-write 'https://github.com/occivink/kakoune-sudo-write'
+bundle kakoune-sudo-write https://github.com/occivink/kakoune-sudo-write
 
-cork kakoune-cargo https://gitlab.com/Screwtapello/kakoune-cargo
+bundle kakoune-cargo https://gitlab.com/Screwtapello/kakoune-cargo
 
-cork kak-ansi https://github.com/eraserhd/kak-ansi
+bundle kak-ansi https://github.com/eraserhd/kak-ansi
 
-cork kakoune-boost https://github.com/krobelus/kakoune-boost %{
+bundle kakoune-boost https://github.com/topisani/kakoune-boost %{
   load-conf ide
 }
 
