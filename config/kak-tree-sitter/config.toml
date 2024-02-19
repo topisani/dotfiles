@@ -604,7 +604,24 @@ pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
 path = "runtime/queries/julia"
 
 # just
-# TODO
+[language.just.grammar]
+name = "just"
+url = "https://github.com/IndianBoy42/tree-sitter-just"
+pin = "4f5d53b52a65771f9695df3f1a294d5c80b916fb"
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "../scanner.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "scanner.o", "-o", "just.so"]
+link_flags = ["-O3"]
+
+
+[language.just.queries]
+url = "https://github.com/IndianBoy42/tree-sitter-just"
+pin = "4f5d53b52a65771f9695df3f1a294d5c80b916fb"
+path = "queries/just"
+
 
 # kdl
 [language.kdl]
@@ -869,7 +886,21 @@ path = "runtime/queries/python"
 # TODO
 
 # rst
-# TODO
+[language.rst.grammar]
+url = "https://github.com/stsewd/tree-sitter-rst"
+pin = "25e6328872ac3a764ba8b926aea12719741103f1"
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "../scanner.c", "../parser.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "scanner.o", "parser.o", "-o", "rst.so"]
+link_flags = ["-O3", "-lstdc++"]
+
+[language.rst.queries]
+url = "https://github.com/helix-editor/helix"
+pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+path = "runtime/queries/rst"
 
 # ruby
 [language.ruby.grammar]
