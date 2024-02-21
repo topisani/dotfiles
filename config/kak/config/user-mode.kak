@@ -105,6 +105,7 @@ alias global g boost-grep
 map global normal <c-n> %{:locations-next<ret>} -docstring 'next Location'
 map global normal <c-p> %{:locations-previous<ret>} -docstring 'previous Location'
 map global normal <c-r> %{:buffers-pop<ret>} -docstring 'pop grep/git buffer'
+map global normal <c-t> ":enter-user-mode kak-tree-sitter<ret>" -docstring 'Tree sitter...'
 
 
 declare-user-mode ui
@@ -128,3 +129,9 @@ map global user q ':ide-quit-notlast<ret>'        -docstring "Close the client, 
 map global user <ret> ':winplace autosplit connect terminal<ret>' -docstring 'Open terminal'
 map global user <c-p> ':winplace popup connect<ret>' -docstring 'Popup Terminal'
 map global user <tab> ':my-sidetree<ret>' -docstring 'sidetree'
+
+# System Clipboard
+map global user p '<a-!>clip -o<ret>' -docstring 'System paste after' 
+map global user P '!clip -o<ret>' -docstring 'System paste before' 
+map global user R '|clip -o<ret>' -docstring 'System replace' 
+map global user y '<a-|>clip<ret>' -docstring 'System yank' 
