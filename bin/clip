@@ -1,5 +1,5 @@
 #!/bin/bash
-COPY_PROVIDERS="tmux osc52 wl-copy"
+COPY_PROVIDERS="osc52 wl-copy"
 PASTE_PROVIDERS="wl-copy tmux"
 TTY=$( (tty || tty </proc/$PPID/fd/0) 2>/dev/null | grep /dev/)
 
@@ -50,7 +50,7 @@ osc52-provider() {
 
 wl-copy-provider() {
 	[ "$SSH_TTY" ] && exit 1
-	! command wl-copy && exit 1
+	! command -v wl-copy > /dev/null && exit 1
 	case $action in
 	copy) printf %s "$stdin"| wl-copy --type text/plain;;
 	paste) exec wl-paste --no-newline ;;
