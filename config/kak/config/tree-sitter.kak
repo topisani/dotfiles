@@ -15,5 +15,5 @@ kts-map-ft-lang git-diff diff
 kts-map-ft-lang justfile just
 
 hook global -once WinDisplay ".*" %{
-  kak-tree-sitter-highlight-submit-faces
+  try %{ kak-tree-sitter-highlight-submit-faces }
 }

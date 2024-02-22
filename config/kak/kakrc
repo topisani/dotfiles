@@ -40,9 +40,9 @@ def toggle-numbers -override %{
   git hide-diff
   try %{
     git show-diff
-    rmhooks window git-diff
-    hook -group git-diff window BufWritePost .* git update-diff
-    hook -group git-diff window BufReload .* git update-diff
+    rmhooks window my-git-diff
+    hook -group my-git-diff window BufWritePost .* git update-diff
+    hook -group my-git-diff window BufReload .* git update-diff
   }
 }
 
@@ -114,6 +114,7 @@ bundle kak-ansi https://github.com/eraserhd/kak-ansi
 
 bundle kakoune-boost https://github.com/topisani/kakoune-boost %{
   load-conf ide
+  load-conf git
 }
 
 # Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈

@@ -55,3 +55,12 @@
 	default = current
 [commit]
 	template = /home/topisani/.config/git/gitmessage.txt
+	verbose = true
+[rerere]
+	enabled = true
+	autoupdate = true
+[merge]
+	conflictstyle = diff3
+[rebase]
+	autoSquash = true
+	autoStash = true
