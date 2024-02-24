@@ -1,10 +1,8 @@
 # decl -hidden str toolsclient_tmux_pane
 
-# def ide-perform-setup -hidden %{
+# def -override ide-perform-setup -hidden %{
 
 # }
-
-
 
 
 # decl -docstring "Folder that paths in make buffer are relative to" str make_folder "."
@@ -19,17 +17,13 @@
 #   echo '}'
 # }}
 
-hook -once global RawKey .* ide-setup
+hook -once global WinDisplay .* ide-setup
 
 declare-option -hidden str toolsclient_tmux_pane
 
-define-command ide-setup %{
+define-command ide-setup -override %{
   rmhooks global ide
   set global jumpclient client0
-
-  hook -group ide global ClientClose %opt[toolsclient] %{
-    hook -once global NormalIdle .* ide-make-tools
-  }
   
   hook -group ide global ClientClose .* %{
       try %{    
@@ -42,7 +36,7 @@ define-command ide-setup %{
       }
   }
 
-  hook global WinDisplay "(^$)|(^%opt{locations_buffer_regex}$|^\*git\*|\*cargo\*)|.*" %{
+  hook -group ide global WinDisplay "(^$)|(^%opt{locations_buffer_regex}$|^\*git\*|\*cargo\*)|.*" %{
       eval %sh{
           if [ "$kak_client" = "$kak_opt_toolsclient" ]; then
               if [ -n "$kak_hook_param_capture_2" ]; then
@@ -57,7 +51,7 @@ define-command ide-setup %{
       }
   }
 
-  hook global WinClose .* %{
+  hook -group ide global WinClose .* %{
       eval %sh{
           if [ "$kak_client" = "$kak_opt_toolsclient" ]; then
               echo "ide-hide-tools"
@@ -65,14 +59,19 @@ define-command ide-setup %{
       }
   }
 
-  hook global FocusIn ^client.* %{
-    set global jumpclient %val[client]
+  hook -group ide global FocusIn client.* %{
+    set global jumpclient %val{hook_param}
+  }
+
+  hook -group ide global ClientClose tools %{
+    hook -once global NormalIdle .* ide-make-tools
   }
   
   ide-make-tools
 }
 
-def ide-show-tools %{
+
+def -override ide-show-tools %{
     ide-make-tools
     eval %sh{
         tmux=${kak_client_env_TMUX:-$TMUX}
@@ -85,7 +84,7 @@ def ide-show-tools %{
     focus %opt{toolsclient} 
 }
 
-def ide-hide-tools %{
+def -override ide-hide-tools %{
     try %{
     eval -client %opt[toolsclient] quit
   } catch %{
@@ -93,7 +92,7 @@ def ide-hide-tools %{
   }
 }
 
-def -hidden ide-make-tools %{
+def -override -hidden ide-make-tools %{
   try %{
     eval -client tools nop
   } catch %{
@@ -107,7 +106,7 @@ def -hidden ide-make-tools %{
   }
 }
 
-def ide-tools -docstring "ide-tools: Focus or hide the tools client" %{
+def -override ide-tools -docstring "ide-tools: Focus or hide the tools client" %{
   eval %sh{
     if [ "$kak_client" = "$kak_opt_toolsclient" ]; then
       echo "ide-hide-tools"
@@ -123,7 +122,9 @@ ide-quit: quit the kakoune client. If it is the last non-tools client, the tools
         remaining=$(printf "%s\n" $kak_client_list | sed "/$kak_client/d;/$kak_opt_toolsclient/d")
         if [ -z $remaining ]; then
             # No other real clients remaining. Close toolsclient first
-            echo "try %{ eval -client %opt{toolsclient} quit }"
+            echo "remove-hooks global ide"
+            echo "hook -once global NormalIdle .* ide-setup"
+            echo "try %{ eval -no-hooks -client %opt{toolsclient} quit }"
         fi
         echo quit
     }

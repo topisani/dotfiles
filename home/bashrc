@@ -66,3 +66,5 @@ then
   _bcpp --defaults
 fi
 
+
+source /home/topisani/.config/broot/launcher/bash/br

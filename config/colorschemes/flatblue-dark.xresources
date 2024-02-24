@@ -4,7 +4,7 @@
 *.background: #000000
 
 ! black
-*.color0:     #010207
+*.color0:     #010309
 *.color8:     #828087
 
 ! red

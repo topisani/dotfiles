@@ -28,7 +28,27 @@ set-option -add global ui_options terminal_assistant=none
 set-option -add global ui_options terminal_set_title=no
 set-option -add global ui_options terminal_synchronized=false
 
-set-option global modelinefmt '{gray}%opt{modeline_lsp_progress} {{mode_info}} {magenta}%val{client}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {{context_info}} {cyan}U+%sh{printf ''%04x'' "$kak_cursor_char_value"}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default}+{cyan}%val{selection_length}{default}'
+declare-option str modeline_client_flags ""
+def update-client-flags -hidden -override %{
+  eval %sh{
+    set -- $kak_client_list
+    for client do
+      val=""
+      [ "$client" = "$kak_opt_jumpclient" ] && val="${val}j"
+      [ "$client" = "$kak_opt_docsclient" ] && val="${val}d"
+      [ "$client" = "$kak_opt_toolsclient" ] && val="${val}t"
+      [ -n "$val" ] && val=" $val"
+      echo "eval -client $client %{ set window modeline_client_flags '$val' }"
+    done
+  }
+}
+rmhooks global modeline-client-flags
+hook -group modeline-client-flags global WinDisplay .* update-client-flags
+hook -group modeline-client-flags global FocusIn .* update-client-flags
+hook -group modeline-client-flags global FocusOut .* update-client-flags
+hook -group modeline-client-flags global GlobalSetOption '(jump|docs|tools)client=.*' update-client-flags
+
+set-option global modelinefmt '{white+d}%opt{modeline_lsp_progress} {{mode_info}} {magenta}%val{client}{magenta+d}%opt{modeline_client_flags}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {{context_info}} {cyan}U+%sh{printf ''%04x'' "$kak_cursor_char_value"}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default}+{cyan}%val{selection_length}{default}'
 
 def toggle-numbers -override %{
   try %{
@@ -246,6 +266,14 @@ filetype-assign .*\.surql sql
 filetype-assign .*\.dts devicetree
 filetype-assign "xkb/symbols/[\w/]$" xkb_symbols
 filetype-assign .*\.kdl kdl
+filetype-assign .*\.hjson hjson
+
+filetype-hook hjson %{
+  require-module yaml
+  addhl window/ ref yaml
+  addhl window/comment regex '//[^\n]*' 0:comment
+  set window comment_line '#'
+}
 
 filetype-hook xkb_symbols %{
   addhl window/comment regex '//[^\n]*' 0:comment

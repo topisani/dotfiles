@@ -46,3 +46,4 @@
 ~/.config/wallpapers;config/wallpapers
 ~/.config/kak-tree-sitter;config/kak-tree-sitter
 ~/.config/git;config/git
+~/.config/broot;config/broot

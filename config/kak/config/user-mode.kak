@@ -24,11 +24,37 @@ def -hidden -override my-fzf-config-popup %{
     winplace popup terminal -title "Config Files" krc-fzf files %val{config} %sh{printf '%s' "$HOME/.config/kak-lsp"} %sh{printf '%s' "$HOME/.config/kak-tree-sitter"}
 }
 
-def -hidden -override my-fzf-cork-popup %{
-    winplace popup terminal -title "Plugin Files" krc-fzf files %sh{printf '%s' "$HOME/.local/share/cork/plugins"}
+def -hidden -override my-fzf-bundle-popup %{
+    winplace popup terminal -title "Plugin Files" krc-fzf files %sh{printf '%s' "$HOME/.config/kak/bundle"}
 }
 
-def my-sidetree -override %{ winplace panel connect terminal sidetree --select %val{buffile} }
+def sidetree -override %{ winplace panel connect terminal sidetree --select %val{buffile} }
+
+def broot -override -params .. %{
+  connect terminal sh -c %{
+    cfgfile="$(mktemp -t kak-broot-XXXXXX.toml)"
+    trap 'rm -rf -- "$cfgfile"' EXIT
+    file=$1; shift
+    (echo '
+    [[verbs]]
+    key = "enter"
+    external = "krc open {file} {line}"
+    apply_to = "text_file"
+    [[verbs]]
+    invocation = "kcd"
+    key = "c-e"
+    external = "krc send cd {directory}"
+    apply_to = "directory"
+    [[verbs]]
+    invocation = "ksel"
+    key = "c-r"'
+    echo "execution = \":select $file\""
+    echo '
+    apply_to = "directory"
+    ') > "$cfgfile"
+    broot --conf "$cfgfile;$HOME/.config/broot/conf.hjson" "$@"
+  } broot %val{buffile} %arg{@}
+}
 
 declare-user-mode my-tmux
 declare-user-mode files
@@ -42,23 +68,26 @@ map global undo k '<c-k>' -docstring "move backward in changes history"
 
 map global files f ':winplace popup terminal -title "Open file..." krc-fzf files<ret>'             -docstring 'List files'
 map global files F ':winplace popup terminal -title "Open file (all)..." krc-fzf files -uuu<ret>'  -docstring 'List files (including hidden)'
-map global files r ":winplace popup terminal -title 'Ranger' ranger<ret>"                          -docstring 'Ranger'
-map global files w ':w<ret>'                                                     -docstring 'Write file' 
-map global files c ":my-fzf-config-popup<ret>"                                   -docstring 'Open config dir'
-map global files C ":my-fzf-cork-popup<ret>"                                   -docstring 'Open config dir'
-map global files d ':my-file-delete<ret>'                                        -docstring 'Delete current file'
-map global files r ':my-file-rename<ret>'                                        -docstring 'Rename current file'
+map global files b ':winplace popup broot<ret>'                                        -docstring 'broot popup'
+map global files B ':winplace window broot<ret>'                                       -docstring 'broot window'
+map global files e ':winplace panel broot<ret>'                                        -docstring 'broot panel'
+map global files r ":winplace popup terminal -title 'Ranger' ranger<ret>"              -docstring 'Ranger'
+map global files w ':w<ret>'                                                           -docstring 'Write file' 
+map global files c ":my-fzf-config-popup<ret>"                                         -docstring 'Open config dir'
+map global files C ":my-fzf-bundle-popup<ret>"                                         -docstring 'Open plugin dir'
+map global files d ':my-file-delete<ret>'                                              -docstring 'Delete current file'
+map global files r ':my-file-rename<ret>'                                              -docstring 'Rename current file'
 
-map global buffers b ':winplace popup terminal -title "Buffers" krc-fzf buffers<ret>'              -docstring "List Buffers" 
-map global buffers n ':buffer-next<ret>'                                         -docstring "Next Buffer" 
-map global buffers p ':buffer-previous<ret>'                                     -docstring "Prev buffer" 
-map global buffers d ':delete-buffer<ret>'                                       -docstring "Delete buffer"
-map global buffers D ':delete-buffer!<ret>'                                       -docstring "Delete buffer (force)"
-map global buffers u ':buffer *debug*<ret>'                                      -docstring "Debug buffer"
-map global buffers m ':buffer *make*<ret>'                                       -docstring "*make*"
-map global buffers M ':buffer make<ret>'                                         -docstring "make"
-map global buffers g ':buffer %opt{my_grep_buffer}<ret>'                         -docstring "*grep* or equivalent"
-map global buffers v ':buffer %opt{my_git_buffer}<ret>'                          -docstring "*git*"
+map global buffers b ':winplace popup terminal -title "Buffers" krc-fzf buffers<ret>'  -docstring "List Buffers" 
+map global buffers n ':buffer-next<ret>'                                               -docstring "Next Buffer" 
+map global buffers p ':buffer-previous<ret>'                                           -docstring "Prev buffer" 
+map global buffers d ':delete-buffer<ret>'                                             -docstring "Delete buffer"
+map global buffers D ':delete-buffer!<ret>'                                            -docstring "Delete buffer (force)"
+map global buffers u ':buffer *debug*<ret>'                                            -docstring "Debug buffer"
+map global buffers m ':buffer *make*<ret>'                                             -docstring "*make*"
+map global buffers M ':buffer make<ret>'                                               -docstring "make"
+map global buffers g ':buffer %opt{my_grep_buffer}<ret>'                               -docstring "*grep* or equivalent"
+map global buffers v ':buffer %opt{my_git_buffer}<ret>'                                -docstring "*git*"
 
 
 map global my-tmux h     ':nop %sh{ tmux select-pane -L }<ret>' -docstring 'Select pane to the left'
@@ -127,8 +156,8 @@ map global user b ':enter-user-mode buffers<ret>' -docstring 'Buffers...'
 map global user q ':ide-quit-notlast<ret>'        -docstring "Close the client, unless it is the last one"
 
 map global user <ret> ':winplace autosplit connect terminal<ret>' -docstring 'Open terminal'
-map global user <c-p> ':winplace popup connect<ret>' -docstring 'Popup Terminal'
-map global user <tab> ':my-sidetree<ret>' -docstring 'sidetree'
+map global user <c-p> ':winplace popup connect terminal<ret>' -docstring 'Popup Terminal'
+map global user <tab> ':sidetree<ret>' -docstring 'sidetree'
 
 # System Clipboard
 map global user p '<a-!>clip -o<ret>' -docstring 'System paste after' 

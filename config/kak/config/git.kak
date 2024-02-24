@@ -1,15 +1,3 @@
-declare-option str git_branch_name
-declare-option str git_work_tree
-
-# Main hook (git branch update, gutters)
-hook global -group git-main-hook NormalIdle .* %{
-  # Update git diff column signs
-  try %{ git update-diff }
-
-  # Update branch name
-  set-option global git_branch_name %sh{ git rev-parse --is-inside-work-tree &> /dev/null && echo " $(git rev-parse --abbrev-ref HEAD)"}
-}
-
 ## Blame current line
 set-face global GitBlameLineRef red,black
 set-face global GitBlameLineSummary green,black
@@ -84,6 +72,9 @@ map global git    k ':git prev-hunk<ret>'         -docstring 'Prev hunk'
 
 map global git W %{:w<ret>: git add -f -- "%val{buffile}"<ret>} -docstring "write - Write and stage the current file (force)"
 map global git w %{:w<ret>: git add -- "%val{buffile}"<ret>} -docstring "write - Write and stage the current file"
+map global git Q %{:git-stack-clear<ret>} -docstring "Remove all *git* buffers"
+map global git <ret> %{:git blame-jump<ret>} -docstring "jump"
+
 map global git-blame b %{:git-blame-current-line<ret>} -docstring "blame popup"
 map global git-blame <ret> %{:git blame-jump<ret>} -docstring "jump"
 
