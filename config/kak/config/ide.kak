@@ -36,7 +36,7 @@ define-command ide-setup -override %{
       }
   }
 
-  hook -group ide global WinDisplay "(^$)|(^%opt{locations_buffer_regex}$|^\*git\*|\*cargo\*)|.*" %{
+  hook -group ide global WinDisplay "(^$)|(\*(:?git|cargo|goto|grep|symbols|make|lint)\*)|.*" %{
       eval %sh{
           if [ "$kak_client" = "$kak_opt_toolsclient" ]; then
               if [ -n "$kak_hook_param_capture_2" ]; then
@@ -79,7 +79,7 @@ def -override ide-show-tools %{
             echo "echo -markup '{Error}This command is only available in a tmux session'"
             exit
         fi
-        TMUX=$tmux tmux join-pane -p 30 -vs "${kak_opt_toolsclient_tmux_pane}" < /dev/null > /dev/null 2>&1 &
+        TMUX=$tmux tmux join-pane -l 30% -vs "${kak_opt_toolsclient_tmux_pane}" < /dev/null > /dev/null 2>&1 &
     }
     focus %opt{toolsclient} 
 }

@@ -90,23 +90,23 @@ map global buffers g ':buffer %opt{my_grep_buffer}<ret>'                        
 map global buffers v ':buffer %opt{my_git_buffer}<ret>'                                -docstring "*git*"
 
 
-map global my-tmux h     ':nop %sh{ tmux select-pane -L }<ret>' -docstring 'Select pane to the left'
-map global my-tmux j     ':nop %sh{ tmux select-pane -D }<ret>' -docstring 'Select pane below'
-map global my-tmux k     ':nop %sh{ tmux select-pane -U }<ret>' -docstring 'Select pane above'
-map global my-tmux l     ':nop %sh{ tmux select-pane -R }<ret>' -docstring 'Select pane to the right'
+map global my-tmux h         ':nop %sh{ tmux select-pane -L }<ret>' -docstring 'Select pane to the left'
+map global my-tmux j         ':nop %sh{ tmux select-pane -D }<ret>' -docstring 'Select pane below'
+map global my-tmux k         ':nop %sh{ tmux select-pane -U }<ret>' -docstring 'Select pane above'
+map global my-tmux l         ':nop %sh{ tmux select-pane -R }<ret>' -docstring 'Select pane to the right'
 
-map global my-tmux <tab> ':nop %sh{ tmux last-pane }<ret>'      -docstring 'Select last pane'
-map global my-tmux J     ':nop %sh{ tmux swap-pane -D }<ret>'   -docstring 'Swap pane below'
-map global my-tmux K     ':nop %sh{ tmux swap-pane -U }<ret>'   -docstring 'Swap pane above'
+map global my-tmux <tab>     ':nop %sh{ tmux last-pane }<ret>'      -docstring 'Select last pane'
+map global my-tmux J         ':nop %sh{ tmux swap-pane -D }<ret>'   -docstring 'Swap pane below'
+map global my-tmux K         ':nop %sh{ tmux swap-pane -U }<ret>'   -docstring 'Swap pane above'
 
-map global my-tmux <ret> ':winplace autosplit new<ret>'             -docstring 'Autosplit'
-map global my-tmux s     ':winplace vertical new<ret>'              -docstring 'Split horizontally'
-map global my-tmux v     ':winplace horizontal new<ret>'            -docstring 'Split vertically'
-map global my-tmux p     ':winplace popup new<ret>'                 -docstring 'Popup client'
-map global my-tmux o     ':winplace bottom-panel new<ret>'          -docstring 'Bottom panel client'
-map global my-tmux d     ':q<ret>'                                  -docstring 'Delete pane'
-map global my-tmux t     ':ide-tools<ret>'                          -docstring 'Toggle the tools client'
-map global my-tmux T     ':ide-hide-tools<ret>'                     -docstring 'Hide the tools client'
+map global my-tmux <ret>     ':winplace autosplit new<ret>'             -docstring 'Autosplit'
+map global my-tmux s         ':winplace vertical new<ret>'              -docstring 'Split horizontally'
+map global my-tmux v         ':winplace horizontal new<ret>'            -docstring 'Split vertically'
+map global my-tmux p         ':winplace popup new<ret>'                 -docstring 'Popup client'
+map global my-tmux o         ':winplace bottom-panel new<ret>'          -docstring 'Bottom panel client'
+map global my-tmux d         ':q<ret>'                                  -docstring 'Delete pane'
+map global my-tmux t         ':ide-tools<ret>'                          -docstring 'Toggle the tools client'
+map global my-tmux T         ':ide-hide-tools<ret>'                     -docstring 'Hide the tools client'
 
 map global my-tmux <c-h>     ':nop %sh{ tmux select-pane -L }<ret>' -docstring 'Select pane to the left'
 map global my-tmux <c-j>     ':nop %sh{ tmux select-pane -D }<ret>' -docstring 'Select pane below'
@@ -128,12 +128,10 @@ map global my-tmux <c-t>     ':ide-tools<ret>'                   -docstring 'Tog
 map global my-tmux <c-T>     ':ide-hide-tools<ret>'              -docstring 'Hide the tools client'
 
 try %{ set-option global autocomplete insert|prompt|no-regex-prompt }
-# alias global m my-make
-# alias global f my-find
-alias global g boost-grep
-map global normal <c-n> %{:locations-next<ret>} -docstring 'next Location'
-map global normal <c-p> %{:locations-previous<ret>} -docstring 'previous Location'
-map global normal <c-r> %{:buffers-pop<ret>} -docstring 'pop grep/git buffer'
+alias global g grep
+map global normal <c-n> %{:jump-next<ret>} -docstring 'next Location'
+map global normal <c-p> %{:jump-previous<ret>} -docstring 'previous Location'
+map global normal <c-r> %{:jump-pop<ret>} -docstring 'pop grep/git buffer'
 map global normal <c-t> ":enter-user-mode kak-tree-sitter<ret>" -docstring 'Tree sitter...'
 
 

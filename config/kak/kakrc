@@ -132,9 +132,12 @@ bundle kakoune-cargo https://gitlab.com/Screwtapello/kakoune-cargo
 
 bundle kak-ansi https://github.com/eraserhd/kak-ansi
 
-bundle kakoune-boost https://github.com/topisani/kakoune-boost %{
-  load-conf ide
+bundle-customload kakoune-boost https://github.com/krobelus/kakoune-boost %{
+  source "%opt{bundle_path}/kakoune-boost/surround.kak"
+  source "%opt{bundle_path}/kakoune-boost/git.kak"
+  source "%opt{bundle_path}/kakoune-boost/doc.kak"
   load-conf git
+  load-conf ide
 }
 
 # Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
@@ -282,6 +285,10 @@ filetype-hook xkb_symbols %{
 
 filetype-hook kdl %{
   set window comment_line '//'
+}
+
+filetype-hook lsp-goto %{
+  set buffer buffer_kind jump
 }
 
 # Global highlighter ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
