@@ -22,12 +22,12 @@ xkb_symbols "basic" {
     key <AD11>  { [bracketleft, braceleft,  aring,          Aring] };
 
     // Danish æ ø å on level3 on more sensible keys
-    key <AD03> { [e,            E,          ae,             AE] };
-    key <AD09> { [o,            O,          oslash,         Oslash] };
-    key <AC01> { [a,            A,          aring,          Aring] };
+    key <AC05> { [g,            G,          ae,             AE] };
+    key <AB05> { [b,            B,          oslash,         Oslash] };
+    key <AB01> { [z,            Z,          aring,          Aring] };
 
     // Add dead_greek. This is more useful to me than eng
-    key <AC05>  { [g,           G,          dead_greek,     ENG]  };
+    // key <AC05>  { [g,           G,          dead_greek,     ENG]  };
 
     // Escape on third level of TILDE for keyboard that lack the FN row
     key <TLDE>  { [grave,       asciitilde, Escape,         Escape]};

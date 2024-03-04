@@ -7,6 +7,14 @@ verbosity = 2
 # set to 0 to disable
 timeout = 1800 # seconds = 30 minutes
 
+[language_ids]
+c = "c_cpp"
+cpp = "c_cpp"
+javascript = "javascriptreact"
+typescript = "typescriptreact"
+protobuf = "proto"
+sh = "shellscript"
+
 [language_server.rust]
 filetypes = ["rust"]
 roots = ["Cargo.toml"]
@@ -64,6 +72,18 @@ args = ["--stdio"]
 filetypes = ["css", "scss", "sass", "less"]
 roots = ["package.json"]
 command = "css-languageserver"
+args = ["--stdio"]
+
+[language_server.tailwind]
+filetypes = ["css", "scss", "tsx", "javascript", "typescript" ]
+roots = ["package.json"]
+command = "tailwindcss-language-server"
+args = ["--stdio"]
+
+[language_server.emmet]
+filetypes = ["css", "scss", "tsx", "javascript", "typescript" ]
+roots = ["package.json"]
+command = "emmet-language-server"
 args = ["--stdio"]
 
 [language_server.html]

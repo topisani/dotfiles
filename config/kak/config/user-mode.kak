@@ -71,12 +71,12 @@ map global files F ':winplace popup terminal -title "Open file (all)..." krc-fzf
 map global files b ':winplace popup broot<ret>'                                        -docstring 'broot popup'
 map global files B ':winplace window broot<ret>'                                       -docstring 'broot window'
 map global files e ':winplace panel broot<ret>'                                        -docstring 'broot panel'
-map global files r ":winplace popup terminal -title 'Ranger' ranger<ret>"              -docstring 'Ranger'
 map global files w ':w<ret>'                                                           -docstring 'Write file' 
 map global files c ":my-fzf-config-popup<ret>"                                         -docstring 'Open config dir'
 map global files C ":my-fzf-bundle-popup<ret>"                                         -docstring 'Open plugin dir'
 map global files d ':my-file-delete<ret>'                                              -docstring 'Delete current file'
 map global files r ':my-file-rename<ret>'                                              -docstring 'Rename current file'
+map global files R ':winplace window terminal ranger<ret>'                             -docstring 'Ranger'
 
 map global buffers b ':winplace popup terminal -title "Buffers" krc-fzf buffers<ret>'  -docstring "List Buffers" 
 map global buffers n ':buffer-next<ret>'                                               -docstring "Next Buffer" 
@@ -132,7 +132,7 @@ alias global g grep
 map global normal <c-n> %{:jump-next<ret>} -docstring 'next Location'
 map global normal <c-p> %{:jump-previous<ret>} -docstring 'previous Location'
 map global normal <c-r> %{:jump-pop<ret>} -docstring 'pop grep/git buffer'
-map global normal <c-t> ":enter-user-mode kak-tree-sitter<ret>" -docstring 'Tree sitter...'
+map global normal <c-t> ":enter-user-mode tree-sitter<ret>" -docstring 'Tree sitter...'
 
 
 declare-user-mode ui

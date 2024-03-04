@@ -21,6 +21,17 @@ def filetype-assign -params 2 %{
   hook global BufCreate %arg{1} "set buffer filetype %arg{2}"
 }
 
+# Set the session name to the Git repo or the CWD unless we already
+# have a session name that doesn't look like a PID (via "kak -s").
+evaluate-commands %sh{
+  expr -- "$kak_session" : '^[0-9]*$' >/dev/null || exit
+  root="$(git rev-parse --show-toplevel 2>/dev/null)"
+  root=${root##*/}
+  root="${root:-$PWD}"
+  session_name="$(printf %s "$root" | sed s/[^a-zA-Z0-9_-]/_/g)"
+  echo "try %{ rename-session $session_name }"
+}
+
 # User interface ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 set-option -add global ui_options terminal_status_on_top=false
@@ -244,17 +255,6 @@ def -override debughl-enable %{
 
 def -override debughl-disable %{
     rmhooks global debughl
-}
-
-# Set the session name to the Git repo or the CWD unless we already
-# have a session name that doesn't look like a PID (via "kak -s").
-evaluate-commands %sh{
-  expr -- "$kak_session" : '^[0-9]*$' >/dev/null || exit
-  root="$(git rev-parse --show-toplevel 2>/dev/null)"
-  root=${root##*/}
-  root="${root:-$PWD}"
-  session_name="$(printf %s "$root" | sed s/[^a-zA-Z0-9_-]/_/g)"
-  echo "try %{ rename-session $session_name }"
 }
 
 

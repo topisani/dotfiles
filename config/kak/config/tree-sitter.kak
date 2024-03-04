@@ -13,6 +13,7 @@ define-command kts-map-ft-lang -params 2 %{
 
 kts-map-ft-lang git-diff diff
 kts-map-ft-lang justfile just
+kts-map-ft-lang typescript tsx
 
 hook global -once WinDisplay ".*" %{
   try %{ kak-tree-sitter-highlight-submit-faces }

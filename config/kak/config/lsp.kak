@@ -1,6 +1,6 @@
 # Setup kak-lsp
 
-eval %sh{ kak-lsp --kakoune -s $kak_session -vvvvv --log /tmp/kak-lsp-$kak_session.log }
+eval %sh{ kak-lsp --kakoune -s $kak_session -vv --log /tmp/kak-lsp-$kak_session.log }
 
 hook -always global KakEnd .* %{ nop %sh{
   rm /tmp/kak-lsp-$kak_session.log
@@ -152,3 +152,111 @@ define-command tsserver-organize-imports -docstring "Ask the typescript language
     lsp-execute-command _typescript.organizeImports """[\""%val{buffile}\""]"""
 }
 
+define-command -override -hidden jump-select %{
+    evaluate-commands -draft %{
+        execute-keys ',xs^([^:\n]+):(\d+):(\d+)?<ret>'
+        set-register a %reg{1} %reg{2} %reg{3}
+    }
+}
+
+define-command -override -hidden jump-select-next %{
+    # First jump to end of buffer so that if jump_current_line == 0
+    # 0g<a-l> will be a no-op and we'll jump to the first result.
+    # Yeah, thats ugly...
+    execute-keys ge %opt{jump_current_line}g<a-l> /^[^:\n]+:\d+:<ret>
+}
+
+define-command -override -hidden jump-select-previous %{
+    # See comment in jump-select-next
+    execute-keys ge %opt{jump_current_line}g<a-h> <a-/>^[^:\n]+:\d+:<ret>
+}
+
+define-command -override -hidden jump %{
+    evaluate-commands -save-regs a %{ # use evaluate-commands to ensure jumps are collapsed
+        jump-select
+        try %{
+            set-option buffer jump_current_line %val{cursor_line}
+            evaluate-commands -try-client %opt{jumpclient} -verbatim -- edit -existing -- %reg{a}
+            try %{ focus %opt{jumpclient} }
+        }
+    }
+}
+
+declare-option line-specs jump_opt_locations
+
+define-command -override -hidden jump-opt-select %{
+    evaluate-commands -draft %{
+        eval %sh{
+            eval "set -- $kak_quoted_opt_jump_opt_locations"
+            shift
+            printf "%s\n" "$@" | awk -F'|' -v cur=$kak_opt_jump_current_line '
+                $1 == cur { gsub(":", " ", $2); print "set-register a " $2 }
+            '
+        }
+    }
+}
+
+define-command -override -hidden jump-opt-select-next %{
+    exec %sh{
+        eval "set -- $kak_quoted_opt_jump_opt_locations"
+        shift
+        printf "%s\n" "$@" | awk -F'|' -v cur=$kak_opt_jump_current_line '
+            NR == 1 { loc=$1 }
+            prev == cur { loc=$1; exit }
+            { prev=$1 }
+            END { print loc "g" }
+        '
+    }
+}
+
+define-command -override -hidden jump-opt-select-previous %{
+    exec %sh{
+        eval "set -- $kak_quoted_opt_jump_opt_locations"
+        shift
+        printf "%s\n" "$@" | awk -F'|' -v cur=$kak_opt_jump_current_line '
+            $1 == cur { exit }
+            { loc=$1 }
+            END { print loc "g" }
+        '
+    }
+}
+
+define-command -override -hidden jump-opt-convert %{
+    eval -draft %{
+        execute-keys '%<a-s>s^([^:\n]+):(\d+):(:?(\d+))?<ret>i<c-r>#|<esc>Gh'
+        set buffer jump_opt_locations %val{timestamp} %val{selections}
+        execute-keys <a-:>Ld
+        alias buffer jump-select jump-opt-select
+        alias buffer jump-select-previous jump-opt-select-previous
+        alias buffer jump-select-next jump-opt-select-next
+    }
+}
+
+
+define-command -override -hidden lsp-show-document-symbol -params 2 -docstring "Render document symbols" %{
+    evaluate-commands -save-regs '"' -try-client %opt[docsclient] %{
+        edit! -scratch *symbols*
+        set-option buffer jump_current_line 0
+        set-option buffer lsp_project_root "%arg{1}/"
+        set-option buffer buffer_kind jump
+        set-register '"' %arg{2}
+        execute-keys Pgg
+        addhl buffer/lsp-symbols-tree regex '[├└─│]' 0:comment
+        addhl buffer/lsp-symbols-types regex '\([^()]+\)' 0:+di@type
+        addhl buffer/lsp-symbols-line line '%opt{jump_current_line}' ,black+b
+        jump-opt-convert
+        map buffer normal <ret> ':jump<ret>'
+    }
+}
+
+rmhooks global idetest
+hook global -group idetest WinDisplay .* %{
+  try %{
+    eval %sh{ [ $kak_client = docs ] && echo fail }
+  } catch %{
+    rmhl window/numbers
+    hook window -once -group idetest WinClose .* %{
+      eval -client docs quit
+    }
+  }
+}

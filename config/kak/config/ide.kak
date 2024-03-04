@@ -106,6 +106,14 @@ def -override -hidden ide-make-tools %{
   }
 }
 
+def -override ide-docs -params .. %{
+  new %{
+    rename-client docs
+    set global docsclient docs
+    eval %arg{@}
+  }
+}
+
 def -override ide-tools -docstring "ide-tools: Focus or hide the tools client" %{
   eval %sh{
     if [ "$kak_client" = "$kak_opt_toolsclient" ]; then

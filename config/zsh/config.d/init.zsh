@@ -228,12 +228,14 @@ DIRSTACKSIZE=20               # Max number of items on dirstack
 # allow ctrl+a and ctrl+e to move to beginning/end of line
 bindkey '^a' beginning-of-line
 bindkey '^e' end-of-line
+bindkey '^[[1~' beginning-of-line
+bindkey '^[[4~' end-of-line
 
 # alt+q to push current line and fetch again on next line
 # bindkey '\eq' push-line
 
 # show man page of current command with alt+h
-bindkey '\eh' run-help
+# bindkey '\eh' run-help
 
 
 # alt+h, alt+l to move to next word
@@ -250,9 +252,9 @@ bindkey '^[[1;3C' forward-word
 # These escape sequences are different depending on your terminal
 bindkey '^?' backward-delete-char
 bindkey '^[[3~' delete-char
-bindkey '\e^?' slash-backward-kill-word
-bindkey '^H' slash-backward-kill-word
-bindkey '^w' slash-backward-kill-word
+bindkey '\e^?' backward-kill-word
+bindkey '^H' backward-kill-word
+bindkey '^w' backward-kill-word
 
 # Shift-Tab to go back in completion menu
 zmodload -i zsh/complist  # Needed for keybindings in menucomplete mode, and completion styling

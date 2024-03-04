@@ -16,13 +16,13 @@ iscmd() {
 export FORGIT_COPY_CMD=clip
 export FORGIT_FZF_DEFAULT_OPTS="--reverse"
 
-zplug "plugins/git",   from:oh-my-zsh
+zplug "plugins/git", from:oh-my-zsh, defer:1
 zplug 'wfxr/forgit', defer:1
 zplug "zsh-users/zsh-autosuggestions"
 zplug "zsh-users/zsh-syntax-highlighting", defer:2
 zplug "xPMo/zsh-toggle-command-prefix"
 
-if ! zplug check --verbose; then
+if ! zplug check; then
     printf "Install? [y/N]: "
     if read -q; then
         echo; zplug install
