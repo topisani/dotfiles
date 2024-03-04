@@ -131,8 +131,8 @@ try %{ set-option global autocomplete insert|prompt|no-regex-prompt }
 alias global g grep
 map global normal <c-n> %{:jump-next<ret>} -docstring 'next Location'
 map global normal <c-p> %{:jump-previous<ret>} -docstring 'previous Location'
-map global normal <c-r> %{:jump-pop<ret>} -docstring 'pop grep/git buffer'
-map global normal <c-t> ":enter-user-mode tree-sitter<ret>" -docstring 'Tree sitter...'
+map global normal <c-r> %{:buffer-pop<ret>} -docstring 'pop grep/git buffer'
+map global normal <c-t> ":enter-user-mode kak-tree-sitter<ret>" -docstring 'Tree sitter...'
 
 
 declare-user-mode ui

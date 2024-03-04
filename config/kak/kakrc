@@ -1,6 +1,6 @@
 # kakoune.cr
 evaluate-commands %sh{
-  krc kak-defs
+ krc kak-defs
   # We're assuming the default bundle_path here...
   plugins="$kak_config/bundle"
   mkdir -p "$plugins"
@@ -212,6 +212,18 @@ define-command -hidden -override my-hull %{
 }
 
 map global normal <a-%> ':my-hull<ret>'
+map global normal <pageup> <c-u>
+map global normal <pagedown> <c-d>
+# map global normal <pageup> '<esc>:execute-keys %sh{echo $(($kak_window_height / 2))} vkv<ret>' -docstring 'scroll half page up'
+# map global normal <pagedown> '<esc>:execute-keys %sh{echo $(($kak_window_height / 2))} vjv<ret>' -docstring 'scroll half page down'
+map global view <up> k
+map global view <down> j
+map global view <left> h
+map global view <right> l
+map global goto <up> k
+map global goto <down> j
+map global goto <left> h
+map global goto <right> l
 
 # Prompt mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
@@ -315,7 +327,7 @@ filetype-hook kak %{
     addhl shared/kakrc/code/user-mode regex '^\h*declare-user-mode\h+([\w-]+)' 1:variable
   }
 
-  map buffer filetype v ':evaluate-commands -- %reg{.}<ret>'
+  map buffer filetype v ':evaluate-commands -itersel -- %reg{.}<ret>'
 }
 
 # ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
@@ -329,3 +341,13 @@ def -override markdown-live %{
 }
 
 load-conf user-mode
+
+
+# ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+# taupiqueur's jump mode
+set-face global JumpLabel 'black,bright-yellow+F'
+
+map -docstring 'enter jump mode (select mode: replace)' global normal t ':enter_jump_mode_with_replace_select_mode<ret>'
+map -docstring 'enter jump mode (select mode: extend)' global normal T ':enter_jump_mode_with_extend_select_mode<ret>'
+map -docstring 'enter jump mode (select mode: append)' global normal <a-t> ':enter_jump_mode_with_append_select_mode<ret>'
+

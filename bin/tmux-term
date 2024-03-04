@@ -1,7 +1,7 @@
 #!/bin/bash
 
 setup_term() {
-    TERM=tmux-256color tmux new-session "$*"\; set destroy-unattached 1\; set status off \; attach
+    TERM=tmux-256color tmux new-session "$*"\; set destroy-unattached on\; set status off\; attach
 }
 
 if [[ "$1" == "--setup" ]]; then

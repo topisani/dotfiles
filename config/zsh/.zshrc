@@ -57,3 +57,5 @@ iscmd kubectl && source <(kubectl completion zsh)
 [[ -e /opt/google-cloud-sdk/path.zsh.inc ]] && source /opt/google-cloud-sdk/path.zsh.inc
 [[ -e /opt/google-cloud-sdk/completion.zsh.inc ]] && source /opt/google-cloud-sdk/completion.zsh.inc
 
+
+source /home/topisani/.config/broot/launcher/bash/br
