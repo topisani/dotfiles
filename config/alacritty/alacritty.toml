@@ -8,6 +8,17 @@ size = 9.0
 x = 0
 y = 0
 
+[mouse]
+hide_when_typing = true
+
+[keyboard]
+bindings = [
+    { key = "Space", mods = "Control|Shift", action = "None" },
+    { key = "F", mods = "Control|Shift", action = "None" },
+    { key = "B", mods = "Control|Shift", action = "None" },
+    { key = "L", mods = "Control", action = "None" },
+]
+
 [font.normal]
 family = "JetBrainsMono Nerd Font"
 
