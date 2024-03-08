@@ -1,6 +1,6 @@
 #!/bin/sh
 
-function kak {
+function  kak-attach {
     test -n "$KAKOUNE_SESSION" && krc attach "$@" || command kak "$@"
 }
 
@@ -38,7 +38,7 @@ function krc-fifo {
     fi
 }
 
-alias k=kak
+alias k=kak-attach
 alias ke=krc-edit
 alias kb=krc-buffers
 alias kman=krc-man

@@ -1,11 +1,11 @@
-## Blame current line
-set-face global GitBlameLineRef red,black
-set-face global GitBlameLineSummary green,black
-set-face global GitBlameLineAuthor blue,black
-set-face global GitBlameLineTime default,black@comment
+## blame current line
+set-face global gitblamelineref red,black
+set-face global gitblamelinesummary green,black
+set-face global gitblamelineauthor blue,black
+set-face global gitblamelinetime default,black@comment
 
 define-command git-blame-current-line %{
-  echo -markup {Information}Press <ret> to jump to blamed commit, b to enable blame view
+  echo -markup {information}press <ret> to jump to blamed commit, b to enable blame view
   on-key %{
     eval %sh{
       [ $kak_key = '<ret>' ] && echo "git blame-jump" && exit
@@ -15,8 +15,8 @@ define-command git-blame-current-line %{
   }
 
   info -markup -style above -anchor "%val{cursor_line}.%val{cursor_column}" -- %sh{
-    git blame -L$kak_cursor_line,$kak_cursor_line $kak_bufname --incremental | awk '\
-BEGIN {
+    git blame -l$kak_cursor_line,$kak_cursor_line $kak_bufname --incremental | awk '\
+begin {
   ref = ""
   author = ""
   time = ""
@@ -28,28 +28,28 @@ BEGIN {
 }
 
 /summary/ {
-  for (i = 2; i < NF; i++) {
+  for (i = 2; i < nf; i++) {
     summary = summary $i " "
   }
 
-  summary = summary $NF
+  summary = summary $nf
 }
 
 /author / {
-  for (i = 2; i < NF; i++) {
+  for (i = 2; i < nf; i++) {
     author = author $i " "
   }
 
-  author = author $NF
+  author = author $nf
 }
 
 /author-time/ {
-  time = strftime("%a %d %b %Y, %H:%M:%S", $2)
+  time = strftime("%a %d %b %y, %h:%m:%s", $2)
 }
 
-END {
-  first = sprintf("{GitBlameLineRef}%s {GitBlameLineSummary}%s", ref, summary)
-  second = sprintf("{GitBlameLineAuthor}%s {GitBlameLineTime}on %s", author, time)
+end {
+  first = sprintf("{gitblamelineref}%s {gitblamelinesummary}%s", ref, summary)
+  second = sprintf("{gitblamelineauthor}%s {gitblamelinetime}on %s", author, time)
 
   max_len = length(first)
   second_len = length(second)
@@ -65,14 +65,14 @@ END {
 }
 
 map global object m %{c^[<lt>=|]{4\,}[^\n]*\n,^[<gt>=|]{4\,}[^\n]*\n<ret>} -docstring 'conflict markers'
-map global git    g ':connect terminal tig<ret>'  -docstring 'Open tig'
-map global git    j ':git next-hunk<ret>'         -docstring 'Next hunk'
-map global git    k ':git prev-hunk<ret>'         -docstring 'Prev hunk'
-# map global git    s ':git status<ret>'            -docstring 'Show status'
+map global git    g ':connect terminal tig<ret>'  -docstring 'open tig'
+map global git    j ':git next-hunk<ret>'         -docstring 'next hunk'
+map global git    k ':git prev-hunk<ret>'         -docstring 'prev hunk'
+# map global git    s ':git status<ret>'            -docstring 'show status'
 
-map global git W %{:w<ret>: git add -f -- "%val{buffile}"<ret>} -docstring "write - Write and stage the current file (force)"
-map global git w %{:w<ret>: git add -- "%val{buffile}"<ret>} -docstring "write - Write and stage the current file"
-map global git Q %{:git-stack-clear<ret>} -docstring "Remove all *git* buffers"
+map global git w %{:w<ret>: git add -f -- "%val{buffile}"<ret>} -docstring "write - write and stage the current file (force)"
+map global git w %{:w<ret>: git add -- "%val{buffile}"<ret>} -docstring "write - write and stage the current file"
+map global git q %{:git-stack-clear<ret>} -docstring "remove all *git* buffers"
 map global git <ret> %{:git blame-jump<ret>} -docstring "jump"
 
 map global git-blame b %{:git-blame-current-line<ret>} -docstring "blame popup"
