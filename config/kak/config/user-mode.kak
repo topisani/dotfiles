@@ -162,3 +162,5 @@ map global user p '<a-!>clip -o<ret>' -docstring 'System paste after'
 map global user P '!clip -o<ret>' -docstring 'System paste before' 
 map global user R '|clip -o<ret>' -docstring 'System replace' 
 map global user y '<a-|>clip<ret>' -docstring 'System yank' 
+
+map global user m ':make<ret>' -docstring 'make'

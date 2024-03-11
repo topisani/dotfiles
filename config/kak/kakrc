@@ -72,8 +72,8 @@ def toggle-numbers -override %{
   try %{
     git show-diff
     rmhooks window my-git-diff
-    hook -group my-git-diff window BufWritePost .* git update-diff
-    hook -group my-git-diff window BufReload .* git update-diff
+    hook -group my-git-diff window BufWritePost .* "git update-diff"
+    hook -group my-git-diff window BufReload .* "git update-diff"
   }
 }
 
@@ -331,10 +331,6 @@ filetype-hook kak %{
 }
 
 # ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
-colorscheme %sh{ colorscheme-switch --current }
-
-
-# ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 def -override markdown-live %{
     terminal mdlive %val[buffile]
@@ -345,9 +341,11 @@ load-conf user-mode
 
 # ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 # taupiqueur's jump mode
-set-face global JumpLabel 'black,bright-yellow+F'
-
 map -docstring 'enter jump mode (select mode: replace)' global normal t ':enter_jump_mode_with_replace_select_mode<ret>'
 map -docstring 'enter jump mode (select mode: extend)' global normal T ':enter_jump_mode_with_extend_select_mode<ret>'
 map -docstring 'enter jump mode (select mode: append)' global normal <a-t> ':enter_jump_mode_with_append_select_mode<ret>'
+
+
+# ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+colorscheme %sh{ colorscheme-switch --current }
 

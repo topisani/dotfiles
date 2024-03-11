@@ -300,5 +300,7 @@ set-face global ts_punctuation_special_link     "$bg3"
 set-face global ts_punctuation_bracket_link     "$bg3"
 set-face global ts_markup_link_url_image        "$purple+u"
 
+set-face global JumpLabel                       "$bg0,$purple_dark+bdF"
+
 # kak-tree-sitter-highlight-submit-faces
 EOF
