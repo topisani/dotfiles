@@ -8,9 +8,9 @@ fi
 
 _layout_office_triple_vert() {
   x=2560
-  y=1400
-  echo "desc:Dell Inc. DELL U2719D 7NRBS83,highres,$(( x ))x0,1,transform,1"
+  y=1440
   echo "desc:Dell Inc. DELL U2719D 5NRBS83,highres,$(( 0 ))x0,1,transform,0"
+  echo "desc:Dell Inc. DELL U2719D 7NRBS83,highres,$(( x ))x0,1,transform,1"
   echo "desc:Dell Inc. DELL U2719D CNRBS83,highres,$(( x+y ))x0,1,transform,3"
   echo "eDP-1,highres,6240x1480,$EDP1_SCALE"
 }
