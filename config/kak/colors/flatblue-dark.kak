@@ -8,7 +8,7 @@ evaluate-commands %sh{
     bg="rgb:010309"
     bg1="rgb:0a0b15"
     bg2="rgb:112126"
-    bg2="rgb:1e1b28"
+    bg2="rgb:181b2e"
     bg3="rgb:323037"
     bg4="rgb:2d334e"
     float_bg="rgb:06070d"
@@ -17,8 +17,8 @@ evaluate-commands %sh{
     # fg="rgb:fdf4d1" # Softer variant
     fg="rgb:fcfcfd"
     fg1="rgb:f4e8ca"
-    fg2="rgb:ebdbc2"
-    fg3="rgb:a89994"
+    fg2="rgb:cbdbe2"
+    fg3="rgb:8899a4"
     
     gray="rgb:565f6f"
     red="rgb:f24130"

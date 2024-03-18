@@ -1,6 +1,5 @@
-# kakoune.cr
 evaluate-commands %sh{
- krc kak-defs
+  krc kak-defs
   # We're assuming the default bundle_path here...
   plugins="$kak_config/bundle"
   mkdir -p "$plugins"
@@ -38,28 +37,6 @@ set-option -add global ui_options terminal_status_on_top=false
 set-option -add global ui_options terminal_assistant=none
 set-option -add global ui_options terminal_set_title=no
 set-option -add global ui_options terminal_synchronized=false
-
-declare-option str modeline_client_flags ""
-def update-client-flags -hidden -override %{
-  eval %sh{
-    set -- $kak_client_list
-    for client do
-      val=""
-      [ "$client" = "$kak_opt_jumpclient" ] && val="${val}j"
-      [ "$client" = "$kak_opt_docsclient" ] && val="${val}d"
-      [ "$client" = "$kak_opt_toolsclient" ] && val="${val}t"
-      [ -n "$val" ] && val=" $val"
-      echo "eval -client $client %{ set window modeline_client_flags '$val' }"
-    done
-  }
-}
-rmhooks global modeline-client-flags
-hook -group modeline-client-flags global WinDisplay .* update-client-flags
-hook -group modeline-client-flags global FocusIn .* update-client-flags
-hook -group modeline-client-flags global FocusOut .* update-client-flags
-hook -group modeline-client-flags global GlobalSetOption '(jump|docs|tools)client=.*' update-client-flags
-
-set-option global modelinefmt '{white+d}%opt{modeline_lsp_progress} {{mode_info}} {magenta}%val{client}{magenta+d}%opt{modeline_client_flags}{default} at {yellow}%val{session}{default} on {green}%val{bufname}{default} {{context_info}} {cyan}U+%sh{printf ''%04x'' "$kak_cursor_char_value"}{default} {cyan}%val{cursor_line}{default}:{cyan}%val{cursor_char_column}{default}+{cyan}%val{selection_length}{default}'
 
 def toggle-numbers -override %{
   try %{
@@ -241,6 +218,7 @@ map global prompt <backspace> '<left><del>'
 
 set-option global makecmd 'make -j 8'
 # Use ripgrep
+require-module grep
 set-option global grepcmd 'rg -Hn --no-heading --vimgrep'
 
 # load-conf git
@@ -349,3 +327,4 @@ map -docstring 'enter jump mode (select mode: append)' global normal <a-t> ':ent
 # ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 colorscheme %sh{ colorscheme-switch --current }
 
+load-conf modeline

@@ -82,13 +82,10 @@ map global buffers b ':winplace popup terminal -title "Buffers" krc-fzf buffers<
 map global buffers n ':buffer-next<ret>'                                               -docstring "Next Buffer" 
 map global buffers p ':buffer-previous<ret>'                                           -docstring "Prev buffer" 
 map global buffers d ':delete-buffer<ret>'                                             -docstring "Delete buffer"
+map global buffers q ':delete-buffer<ret>'                                             -docstring "Delete buffer"
 map global buffers D ':delete-buffer!<ret>'                                            -docstring "Delete buffer (force)"
+map global buffers Q ':delete-buffer!<ret>'                                            -docstring "Delete buffer (force)"
 map global buffers u ':buffer *debug*<ret>'                                            -docstring "Debug buffer"
-map global buffers m ':buffer *make*<ret>'                                             -docstring "*make*"
-map global buffers M ':buffer make<ret>'                                               -docstring "make"
-map global buffers g ':buffer %opt{my_grep_buffer}<ret>'                               -docstring "*grep* or equivalent"
-map global buffers v ':buffer %opt{my_git_buffer}<ret>'                                -docstring "*git*"
-
 
 map global my-tmux h         ':nop %sh{ tmux select-pane -L }<ret>' -docstring 'Select pane to the left'
 map global my-tmux j         ':nop %sh{ tmux select-pane -D }<ret>' -docstring 'Select pane below'
@@ -105,6 +102,7 @@ map global my-tmux v         ':winplace horizontal new<ret>'            -docstri
 map global my-tmux p         ':winplace popup new<ret>'                 -docstring 'Popup client'
 map global my-tmux o         ':winplace bottom-panel new<ret>'          -docstring 'Bottom panel client'
 map global my-tmux d         ':q<ret>'                                  -docstring 'Delete pane'
+map global my-tmux q         ':q<ret>'                                  -docstring 'Delete pane'
 map global my-tmux t         ':ide-tools<ret>'                          -docstring 'Toggle the tools client'
 map global my-tmux T         ':ide-hide-tools<ret>'                     -docstring 'Hide the tools client'
 
