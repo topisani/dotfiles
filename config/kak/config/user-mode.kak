@@ -126,6 +126,7 @@ map global my-tmux <c-t>     ':ide-tools<ret>'                   -docstring 'Tog
 map global my-tmux <c-T>     ':ide-hide-tools<ret>'              -docstring 'Hide the tools client'
 
 try %{ set-option global autocomplete insert|prompt|no-regex-prompt }
+require-module grep
 alias global g grep
 map global normal <c-n> %{:jump-next<ret>} -docstring 'next Location'
 map global normal <c-p> %{:jump-previous<ret>} -docstring 'previous Location'

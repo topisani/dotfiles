@@ -11,7 +11,11 @@ bundle-noload kak-bundle https://github.com/jdugan6240/kak-bundle
 
 def load-conf -params 1 %{
   echo -debug "[load-conf] Loading %arg{1}..."
-  source "%val{config}/config/%arg{1}.kak"
+  try %{
+    source "%val{config}/config/%arg{1}.kak"
+  } catch %{
+    echo -debug "[load-conf] Error loading %arg{1}: %val{error}"
+  }
 }
 def filetype-hook -params 2 %{ 
   hook global WinSetOption "filetype=%arg{1}" %arg{2}

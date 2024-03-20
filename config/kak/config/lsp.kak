@@ -152,6 +152,8 @@ define-command tsserver-organize-imports -docstring "Ask the typescript language
     lsp-execute-command _typescript.organizeImports """[\""%val{buffile}\""]"""
 }
 
+require-module jump
+
 define-command -override -hidden jump-select %{
     evaluate-commands -draft %{
         execute-keys ',xs^([^:\n]+):(\d+):(\d+)?<ret>'
