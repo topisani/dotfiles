@@ -182,7 +182,7 @@ hook -group flatblue global ModeChange (push|pop):.*insert %{
 hook -group flatblue global ModeChange (push|pop):.*insert.+ %{
   set-face window PrimaryCursor PrimaryCursorNormal
   set-face window PrimaryCursorEol PrimaryCursorEolNormal
-  face window StatusLineMode              $blue,           default       +b
+  face window StatusLineMode              $blue_light,           default       +b
   
   # remove-highlighter window/current-line
 }
