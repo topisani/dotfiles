@@ -48,3 +48,4 @@
 ~/.config/git;config/git
 ~/.config/broot;config/broot
 ~/.zshenv;home/.zshenv
+~/.zshrc;home/zshrc
