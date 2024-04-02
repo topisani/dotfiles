@@ -16,7 +16,7 @@ iscmd() {
 export FORGIT_COPY_CMD=clip
 export FORGIT_FZF_DEFAULT_OPTS="--reverse"
 
-zplug "plugins/git", from:oh-my-zsh, defer:1
+zplug "plugins/git", from:oh-my-zsh
 zplug 'wfxr/forgit', defer:1
 zplug "zsh-users/zsh-autosuggestions"
 zplug "zsh-users/zsh-syntax-highlighting", defer:2
@@ -53,6 +53,7 @@ alias ssh="TERM=xterm-256color ssh"
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 iscmd kubectl && source <(kubectl completion zsh)
+iscmd himalaya && eval "$(himalaya completion zsh)"
 
 [[ -e /opt/google-cloud-sdk/path.zsh.inc ]] && source /opt/google-cloud-sdk/path.zsh.inc
 [[ -e /opt/google-cloud-sdk/completion.zsh.inc ]] && source /opt/google-cloud-sdk/completion.zsh.inc

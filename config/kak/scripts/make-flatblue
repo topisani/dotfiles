@@ -41,6 +41,7 @@ face global Prompt                      $yellow,           default
 face global MatchingChar                                                '+b'
 face global BufferPadding               $bg2,              default
 face global Whitespace                  $bg1,              default      +f
+face global WhitespaceIndent            $bg2,              default      +f
 face global Information                 $blue,             $float_bg
 
 face global GitBlame                    $fg2,              default

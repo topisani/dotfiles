@@ -45,6 +45,7 @@ purple=$(tput setaf 5)
 orange=$(tput setaf 9)
 
 export PAGER=less # Less colors for man pages
+export LESS="--mouse --wheel-lines 3"
 export LESS_TERMCAP_mb=$red # Begin blinking
 export LESS_TERMCAP_md=$orange # Begin bold
 export LESS_TERMCAP_me=$default # End mode

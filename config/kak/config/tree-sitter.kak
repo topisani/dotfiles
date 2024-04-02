@@ -1,4 +1,4 @@
-eval %sh{ kak-tree-sitter -dks --session $kak_session }
+eval %sh{ kak-tree-sitter -dks --session $kak_session --with-highlighting --with-text-objects }
 
 # Default Behavior
 define-command -override kak-tree-sitter-set-lang %{
@@ -15,6 +15,4 @@ kts-map-ft-lang git-diff diff
 kts-map-ft-lang justfile just
 kts-map-ft-lang typescript tsx
 
-hook global -once WinDisplay ".*" %{
-  try %{ kak-tree-sitter-highlight-submit-faces }
-}
+kak-tree-sitter-enable-highlighting

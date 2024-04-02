@@ -131,7 +131,7 @@ alias global g grep
 map global normal <c-n> %{:jump-next<ret>} -docstring 'next Location'
 map global normal <c-p> %{:jump-previous<ret>} -docstring 'previous Location'
 map global normal <c-r> %{:buffer-pop<ret>} -docstring 'pop grep/git buffer'
-map global normal <c-t> ":enter-user-mode kak-tree-sitter<ret>" -docstring 'Tree sitter...'
+map global normal <c-t> ":enter-user-mode tree-sitter<ret>" -docstring 'Tree sitter...'
 
 
 declare-user-mode ui
@@ -150,7 +150,7 @@ map global user v ':enter-user-mode ui<ret>'      -docstring 'View...'
 map global user f ':enter-user-mode files<ret>'   -docstring 'Files...'
 map global user b ':enter-user-mode buffers<ret>' -docstring 'Buffers...'
 
-map global user q ':ide-quit-notlast<ret>'        -docstring "Close the client, unless it is the last one"
+map global user q ':i-delete-buffer<ret>'        -docstring "Close buffer"
 
 map global user <ret> ':winplace autosplit connect terminal<ret>' -docstring 'Open terminal'
 map global user <c-p> ':winplace popup connect terminal<ret>' -docstring 'Popup Terminal'

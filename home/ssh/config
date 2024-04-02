@@ -25,3 +25,7 @@ Host gitlab-as-move
   Hostname gitlab.com
   IdentitiesOnly true
   IdentityFile ~/.ssh/id_rsa.topisani-move
+
+Host git.topisani.com
+  IdentityFile ~/.ssh/id_rsa
+  ProxyCommand cloudflared access ssh --hostname %h

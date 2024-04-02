@@ -1,6 +1,6 @@
 # vim: ft=ini
 [user]
-	email = topisani@hamsterpoison.com
+	email = mail@topisani.dev
 	name = Tobias Pisani
 [credential]
 	helper = store
@@ -9,16 +9,17 @@
 [color]
 	ui = auto
 [core]
-  whitespace = -trailing-space,-indent-with-non-tab,-tab-in-indent
+	whitespace = -trailing-space,-indent-with-non-tab,-tab-in-indent
 	pager = diff-so-fancy | less --tabs=4 -RFX
 [alias]
-  diffw = diff -w -U0 --word-diff-regex=[^[:space:]]
-  lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	diffw = diff -w -U0 --word-diff-regex=[^[:space:]]
+	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 	ignore = update-index --skip-worktree
 	unignore = update-index --no-skip-worktree
 	ignored = !git ls-files -v | grep \"^S\"
 	# git dft runs difftool, which runs difftastic, which gives a diff with semantic context
 	dft = difftool
+	pushf = push --force-with-lease --force-if-includes
 [diff]
 	tool = difftastic
 
@@ -32,13 +33,13 @@
 	difftool = true
 
 [interactive]
-    diffFilter = (diff-so-fancy --patch)
-  
+	diffFilter = (diff-so-fancy --patch)
+	
 [pull]
 	rebase = true
 
 [url "git@github.com:"]
-  pushInsteadOf = https://github.com/
+	pushInsteadOf = https://github.com/
 
 [init]
 	defaultBranch = master
@@ -64,3 +65,12 @@
 [rebase]
 	autoSquash = true
 	autoStash = true
+
+[sendemail]
+	smtpserver = smtp.purelymail.com
+	smtpuser = mail@topisani.dev
+	smtpencryption = ssl
+	smtpserverport = 465
+	confirm = always
+	annotate = yes
+	assume8bitEncoding = UTF-8

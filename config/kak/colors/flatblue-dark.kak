@@ -44,17 +44,17 @@ evaluate-commands %sh{
     . "$HOME/.config/kak/scripts/make-flatblue"
 }
 
-define-command refresh-colors -override %{
-    remove-hooks window refresh-colors
-    hook window -group refresh-colors BufWritePost %reg[percent] %{
-        source %reg[percent]
-        rmhl window/refresh-colors
-        addhl window/refresh-colors group
-        execute-keys '%sface +global +\K\w+<ret>'
-        eval %sh{
-            for x in $kak_selections; do
-                echo "addhl window/refresh-colors/$x regex 'face global \K$x' 0:$x"
-            done
+declare-option range-specs show_colors
+define-command show-colors -override %{
+    remove-hooks window show-colors
+    add-highlighter -override window/show-colors ranges show_colors
+    hook window -group show-colors NormalIdle .* %{
+        eval -draft %{
+            set window show_colors %val{timestamp}
+            execute-keys '%s(rgb:|#)\K[0-9a-fA-F]{6,8}<ret>'
+            eval -itersel %{
+                set -add window show_colors "%val{selection_desc}|,rgb:%reg{.}"
+            }
         }
     }
 }
