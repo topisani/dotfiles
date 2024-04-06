@@ -66,7 +66,7 @@ hook global WinCreate .* %{
   addhl -override window/indent-guides show-whitespaces -lf '' -spc '' -tab '' -nbsp '' -face WhitespaceIndent
   toggle-numbers
 }
-face global WhitespaceTrailing red+rF
+face global WhitespaceTrailing ,rgba:FF555520  
 
 load-conf windowing
 
