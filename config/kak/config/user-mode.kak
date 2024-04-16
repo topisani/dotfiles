@@ -1,7 +1,7 @@
 # Util functions
 
 define-command my-file-delete -docstring "Delete current file" -override %{
-   prompt "Delete file [Y/n]? " '%sh{ ([ "$kak_text" = "y" ] || [ "$kak_text" = "Y" ])   && rm $kak_buffile && echo "delete-buffer" }' 
+   prompt "Delete file [Y/n]? " '%sh{ ([ "$kak_text" = "y" ] || [ "$kak_text" = "Y" ])   && rm $kak_buffile && echo "delete-buffer" }'
 }
 
 define-command -override my-file-rename %{
@@ -16,8 +16,8 @@ define-command -override my-file-rename %{
   }' -file-completion
 }
 
-define-command winplace -params 2.. %{
-   with-option windowing_placement %arg{@} 
+define-command -override winplace -params 2.. %{
+   with-option windowing_placement %arg{@}
 }
 
 def -hidden -override my-fzf-config-popup %{
@@ -56,10 +56,16 @@ def broot -override -params .. %{
   } broot %val{buffile} %arg{@}
 }
 
-declare-user-mode my-tmux
-declare-user-mode files
-declare-user-mode buffers
-declare-user-mode undo
+try %{ declare-user-mode my-tmux }
+try %{ declare-user-mode files }
+try %{ declare-user-mode buffers }
+try %{ declare-user-mode undo }
+try %{ declare-user-mode edit }
+
+def -override trailing-whitespace-remove %{
+  exec -draft '%s\h+$<ret>d'
+}
+map global edit w ':trailing-whitespace-remove<ret>' -docstring "Clear trailing whitespace"
 
 map global undo u 'u' -docstring "undo last change"
 map global undo U 'U' -docstring "redo last change"
@@ -71,16 +77,16 @@ map global files F ':winplace popup terminal -title "Open file (all)..." krc-fzf
 map global files b ':winplace popup broot<ret>'                                        -docstring 'broot popup'
 map global files B ':winplace window broot<ret>'                                       -docstring 'broot window'
 map global files e ':winplace panel broot<ret>'                                        -docstring 'broot panel'
-map global files w ':w<ret>'                                                           -docstring 'Write file' 
+map global files w ':w<ret>'                                                           -docstring 'Write file'
 map global files c ":my-fzf-config-popup<ret>"                                         -docstring 'Open config dir'
 map global files C ":my-fzf-bundle-popup<ret>"                                         -docstring 'Open plugin dir'
 map global files d ':my-file-delete<ret>'                                              -docstring 'Delete current file'
 map global files r ':my-file-rename<ret>'                                              -docstring 'Rename current file'
 map global files R ':winplace window terminal ranger<ret>'                             -docstring 'Ranger'
 
-map global buffers b ':winplace popup terminal -title "Buffers" krc-fzf buffers<ret>'  -docstring "List Buffers" 
-map global buffers n ':buffer-next<ret>'                                               -docstring "Next Buffer" 
-map global buffers p ':buffer-previous<ret>'                                           -docstring "Prev buffer" 
+map global buffers b ':winplace popup terminal -title "Buffers" krc-fzf buffers<ret>'  -docstring "List Buffers"
+map global buffers n ':buffer-next<ret>'                                               -docstring "Next Buffer"
+map global buffers p ':buffer-previous<ret>'                                           -docstring "Prev buffer"
 map global buffers d ':delete-buffer<ret>'                                             -docstring "Delete buffer"
 map global buffers q ':delete-buffer<ret>'                                             -docstring "Delete buffer"
 map global buffers D ':delete-buffer!<ret>'                                            -docstring "Delete buffer (force)"
@@ -125,6 +131,7 @@ map global my-tmux <c-d>     ':q<ret>'                           -docstring 'Del
 map global my-tmux <c-t>     ':ide-tools<ret>'                   -docstring 'Toggle the tools client'
 map global my-tmux <c-T>     ':ide-hide-tools<ret>'              -docstring 'Hide the tools client'
 
+
 try %{ set-option global autocomplete insert|prompt|no-regex-prompt }
 require-module grep
 alias global g grep
@@ -134,11 +141,13 @@ map global normal <c-r> %{:buffer-pop<ret>} -docstring 'pop grep/git buffer'
 map global normal <c-t> ":enter-user-mode tree-sitter<ret>" -docstring 'Tree sitter...'
 
 
-declare-user-mode ui
+try %{ declare-user-mode ui }
 map global ui   n ':toggle-numbers<ret>' -docstring 'Toggle Line numbers'
 
 # user mode
 map global normal  <c-w> ':enter-user-mode my-tmux<ret>'        -docstring 'Tmux...'
+
+map global user e ':enter-user-mode edit<ret>' -docstring "Edit..."
 
 map global user s ':surround-mode<ret>' -docstring 'Surround mode'
 map global user r ':enter-replace-mode<ret>' -docstring 'Replace'
@@ -157,9 +166,9 @@ map global user <c-p> ':winplace popup connect terminal<ret>' -docstring 'Popup 
 map global user <tab> ':sidetree<ret>' -docstring 'sidetree'
 
 # System Clipboard
-map global user p '<a-!>clip -o<ret>' -docstring 'System paste after' 
-map global user P '!clip -o<ret>' -docstring 'System paste before' 
-map global user R '|clip -o<ret>' -docstring 'System replace' 
-map global user y '<a-|>clip<ret>' -docstring 'System yank' 
+map global user p '<a-!>clip -o<ret>' -docstring 'System paste after'
+map global user P '!clip -o<ret>' -docstring 'System paste before'
+map global user R '|clip -o<ret>' -docstring 'System replace'
+map global user y '<a-|>clip<ret>' -docstring 'System yank'
 
 map global user m ':make<ret>' -docstring 'make'
