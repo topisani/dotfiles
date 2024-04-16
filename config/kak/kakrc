@@ -66,7 +66,6 @@ hook global WinCreate .* %{
   addhl -override window/indent-guides show-whitespaces -lf '' -spc '' -tab '' -nbsp '' -face WhitespaceIndent
   toggle-numbers
 }
-face global WhitespaceTrailing ,rgba:FF555520  
 
 load-conf windowing
 
@@ -135,6 +134,12 @@ bundle-customload kakoune-boost https://github.com/krobelus/kakoune-boost %{
   load-conf ide
 }
 
+bundle kakoune-phantom-selection https://github.com/occivink/kakoune-phantom-selection %{
+  map global user t     ": phantom-selection-add-selection<ret>"
+  map global user T     ": phantom-selection-select-all; phantom-selection-clear<ret>"
+  map global user <a-t> ": phantom-selection-iterate-next<ret>"
+  map global user <a-T> ": phantom-selection-iterate-prev<ret>"
+}
 # Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 load-conf indent
@@ -156,10 +161,10 @@ map global insert <c-f> ': enter-user-mode filetype<ret>'
 map global normal '#' ': comment-line<ret>' -docstring "Comment line"
 map global normal '<a-#>' ': comment-block<ret>' -docstring "Comment block"
 
-map global normal "'" ': enter-user-mode lsp<ret>' -docstring 'lsp...' 
+map global normal "'" ': enter-user-mode lsp<ret>' -docstring 'lsp...'
 
 # Restores old kakoune behavior that i liked
-map global normal <X> ': select-next-whole-line<ret>' -docstring 'Select next whole line' 
+map global normal <X> ': select-next-whole-line<ret>' -docstring 'Select next whole line'
 define-command -hidden -override select-next-whole-line -docstring 'Performs the old <X> command from kakoune' %{
   try %[
     execute-keys '<a-k>^.*$<ret>'
@@ -177,11 +182,6 @@ def -override bc %{
   exec "|sed -e '$a\'|bc<ret>"
 }
 
-map global view u '<esc>:execute-keys %sh{echo $(($kak_window_height / 2))} vkv<ret>' -docstring 'scroll half page up'
-map global view d '<esc>:execute-keys %sh{echo $(($kak_window_height / 2))} vjv<ret>' -docstring 'scroll half page down'
-map global view <c-b> '<esc>:execute-keys %val{window_height} vkv<ret>' -docstring 'scroll one page up'
-map global view <c-f> '<esc>:execute-keys %val{window_height} vjv<ret>' -docstring 'scroll one page down'
-
 # Merge all current selections into one
 define-command -hidden -override my-hull %{
     evaluate-commands -save-regs ^ %{
@@ -196,6 +196,8 @@ define-command -hidden -override my-hull %{
 }
 
 map global normal <a-%> ':my-hull<ret>'
+
+# Map arrow keys to hjkl wherever possible
 map global normal <pageup> <c-u>
 map global normal <pagedown> <c-d>
 # map global normal <pageup> '<esc>:execute-keys %sh{echo $(($kak_window_height / 2))} vkv<ret>' -docstring 'scroll half page up'
@@ -208,6 +210,23 @@ map global goto <up> k
 map global goto <down> j
 map global goto <left> h
 map global goto <right> l
+# map global normal <a-up> <a-k>
+# map global normal <a-down> <a-j>
+# map global normal <a-s-up> <a-s-k>
+# map global normal <a-s-down> <a-s-j>
+map global normal <a-left> <a-h>
+map global normal <a-right> <a-l>
+map global normal <a-s-left> <a-s-h>
+map global normal <a-s-right> <a-s-l>
+map global normal <c-up> <c-k>
+map global normal <c-down> <c-j>
+map global normal <c-left> <c-h>
+map global normal <c-right> <c-l>
+
+map global insert <a-left> '<a-;><a-h>'
+map global insert <a-right> '<a-;><a-l>'
+map global insert <a-s-left> '<a-;><a-s-h>'
+map global insert <a-s-right> '<a-;><a-s-l>'
 
 # Prompt mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 

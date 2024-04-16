@@ -63,20 +63,20 @@ decl str myml_lsp_info ''
 decl str myml_lsp_hint ''
 hook -group myml global WinSetOption lsp_diagnostic_(\w+)_count.* %{
   eval %sh{
-    [ $kak_opt_lsp_diagnostic_error_count != 0 ] && echo 'set window myml_lsp_error " %opt{lsp_diagnostic_error_count}"' 
-    [ $kak_opt_lsp_diagnostic_warning_count != 0 ] && echo 'set window myml_lsp_warning " %opt{lsp_diagnostic_warning_count}"' 
-    [ $kak_opt_lsp_diagnostic_info_count != 0 ] && echo 'set window myml_lsp_info " %opt{lsp_diagnostic_info_count}"' 
-    [ $kak_opt_lsp_diagnostic_hint_count != 0 ] && echo 'set window myml_lsp_hint " %opt{lsp_diagnostic_hint_count}"' 
+    [ $kak_opt_lsp_diagnostic_error_count != 0 ] && echo 'set window myml_lsp_error " %opt{lsp_diagnostic_error_count} "' 
+    [ $kak_opt_lsp_diagnostic_warning_count != 0 ] && echo 'set window myml_lsp_warning " %opt{lsp_diagnostic_warning_count} "' 
+    [ $kak_opt_lsp_diagnostic_info_count != 0 ] && echo 'set window myml_lsp_info " %opt{lsp_diagnostic_info_count} "' 
+    [ $kak_opt_lsp_diagnostic_hint_count != 0 ] && echo 'set window myml_lsp_hint " %opt{lsp_diagnostic_hint_count} "' 
   }
 }
 
 set-option global modelinefmt %sh{
   tr -d '\n' <<'EOF'
 {annotation}%opt{modeline_lsp_progress} 
-{StatusLspError}%opt{myml_lsp_error} 
-{StatusLspWarning}%opt{myml_lsp_warning} 
-{StatusLspInfo}%opt{myml_lsp_info} 
-{StatusLspHint}%opt{myml_lsp_hint} 
+{StatusLspError}%opt{myml_lsp_error}
+{StatusLspWarning}%opt{myml_lsp_warning}
+{StatusLspInfo}%opt{myml_lsp_info}
+{StatusLspHint}%opt{myml_lsp_hint}
 {bright-magenta}%val{selection_count} %sh{[ $kak_selection_count != 1 ] && echo "sels ($kak_main_reg_hash)" || echo "sel"} 
 %sh{[ -n "$kak_register" ] && echo "reg=$kak_register "}
 %sh{[ -n "$kak_count" ] && [ $kak_count != 0 ] && echo "count=$kak_count "}

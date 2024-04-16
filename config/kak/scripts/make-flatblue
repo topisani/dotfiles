@@ -42,6 +42,7 @@ face global MatchingChar                                                '+b'
 face global BufferPadding               $bg2,              default
 face global Whitespace                  $bg1,              default      +f
 face global WhitespaceIndent            $bg2,              default      +f
+face global WhitespaceTrailing          ,                  rgba:FF555520
 face global Information                 $blue,             $float_bg
 
 face global GitBlame                    $fg2,              default
@@ -76,7 +77,7 @@ face global Reference                                                    '+b'
 face global ReferenceBind                                                '+bu'
 
 # Plugs
-face global Phantom                     $bg,               $green_dark
+face global PhantomSelection            $bg,               $(alpha $yellow 20)
 face global Search                      $fg,               $bg3
 face global PrimarySelectionDefault     $fg,               $blue
 face global PrimarySelectionSearch      $fg,               $blue

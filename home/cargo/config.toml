@@ -3,7 +3,7 @@ git-fetch-with-cli = true # use the `git` executable for git operations
 
 [build]
 jobs = 6
-rustflags = ["-Z", "threads=8"]
+# rustflags = ["-Z", "threads=8"]
 
 [doc]
 browser = "webview"

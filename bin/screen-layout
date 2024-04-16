@@ -56,7 +56,7 @@ _layout_mirror() {
 }
 
 _layout_auto() {
-  serials=$(hyprctl monitors -j | jq '.[].serial')
+  serials=$(hyprctl monitors -j | jq -r '.[].serial')
   echo "$serials" > /dev/stderr
   layout=$(
     if echo "$serials" | grep 7NRBS83 -q; then
@@ -72,7 +72,7 @@ _layout_auto() {
     fi
   )
   lid=$(cat /proc/acpi/button/lid/*/state)
-  if [[ "$lid" =~ "closed" ]] &&  [[ $(echo "$serials" | wc -l ) -ge 2 ]]; then
+  if [[ "$lid" =~ "closed" ]] &&  [[ "$serials" != "" ]]; then
     echo "eDP-1,disable"
   else
     echo "$layout"

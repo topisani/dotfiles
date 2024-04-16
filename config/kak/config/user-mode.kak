@@ -21,11 +21,11 @@ define-command -override winplace -params 2.. %{
 }
 
 def -hidden -override my-fzf-config-popup %{
-    winplace popup terminal -title "Config Files" krc-fzf files %val{config} %sh{printf '%s' "$HOME/.config/kak-lsp"} %sh{printf '%s' "$HOME/.config/kak-tree-sitter"}
+    winplace popup connect terminal krc-fzf files %val{config} %sh{printf '%s' "$HOME/.config/kak-lsp"} %sh{printf '%s' "$HOME/.config/kak-tree-sitter"}
 }
 
 def -hidden -override my-fzf-bundle-popup %{
-    winplace popup terminal -title "Plugin Files" krc-fzf files %sh{printf '%s' "$HOME/.config/kak/bundle"}
+    winplace popup connect terminal krc-fzf files %sh{printf '%s' "$HOME/.config/kak/bundle"}
 }
 
 def sidetree -override %{ winplace panel connect terminal sidetree --select %val{buffile} }
@@ -72,8 +72,10 @@ map global undo U 'U' -docstring "redo last change"
 map global undo j '<c-j>' -docstring "move forward in changes history"
 map global undo k '<c-k>' -docstring "move backward in changes history"
 
-map global files f ':winplace popup terminal -title "Open file..." krc-fzf files<ret>'             -docstring 'List files'
-map global files F ':winplace popup terminal -title "Open file (all)..." krc-fzf files -uuu<ret>'  -docstring 'List files (including hidden)'
+# map global files f ':winplace popup terminal -title "Open file..." krc-fzf files<ret>'             -docstring 'List files'
+# map global files F ':winplace popup terminal -title "Open file (all)..." krc-fzf files -uuu<ret>'  -docstring 'List files (including hidden)'
+map global files f ':winplace popup terminal krc-fzf files<ret>'             -docstring 'List files'
+map global files F ':winplace popup terminal krc-fzf files -uuu<ret>'        -docstring 'List files (including hidden)'
 map global files b ':winplace popup broot<ret>'                                        -docstring 'broot popup'
 map global files B ':winplace window broot<ret>'                                       -docstring 'broot window'
 map global files e ':winplace panel broot<ret>'                                        -docstring 'broot panel'
@@ -84,25 +86,20 @@ map global files d ':my-file-delete<ret>'                                       
 map global files r ':my-file-rename<ret>'                                              -docstring 'Rename current file'
 map global files R ':winplace window terminal ranger<ret>'                             -docstring 'Ranger'
 
-map global buffers b ':winplace popup terminal -title "Buffers" krc-fzf buffers<ret>'  -docstring "List Buffers"
-map global buffers n ':buffer-next<ret>'                                               -docstring "Next Buffer"
-map global buffers p ':buffer-previous<ret>'                                           -docstring "Prev buffer"
+map global buffers b ':winplace popup krc-fzf buffers<ret>'                            -docstring "List Buffers" 
+map global buffers n ':buffer-next<ret>'                                               -docstring "Next Buffer" 
+map global buffers p ':buffer-previous<ret>'                                           -docstring "Prev buffer" 
 map global buffers d ':delete-buffer<ret>'                                             -docstring "Delete buffer"
 map global buffers q ':delete-buffer<ret>'                                             -docstring "Delete buffer"
 map global buffers D ':delete-buffer!<ret>'                                            -docstring "Delete buffer (force)"
 map global buffers Q ':delete-buffer!<ret>'                                            -docstring "Delete buffer (force)"
 map global buffers u ':buffer *debug*<ret>'                                            -docstring "Debug buffer"
 
-map global my-tmux h         ':nop %sh{ tmux select-pane -L }<ret>' -docstring 'Select pane to the left'
-map global my-tmux j         ':nop %sh{ tmux select-pane -D }<ret>' -docstring 'Select pane below'
-map global my-tmux k         ':nop %sh{ tmux select-pane -U }<ret>' -docstring 'Select pane above'
-map global my-tmux l         ':nop %sh{ tmux select-pane -R }<ret>' -docstring 'Select pane to the right'
-
 map global my-tmux <tab>     ':nop %sh{ tmux last-pane }<ret>'      -docstring 'Select last pane'
 map global my-tmux J         ':nop %sh{ tmux swap-pane -D }<ret>'   -docstring 'Swap pane below'
 map global my-tmux K         ':nop %sh{ tmux swap-pane -U }<ret>'   -docstring 'Swap pane above'
 
-map global my-tmux <ret>     ':winplace autosplit new<ret>'             -docstring 'Autosplit'
+map global my-tmux <ret>     ':winplace auto new<ret>'             -docstring 'Autosplit'
 map global my-tmux s         ':winplace vertical new<ret>'              -docstring 'Split horizontally'
 map global my-tmux v         ':winplace horizontal new<ret>'            -docstring 'Split vertically'
 map global my-tmux p         ':winplace popup new<ret>'                 -docstring 'Popup client'
@@ -121,7 +118,7 @@ map global my-tmux <c-tab>   ':nop %sh{ tmux last-pane }<ret>'      -docstring '
 map global my-tmux <c-J>     ':nop %sh{ tmux swap-pane -D }<ret>'   -docstring 'Swap pane below'
 map global my-tmux <c-K>     ':nop %sh{ tmux swap-pane -U }<ret>'   -docstring 'Swap pane above'
 
-map global my-tmux <c-ret>   ':winplace autosplit new<ret>'             -docstring 'Autosplit'
+map global my-tmux <c-ret>   ':winplace autos new<ret>'             -docstring 'Autosplit'
 map global my-tmux <c-s>     ':winplace vertical new<ret>'              -docstring 'Split horizontally'
 map global my-tmux <c-v>     ':winplace horizontal new<ret>'            -docstring 'Split vertically'
 map global my-tmux <c-p>     ':winplace popup new<ret>'                 -docstring 'Popup client'
@@ -161,7 +158,7 @@ map global user b ':enter-user-mode buffers<ret>' -docstring 'Buffers...'
 
 map global user q ':i-delete-buffer<ret>'        -docstring "Close buffer"
 
-map global user <ret> ':winplace autosplit connect terminal<ret>' -docstring 'Open terminal'
+map global user <ret> ':winplace auto connect terminal<ret>' -docstring 'Open terminal'
 map global user <c-p> ':winplace popup connect terminal<ret>' -docstring 'Popup Terminal'
 map global user <tab> ':sidetree<ret>' -docstring 'sidetree'
 

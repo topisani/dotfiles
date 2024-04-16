@@ -1,0 +1,67 @@
+# vim: ft=conf
+# 
+# aerc dracula styleset
+# 
+# This styleset uses the terminal defaults as its fallback.
+# More information on how to configure the styleset can be found in
+# the aerc-stylesets(7) manpage. Please read the manual before
+# modifying or creating a styleset.
+#
+
+*.default=true
+
+default.bg=default
+
+title.reverse=true
+header.bold=true
+header.fg=12
+
+*error.bold=true
+error.fg=1
+warning.fg=11
+success.fg=2
+
+statusline*.default=true
+statusline_default.reverse=true
+statusline_error.fg=1
+statusline_error.reverse=true
+statusline_default.fg=233
+statusline_default.bg=12
+
+dirlist_default.selected.fg=#f8f8f2
+dirlist_default.selected.bg=234
+dirlist_recent.selected.fg=234
+dirlist_recent.selected.bg=#f8f8f2
+dirlist_unread.fg=10
+dirlist_unread.selected.fg=10
+dirlist_unread.selected.bg=234
+
+msglist_default.selected.fg=234
+msglist_default.selected.bg=#f8f8f2
+msglist_unread.bold=true
+msglist_unread.fg=10
+msglist_unread.selected.bg=234
+msglist_read.selected.fg=#f8f8f2
+msglist_read.selected.bg=234
+msglist_marked.fg=11
+msglist_marked.selected.fg=11
+msglist_marked.selected.bg=234
+msglist_deleted.fg=1
+msglist_result.fg=12
+msglist_result.selected.bg=234
+
+msglist_deleted.selected.reverse=toggle
+
+completion_pill.reverse=true
+
+tab.reverse=false
+border.reverse = false
+tab.bg=233
+tab.fg=12
+tab.selected.bg=12
+tab.selected.fg=default
+tab.selected.bold=true
+border.fg=233
+
+selector_focused.reverse=true
+selector_chooser.bold=true

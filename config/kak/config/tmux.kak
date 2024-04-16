@@ -1,4 +1,3 @@
-
 hook global ModuleLoaded tmux %{
     # Commands
     define-command -override tmux-terminal-horizontal -params .. -docstring 'tmux-terminal-horizontal [<program>] [<arguments>]: Creates a new terminal to the right as a tmux pane.' %{
@@ -49,7 +48,7 @@ hook global ModuleLoaded tmux %{
     define-command -override tmux-terminal-bottom-panel -params .. -shell-completion -docstring 'tmux-terminal-bottom-panel <program> [arguments]: create a new terminal as a tmux bottom panel' %{
       tmux_impl split-window -v -l 20 -c %sh{pwd} %arg{@}
     }
-    define-command -override tmux-terminal-autosplit -params .. -shell-completion -docstring 'tmux-terminal-autosplit <program> [arguments]: create a new terminal as a tmux pane with autosplit' %{
+    define-command -override tmux-terminal-auto -params .. -shell-completion -docstring 'tmux-terminal-auto <program> [arguments]: create a new terminal as a tmux pane with autosplit' %{
       nop %sh{
         tmux-autosplit -c "$PWD" "$@"
       }
