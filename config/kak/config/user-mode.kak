@@ -86,9 +86,9 @@ map global files d ':my-file-delete<ret>'                                       
 map global files r ':my-file-rename<ret>'                                              -docstring 'Rename current file'
 map global files R ':winplace window terminal ranger<ret>'                             -docstring 'Ranger'
 
-map global buffers b ':winplace popup krc-fzf buffers<ret>'                            -docstring "List Buffers" 
-map global buffers n ':buffer-next<ret>'                                               -docstring "Next Buffer" 
-map global buffers p ':buffer-previous<ret>'                                           -docstring "Prev buffer" 
+map global buffers b ':winplace popup terminal krc-fzf buffers<ret>'                   -docstring "List Buffers"
+map global buffers n ':buffer-next<ret>'                                               -docstring "Next Buffer"
+map global buffers p ':buffer-previous<ret>'                                           -docstring "Prev buffer"
 map global buffers d ':delete-buffer<ret>'                                             -docstring "Delete buffer"
 map global buffers q ':delete-buffer<ret>'                                             -docstring "Delete buffer"
 map global buffers D ':delete-buffer!<ret>'                                            -docstring "Delete buffer (force)"

@@ -11,6 +11,7 @@ alias du='du -h'
 alias free='free -m'                      # show sizes in MB
 alias np='nano -w PKGBUILD'
 alias more=less
+export LESS="$LESS --mouse"
 
 alias l='exa --group-directories-first -F'
 alias ll='l -lh --git'
@@ -19,6 +20,9 @@ alias llg='ll --grid'
 # alias cd='z'
 
 export BAT_THEME=base16
+alias bat='bat --style=plain'
+# Fancy bat
+alias fat='bat --style=full'
 
 # Paru in the correct order
 alias paru='paru --bottomup'

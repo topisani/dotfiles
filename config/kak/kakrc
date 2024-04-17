@@ -281,7 +281,7 @@ filetype-assign .*\.yuck lisp
 filetype-assign .*\.ocd sh
 filetype-assign .*\.conf conf
 filetype-assign .*\.surql sql
-filetype-assign .*\.dtsi? devicetree
+filetype-assign .*\.(dtsi?|overlay) devicetree
 filetype-assign "xkb/symbols/[\w/]$" xkb_symbols
 filetype-assign .*\.kdl kdl
 filetype-assign .*\.hjson hjson
