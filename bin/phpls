@@ -1,4 +1,0 @@
-#!/bin/bash
-
-#php /home/topisani/.composer/vendor/felixfbecker/language-server/bin/php-language-server.php "$@"
-php ~/dev/php-language-server/bin/php-language-server.php "$@"

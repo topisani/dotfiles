@@ -1,8 +1,0 @@
-#!/bin/bash
-
-echo -e "\n ------- started -------\n" >> ~/kbd.log
-
-ASAN_OPTIONS=new_delete_type_mismatch=0 /home/topisani/dev/tablecloth/build/cloth-kbd/cloth-kbd --css /home/topisani/dev/tablecloth/cloth-kbd/resources/style.css
-
-echo -e "\n ------- STOPPPED -------\n" >> ~/kbd.log
-

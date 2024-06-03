@@ -1,8 +1,0 @@
-#!/bin/zsh
-cd ~/grive
-while true; do
-    grive
-    echo -e "\e[33mLast synced at $(date +%x\ %R)"
-    echo -e "\e[36mPress any key to sync\e[0m" 
-    read -ks -t 3600 
-done

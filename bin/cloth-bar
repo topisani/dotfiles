@@ -1,4 +1,0 @@
-#!/bin/bash
-
-ASAN_OPTIONS=new_delete_type_mismatch=0 /home/topisani/dev/tablecloth/build/cloth-bar/cloth-bar --css /home/topisani/dev/tablecloth/cloth-bar/resources/style.css
-
