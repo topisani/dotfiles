@@ -17,7 +17,13 @@ define-command -override my-file-rename %{
 }
 
 define-command -override winplace -params 2.. %{
-   with-option windowing_placement %arg{@}
+   eval %{
+      set local windowing_placement %arg{1}
+      eval %sh{
+         shift
+         printf '%s ' "$@"
+      }
+   }
 }
 
 def -hidden -override my-fzf-config-popup %{
