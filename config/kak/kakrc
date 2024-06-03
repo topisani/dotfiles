@@ -306,6 +306,10 @@ filetype-hook lsp-goto %{
   set buffer buffer_kind jump
 }
 
+filetype-hook devicetree %{
+  set window comment_line '//'
+}
+
 # Global highlighter ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 def -override hl-todo-enable %{

@@ -177,7 +177,7 @@ hook -group flatblue global ModeChange (push|pop):.*insert %{
   face window PrimaryCursor PrimaryCursorInsert
   face window PrimaryCursorEol PrimaryCursorEolInsert
   face window StatusLineMode              $yellow,           default       +b
-  
+
   # add-highlighter window/current-line line '%val{cursor_line}' ',$bg3'
 }
 
@@ -185,7 +185,7 @@ hook -group flatblue global ModeChange (push|pop):.*insert.+ %{
   set-face window PrimaryCursor PrimaryCursorNormal
   set-face window PrimaryCursorEol PrimaryCursorEolNormal
   face window StatusLineMode              $blue_light,           default       +b
-  
+
   # remove-highlighter window/current-line
 }
 
@@ -243,12 +243,12 @@ set-face global ts_keyword_control_exception    "ts_keyword"
 set-face global ts_keyword_directive            "$orange+i"
 set-face global ts_keyword_function             "ts_keyword"
 set-face global ts_keyword_operator             "ts_keyword"
-set-face global ts_keyword_special              "ts_keyword" 
-set-face global ts_keyword_storage              "ts_keyword" 
-set-face global ts_keyword_storage_modifier     "ts_keyword" 
-set-face global ts_keyword_storage_modifier_mut "ts_keyword" 
-set-face global ts_keyword_storage_modifier_ref "operator" 
-set-face global ts_keyword_storage_type         "ts_keyword" 
+set-face global ts_keyword_special              "ts_keyword"
+set-face global ts_keyword_storage              "ts_keyword"
+set-face global ts_keyword_storage_modifier     "ts_keyword"
+set-face global ts_keyword_storage_modifier_mut "ts_keyword"
+set-face global ts_keyword_storage_modifier_ref "operator"
+set-face global ts_keyword_storage_type         "ts_keyword"
 set-face global ts_label                        "$orange+i"
 set-face global ts_markup_bold                  "bold"
 set-face global ts_markup_heading               "header"
@@ -307,7 +307,7 @@ set-face global ts_punctuation_special_link     "$bg3"
 set-face global ts_punctuation_bracket_link     "$bg3"
 set-face global ts_markup_link_url_image        "$purple+u"
 
-set-face global JumpLabel                       "$bg0,$(alpha $purple_dark 30)+bd"
+set-face global JumpLabel                       "$yellow,$(alpha $purple_dark 30)+bf"
 
 # kak-tree-sitter-highlight-submit-faces
 EOF
