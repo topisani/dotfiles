@@ -82,9 +82,9 @@ define-command -override make-directory-on-save -docstring 'make directory on sa
 }
 
 # Auto-pairing of characters
-bundle auto-pairs.kak https://github.com/xzto/auto-pairs.kak %{
-  enable-auto-pairs
-}
+# bundle auto-pairs.kak https://github.com/xzto/auto-pairs.kak %{
+#   enable-auto-pairs
+# }
 
 bundle kakoune-grep-write https://github.com/JacobTravers/kakoune-grep-write
 
