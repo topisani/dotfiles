@@ -41,6 +41,10 @@ window#waybar.firefox {
     color: #DDD
 }
 
+#workspaces button.empty {
+    color: #666;
+}
+
 #workspaces button.active {
     color: #ffffff;
     border-bottom: 0px solid #ffffff;

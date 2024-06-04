@@ -2,14 +2,12 @@
     "layer": "top", // Waybar at top layer
     "position": "top", // Waybar position (top|bottom|left|right)
     "height": 21, // Waybar height (to be removed for auto height)
-    // "width": 21, // Waybar width
     // Choose the order of the modules
     "modules-left": ["hyprland/workspaces", "hyprland/submap"],
     "modules-center": ["custom/window"],
     "modules-right": ["custom/agenda", "hyprland/language", "idle_inhibitor", "pulseaudio", "battery", "clock", "tray"],
     // Modules configuration
     "hyprland/workspaces": {
-        "sort-by-number": true,
     },
     "wlr/mode": {
         "format": "<span style=\"italic\">{}</span>"
@@ -28,16 +26,6 @@
         "return-type": "json",
         "on-scroll-up": "$HOME/.config/hypr/groupnav.sh group f",
         "on-scroll-down": "$HOME/.config/hypr/groupnav.sh group b",
-    },
-    "custom/agenda": {
-        "format": "{}",
-        "exec": "nextmeeting --max-title-length 50 --waybar",
-        "on-click": "nextmeeting --open-meet-url",
-        "on-click-right": "kitty --class=GClock -- /bin/bash -c \"batz;echo;cal -3;echo;nextmeeting;read;\";",
-        "interval": 59,
-        "return-type": "json",
-        "tooltip": "true",
-        "tooltip-format": "{tooltip}",
     },
     "mpd": {
         "format": "{stateIcon} {consumeIcon}{randomIcon}{repeatIcon}{singleIcon}{artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ",

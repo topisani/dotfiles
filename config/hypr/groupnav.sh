@@ -110,7 +110,7 @@ case "$cmd" in
         esac
         ;;
     bar)
-        bar
+        bar "$@"
         ;;
     bar-fmt)
         bar_format "$@"
