@@ -138,10 +138,19 @@ map global my-tmux <c-T>     ':ide-hide-tools<ret>'              -docstring 'Hid
 try %{ set-option global autocomplete insert|prompt|no-regex-prompt }
 require-module grep
 alias global g grep
-map global normal <c-n> %{:jump-next<ret>} -docstring 'next Location'
-map global normal <c-p> %{:jump-previous<ret>} -docstring 'previous Location'
+map global normal <c-n> %{:jump-next %opt{jump_buffer_recent}<ret>} -docstring 'next Location'
+map global normal <c-p> %{:jump-previous %opt{jump_buffer_recent}<ret>} -docstring 'previous Location'
 map global normal <c-r> %{:buffer-pop<ret>} -docstring 'pop grep/git buffer'
+
+declare-option str jump_buffer_recent ''
+
+hook global BufSetOption jump_current_line=[^0].* %{
+   echo -debug "jump_buffer_recent=%val{bufname}, %val{hook_param}"
+   set global jump_buffer_recent %val{bufname}
+}
+
 map global normal <c-t> ":enter-user-mode tree-sitter<ret>" -docstring 'Tree sitter...'
+map global normal <c-T> ":enter-user-mode tree-sitter-nav-sticky<ret>" -docstring 'Tree sitter nav...'
 
 
 try %{ declare-user-mode ui }

@@ -135,10 +135,10 @@ bundle-customload kakoune-boost https://github.com/krobelus/kakoune-boost %{
 }
 
 bundle kakoune-phantom-selection https://github.com/occivink/kakoune-phantom-selection %{
-  map global user t     ": phantom-selection-add-selection<ret>"
-  map global user T     ": phantom-selection-select-all; phantom-selection-clear<ret>"
-  map global user <a-t> ": phantom-selection-iterate-next<ret>"
-  map global user <a-T> ": phantom-selection-iterate-prev<ret>"
+  map global user t     ": phantom-selection-add-selection<ret>"                        -docstring "Phantom add"
+  map global user T     ": phantom-selection-select-all; phantom-selection-clear<ret>"  -docstring "Phantom select all"
+  map global user <a-t> ": phantom-selection-iterate-next<ret>"                         -docstring "Phantom next"
+  map global user <a-T> ": phantom-selection-iterate-prev<ret>"                         -docstring "Phantom prev"
 }
 # Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
@@ -148,6 +148,8 @@ enable-detect-indent
 set-indent global 4
 
 # Normal mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+set global scrolloff 7,1
 
 # Leader / Filetype modes ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
