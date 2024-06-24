@@ -43,7 +43,7 @@ bar_format() {
 bar() {
     while : ; do
         bar_format "$@"
-        socat -U - UNIX-CONNECT:/tmp/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock | while read -r line; do bar_format "$@"; done
+        socat -U - UNIX-CONNECT:$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock | while read -r line; do bar_format "$@"; done
     done 2> /dev/null
 }
 
