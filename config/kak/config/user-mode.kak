@@ -62,6 +62,15 @@ def broot -override -params .. %{
   } broot %val{buffile} %arg{@}
 }
 
+def ranger -override -params .. %{
+  connect terminal sh -c %{
+    tmpfile="$(mktemp -t kak-ranger-XXXXXX)"
+    trap 'rm -rf -- "$tmpfile"' EXIT
+    ranger "$1" --choosefile=$tmpfile
+    krc open $(cat $tmpfile)
+  } ranger %val{buffile} %arg{@}
+}
+
 try %{ declare-user-mode my-tmux }
 try %{ declare-user-mode files }
 try %{ declare-user-mode buffers }
@@ -90,7 +99,8 @@ map global files c ":my-fzf-config-popup<ret>"                                  
 map global files C ":my-fzf-bundle-popup<ret>"                                         -docstring 'Open plugin dir'
 map global files d ':my-file-delete<ret>'                                              -docstring 'Delete current file'
 map global files r ':my-file-rename<ret>'                                              -docstring 'Rename current file'
-map global files R ':winplace window terminal ranger<ret>'                             -docstring 'Ranger'
+map global files R ':winplace window terminal ranger %reg[%]<ret>'                     -docstring 'Ranger'
+map global files h ':winplace popup ranger<ret>'                                       -docstring 'Ranger'
 
 map global buffers b ':winplace popup terminal krc-fzf buffers<ret>'                   -docstring "List Buffers"
 map global buffers n ':buffer-next<ret>'                                               -docstring "Next Buffer"

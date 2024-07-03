@@ -13,3 +13,34 @@ link_flags = ["-O3"]
 source = { git = { url = "https://github.com/helix-editor/helix", pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7" }}
 path = "runtime/queries/devicetree"
 
+# just
+[language.just.grammar]
+name = "just"
+source = { git = { url = "https://github.com/IndianBoy42/tree-sitter-just", pin = "4f5d53b52a65771f9695df3f1a294d5c80b916fb" }}
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "../scanner.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "scanner.o", "-o", "just.so"]
+link_flags = ["-O3"]
+
+[language.just.queries]
+source = { git = { url = "https://github.com/IndianBoy42/tree-sitter-just", pin = "4f5d53b52a65771f9695df3f1a294d5c80b916fb" }}
+path = "queries/just"
+
+# kconfig
+# [language.kconfig.grammar]
+# name = "kconfig"
+# source = { git = { url = "https://github.com/tree-sitter-grammars/tree-sitter-kconfig", pin = "486fea71f61ad9f3fd4072a118402e97fe88d26c" }}
+# path = "src"
+# compile = "cc"
+# compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "../scanner.c", "-I", ".."]
+# compile_flags = ["-O3"]
+# link = "cc"
+# link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "scanner.o", "-o", "kconfig.so"]
+# link_flags = ["-O3"]
+
+# [language.kconfig.queries]
+# source = { git = { url = "https://github.com/tree-sitter-grammars/tree-sitter-kconfig", pin = "486fea71f61ad9f3fd4072a118402e97fe88d26c" }}
+# path = "queries"

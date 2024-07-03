@@ -287,6 +287,8 @@ filetype-assign .*\.(dtsi?|overlay) devicetree
 filetype-assign "xkb/symbols/[\w/]$" xkb_symbols
 filetype-assign .*\.kdl kdl
 filetype-assign .*\.hjson hjson
+filetype-assign .*\.just just
+filetype-assign .*defconfig conf
 
 filetype-hook hjson %{
   require-module yaml

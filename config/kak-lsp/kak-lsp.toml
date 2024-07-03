@@ -36,6 +36,8 @@ cargo.features = "all"
 checkOnSave.allTargets = true
 checkOnSave.extraArgs = ["--bins"]
 checkOnSave.command = "clippy"
+check.allTargets = true
+check.extraArgs = ["--bins"]
 # See https://github.com/rust-analyzer/rust-analyzer/issues/6448
 inlayHints.expressionAdjustmentHints.enable = false
 inlayHints.closureReturnTypeHints.enable = true
