@@ -1,0 +1,56 @@
+#!/bin/bash
+
+setup::install() {
+    yay -S --needed "$@"
+}
+
+setup::project() {
+    cd ~/git/tools/
+    repo=$1
+    name=${repo##*/}
+    if ! [ -d "$name" ]; then
+        git clone "$repo"
+    else
+        cd "$name"
+        git pull
+    fi
+    cd "$HOME/git/tools/$name"
+}
+
+mkdir -p ~/git/tools/
+
+setup::install git zsh jq tmux zoxide 
+setup::install diff-so-fancy bat ripgrep fd
+
+setup::install editorconfig tig ranger fzf
+setup::project https://github.com/topisani/kakoune && (
+    make
+    sudo make install
+)
+
+setup::project https://github.com/topisani/kakoune-remote-control && (
+    make install
+)
+
+setup::install rustup && (
+    rustup default || rustup default stable
+    rustup component add rust-src
+    cargo install cargo-binstall cargo-update
+    cargo install-update -a
+)
+
+setup::install rust-analyzer
+setup::project https://github.com/topisani/kak-lsp && (
+    cargo install --path . --locked
+)
+
+setup::project https://github.com/topisani/sidetree && (
+    cargo install --path . --locked
+)
+
+# GUI
+setup::install alacritty ttf-jetbrains-mono-nerd
+setup::install hyprland hyprpaper hyprlock xdg-desktop-portal-hyprland hyprcursor hypridle
+setup::install waybar wofi dunst
+setup::install breeze breeze5 papirus-icon-theme nordzy-cursors-hyprcursor
+setup::install zathura zathura-pdf-poppler imv nemo

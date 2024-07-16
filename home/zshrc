@@ -130,5 +130,4 @@ iscmd himalaya && eval "$(himalaya completion zsh)"
 
 [[ -e /opt/google-cloud-sdk/path.zsh.inc ]] && source /opt/google-cloud-sdk/path.zsh.inc
 [[ -e /opt/google-cloud-sdk/completion.zsh.inc ]] && source /opt/google-cloud-sdk/completion.zsh.inc
-
-source  ~/.config/broot/launcher/bash/br
+[[ -e ~/.config/broot/launcher/bash/br ]] && source  ~/.config/broot/launcher/bash/br
