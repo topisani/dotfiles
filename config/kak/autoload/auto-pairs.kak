@@ -21,7 +21,10 @@ define-command auto-pairs-setup-pair -params 2 %{
     keyname=$2
     case "$2" in
       "'")
-        keyname="''''"
+        keyname="<quote>"
+        ;;
+      '"')
+        keyname="<dquote>"
         ;;
       "<")
         keyname="<lt>"
@@ -40,6 +43,6 @@ define-command auto-pairs-enable %{
   auto-pairs-setup-pair [ ]
   auto-pairs-setup-pair ( )
   # auto-pairs-setup-pair < >
-  # auto-pairs-setup-pair "'" "'"
-  # auto-pairs-setup-pair '"' '"'
+  auto-pairs-setup-pair "'" "'"
+  auto-pairs-setup-pair '"' '"'
 }

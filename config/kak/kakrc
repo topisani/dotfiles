@@ -1,4 +1,5 @@
 evaluate-commands %sh{
+  # 
   krc kak-defs
   # We're assuming the default bundle_path here...
   plugins="$kak_config/bundle"
@@ -143,9 +144,10 @@ bundle kakoune-phantom-selection https://github.com/occivink/kakoune-phantom-sel
 # Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 load-conf indent
-enable-auto-indent
+# enable-auto-indent
 enable-detect-indent
 set-indent global 4
+auto-pairs-enable
 
 # Normal mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
