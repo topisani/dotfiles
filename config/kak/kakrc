@@ -319,7 +319,7 @@ filetype-hook devicetree %{
 # Global highlighter ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 def -override hl-todo-enable %{
-  hl-todo-disable
+  try %{hl-todo-disable}
   addhl window/hl-todo regex "\b(?:(TODO)|(FIXME)|(NOTE))\b" 1:MarkerTodo 2:MarkerFixme 3:MarkerNote
 }
 

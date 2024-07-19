@@ -20,9 +20,17 @@ setup::project() {
 mkdir -p ~/git/tools/
 
 setup::install git zsh jq tmux zoxide 
-setup::install diff-so-fancy bat ripgrep fd
+setup::install diff-so-fancy bat ripgrep fd git-revise qalc bc
 
-setup::install editorconfig tig ranger fzf
+setup::install editorconfig-core-c tig ranger fzf
+setup::install rustup && (
+    rustup default || rustup default stable
+    rustup component add rust-src
+    cargo install cargo-binstall cargo-update
+    cargo install-update -a
+)
+setup::install rust-analyzer
+
 setup::project https://github.com/topisani/kakoune && (
     make
     sudo make install
@@ -32,16 +40,17 @@ setup::project https://github.com/topisani/kakoune-remote-control && (
     make install
 )
 
-setup::install rustup && (
-    rustup default || rustup default stable
-    rustup component add rust-src
-    cargo install cargo-binstall cargo-update
-    cargo install-update -a
-)
-
-setup::install rust-analyzer
 setup::project https://github.com/topisani/kak-lsp && (
     cargo install --path . --locked
+)
+
+setup::project https://github.com/topisani/kak-tree-sitter && (
+    git remote add upstream git@git.sr.ht:~hadronized/kak-tree-sitter
+    git fetch upstream
+    git reset --hard upstream/master
+    cargo install --locked --path kak-tree-sitter
+    cargo install --locked --path ktsctl
+    ktsctl sync -a
 )
 
 setup::project https://github.com/topisani/sidetree && (
@@ -50,7 +59,12 @@ setup::project https://github.com/topisani/sidetree && (
 
 # GUI
 setup::install alacritty ttf-jetbrains-mono-nerd
-setup::install hyprland hyprpaper hyprlock xdg-desktop-portal-hyprland hyprcursor hypridle
-setup::install waybar wofi dunst
-setup::install breeze breeze5 papirus-icon-theme nordzy-cursors-hyprcursor
+setup::install hyprland hyprpaper hyprlock xdg-desktop-portal-hyprland hyprcursor hypridle wl-clipboard
+setup::install waybar wofi dunst udiskie
+setup::install breeze breeze5 papirus-icon-theme
 setup::install zathura zathura-pdf-poppler imv nemo
+
+gsettings set org.cinnamon.desktop.default-applications.terminal exec "$(which tmux-term)"
+gsettings set org.cinnamon.desktop.default-applications.terminal exec-arg ""
+gsettings set org.gnome.desktop.default-applications.terminal exec "$(which tmux-term)"
+gsettings set org.gnome.desktop.default-applications.terminal exec-arg ""

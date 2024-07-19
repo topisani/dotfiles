@@ -37,8 +37,12 @@ define-command auto-pairs-setup-pair -params 2 %{
   }
 }
 
-define-command auto-pairs-enable %{
+define-command auto-pairs-disable %{
   remove-hooks %opt{auto_pairs_scope} auto-pairs
+}
+
+define-command auto-pairs-enable %{
+  auto-pairs-disable
   auto-pairs-setup-pair { }
   auto-pairs-setup-pair [ ]
   auto-pairs-setup-pair ( )
@@ -46,3 +50,7 @@ define-command auto-pairs-enable %{
   auto-pairs-setup-pair "'" "'"
   auto-pairs-setup-pair '"' '"'
 }
+
+# Compatibility with the hooks in kakoune-boost/surround
+alias global enable-auto-pairs auto-pairs-enable
+alias global disable-auto-pairs auto-pairs-disable

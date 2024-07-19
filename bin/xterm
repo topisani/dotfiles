@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if command -v alacritty > /dev/null; then
+    if [ "$1" = "-e" ]; then
+        shift
+    fi
+    if command -v tmux > /dev/null; then
+        exec tmux-term "$@"
+    fi
+    exec alacritty -e "$@"
+fi
+
+exec /usr/bin/xterm "$@"
