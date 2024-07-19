@@ -54,6 +54,7 @@
 	
 [push]
 	default = current
+	autoSetupRemote = true
 [commit]
 	template = /home/topisani/.config/git/gitmessage.txt
 	verbose = true

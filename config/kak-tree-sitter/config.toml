@@ -44,3 +44,18 @@ path = "queries/just"
 # [language.kconfig.queries]
 # source = { git = { url = "https://github.com/tree-sitter-grammars/tree-sitter-kconfig", pin = "486fea71f61ad9f3fd4072a118402e97fe88d26c" }}
 # path = "queries"
+
+[language.hare.grammar]
+name = "hare"
+source = { git = { url = "https://github.com/tree-sitter-grammars/tree-sitter-hare", pin = "4af5d82cf9ec39f67cb1db5b7a9269d337406592" }}
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "-o", "hare.so"]
+link_flags = ["-O3"]
+
+[language.hare.queries]
+source = { git = { url = "https://github.com/tree-sitter-grammars/tree-sitter-hare", pin = "4af5d82cf9ec39f67cb1db5b7a9269d337406592" }}
+path = "queries"

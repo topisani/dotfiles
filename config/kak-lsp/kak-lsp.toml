@@ -222,17 +222,22 @@ roots = ["package.json"]
 command = "vls"
 settings_section = "vls"
 
-[language_server.text]
+[language_server.markdown]
 filetypes = ["markdown"]
-command = "unified-language-server"
-roots = []
-args = ["--parser=remark-parse", "--stdio"]
+roots = [".marksman.toml"]
+command = "marksman"
+args = ["server"]
 
 [language_server.toml]
 filetypes = ["toml"]
 command = "taplo"
 args = ["lsp", "stdio"]
 roots = [""]
+
+[language_server.zls]
+filetypes = ["zig"]
+roots = ["build.zig"]
+command = "zls"
 
 # Semantic tokens support
 # See https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_semanticTokens

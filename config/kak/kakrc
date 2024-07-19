@@ -148,6 +148,7 @@ load-conf indent
 enable-detect-indent
 set-indent global 4
 auto-pairs-enable
+set global tabstop 8
 
 # Normal mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 

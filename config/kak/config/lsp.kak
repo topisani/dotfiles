@@ -1,6 +1,6 @@
 # Setup kak-lsp
 
-eval %sh{ kak-lsp --kakoune -s $kak_session -vv --log /tmp/kak-lsp-$kak_session.log }
+eval %sh{ kak-lsp --kakoune -s $kak_session -vvv --log /tmp/kak-lsp-$kak_session.log }
 
 hook -always global KakEnd .* %{ nop %sh{
   rm /tmp/kak-lsp-$kak_session.log
@@ -131,7 +131,7 @@ def lsp-enable-semantic-tokens %{
   }
 }
 
-filetype-hook (css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml) %{
+filetype-hook (css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml|zig) %{
   lsp-setup
   lsp-enable-semantic-tokens
 }
