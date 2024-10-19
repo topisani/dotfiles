@@ -291,7 +291,16 @@ filetype-assign "xkb/symbols/[\w/]$" xkb_symbols
 filetype-assign .*\.kdl kdl
 filetype-assign .*\.hjson hjson
 filetype-assign .*\.just just
-filetype-assign .*defconfig conf
+filetype-assign .*_defconfig conf
+filetype-assign .*\.defconfig kconfig
+filetype-assign .*\.typst typst
+filetype-assign .*\.env sh
+
+filetype-hook typst %{
+  set window comment_line '//'
+  set window comment_block_begin '/*'
+  set window comment_block_end '*/'
+}
 
 filetype-hook hjson %{
   require-module yaml

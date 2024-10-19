@@ -66,8 +66,9 @@ def ranger -override -params .. %{
   connect terminal sh -c %{
     tmpfile="$(mktemp -t kak-ranger-XXXXXX)"
     trap 'rm -rf -- "$tmpfile"' EXIT
-    ranger "$1" --choosefile=$tmpfile
+    ranger "$1" --choosefile=$tmpfile || (echo "$*" && sleep 100)
     krc open $(cat $tmpfile)
+
   } ranger %val{buffile} %arg{@}
 }
 

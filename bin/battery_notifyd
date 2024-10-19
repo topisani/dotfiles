@@ -30,10 +30,11 @@ get_bat() {
 }
 
 while true; do
-    get_bat
+    get_bat 2> /dev/null
     sl=60
-    if [ "$POWER_SUPPLY_CAPACITY" -lt 16 ] && [ "$POWER_SUPPLY_STATUS" != "Charging" ]; then
+    if [ "${POWER_SUPPLY_CAPACITY:-100}" -lt 16 ] && [ "$POWER_SUPPLY_STATUS" != "Charging" ]; then
         dunstify -u 2 -i battery-empty-symbolic "Battery Low!" "$POWER_SUPPLY_CAPACITY%" -r $not_id
+        sl=5
     else
         dunstify -C $not_id
     fi

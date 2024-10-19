@@ -72,7 +72,7 @@ _layout_auto() {
       _layout_single
     fi
   )
-  lid=$(cat /proc/acpi/button/lid/*/state)
+  lid=$(cat /proc/acpi/button/lid/*/state 2> /dev/null)
   if [[ "$lid" =~ "closed" ]] &&  [[ "$serials" != "" ]]; then
     echo "eDP-1,disable"
   else

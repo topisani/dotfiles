@@ -1,6 +1,6 @@
 # Setup kak-lsp
 
-eval %sh{ kak-lsp --kakoune -s $kak_session -vvv --log /tmp/kak-lsp-$kak_session.log }
+eval %sh{ kak-lsp --kakoune }
 
 hook -always global KakEnd .* %{ nop %sh{
   rm /tmp/kak-lsp-$kak_session.log
@@ -68,7 +68,7 @@ map global goto y '<esc>:lsp-type-definition<ret>' -docstring 'type definition'
 
 def lsp-setup %{
   lsp-enable-window
-  lsp-auto-hover-enable
+  # lsp-auto-hover-enable
   lsp-inlay-diagnostics-enable window
   lsp-inlay-code-lenses-enable window
 
@@ -131,12 +131,6 @@ def lsp-enable-semantic-tokens %{
   }
 }
 
-filetype-hook (css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml|zig) %{
-  lsp-setup
-  lsp-enable-semantic-tokens
-}
-
-
 # Modeline progress
 declare-option -hidden str modeline_lsp_progress ""
 define-command -hidden -params 6 -override lsp-handle-progress %{
@@ -152,6 +146,7 @@ define-command tsserver-organize-imports -docstring "Ask the typescript language
     lsp-execute-command _typescript.organizeImports """[\""%val{buffile}\""]"""
 }
 
+ 
 require-module jump
 
 define-command -override -hidden jump-select %{
@@ -261,4 +256,83 @@ hook global -group idetest WinDisplay .* %{
       eval -client docs quit
     }
   }
+}
+
+set global lsp_semantic_tokens %{
+  [
+    { token = "", modifiers = [ "documentation", ], face = "documentation" },
+    { token = "variable", modifiers = [ "mutable" ], face = "+i@variable" },
+    { token = "", modifiers = [ "deprecated" ], face = "+u" },
+    { token = "", modifiers = [ "intraDocLink" ], face = "+u" },
+    { token = "method", modifiers = [ "trait" ], face = "memberFunction" },
+    { token = "type", face = "type" },
+    { token = "struct", face = "type" },
+    { token = "class", face = "type" },
+    { token = "interface", face = "type" },
+    { token = "typeAlias", face = "type" },
+    { token = "union", face = "type" },
+    { token = "variable", face = "variable" },
+    { token = "namespace", face = "module" },
+    { token = "function", face = "function" },
+    { token = "namespace", face = "module" },
+    { token = "typeParameter", face = "type" },
+    { token = "macro", face = "cppMacro" },
+    { token = "formatSpecifier", face = "value" },
+  ]
+}
+
+rmhooks global lsp-filtype-python
+hook -group lsp-filetype-python global BufSetOption filetype=python %{
+  set buffer lsp_servers %sh{
+    root=$(eval "$kak_opt_lsp_find_root" pyproject.toml .git .hg $(: kak_buffile))
+    cat <<EOF
+    [pylsp]
+    command = "sh"
+    args = ["-c", "cd '$root' && python-env-run pylsp"]
+    settings_section = "_"
+    root = '$root'
+
+    [pylsp.settings._]
+    # See https://github.com/python-lsp/python-lsp-server#configuration
+    # pylsp.configurationSources = ["flake8"]
+    pylsp.plugins.jedi_completion.include_params = true
+    pylsp.plugins.jedi_completion.fuzzy = true
+    pylsp.plugins.rope_autoimport.enabled = true
+    pylsp.plugins.rope_autoimport.memory = true
+
+    # [language_server.pyright]
+    # filetypes = ["python"]
+    # roots = ["pyproject.toml", "requirements.txt", ".git"]
+    # command = "python-env-run"
+    # args = ["pyright-langserver", "--stdio"]
+    # settings_section = "pyright"
+
+    # [language_server.pyright.settings._]
+
+    [ruff]
+    command = "sh"
+    args = ["-c", "cd '$root'; python-env-run ruff-lsp"]
+    settings_section = "_"
+    root = '$root'
+
+    [ruff.settings._.globalSettings]
+    organizeImports = true
+    fixAll = true
+EOF
+  }
+}
+
+rmhooks global lsp-filetype-c-family
+hook -group lsp-filetype-c-family global BufSetOption filetype=(?:c|cpp|objc) %{
+    set-option buffer lsp_servers %exp{
+        [clangd]
+        command = "sh"
+        args = [ '-c', 'TMPDIR=~/.cache/clangd/ clangd --query-driver=/home/topisani/**,/usr/**,arm-none-eabi-gcc,arm-none-eabi-*,arm-none-eabi-g++,**']
+        root = '%sh{eval "$kak_opt_lsp_find_root" compile_commands.json .clangd .git .hg $(: kak_buffile)}'
+    }
+}
+
+hook global BufSetOption filetype=(css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml|zig) %{
+  lsp-setup
+  lsp-enable-semantic-tokens
 }
