@@ -76,12 +76,15 @@ def -override ide-show-tools %{
     eval %sh{
         tmux=${kak_client_env_TMUX:-$TMUX}
         if [ -z "$tmux" ]; then
-            echo "echo -markup '{Error}This command is only available in a tmux session'"
-            exit
+            # echo "echo -markup '{Error}This command is only available in a tmux session'"
+            echo "set local windowing_placement bottom-panel"
+            echo "set global toolsclient tools"
+            echo "new 'rename-client tools'"
+        else
+          TMUX=$tmux tmux join-pane -l 30% -vs "${kak_opt_toolsclient_tmux_pane}" < /dev/null > /dev/null 2>&1 &
         fi
-        TMUX=$tmux tmux join-pane -l 30% -vs "${kak_opt_toolsclient_tmux_pane}" < /dev/null > /dev/null 2>&1 &
     }
-    focus %opt{toolsclient} 
+    # focus %opt{toolsclient} 
 }
 
 def -override ide-hide-tools %{
@@ -96,11 +99,15 @@ def -override -hidden ide-make-tools %{
   try %{
     eval -client tools nop
   } catch %{
-    set global toolsclient tools
     # set global docsclient tools
     eval %sh{
       TMUX=${kak_client_env_TMUX:-$TMUX}
+      if [ -z "$tmux" ]; then
+          # echo "echo -markup '{Error}This command is only available in a tmux session'"
+          exit
+      fi
       DEST=$(tmux neww -dP -t :10 kak -c $kak_session -e 'rename-client tools' 2> /dev/null || tmux splitw -dP -t :10 kak -c $kak_session -e 'rename-client tools')
+      echo "set global toolsclient tools"
       [ $? -eq 0 ] && echo "set global toolsclient_tmux_pane '$DEST'"
     }
   }

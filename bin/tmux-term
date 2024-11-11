@@ -1,5 +1,8 @@
 #!/bin/bash
 
+exec wezterm start -- "$@"
+exit $?
+
 setup_term() {
     # TERM=tmux-256color tmux new-session "$*"\; set destroy-unattached on\; set status off\; attach
     zellij
