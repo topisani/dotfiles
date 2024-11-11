@@ -44,7 +44,7 @@ _layout_umag() {
 }
 
 _layout_home() {
-  echo 'desc:Dell Inc. DELL S2721QS CH3CM43,highres,0x0,1.25'
+  echo "desc:Dell Inc. DELL S2721QS CH3CM43,highres,0x0,1.25"
   echo "eDP-1,highres,960x2160,$EDP1_SCALE"
 }
 
@@ -74,6 +74,7 @@ _layout_auto() {
   )
   lid=$(cat /proc/acpi/button/lid/*/state 2> /dev/null)
   if [[ "$lid" =~ "closed" ]] &&  [[ "$serials" != "" ]]; then
+    echo "$layout" | sed '/^eDP-1/d'
     echo "eDP-1,disable"
   else
     echo "$layout"

@@ -95,10 +95,10 @@ def lsp-setup %{
   map window object D '<a-semicolon>lsp-diagnostic-object<ret>' -docstring 'LSP errors'
 }
 
-def lsp-restart -docstring "Restart lsp server" %{
-  lsp-stop
-  lsp-start
-}
+# def lsp-restart -docstring "Restart lsp server" %{
+#   lsp-stop
+#   lsp-start
+# }
 
 filetype-hook make %{
   addhl window/wrap wrap -word -marker ">> "
@@ -129,6 +129,11 @@ def lsp-enable-semantic-tokens %{
   hook -once -always window WinSetOption filetype=.* %{
     remove-hooks window semantic-tokens
   }
+}
+
+filetype-hook (css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml|zig|go|templ) %{
+  lsp-setup
+  lsp-enable-semantic-tokens
 }
 
 # Modeline progress

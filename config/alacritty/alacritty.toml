@@ -1,4 +1,3 @@
-import = ["~/.config/alacritty/theme.toml"]
 
 [font]
 builtin_box_drawing = true
@@ -37,3 +36,6 @@ persist = false
 mouse.enabled = true
 # binding = { key = "U", mods = "Control|Shift" }
 regex = "(ipfs:|ipns:|magnet:|mailto:|gemini://|gopher://|https://|http://|news:|file:|git://|ssh:|ftp://)[^\u0000-\u001F\u007F-\u009F<>\"\\s{-}\\^⟨⟩`¬]+"
+
+[general]
+import = ["~/.config/alacritty/theme.toml"]

@@ -88,22 +88,22 @@ map global undo U 'U' -docstring "redo last change"
 map global undo j '<c-j>' -docstring "move forward in changes history"
 map global undo k '<c-k>' -docstring "move backward in changes history"
 
-# map global files f ':winplace popup terminal -title "Open file..." krc-fzf files<ret>'             -docstring 'List files'
-# map global files F ':winplace popup terminal -title "Open file (all)..." krc-fzf files -uuu<ret>'  -docstring 'List files (including hidden)'
-map global files f ':winplace popup terminal krc-fzf files<ret>'             -docstring 'List files'
-map global files F ':winplace popup terminal krc-fzf files -uuu<ret>'        -docstring 'List files (including hidden)'
-map global files b ':winplace popup broot<ret>'                                        -docstring 'broot popup'
-map global files B ':winplace window broot<ret>'                                       -docstring 'broot window'
-map global files e ':winplace panel broot<ret>'                                        -docstring 'broot panel'
+# map global files f ':winplace popup connect terminal -title "Open file..." krc-fzf files<ret>'             -docstring 'List files'
+# map global files F ':winplace popup connect terminal -title "Open file (all)..." krc-fzf files -uuu<ret>'  -docstring 'List files (including hidden)'
+map global files f ':winplace popup connect terminal krc-fzf files<ret>'             -docstring 'List files'
+map global files F ':winplace popup connect terminal krc-fzf files -uuu<ret>'        -docstring 'List files (including hidden)'
+map global files b ':winplace popup connect broot<ret>'                                        -docstring 'broot popup'
+map global files B ':winplace window connect broot<ret>'                                       -docstring 'broot window'
+map global files e ':winplace panel connect broot<ret>'                                        -docstring 'broot panel'
 map global files w ':w<ret>'                                                           -docstring 'Write file'
 map global files c ":my-fzf-config-popup<ret>"                                         -docstring 'Open config dir'
 map global files C ":my-fzf-bundle-popup<ret>"                                         -docstring 'Open plugin dir'
 map global files d ':my-file-delete<ret>'                                              -docstring 'Delete current file'
 map global files r ':my-file-rename<ret>'                                              -docstring 'Rename current file'
-map global files R ':winplace window terminal ranger %reg[%]<ret>'                     -docstring 'Ranger'
-map global files h ':winplace popup ranger<ret>'                                       -docstring 'Ranger'
+map global files R ':winplace window connect terminal ranger %reg[%]<ret>'                     -docstring 'Ranger'
+map global files h ':winplace popup connect ranger<ret>'                                       -docstring 'Ranger'
 
-map global buffers b ':winplace popup terminal krc-fzf buffers<ret>'                   -docstring "List Buffers"
+map global buffers b ':winplace popup connect terminal krc-fzf buffers<ret>'                   -docstring "List Buffers"
 map global buffers n ':buffer-next<ret>'                                               -docstring "Next Buffer"
 map global buffers p ':buffer-previous<ret>'                                           -docstring "Prev buffer"
 map global buffers d ':delete-buffer<ret>'                                             -docstring "Delete buffer"
@@ -116,11 +116,11 @@ map global my-tmux <tab>     ':nop %sh{ tmux last-pane }<ret>'      -docstring '
 map global my-tmux J         ':nop %sh{ tmux swap-pane -D }<ret>'   -docstring 'Swap pane below'
 map global my-tmux K         ':nop %sh{ tmux swap-pane -U }<ret>'   -docstring 'Swap pane above'
 
-map global my-tmux <ret>     ':winplace auto new<ret>'             -docstring 'Autosplit'
-map global my-tmux s         ':winplace vertical new<ret>'              -docstring 'Split horizontally'
-map global my-tmux v         ':winplace horizontal new<ret>'            -docstring 'Split vertically'
-map global my-tmux p         ':winplace popup new<ret>'                 -docstring 'Popup client'
-map global my-tmux o         ':winplace bottom-panel new<ret>'          -docstring 'Bottom panel client'
+map global my-tmux <ret>     ':winplace auto connect new<ret>'             -docstring 'Autosplit'
+map global my-tmux s         ':winplace vertical connect new<ret>'              -docstring 'Split horizontally'
+map global my-tmux v         ':winplace horizontal connect new<ret>'            -docstring 'Split vertically'
+map global my-tmux p         ':winplace popup connect new<ret>'                 -docstring 'Popup client'
+map global my-tmux o         ':winplace bottom-panel connect new<ret>'          -docstring 'Bottom panel client'
 map global my-tmux d         ':q<ret>'                                  -docstring 'Delete pane'
 map global my-tmux q         ':q<ret>'                                  -docstring 'Delete pane'
 map global my-tmux t         ':ide-tools<ret>'                          -docstring 'Toggle the tools client'
@@ -135,11 +135,11 @@ map global my-tmux <c-tab>   ':nop %sh{ tmux last-pane }<ret>'      -docstring '
 map global my-tmux <c-J>     ':nop %sh{ tmux swap-pane -D }<ret>'   -docstring 'Swap pane below'
 map global my-tmux <c-K>     ':nop %sh{ tmux swap-pane -U }<ret>'   -docstring 'Swap pane above'
 
-map global my-tmux <c-ret>   ':winplace autos new<ret>'             -docstring 'Autosplit'
-map global my-tmux <c-s>     ':winplace vertical new<ret>'              -docstring 'Split horizontally'
-map global my-tmux <c-v>     ':winplace horizontal new<ret>'            -docstring 'Split vertically'
-map global my-tmux <c-p>     ':winplace popup new<ret>'                 -docstring 'Popup client'
-map global my-tmux <c-o>     ':winplace bottom-panel new<ret>'          -docstring 'Bottom panel client'
+map global my-tmux <c-ret>   ':winplace autos connect new<ret>'             -docstring 'Autosplit'
+map global my-tmux <c-s>     ':winplace vertical connect new<ret>'              -docstring 'Split horizontally'
+map global my-tmux <c-v>     ':winplace horizontal connect new<ret>'            -docstring 'Split vertically'
+map global my-tmux <c-p>     ':winplace popup connect new<ret>'                 -docstring 'Popup client'
+map global my-tmux <c-o>     ':winplace bottom-panel connect new<ret>'          -docstring 'Bottom panel client'
 
 map global my-tmux <c-d>     ':q<ret>'                           -docstring 'Delete pane'
 map global my-tmux <c-t>     ':ide-tools<ret>'                   -docstring 'Toggle the tools client'

@@ -58,17 +58,23 @@ filetypes = ["crystal"]
 roots = ["shard.yml"]
 command = "scry"
 
-[language_server.typescript]
-filetypes = ["typescript", "javascript"]
-roots = ["tsconfig.json", "package.json"]
-command = "typescript-language-server"
-args = ["--stdio"]
-
 [language_server.json]
 filetypes = ["json"]
 roots = ["package.json"]
 command = "json-languageserver"
 args = ["--stdio"]
+
+[language_server.deno]
+filetypes = ["typescript", "javascript", "tsx", "jsx"]
+roots = ["deno.json"]
+command = "deno"
+args = ["lsp"]
+
+# [language_server.typescript]
+# filetypes = ["typescript", "javascript"]
+# roots = ["tsconfig.json", "package.json"]
+# command = "typescript-language-server"
+# args = ["--stdio"]
 
 [language_server.css]
 filetypes = ["css", "scss", "sass", "less"]
@@ -239,11 +245,21 @@ filetypes = ["zig"]
 roots = ["build.zig"]
 command = "zls"
 
+<<<<<<< Updated upstream:config/kak-lsp/kak-lsp.bak.toml
 [language_server.typst]
 filetypes = ["typst"]
 roots = ["typst.toml", ".git"]
 command = "typst-lsp"
 
+||||||| Stash base:config/kak-lsp/kak-lsp.toml
+=======
+[language_server.templ]
+filetypes = ["templ"]
+roots = ["go.mod", ".git"]
+command = "templ"
+args = ["lsp"]
+
+>>>>>>> Stashed changes:config/kak-lsp/kak-lsp.toml
 # Semantic tokens support
 # See https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_semanticTokens
 # for the default list of tokens and modifiers.

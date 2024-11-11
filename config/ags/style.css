@@ -1,0 +1,129 @@
+@define-color bar_bg_color @theme_bg_color;
+@define-color bar_fg_color @theme_fg_color;
+@define-color wb-primary #f0c671;
+
+window.bar * {
+    border: none;
+    font-family: Jetbrains Mono Nerd Font;
+    font-size: 13px;
+    min-height: 0;
+}
+
+window.bar {
+    background: @bar_bg_color;
+    border-bottom: none;
+    color: @bar_fg_color;
+    transition-property: background, background-color;
+    transition-duration: .5s;
+}
+
+window.bar button {
+    border-radius: 0px;
+    min-width: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding: 0 5px;
+    border-bottom: 0px solid transparent;
+    background: transparent;
+}
+
+window.bar button:active {
+}
+
+window.bar button:hover {
+}
+
+window.bar label {
+    font-weight: bold;
+}
+
+window.bar slider {
+    border-radius: 0px;
+}
+
+window.bar .workspaces button.focused {
+    background: #005973;
+    color: #ffffff;
+}
+
+window.bar .client-title {
+}
+
+window.bar .notification {
+    color: yellow;
+}
+
+levelbar block,
+window.bar highlight {
+    min-height: 10px;
+}
+
+window.bar .scroller {
+    color: #f0c671;
+}
+window.bar .scroller-mode { }
+window.bar .scroller-overview { }
+
+window.bar .systray {
+    padding: 0;
+}
+
+/***** NOTIFICATIONS *****/
+
+window.notification-popups box.notifications {
+    padding: .5em;
+}
+
+window.notification-popups .icon {
+    min-width: 68px;
+    min-height: 68px;
+    margin-right: 1em;
+}
+
+window.notification-popups .icon image {
+    font-size: 58px;
+    /* to center the icon */
+    margin: 5px;
+    color: @theme_fg_color;
+}
+
+window.notification-popups .icon box {
+    min-width: 68px;
+    min-height: 68px;
+    border-radius: 7px;
+}
+
+window.notification-popups .notification {
+    min-width: 350px;
+    border-radius: 11px;
+    padding: 1em;
+    margin: .5em;
+    border: 1px solid @wm_borders_edge;
+    background-color: @theme_bg_color;
+}
+
+window.notification-popups .notification.critical {
+    border: 1px solid lightcoral;
+}
+
+window.notification-popups .title {
+    color: @theme_fg_color;
+    font-size: 1.4em;
+}
+
+window.notification-popups .body {
+    color: @theme_unfocused_fg_color;
+}
+
+window.notification-popups .actions .action-button {
+    margin: 0 .4em;
+    margin-top: .8em;
+}
+
+window.notification-popups .actions .action-button:first-child {
+    margin-left: 0;
+}
+
+window.notification-popups .actions .action-button:last-child {
+    margin-right: 0;
+}

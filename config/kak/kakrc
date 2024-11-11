@@ -130,6 +130,7 @@ bundle kak-ansi https://github.com/eraserhd/kak-ansi
 bundle-customload kakoune-boost https://github.com/krobelus/kakoune-boost %{
   source "%opt{bundle_path}/kakoune-boost/surround.kak"
   source "%opt{bundle_path}/kakoune-boost/git.kak"
+  source "%opt{bundle_path}/kakoune-boost/jj.kak"
   source "%opt{bundle_path}/kakoune-boost/doc.kak"
   load-conf git
   load-conf ide
@@ -140,6 +141,18 @@ bundle kakoune-phantom-selection https://github.com/occivink/kakoune-phantom-sel
   map global user T     ": phantom-selection-select-all; phantom-selection-clear<ret>"  -docstring "Phantom select all"
   map global user <a-t> ": phantom-selection-iterate-next<ret>"                         -docstring "Phantom next"
   map global user <a-T> ": phantom-selection-iterate-prev<ret>"                         -docstring "Phantom prev"
+}
+
+bundle reasymotion https://github.com/astaugaard/reasymotion %{
+  evaluate-commands %sh{ rkak_easymotion start }
+  set global reasymotion_keys "thnesirayfoluckpdg,m.w/xjbvq"
+  map global normal <a-t> ':reasymotion-on-letter-to-letter<ret>'
+  map global normal T ':reasymotion-selection<ret>'
+  map global normal t ':reasymotion-word<ret>'
+}
+
+bundle-install-hook reasymotion %{
+  cargo install --locked --force --path .
 }
 # Insert mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
@@ -301,6 +314,7 @@ filetype-hook typst %{
   set window comment_block_begin '/*'
   set window comment_block_end '*/'
 }
+filetype-assign .*\.templ templ
 
 filetype-hook hjson %{
   require-module yaml
@@ -323,6 +337,12 @@ filetype-hook lsp-goto %{
 }
 
 filetype-hook devicetree %{
+  set window comment_line '//'
+}
+
+filetype-hook templ %{
+  require-module go
+  addhl window/ ref go
   set window comment_line '//'
 }
 
@@ -368,10 +388,10 @@ load-conf himalaya
 
 
 # ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
-# taupiqueur's jump mode
-map -docstring 'enter jump mode (select mode: replace)' global normal t ':enter_jump_mode_with_replace_select_mode<ret>'
-map -docstring 'enter jump mode (select mode: extend)' global normal T ':enter_jump_mode_with_extend_select_mode<ret>'
-map -docstring 'enter jump mode (select mode: append)' global normal <a-t> ':enter_jump_mode_with_append_select_mode<ret>'
+# # taupiqueur's jump mode
+# map -docstring 'enter jump mode (select mode: replace)' global normal t ':enter_jump_mode_with_replace_select_mode<ret>'
+# map -docstring 'enter jump mode (select mode: extend)' global normal T ':enter_jump_mode_with_extend_select_mode<ret>'
+# map -docstring 'enter jump mode (select mode: append)' global normal <a-t> ':enter_jump_mode_with_append_select_mode<ret>'
 
 
 # ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈

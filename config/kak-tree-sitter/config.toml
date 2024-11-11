@@ -166,3 +166,35 @@ link_flags = ["-O3"]
 [language.hare.queries]
 source = { git = { url = "https://github.com/tree-sitter-grammars/tree-sitter-hare", pin = "4af5d82cf9ec39f67cb1db5b7a9269d337406592" }}
 path = "queries"
+
+[language.templ.grammar]
+source = { git = { url = "https://github.com/vrischmann/tree-sitter-templ", pin = "58aed18580c476d7bc211f187e7b07a6cd12bb1f" }}
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "../scanner.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "scanner.o", "-o", "templ.so"]
+link_flags = ["-O3"]
+
+[language.templ.queries]
+source = { git = { url = "https://github.com/helix-editor/helix", pin = "b90ec5c77985bd444e7043fe738bb51b396ed496" }}
+path = "runtime/queries/templ"
+
+
+
+[language.kdl.grammar]
+source = { git = { url = "https://github.com/amaanq/tree-sitter-kdl", pin = "3ca569b9f9af43593c24f9e7a21f02f43a13bb88" }}
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "../scanner.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "scanner.o", "-o", "kdl.so"]
+link_flags = ["-O3"]
+
+[language.kdl.queries]
+source = { git = { url = "https://github.com/helix-editor/helix", pin = "b90ec5c77985bd444e7043fe738bb51b396ed496" }}
+path = "runtime/queries/kdl"
+
+

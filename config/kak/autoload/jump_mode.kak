@@ -1,7 +1,7 @@
 # name: kakoune_jump_mode
 # version: 0.1.0
 # description: Click with your keyboard.
-# authors: ["Mathieu Ablasou <taupiqueur.kanto@gmail.com>"]
+# authors: ["Mathieu Ablasou <alexherbo2@gmail.com>"]
 # kakoune: 2023-12-12
 # license: MIT
 # dependencies: []

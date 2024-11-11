@@ -51,3 +51,4 @@
 ~/.zshrc;home/zshrc
 ~/.p10k.zsh;home/p10k.zsh
 ~/.config/aerc;config/aerc
+~/.config/ags;config/ags
