@@ -150,6 +150,7 @@ try %{ set-option global autocomplete insert|prompt|no-regex-prompt }
 require-module grep
 alias global g grep
 map global normal <c-n> %{:jump-next %opt{jump_buffer_recent}<ret>} -docstring 'next Location'
+map global normal <c-s-n> %{:jump-next %opt{jump_buffer_recent}<ret>} -docstring 'next Location'
 map global normal <c-p> %{:jump-previous %opt{jump_buffer_recent}<ret>} -docstring 'previous Location'
 map global normal <c-r> %{:buffer-pop<ret>} -docstring 'pop grep/git buffer'
 
