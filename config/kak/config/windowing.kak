@@ -4,7 +4,9 @@ set global windowing_modules 'tmux' 'screen' 'zellij' 'wezterm' 'kitty' 'sway' '
 
 hook global ModuleLoaded wezterm %{
     define-command wezterm-terminal-popup -params 1.. %{
-        wezterm-terminal-impl split-pane --cwd "%val{client_env_PWD}" --top --percent 30 --pane-id "%val{client_env_WEZTERM_PANE}" -- %arg{@}
+        # wezterm-terminal-impl split-pane --cwd "%val{client_env_PWD}" --top --percent 30 --pane-id "%val{client_env_WEZTERM_PANE}" -- %arg{@}
+        # See https://github.com/wez/wezterm/pull/5576
+        wezterm-terminal-impl spawn --cwd "%val{client_env_PWD}" --floating-pane --pane-id "%val{client_env_WEZTERM_PANE}" -- %arg{@}
     }
     complete-command wezterm-terminal-popup shell
 

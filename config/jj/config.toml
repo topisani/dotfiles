@@ -1,0 +1,23 @@
+[user]
+name = "Tobias Pisani"
+email = "mail@topisani.dev"
+
+[ui]
+default-command = "log"
+
+
+[templates]
+draft_commit_description = '''
+concat(
+  description,
+  surround(
+    "\nJJ: This commit contains the following changes:\n", "\n",
+    indent("JJ:     ", diff.stat(72)),
+  ),
+)
+'''
+
+[colors]
+# Highlight hunks with background
+"diff removed token" = { bg = "#221111", underline = false }
+"diff added token" = { bg = "#002200", underline = false }

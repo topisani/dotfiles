@@ -15,6 +15,7 @@ config.use_fancy_tab_bar = false
 config.hide_tab_bar_if_only_one_tab = true
 config.enable_csi_u_key_encoding = true
 config.enable_kitty_keyboard = true
+config.term = "wezterm"
 
 config.front_end = 'OpenGL'
 -- config.webgpu_power_preference = 'HighPerformance'
@@ -328,7 +329,7 @@ config.color_schemes = {
         -- The color of the split lines between panes
         split = '#444444',
 
-        background = '#000000',
+        background = '#010309',
         foreground = '#fcfefb',
 
         ansi = {
@@ -399,8 +400,8 @@ config.color_schemes = {
 
 
 config.inactive_pane_hsb = {
-  saturation = 0.8,
-  brightness = 0.7,
+  saturation = 0.9,
+  brightness = 0.8,
 }
 
 -- and finally, return the configuration to wezterm
