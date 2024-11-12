@@ -231,3 +231,53 @@ hook global BufSetOption filetype=(css|scss|typescript|javascript|php|python|jav
   lsp-setup
   lsp-enable-semantic-tokens
 }
+
+remove-hooks global lsp-filetype-rust
+hook -group lsp-filetype-rust global BufSetOption filetype=rust %{
+  set-option buffer lsp_servers %exp{
+      [rust-analyzer]
+      root_globs = ["Cargo.toml"]
+      command = "sh"
+      args = [
+          "-c",
+          """
+              if path=$(rustup which rust-analyzer 2>/dev/null); then
+                  exec "$path"
+              else
+                  exec rust-analyzer
+              fi
+          """,
+      ]
+      [rust-analyzer.experimental]
+      commands.commands = ["rust-analyzer.runSingle"]
+      hoverActions = true
+      [rust-analyzer.settings.rust-analyzer]
+      # See https://rust-analyzer.github.io/manual.html#configuration
+      # cargo.features = []
+      check.command = "clippy"
+      # If you get 'unresolved proc macro' warnings, you have two options
+      # 1. The safe choice is two disable the warning:
+      # diagnostics.disabled = ["unresolved-proc-macro"]
+      # 2. Or you can opt-in for proc macro support
+      procMacro.enable = true
+      procMacro.attributes.enable = true
+      cargo.loadOutDirsFromCheck = true
+      cargo.runBuildScripts = true
+      cargo.features = "all"
+      # default settings gives "can't find crate test" for no_std targets
+      checkOnSave.allTargets = true
+      checkOnSave.extraArgs = ["--bins"]
+      checkOnSave.command = "clippy"
+      check.allTargets = true
+      check.extraArgs = ["--bins"]
+      # See https://github.com/rust-analyzer/rust-analyzer/issues/6448
+      inlayHints.expressionAdjustmentHints.enable = false
+      inlayHints.closureReturnTypeHints.enable = true
+      inlayHints.lifetimeElisionHints.enable = "skip_trivial"
+      imports.granularity.group = "item"
+      workspace.symbol.search.scope = "workspace"
+      workspace.symbol.search.kind = "all_symbols"
+      # These can fail on try blocks and similar syntax that is not implemented in RA
+      # diagnostics.disabled = ["type-mismatch"]
+    }
+}

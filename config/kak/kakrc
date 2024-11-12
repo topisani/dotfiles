@@ -219,6 +219,17 @@ map global normal <a-%> ':my-hull<ret>'
 # Map arrow keys to hjkl wherever possible
 map global normal <pageup> <c-u>
 map global normal <pagedown> <c-d>
+map global normal <pageup> <c-u>
+map global normal <pagedown> <c-d>
+
+map global normal <c-B> ':execute-keys %val{window_height}K<ret>'
+map global normal <c-F> ':execute-keys %val{window_height}J<ret>'
+map global normal <c-U> ':execute-keys %sh{echo $(($kak_window_height / 2))}K<ret>'
+map global normal <c-D> ':execute-keys %sh{echo $(($kak_window_height / 2))}J<ret>'
+
+map global normal <s-pageup> ':execute-keys %sh{echo $(($kak_window_height / 2))}K<ret>'
+map global normal <s-pagedown> ':execute-keys %sh{echo $(($kak_window_height / 2))}J<ret>'
+
 # map global normal <pageup> '<esc>:execute-keys %sh{echo $(($kak_window_height / 2))} vkv<ret>' -docstring 'scroll half page up'
 # map global normal <pagedown> '<esc>:execute-keys %sh{echo $(($kak_window_height / 2))} vjv<ret>' -docstring 'scroll half page down'
 map global view <up> k
