@@ -10,13 +10,20 @@ hook global ModuleLoaded wezterm %{
     }
     complete-command wezterm-terminal-popup shell
 
-    define-command wezterm-terminal-auto -params 1.. %{
-        wezterm-terminal-impl split-pane --cwd "%val{client_env_PWD}" --right --pane-id "%val{client_env_WEZTERM_PANE}" -- %arg{@}
+    define-command wezterm-terminal-auto -override -params 1.. %{
+        set local windowing_placement %sh{
+            if [ $((kak_window_height * 2 > kak_window_width)) = 0 ]; then
+                echo "horizontal"
+            else
+                echo "vertical"
+            fi
+        }
+        terminal %arg{@}
     }
     complete-command wezterm-terminal-auto shell
 
     define-command wezterm-terminal-panel -params 1.. %{
-        wezterm-terminal-impl split-pane --cwd "%val{client_env_PWD}" --left --cells 30 --pane-id "%val{client_env_WEZTERM_PANE}" -- %arg{@}
+        wezterm-terminal-impl split-pane --cwd "%val{client_env_PWD}" --left --cells 35 --pane-id "%val{client_env_WEZTERM_PANE}" -- %arg{@}
     }
     complete-command wezterm-terminal-panel shell
 

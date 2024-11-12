@@ -6,6 +6,7 @@ local act = wezterm.action
 local config = wezterm.config_builder()
 
 config.font = wezterm.font 'Jetbrains Mono Nerd Font'
+config.harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
 config.freetype_load_target = 'Light'
 config.freetype_render_target = 'HorizontalLcd'
 config.cell_width = 0.9

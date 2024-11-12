@@ -71,15 +71,10 @@ def lsp-setup %{
   hook -group lsp window InsertCompletionHide .* %{
     map window insert <c-n> '<a-;>: lsp-snippets-select-next-placeholders<ret>'
   }
-  
+
   map window insert <c-n> '<a-;>: lsp-snippets-select-next-placeholders<ret>'
   # map window normal <c-n> ': lsp-snippets-select-next-placeholders<ret>'
-  
-  map window filetype s   ': enter-user-mode lsp<ret>' -docstring 'lsp...'
-  map window normal <c-e> ': enter-user-mode lsp<ret>' -docstring 'lsp...'
-  map window filetype ,   ': lsp-code-actions<ret>'    -docstring 'lsp code actions'
-  map window filetype =   ': lsp-format<ret>'          -docstring 'lsp-format'
- 
+
   map window object a '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
   map window object <a-a> '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
   map window object e '<a-semicolon>lsp-object Function Method<ret>' -docstring 'LSP function or method'
@@ -87,6 +82,14 @@ def lsp-setup %{
   map window object d '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>' -docstring 'LSP errors and warnings'
   map window object D '<a-semicolon>lsp-diagnostic-object<ret>' -docstring 'LSP errors'
 }
+
+map global filetype s   ': enter-user-mode lsp<ret>' -docstring 'lsp...'
+map global normal <c-e> ': enter-user-mode lsp<ret>' -docstring 'lsp...'
+map global filetype ,   ': lsp-code-actions<ret>'    -docstring 'lsp code actions'
+map global filetype =   ': lsp-format<ret>'          -docstring 'lsp-format'
+map global normal <c-h> ': lsp-hover<ret>'           -docstring 'lsp-hover'
+map global normal <c-H> ': lsp-hover-buffer<ret>'    -docstring 'lsp-hover'
+
 
 filetype-hook make %{
   addhl window/wrap wrap -word -marker ">> "
@@ -113,7 +116,7 @@ def lsp-enable-semantic-tokens %{
   hook window -group semantic-tokens BufReload .* lsp-semantic-tokens
   hook window -group semantic-tokens NormalIdle .* lsp-semantic-tokens
   hook window -group semantic-tokens InsertIdle .* lsp-semantic-tokens
-  
+
   hook -once -always window WinSetOption filetype=.* %{
     remove-hooks window semantic-tokens
   }

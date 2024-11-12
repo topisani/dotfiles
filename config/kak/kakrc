@@ -166,6 +166,8 @@ set global tabstop 8
 # Normal mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
 set global scrolloff 7,1
+set-option global autowrap_column 80
+set-option global autowrap_fmtcmd 'fmt.sh -w %c'
 
 # Leader / Filetype modes ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
@@ -173,13 +175,12 @@ set global scrolloff 7,1
 declare-user-mode filetype
 unmap global normal ,
 map global normal , ': enter-user-mode filetype<ret>'
-map global normal <c-f> ': enter-user-mode filetype<ret>'
-map global insert <c-f> ': enter-user-mode filetype<ret>'
-
 map global normal '#' ': comment-line<ret>' -docstring "Comment line"
 map global normal '<a-#>' ': comment-block<ret>' -docstring "Comment block"
 
 map global normal "'" ': enter-user-mode lsp<ret>' -docstring 'lsp...'
+
+map global normal = %{|fmt.sh -w $kak_opt_autowrap_column<ret>}
 
 # Restores old kakoune behavior that i liked
 map global normal <X> ': select-next-whole-line<ret>' -docstring 'Select next whole line'
@@ -308,6 +309,13 @@ filetype-assign .*_defconfig conf
 filetype-assign .*\.defconfig kconfig
 filetype-assign .*\.typst typst
 filetype-assign .*\.env sh
+filetype-assign .*\.jjdescription jj-describe
+
+filetype-hook jj-describe %{
+  # set window comment_line 'JJ:'
+  # addhl window/comment regex 'JJ:[^\n]*' 0:comment
+  set buffer autowrap_column 72
+}
 
 filetype-hook typst %{
   set window comment_line '//'

@@ -78,3 +78,16 @@ map global git <ret> %{:git blame-jump<ret>} -docstring "jump"
 map global git-blame b %{:git-blame-current-line<ret>} -docstring "blame popup"
 map global git-blame <ret> %{:git blame-jump<ret>} -docstring "jump"
 
+filetype-hook jj-describe %{
+  add-highlighter window/jj-describe regions
+  add-highlighter window/jj-describe/diff region "^JJ: diff --git [^\n]*"  "^\n" group
+  add-highlighter window/jj-describe/diff/ regex "^JJ: " 0:comment
+  add-highlighter window/jj-describe/diff/ regex "^JJ: ( [^\n]*\n)" 1:default
+  add-highlighter window/jj-describe/diff/ regex "^JJ: (\+[^\n]*\n)" 1:green,default
+  add-highlighter window/jj-describe/diff/ regex "^JJ: (-[^\n]*\n)" 1:red,default
+  add-highlighter window/jj-describe/diff/ regex "^JJ: (@@[^\n]*@@)" 1:cyan,default
+# If any trailing whitespace was introduced in diff, show it with red background
+  add-highlighter window/jj-describe/diff/ regex "^JJ: \+[^\n]*?(\h+)\n" 1:default,red
+
+  add-highlighter window/jj-describe/comment region "^JJ: " "$" fill comment
+}

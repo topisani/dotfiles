@@ -162,8 +162,7 @@ hook global BufSetOption jump_current_line=[^0].* %{
 }
 
 map global normal <c-t> ":enter-user-mode tree-sitter<ret>" -docstring 'Tree sitter...'
-map global normal <c-T> ":enter-user-mode tree-sitter-nav-sticky<ret>" -docstring 'Tree sitter nav...'
-
+map global normal <c-T> %{:tree-sitter-nav '"parent"'<ret>} -docstring 'Tree sitter select parent'
 
 try %{ declare-user-mode ui }
 map global ui   n ':toggle-numbers<ret>' -docstring 'Toggle Line numbers'

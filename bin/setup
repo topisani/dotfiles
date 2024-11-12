@@ -57,6 +57,11 @@ setup::project https://github.com/topisani/sidetree && (
     cargo install --path . --locked
 )
 
+setup::project git@github.com:bnjmnt4n/jj && (
+    git checkout ssh-openssh
+    cargo install --path cli --locked --bin jj
+)
+
 # GUI
 setup::install alacritty ttf-jetbrains-mono-nerd
 setup::install hyprland hyprpaper hyprlock xdg-desktop-portal-hyprland hyprcursor hypridle wl-clipboard
