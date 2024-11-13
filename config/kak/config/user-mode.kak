@@ -62,14 +62,13 @@ def broot -override -params .. %{
   } broot %val{buffile} %arg{@}
 }
 
-def ranger -override -params .. %{
+def yazi -override -params .. %{
   connect terminal sh -c %{
-    tmpfile="$(mktemp -t kak-ranger-XXXXXX)"
+    tmpfile="$(mktemp -t kak-yazi-XXXXXX)"
     trap 'rm -rf -- "$tmpfile"' EXIT
-    ranger "$1" --choosefile=$tmpfile || (echo "$*" && sleep 100)
+    yazi "$1" --chooser-file=$tmpfile || (echo "$*" && sleep 100)
     krc open $(cat $tmpfile)
-
-  } ranger %val{buffile} %arg{@}
+  } yazi %val{buffile} %arg{@}
 }
 
 try %{ declare-user-mode my-tmux }
@@ -100,8 +99,8 @@ map global files c ":my-fzf-config-popup<ret>"                                  
 map global files C ":my-fzf-bundle-popup<ret>"                                         -docstring 'Open plugin dir'
 map global files d ':my-file-delete<ret>'                                              -docstring 'Delete current file'
 map global files r ':my-file-rename<ret>'                                              -docstring 'Rename current file'
-map global files R ':winplace window connect terminal ranger %reg[%]<ret>'                     -docstring 'Ranger'
-map global files h ':winplace popup connect ranger<ret>'                                       -docstring 'Ranger'
+map global files R ':winplace window connect terminal yazi %reg[%]<ret>'                     -docstring 'Yazi'
+map global files h ':winplace popup connect yazi<ret>'                                       -docstring 'Yazi'
 
 map global buffers b ':winplace popup connect terminal krc-fzf buffers<ret>'                   -docstring "List Buffers"
 map global buffers n ':buffer-next<ret>'                                               -docstring "Next Buffer"

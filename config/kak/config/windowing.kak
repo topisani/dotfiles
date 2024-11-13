@@ -31,6 +31,11 @@ hook global ModuleLoaded wezterm %{
         wezterm-terminal-impl split-pane --cwd "%val{client_env_PWD}" --bottom --cells 18 --pane-id "%val{client_env_WEZTERM_PANE}" -- %arg{@}
     }
     complete-command wezterm-terminal-bottom-panel shell
+
+    # Never open a window, open a tab
+    define-command wezterm-terminal-window -override -params 1.. %{
+        wezterm-terminal-tab %arg{@}
+    }
 }
 
 hook global ModuleLoaded zellij %{
