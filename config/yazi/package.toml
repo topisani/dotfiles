@@ -1,0 +1,5 @@
+[plugin]
+deps = [{ use = "Reledia/miller", rev = "40e0265" }, { use = "Reledia/glow", rev = "388e847" }, { use = "yazi-rs/plugins:git", rev = "fb3ae90" }]
+
+[flavor]
+deps = []
