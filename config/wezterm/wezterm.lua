@@ -17,7 +17,6 @@ config.hide_tab_bar_if_only_one_tab = true
 config.enable_csi_u_key_encoding = true
 config.enable_kitty_keyboard = true
 -- config.term = "wezterm"
-config.default_prog = {"fish"}
 
 config.front_end = 'OpenGL'
 -- config.webgpu_power_preference = 'HighPerformance'

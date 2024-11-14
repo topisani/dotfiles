@@ -37,8 +37,8 @@ stty -ixon -ixoff
 # xhost +local:root > /dev/null 2>&1
 
 # Configuration
-source ~/.config/bash/aliases.sh
-source ~/.config/bash/git.sh
+# source ~/.config/bash/aliases.sh
+# source ~/.config/bash/git.sh
 
 # Node Version Manager
 test -r /usr/share/nvm/init-nvm.sh && source /usr/share/nvm/init-nvm.sh

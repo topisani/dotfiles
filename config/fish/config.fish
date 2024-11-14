@@ -10,7 +10,7 @@ if status is-interactive
 end
 
 function k
-    test -n $KAKOUNE_SESSION && krc attach $argv || command kak $argv
+    set -q $KAKOUNE_SESSION && krc attach $argv || command kak $argv
 end
 
 function y
