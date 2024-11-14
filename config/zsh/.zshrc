@@ -53,7 +53,8 @@ alias ssh="TERM=xterm-256color ssh"
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 iscmd kubectl && source <(kubectl completion zsh)
-iscmd himalaya && eval "$(himalaya completion zsh)"
+iscmd himalaya && source <(himalaya completion zsh)
+iscmd jj && source <(jj util completion zsh)
 
 [[ -e /opt/google-cloud-sdk/path.zsh.inc ]] && source /opt/google-cloud-sdk/path.zsh.inc
 [[ -e /opt/google-cloud-sdk/completion.zsh.inc ]] && source /opt/google-cloud-sdk/completion.zsh.inc

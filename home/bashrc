@@ -53,8 +53,15 @@ fi
 # Only continue for interactive shells
 [[ $- != *i* ]] && return
 
+if [[ $(ps --no-header --pid=$PPID --format=comm) != "fish" && -z ${BASH_EXECUTION_STRING} && ${SHLVL} ]]
+then
+	shopt -q login_shell && LOGIN_OPTION='--login' || LOGIN_OPTION=''
+	exec fish $LOGIN_OPTION
+	exit $?
+fi
+
 # Starship prompt
-eval "$(starship init bash)"
+# eval "$(starship init bash)"
 
 # https://github.com/ajeetdsouza/zoxide
 eval "$(zoxide init bash)"
@@ -67,4 +74,4 @@ then
 fi
 
 
-source /home/topisani/.config/broot/launcher/bash/br
+# source /home/topisani/.config/broot/launcher/bash/br

@@ -19,10 +19,10 @@ setup::project() {
 
 mkdir -p ~/git/tools/
 
-setup::install git zsh jq tmux zoxide 
+setup::install git zsh jq tmux zoxide exa forgit
 setup::install diff-so-fancy bat ripgrep fd git-revise qalc bc
+setup::install editorconfig-core-c tig fzf
 
-setup::install editorconfig-core-c tig ranger fzf
 setup::install rustup && (
     rustup default || rustup default stable
     rustup component add rust-src
@@ -62,12 +62,22 @@ setup::project git@github.com:bnjmnt4n/jj && (
     cargo install --path cli --locked --bin jj
 )
 
+setup::project https://github.com/e82eric/wezterm && (
+    git checkout float-pane
+    cargo install --locked --path wezterm
+    cargo install --locked --path wezterm-gui
+)
+
+setup::install yazi && (
+    ya pack -i
+)
+
 # GUI
 setup::install alacritty ttf-jetbrains-mono-nerd
 setup::install hyprland hyprpaper hyprlock xdg-desktop-portal-hyprland hyprcursor hypridle wl-clipboard
 setup::install waybar wofi dunst udiskie
 setup::install breeze breeze5 papirus-icon-theme
-setup::install zathura zathura-pdf-poppler imv nemo
+setup::install zathura-git zathura-pdf-poppler imv nemo
 
 gsettings set org.cinnamon.desktop.default-applications.terminal exec "$(which tmux-term)"
 gsettings set org.cinnamon.desktop.default-applications.terminal exec-arg ""
