@@ -214,6 +214,16 @@ config.keys = {
     { key = 'RightArrow', mods = 'LEADER|CTRL', action = act.AdjustPaneSize{ 'Right', 5 } },
     { key = 'UpArrow', mods = 'LEADER|CTRL', action = act.AdjustPaneSize{ 'Up', 5 } },
     { key = 'DownArrow', mods = 'LEADER|CTRL', action = act.AdjustPaneSize{ 'Down', 5 } },
+
+    { key = 'h', mods = 'LEADER', action = act.ActivatePaneDirection 'Left' },
+    { key = 'l', mods = 'LEADER', action = act.ActivatePaneDirection 'Right' },
+    { key = 'k', mods = 'LEADER', action = act.ActivatePaneDirection 'Up' },
+    { key = 'j', mods = 'LEADER', action = act.ActivatePaneDirection 'Down' },
+    { key = 'h', mods = 'LEADER|CTRL', action = act.AdjustPaneSize{ 'Left', 5 } },
+    { key = 'l', mods = 'LEADER|CTRL', action = act.AdjustPaneSize{ 'Right', 5 } },
+    { key = 'k', mods = 'LEADER|CTRL', action = act.AdjustPaneSize{ 'Up', 5 } },
+    { key = 'j', mods = 'LEADER|CTRL', action = act.AdjustPaneSize{ 'Down', 5 } },
+
     { key = 'Insert', mods = 'SHIFT', action = act.PasteFrom 'PrimarySelection' },
     { key = 'Insert', mods = 'CTRL', action = act.CopyTo 'PrimarySelection' },
     { key = 'Copy', mods = 'NONE', action = act.CopyTo 'Clipboard' },
