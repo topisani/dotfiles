@@ -72,6 +72,12 @@ setup::install yazi && (
     ya pack -i
 )
 
+setup::install fish && (
+    fish <<EOF
+    curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
+EOF
+)
+
 # GUI
 setup::install alacritty ttf-jetbrains-mono-nerd
 setup::install hyprland hyprpaper hyprlock xdg-desktop-portal-hyprland hyprcursor hypridle wl-clipboard

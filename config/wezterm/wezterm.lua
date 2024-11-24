@@ -199,12 +199,12 @@ config.keys = {
     { key = 'q', mods = 'LEADER', action = act.CloseCurrentTab{ confirm = true } },
 
     { key = 'f', mods = 'LEADER', action = act.QuickSelect },
-    { key = 'PageUp', mods = 'LEADER', action = act.ScrollByPage(-1) },
-    { key = 'PageUp', mods = 'LEADER|CTRL', action = act.ActivateTabRelative(-1) },
-    { key = 'PageUp', mods = 'LEADER|CTRL', action = act.MoveTabRelative(-1) },
-    { key = 'PageDown', mods = 'LEADER', action = act.ScrollByPage(1) },
-    { key = 'PageDown', mods = 'LEADER|CTRL', action = act.ActivateTabRelative(1) },
-    { key = 'PageDown', mods = 'LEADER|CTRL', action = act.MoveTabRelative(1) },
+    -- { key = 'PageUp', mods = 'LEADER', action = act.ScrollByPage(-1) },
+    { key = 'PageUp', mods = 'LEADER', action = act.ActivateTabRelative(-1) },
+    { key = 'PageUp', mods = 'LEADER|SHIFT', action = act.MoveTabRelative(-1) },
+    -- { key = 'PageDown', mods = 'LEADER', action = act.ScrollByPage(1) },
+    { key = 'PageDown', mods = 'LEADER', action = act.ActivateTabRelative(1) },
+    { key = 'PageDown', mods = 'LEADER|SHIFT', action = act.MoveTabRelative(1) },
 
     { key = 'LeftArrow', mods = 'LEADER', action = act.ActivatePaneDirection 'Left' },
     { key = 'RightArrow', mods = 'LEADER', action = act.ActivatePaneDirection 'Right' },
