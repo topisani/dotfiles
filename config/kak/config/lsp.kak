@@ -113,9 +113,9 @@ def -hidden -override lsp-show-error -params 1 -docstring "Render error" %{
 # }
 
 def lsp-enable-semantic-tokens %{
-  hook window -group semantic-tokens BufReload .* lsp-semantic-tokens
-  hook window -group semantic-tokens NormalIdle .* lsp-semantic-tokens
-  hook window -group semantic-tokens InsertIdle .* lsp-semantic-tokens
+  hook window -group lsp-semantic-tokens BufReload .* lsp-semantic-tokens
+  hook window -group lsp-semantic-tokens NormalIdle .* lsp-semantic-tokens
+  hook window -group lsp-semantic-tokens InsertIdle .* lsp-semantic-tokens
 
   hook -once -always window WinSetOption filetype=.* %{
     remove-hooks window semantic-tokens

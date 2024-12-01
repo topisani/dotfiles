@@ -310,7 +310,6 @@ filetype-assign .*Makefile\..* makefile
 filetype-assign .*\.yuck lisp
 filetype-assign .*\.ocd sh
 filetype-assign .*\.conf conf
-filetype-assign .*\.surql sql
 filetype-assign .*\.(dtsi?|overlay) devicetree
 filetype-assign "xkb/symbols/[\w/]$" xkb_symbols
 filetype-assign .*\.kdl kdl
@@ -321,6 +320,7 @@ filetype-assign .*\.defconfig kconfig
 filetype-assign .*\.typst typst
 filetype-assign .*\.env sh
 filetype-assign .*\.jjdescription jj-describe
+filetype-assign .*\.surql surrealdb
 
 filetype-hook jj-describe %{
   # set window comment_line 'JJ:'
@@ -363,6 +363,12 @@ filetype-hook templ %{
   require-module go
   addhl window/ ref go
   set window comment_line '//'
+}
+
+filetype-hook surrealdb %{
+  require-module sql
+  addhl window/ ref sql
+  set window comment_line '--'
 }
 
 # Global highlighter ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈

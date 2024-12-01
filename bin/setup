@@ -66,6 +66,7 @@ setup::project https://github.com/e82eric/wezterm && (
     git checkout float-pane
     cargo install --locked --path wezterm
     cargo install --locked --path wezterm-gui
+    cargo install --locked --path wezterm-mux-server
 )
 
 setup::install yazi && (

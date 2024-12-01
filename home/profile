@@ -18,13 +18,13 @@ command -v yarn > /dev/null && PATH="$(yarn --offline global bin):$PATH"
 PATH="$PATH:/usr/lib/dart/bin"
 PATH="$PATH:$HOME/dev/flutter/.pub-cache/bin"
 PATH="$HOME/.ghcup/bin:$PATH"
+export PATH="$HOME/.bin:$HOME/.local/bin:/usr/local/bin:$PATH"
 
 [ -e "~/.rye/env" ] && source "~/.rye/env"
 
 # opam configuration
 test -r /home/topisani/.opam/opam-init/init.sh && . /home/topisani/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
 
-export PATH="$HOME/.bin:$HOME/.local/bin:/usr/local/bin:$PATH"
 
 # Kill the GNU
 # export CC=/usr/bin/clang

@@ -13,6 +13,24 @@ function k
     set -q $KAKOUNE_SESSION && krc attach $argv || command kak $argv
 end
 
+function grel
+    set ver (string trim -l -c v $argv[1])
+    if [ -z "$ver" ]
+      echo "Usage: $argv[0] <version> [git tag options...]"
+      return 1
+    end
+    git tag -a v$ver -m "Release $ver" $argv[2..] && echo "Created tag v$ver"
+end
+
+# whichpkg() (
+#     set -e
+#     file=$(which $1)
+#     la "$file"
+#     pacman -Qo "$file"
+# )
+
+alias mods 'OPENAI_API_KEY=(pass openai-api-key) mods'
+
 function y
     set tmp (mktemp -t "yazi-cwd.XXXXXX")
     yazi $argv --cwd-file="$tmp"

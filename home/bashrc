@@ -30,9 +30,6 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 shopt -s extglob
 shopt -s expand_aliases
 
-# Disable special handing of <c-s> and <c-q>
-stty -ixon -ixoff
-
 # xhost to allow remote X connections
 # xhost +local:root > /dev/null 2>&1
 
@@ -52,6 +49,9 @@ fi
 
 # Only continue for interactive shells
 [[ $- != *i* ]] && return
+
+# Disable special handing of <c-s> and <c-q>
+stty -ixon -ixoff
 
 if [[ $(ps --no-header --pid=$PPID --format=comm) != "fish" && -z ${BASH_EXECUTION_STRING} && ${SHLVL} ]]
 then

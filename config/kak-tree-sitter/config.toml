@@ -198,3 +198,19 @@ source = { git = { url = "https://github.com/helix-editor/helix", pin = "b90ec5c
 path = "runtime/queries/kdl"
 
 
+
+[language.surrealdb.grammar]
+source = { git = { url = "https://github.com/DariusCorvus/tree-sitter-surrealdb", pin = "17a7ed4481bdaaa35a1372f3a94bc851d634a19e" }}
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "-o", "surrealdb.so"]
+link_flags = ["-O3"]
+
+[language.surrealdb.queries]
+source = { git = { url = "https://github.com/DariusCorvus/tree-sitter-surrealdb", pin = "17a7ed4481bdaaa35a1372f3a94bc851d634a19e" }}
+path = "queries"
+
+
