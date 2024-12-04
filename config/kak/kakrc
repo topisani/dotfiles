@@ -146,9 +146,9 @@ bundle kakoune-phantom-selection https://github.com/occivink/kakoune-phantom-sel
 bundle reasymotion https://github.com/astaugaard/reasymotion %{
   evaluate-commands %sh{ rkak_easymotion start }
   set global reasymotion_keys "thnesirayfoluckpdg,m.w/xjbvq"
-  map global normal <a-t> ':reasymotion-on-letter-to-letter<ret>'
-  map global normal T ':reasymotion-selection<ret>'
+  map global normal <a-t> ':reasymotion-selection<ret>'
   map global normal t ':reasymotion-word<ret>'
+  map global normal T ':reasymotion-selection<ret>'
 }
 
 bundle-install-hook reasymotion %{

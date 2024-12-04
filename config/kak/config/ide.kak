@@ -60,7 +60,16 @@ define-command ide-setup -override %{
   }
 
   hook -group ide global FocusIn client.* %{
-    set global jumpclient %val{hook_param}
+    try %{
+      eval %sh{
+        case "$kak_buffile" in
+          \**\*) echo fail ;;
+          *) ;;
+        esac
+        [ "$kak_hook_param" == "$kak_opt_docsclient" ] && echo fail
+      }
+      set global jumpclient %val{hook_param}
+    }
   }
 
   hook -group ide global ClientClose tools %{

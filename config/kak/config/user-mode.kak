@@ -180,6 +180,7 @@ map global user g ':enter-user-mode git<ret>'     -docstring "Git..."
 map global user v ':enter-user-mode ui<ret>'      -docstring 'View...'
 map global user f ':enter-user-mode files<ret>'   -docstring 'Files...'
 map global user b ':enter-user-mode buffers<ret>' -docstring 'Buffers...'
+map global user j ':enter-user-mode jj<ret>'     -docstring "jj..."
 
 map global user q ':i-delete-buffer<ret>'        -docstring "Close buffer"
 

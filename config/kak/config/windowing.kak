@@ -12,7 +12,8 @@ hook global ModuleLoaded wezterm %{
 
     define-command wezterm-terminal-auto -override -params 1.. %{
         set local windowing_placement %sh{
-            if [ $((kak_window_height * 2 > kak_window_width)) = 0 ]; then
+            # Cell size is typically around 1:2.5
+            if [ $((kak_window_height * 5 > kak_window_width * 2)) = 0 ]; then
                 echo "horizontal"
             else
                 echo "vertical"

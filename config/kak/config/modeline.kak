@@ -37,6 +37,8 @@ define-command -hidden -override update-bufname-abbrev %{
 
 hook global -group bufname-abbrev WinDisplay .* update-bufname-abbrev
 hook global -group bufname-abbrev WinResize .* update-bufname-abbrev
+hook global -group bufname-abbrev EnterDirectory .* update-bufname-abbrev
+hook global -group bufname-abbrev EnterDirectory .* update-bufname-abbrev
 
 declare-option str myml_git
 
@@ -82,8 +84,9 @@ set-option global modelinefmt %sh{
 %sh{[ -n "$kak_count" ] && [ $kak_count != 0 ] && echo "count=$kak_count "}
 {cyan+i}%opt{bufname_abbrev}{annotation}:{bright-blue+d}%val{cursor_line}{annotation}:{bright-blue+d}%val{cursor_char_column}{annotation}+{bright-blue+d}%val{selection_length}
 {{context_info}} 
+{+da@comment}%opt{filetype} 
 {yellow}%opt{myml_git}
-{magenta}%val{client}{magenta+d}%opt{modeline_client_flags}@{magenta}%val{session} 
+{magenta}%val{client}{magenta+d} {magenta}%val{session}{magenta+d}%opt{modeline_client_flags} 
 {cyan}U+%sh{printf '%04X' "$kak_cursor_char_value"}{default} 
 {+r@StatusLineMode} %opt{myml_mode_str} 
 EOF

@@ -91,3 +91,30 @@ filetype-hook jj-describe %{
 
   add-highlighter window/jj-describe/comment region "^JJ: " "$" fill comment
 }
+
+declare-user-mode jj
+
+map global jj j %{:jj } -docstring 'jj...'
+map global jj a %{:jj abandon<ret>} -docstring 'jj abandon'
+map global jj l %{:jj log<ret>} -docstring 'jj log'
+map global jj s %{:jj show --git<ret>} -docstring 'jj show'
+map global jj e %{:jj edit<ret>} -docstring 'jj edit'
+map global jj m %{:jj describe<ret>} -docstring 'jj describe'
+
+complete-command jj shell-script-candidates -menu %{
+    printf %s\\n \
+        abandon \
+        backout \
+        describe \
+        diff \
+        edit \
+        log \
+        new \
+        parallelize \
+        rebase \
+        show \
+        squash \
+        split \
+        status \
+        undo \
+}

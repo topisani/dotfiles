@@ -29,7 +29,7 @@ end
 #     pacman -Qo "$file"
 # )
 
-alias mods 'OPENAI_API_KEY=(pass openai-api-key) mods'
+alias mods 'OPENAI_API_KEY=(pass openai-api-key) command mods'
 
 function y
     set tmp (mktemp -t "yazi-cwd.XXXXXX")

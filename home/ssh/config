@@ -29,3 +29,8 @@ Host gitlab-as-move
 Host git.topisani.com
   IdentityFile ~/.ssh/id_rsa
   ProxyCommand cloudflared access ssh --hostname %h
+
+Host pisani-move.move
+  HostName 10.0.5.52
+  IdentitiesOnly true
+  IdentityFile ~/.ssh/id_rsa
