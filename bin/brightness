@@ -30,12 +30,26 @@ send_notification() {
     dunstify -u 0 -i $(icon $val) "Brightness: $val%" -r $dunst_id -h int:value:"$val"
 }
 
-brightness() {
-    if [[ $1 == "down" ]]; then
-        xbacklight -dec ${2-5}
-    elif [[ $1 == "up" ]]; then
-        xbacklight -inc ${2-5}
+brightness_set() {
+    percent=$1
+    brightnessctl set $percent%
+
+    # Set external monitor brightness through ddcutil
+
+    if [[ ! -e /tmp/monitor-i2c-buses ]]; then
+            # detects and stores i2c bus numbers for all monitors in /tmp
+            ddcutil detect -t | grep '^Display .*' -A2 | grep -o "i2c.*" | cut -f2- -d- > /tmp/monitor-i2c-buses
     fi
+
+    # VCP code for monitor brightness, usually 10. 
+    VCP=10
+
+    while read BUS; do
+            # --bus to send over I2C, which has the least overhead.
+            # --noverify to skip waiting for acknowledgement packet.
+            ddcutil --bus $BUS setvcp $VCP $percent --noverify &
+    done < /tmp/monitor-i2c-buses
+    wait
 }
 
 notify=0
@@ -53,6 +67,10 @@ while (( $# )); do
             ;;
         down)
             brightnessctl set 5%-
+            ;;
+        set)
+            shift
+            brightness_set $1
             ;;
         --notify|-n)
             notify=1

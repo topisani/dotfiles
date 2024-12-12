@@ -281,3 +281,12 @@ hook -group lsp-filetype-rust global BufSetOption filetype=rust %{
       # diagnostics.disabled = ["type-mismatch"]
     }
 }
+
+rmhooks global lsp-filetype-devicetree
+hook -group lsp-filetype-devicetree global BufSetOption filetype=devicetree %{
+  set-option buffer lsp_servers %exp{
+      [ginko]
+      root_globs = [".git"]
+      command = "ginko_ls"
+  }
+}

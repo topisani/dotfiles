@@ -206,6 +206,11 @@ updateKak() {
     done
 }
 
+update_wezterm() {
+    echo "colorscheme $COLORSCHEME_NAME" | kak -p $session
+    sed -i "s/^config.color_scheme\s*=\s'[^']*'/config.color_scheme = '$COLORSCHEME_NAME'/" ~/.config/wezterm/wezterm.lua
+}
+
 update_gtk() {
     gsettings set org.gnome.desktop.interface gtk-theme $(xrdb -query | grep -Po "gtk-theme:\h*\K.*")
     gsettings set org.gnome.desktop.interface icon-theme $(xrdb -query | grep -Po "icon-theme:\h*\K.*")
@@ -278,6 +283,7 @@ switch() {
         # updateTermite
         update_kitty
         update_alacritty
+        update_wezterm
         # update_gtk
         # killall -sUSR1 polybar
     else

@@ -181,33 +181,15 @@ config.key_tables = {
 
 }
 
-config.color_scheme = 'flatblue-dark'
+config.color_scheme = 'flatblue-light'
 config.color_schemes = {
     ['flatblue-dark'] = {
-        -- The default text color
-        foreground = 'silver',
-        -- The default background color
-        background = 'black',
-
-        -- Overrides the cell background color when the current cell is occupied by the
-        -- cursor and the cursor style is set to Block
         cursor_bg = '#52ad70',
-        -- Overrides the text color when the current cell is occupied by the cursor
         cursor_fg = 'black',
-        -- Specifies the border color of the cursor when the cursor style is set to Block,
-        -- or the color of the vertical or horizontal bar when the cursor style is set to
-        -- Bar or Underline.
         cursor_border = '#52ad70',
-
-        -- the foreground color of selected text
         selection_fg = 'black',
-        -- the background color of selected text
         selection_bg = '#fffacd',
-
-        -- The color of the scrollbar "thumb"; the portion that represents the current viewport
         scrollbar_thumb = '#222222',
-
-        -- The color of the split lines between panes
         split = '#444444',
 
         background = '#010309',
@@ -276,14 +258,96 @@ config.color_schemes = {
         quick_select_label_fg = { Color = '#ffffff' },
         quick_select_match_bg = { AnsiColor = 'Navy' },
         quick_select_match_fg = { Color = '#ffffff' }, 
+    },
+    ['flatblue-light'] = {
+        cursor_bg = '#52ad70',
+        cursor_fg = 'black',
+        cursor_border = '#52ad70',
+        selection_fg = 'black',
+        selection_bg = '#fffacd',
+        scrollbar_thumb = '#222222',
+        split = '#444444',
+
+        background = '#ffffff',
+        foreground = '#18191c',
+
+        ansi = {
+            '#ffffff',
+            '#f24130',
+            '#71ba51',
+            '#ffe000',
+            '#07b0ff',
+            '#ff465a',
+            '#67c5b4',
+            '#1E1F21',
+        },
+
+        brights = {
+            '#b8b9b4',
+            '#d92817',
+            '#3e871e',
+            '#f2bb13',
+            '#178ca6',
+            '#dd465a',
+            '#249991',
+            '#323037',
+        },
+
+        indexed = {
+            [232] = '#F4F4F4',
+            [233] = '#E9E9E9',
+            [234] = '#DFDFDF',
+            [235] = '#D5D5D5',
+            [236] = '#CACACA',
+            [237] = '#C0C0C0',
+            [238] = '#B6B6B6',
+            [239] = '#ACACAC',
+            [240] = '#A1A1A1',
+            [241] = '#979797',
+            [242] = '#8D8D8D',
+            [243] = '#838383',
+            [244] = '#787878',
+            [245] = '#6E6E6E',
+            [246] = '#646464',
+            [247] = '#5A5A5A',
+            [248] = '#4F4F4F',
+            [249] = '#454545',
+            [250] = '#3B3B3B',
+            [251] = '#313131',
+            [252] = '#262626',
+            [253] = '#1C1C1C',
+            [254] = '#121212',
+            [255] = '#080808',
+        },
+
+        compose_cursor = 'orange',
+        copy_mode_active_highlight_bg = { Color = '#000000' },
+        -- use `AnsiColor` to specify one of the ansi color palette values
+        -- (index 0-15) using one of the names "Black", "Maroon", "Green",
+        --  "Olive", "Navy", "Purple", "Teal", "Silver", "Grey", "Red", "Lime",
+        -- "Yellow", "Blue", "Fuchsia", "Aqua" or "White".
+        copy_mode_active_highlight_fg = { AnsiColor = 'Black' },
+        copy_mode_inactive_highlight_bg = { Color = '#52ad70' },
+        copy_mode_inactive_highlight_fg = { AnsiColor = 'White' },
+
+        quick_select_label_bg = { Color = 'peru' },
+        quick_select_label_fg = { Color = '#ffffff' },
+        quick_select_match_bg = { AnsiColor = 'Navy' },
+        quick_select_match_fg = { Color = '#ffffff' }, 
     }
 }
 
-
-config.inactive_pane_hsb = {
-  saturation = 0.9,
-  brightness = 0.8,
-}
+if config.color_scheme == 'flatblue-dark' then
+    config.inactive_pane_hsb = {
+      saturation = 0.9,
+      brightness = 0.8,
+    }
+else
+    config.inactive_pane_hsb = {
+      saturation = 1.0,
+      brightness = 0.95,
+    }
+end
 
 -- and finally, return the configuration to wezterm
 return config

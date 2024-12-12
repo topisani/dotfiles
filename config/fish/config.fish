@@ -22,6 +22,19 @@ function grel
     git tag -a v$ver -m "Release $ver" $argv[2..] && echo "Created tag v$ver"
 end
 
+function gitignore
+    argparse -x f,l h/help f/file= l/local -- $argv
+    or return
+
+    if set -q _flag_help
+        echo "Usage..."
+        return 1
+    end
+
+    # set -l ignorefile ()
+    # if set -q 
+end
+
 # whichpkg() (
 #     set -e
 #     file=$(which $1)
