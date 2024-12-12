@@ -17,14 +17,14 @@ threshold = 100
 [git_status]
 disabled = true
 
-[custom.kakoune]
-symbol = ''
-command = 'kcr prompt'
-when = 'kcr prompt'
-shell = ['sh']
-description = 'The current Kakoune session and client'
-style = 'green'
-format = '[$symbol$output]($style) '
+# [custom.kakoune]
+# symbol = ''
+# command = 'kcr prompt'
+# when = 'kcr prompt'
+# shell = ['sh']
+# description = 'The current Kakoune session and client'
+# style = 'green'
+# format = '[$symbol$output]($style) '
 
 [time]
 disabled = false
@@ -32,6 +32,6 @@ disabled = false
 [status]
 disabled = true
 
-[python]
-format='via [${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
-symbol=" "
+# [python]
+# format='via [${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
+# symbol=" "

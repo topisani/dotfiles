@@ -118,3 +118,16 @@ complete-command jj shell-script-candidates -menu %{
         status \
         undo \
 }
+
+define-command git-commit-insert-signed-off %{
+  evaluate-commands -draft -save-regs a %{
+    set-register a %sh{
+      printf 'Signed-off-by: %s <%s>\n' "$(git config user.name)" "$(git config user.email)"
+    }
+    execute-keys 'o<c-r>a<esc>'
+  }
+}
+
+filetype-hook jj-describe|git-commit %{
+  map buffer filetype s ':git-commit-insert-signed-off<ret>' -docstring 'Insert Signed-off-by'
+}
