@@ -7,7 +7,7 @@ show_help() {
 }
 
 query() {
-    res=$(brightnessctl info | grep -oP "\(\K\d+%\)")
+    res=$(brightnessctl --class backlight info | grep -oP "\(\K\d+%\)")
     echo ${res//%)/}
 }
 
@@ -32,7 +32,7 @@ send_notification() {
 
 brightness_set() {
     percent=$1
-    brightnessctl set $percent%
+    brightnessctl --class backlight set $percent%
 
     # Set external monitor brightness through ddcutil
 
@@ -63,10 +63,10 @@ while (( $# )); do
             query
             ;;
         up)
-            brightnessctl set +5%
+            brightnessctl --class backlight set +5%
             ;;
         down)
-            brightnessctl set 5%-
+            brightnessctl --class backlight set 5%-
             ;;
         set)
             shift

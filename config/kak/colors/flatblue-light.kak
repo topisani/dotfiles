@@ -1,7 +1,8 @@
 # flatblue-light theme
 
 evaluate-commands %sh{
-    bg_unfocused="rgb:fbf8f8"
+    # bg_unfocused="rgb:fbf8f8"
+    bg_unfocused="rgb:ffffff"
     bg0="rgb:fdf4df"
     bg="rgb:ffffff"
     bg1="rgb:f4f4fd"
