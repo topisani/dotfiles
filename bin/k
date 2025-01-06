@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ -n "$KAKOUNE_SESSION" ]; then
+    exec krc attach "$@"
+else
+    exec kak "$@"
+fi

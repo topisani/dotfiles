@@ -1,5 +1,5 @@
 [Added Associations]
-image/gif=firefox.desktop;sxiv.desktop;gimp.desktop;
+image/gif=sxiv.desktop;gimp.desktop;
 application/pdf=org.pwmt.zathura.desktop;
 x-scheme-handler/mailto=userapp-Thunderbird-0XNXN1.desktop;
 x-scheme-handler/mid=userapp-Thunderbird-0XNXN1.desktop;
@@ -7,11 +7,11 @@ x-scheme-handler/mid=userapp-Thunderbird-0XNXN1.desktop;
 [Default Applications]
 application/pdf=org.pwmt.zathura.desktop;
 message/rfc822=userapp-Thunderbird-0XNXN1.desktop
-text/html=vivaldi-stable.desktop
-x-scheme-handler/about=vivaldi-stable.desktop
-x-scheme-handler/http=vivaldi-stable.desktop
-x-scheme-handler/https=vivaldi-stable.desktop
-x-scheme-handler/mailto=vivaldi-stable.desktop
+text/html=min.desktop
+x-scheme-handler/about=min.desktop
+x-scheme-handler/http=min.desktop
+x-scheme-handler/https=min.desktop
+x-scheme-handler/mailto=min.desktop
 x-scheme-handler/mid=userapp-Thunderbird-0XNXN1.desktop
-x-scheme-handler/unknown=vivaldi-stable.desktop
+x-scheme-handler/unknown=min.desktop
 TerminalEmulator=alacritty.desktop

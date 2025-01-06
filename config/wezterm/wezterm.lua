@@ -16,6 +16,8 @@ config.use_fancy_tab_bar = false
 config.hide_tab_bar_if_only_one_tab = true
 config.enable_csi_u_key_encoding = true
 config.enable_kitty_keyboard = true
+config.underline_thickness = "250%"
+config.underline_position = -3
 -- config.term = "wezterm"
 
 config.front_end = 'OpenGL'
@@ -181,7 +183,7 @@ config.key_tables = {
 
 }
 
-config.color_scheme = 'flatblue-light'
+config.color_scheme = 'flatblue-dark'
 config.color_schemes = {
     ['flatblue-dark'] = {
         cursor_bg = '#52ad70',

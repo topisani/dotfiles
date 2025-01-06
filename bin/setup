@@ -1,7 +1,7 @@
 #!/bin/bash
 
 setup::install() {
-    yay -S --needed "$@"
+    yay -S --needed --noconfirm "$@"
 }
 
 setup::project() {
@@ -50,7 +50,7 @@ setup::project https://github.com/topisani/kak-tree-sitter && (
     git reset --hard upstream/master
     cargo install --locked --path kak-tree-sitter
     cargo install --locked --path ktsctl
-    ktsctl sync -a
+    ktsctl sync -a 
 )
 
 setup::project https://github.com/topisani/sidetree && (

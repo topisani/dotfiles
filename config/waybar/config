@@ -3,8 +3,8 @@
     "position": "top", // Waybar position (top|bottom|left|right)
     "height": 21, // Waybar height (to be removed for auto height)
     // Choose the order of the modules
-    "modules-left": ["hyprland/workspaces", "hyprland/submap"],
-    "modules-center": ["custom/window"],
+    "modules-left": ["hyprland/workspaces", "hyprland/submap", "niri/workspaces"],
+    "modules-center": ["custom/window", "niri/window"],
     "modules-right": ["custom/agenda", "hyprland/language", "idle_inhibitor", "pulseaudio", "battery", "clock", "tray"],
     // Modules configuration
     "hyprland/workspaces": {

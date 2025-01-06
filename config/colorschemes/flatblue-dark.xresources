@@ -70,5 +70,5 @@ rofi.color-active: #23252F, #FCFEFB, #23252F, #23252F, #178CA6
 rofi.color-window: #23252F, #178CA6
 
 ! GNOME theme
-gtk-theme: Matcha-dark-azul
+gtk-theme: Fluent-Dark-compact
 icon-theme: Papirus-Dark

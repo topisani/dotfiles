@@ -25,9 +25,12 @@ icon() {
     #echo /usr/share/icons/Yaru/scalable/status/display-brightness-symbolic.svg
 }
 
+NOTIFY_ID_PATH=/tmp/.brightness.notify-id
+
 send_notification() {
     val=$(query)
-    dunstify -u 0 -i $(icon $val) "Brightness: $val%" -r $dunst_id -h int:value:"$val"
+    id=$(cat $NOTIFY_ID_PATH)
+    dunstify -i $(icon $val) "Brightness: $val%" -r ${id:-0} -h int:value:"$val" -p > $NOTIFY_ID_PATH
 }
 
 brightness_set() {

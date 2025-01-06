@@ -1,7 +1,5 @@
 #!/bin/bash
 
-dunst_id=321478
-
 show_help() {
     echo "Usage: $0 volume [up|down|query] | mute [query|toggle]  -n|--notify"
 }
@@ -27,12 +25,22 @@ vol_icon() {
     echo /usr/share/icons/Papirus-Dark/symbolic/status/audio-volume-$icon-symbolic.svg
 }
 
+
+NOTIFY_ID_PATH=/tmp/.volume.notify-id
+
 send_notification() {
+    val=$(query)
+    dunstify -i $(icon $val) "Brightness: $val%" -r ${id:-0} -h int:value:"$val" -p > $NOTIFY_ID_PATH
+}
+
+send_notification() {
+    id=$(cat $NOTIFY_ID_PATH)
+    id=${id:-0}
     if [[ $(query_mute) == "true" ]]; then
-        dunstify -u 0 -i $(vol_icon muted) Muted -r $dunst_id
+        dunstify -u 0 -i $(vol_icon muted) Muted -r $id -p > $NOTIFY_ID_PATH
     else
         vol=$(query_volume)
-        dunstify -u 0 -i $(vol_icon $vol) -r $dunst_id "Volume: $vol%" -h int:value:"$vol"
+        dunstify -u 0 -i $(vol_icon $vol) -r $id "Volume: $vol%" -h int:value:"$vol" -p > $NOTIFY_ID_PATH
     fi
 }
 

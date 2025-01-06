@@ -6,7 +6,7 @@ if status is-interactive
     zoxide init fish | source
 
 
-    jj util completion fish | source
+    COMPLETE=fish jj | source
 end
 
 function k

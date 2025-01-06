@@ -23,6 +23,7 @@ not_id=158283
 # POWER_SUPPLY_MODEL_NAME=BASE-BAT
 # POWER_SUPPLY_MANUFACTURER=Simplo
 # POWER_SUPPLY_SERIAL_NUMBER=123456789
+#
 
 get_bat() {
     POWER_SUPPLY_CAPACITY=$(cat /sys/class/power_supply/BAT*/uevent | grep -P "POWER_SUPPLY_CAPACITY=" | cut -d= -f2)
@@ -33,10 +34,11 @@ while true; do
     get_bat 2> /dev/null
     sl=60
     if [ "${POWER_SUPPLY_CAPACITY:-100}" -lt 16 ] && [ "$POWER_SUPPLY_STATUS" != "Charging" ]; then
-        dunstify -u 2 -i battery-empty-symbolic "Battery Low!" "$POWER_SUPPLY_CAPACITY%" -r $not_id
+        not_id=$(dunstify -u 2 -i battery-empty-symbolic "Battery Low!" "$POWER_SUPPLY_CAPACITY%" -r $not_id -p)
         sl=5
     else
         dunstify -C $not_id
+        not_id=0
     fi
     sleep $sl
 done

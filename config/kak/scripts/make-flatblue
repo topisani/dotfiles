@@ -64,10 +64,10 @@ face global comment                     $gray,             default       +i
 face global identifier                  $yellow_dark,      default
 face global annotation                  $gray,             default
 
-face global DiagnosticWarning           default, default,  $yellow       +ca
-face global DiagnosticError             default, default,  $red          +ca
-face global DiagnosticInfo              default, default,  $green        +ca
-face global DiagnosticHint              default, default,  $gray         +ca
+face global DiagnosticWarning           default, default,  bright-yellow       +ca
+face global DiagnosticError             default, default,  bright-red          +ca
+face global DiagnosticInfo              default, default,  bright-green        +ca
+face global DiagnosticHint              default, default,  bright-white         +ca
 face global LineFlagError               $red,              default       +b
 face global LineFlagWarning             $yellow,           default       +b
 face global LineFlagInfo                $green,            default       +b

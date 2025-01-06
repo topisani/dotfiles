@@ -54,7 +54,7 @@ orange=$(tput setaf 9)
 # export LESS_TERMCAP_ue=$default # End underline
 # export LESS_TERMCAP_us=$green # Begin underline
 
-export EDITOR='kak'
+export EDITOR='k'
 # Breaks forgit
 # export FZF_DEFAULT_OPTS='--preview-window=right,border-left,<30(up,30%,border-bottom)'
 
