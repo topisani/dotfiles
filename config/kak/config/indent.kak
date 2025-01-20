@@ -80,10 +80,10 @@ define-command -override detect-indent -docstring 'detect indent' %{
       set-indent window tabs %opt{tabstop}
     } catch %{
       # Search the first indent level
-      execute-keys 'gg/^([ ]{2,8})+<ret>'
+      # Assume even number of spaces, maximum 8
+      execute-keys 'gg/^((  ){1,4})[^ ]<ret>H'
       set-indent window %val{selection_length}
     } catch %{
-      
     }
     editorconfig-load
   }

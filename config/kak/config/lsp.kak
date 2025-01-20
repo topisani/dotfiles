@@ -60,27 +60,27 @@ map global goto r '<esc>:lsp-references<ret>' -docstring 'references'
 map global goto y '<esc>:lsp-type-definition<ret>' -docstring 'type definition'
 
 def lsp-setup %{
-  lsp-enable-window
+  lsp-enable
   # lsp-auto-hover-enable
-  lsp-inlay-diagnostics-enable window
-  lsp-inlay-code-lenses-enable window
+  lsp-inlay-diagnostics-enable global
+  lsp-inlay-code-lenses-enable global
 
-  hook -group lsp window InsertCompletionShow .* %{
+  hook -group lsp global InsertCompletionShow .* %{
     unmap window insert <c-n>
   }
-  hook -group lsp window InsertCompletionHide .* %{
+  hook -group lsp global InsertCompletionHide .* %{
     map window insert <c-n> '<a-;>: lsp-snippets-select-next-placeholders<ret>'
   }
 
-  map window insert <c-n> '<a-;>: lsp-snippets-select-next-placeholders<ret>'
+  map global insert <c-n> '<a-;>: lsp-snippets-select-next-placeholders<ret>'
   # map window normal <c-n> ': lsp-snippets-select-next-placeholders<ret>'
 
-  map window object a '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
-  map window object <a-a> '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
-  map window object e '<a-semicolon>lsp-object Function Method<ret>' -docstring 'LSP function or method'
-  map window object k '<a-semicolon>lsp-object Class Interface Struct<ret>' -docstring 'LSP class interface or struct'
-  map window object d '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>' -docstring 'LSP errors and warnings'
-  map window object D '<a-semicolon>lsp-diagnostic-object<ret>' -docstring 'LSP errors'
+  map global object a '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
+  map global object <a-a> '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
+  map global object e '<a-semicolon>lsp-object Function Method<ret>' -docstring 'LSP function or method'
+  map global object k '<a-semicolon>lsp-object Class Interface Struct<ret>' -docstring 'LSP class interface or struct'
+  map global object d '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>' -docstring 'LSP errors and warnings'
+  map global object D '<a-semicolon>lsp-diagnostic-object<ret>' -docstring 'LSP errors'
 }
 
 map global filetype s   ': enter-user-mode lsp<ret>' -docstring 'lsp...'
@@ -123,7 +123,6 @@ def lsp-enable-semantic-tokens %{
 }
 
 filetype-hook (css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml|zig|go|templ) %{
-  lsp-setup
   lsp-enable-semantic-tokens
 }
 
@@ -206,7 +205,7 @@ hook -group lsp-filetype-python global BufSetOption filetype=python %{
 
     [ruff]
     command = "sh"
-    args = ["-c", "cd '$root'; python-env-run ruff-lsp"]
+    args = ["-c", "cd '$root'; python-env-run ruff server"]
     settings_section = "_"
     root = '$root'
 
@@ -225,11 +224,6 @@ hook -group lsp-filetype-c-family global BufSetOption filetype=(?:c|cpp|objc) %{
         args = [ '-c', 'TMPDIR=~/.cache/clangd/ clangd --query-driver=/home/topisani/**,/usr/**,arm-none-eabi-gcc,arm-none-eabi-*,arm-none-eabi-g++,**']
         root = '%sh{eval "$kak_opt_lsp_find_root" compile_commands.json .clangd .git .hg $(: kak_buffile)}'
     }
-}
-
-hook global BufSetOption filetype=(css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml|zig) %{
-  lsp-setup
-  lsp-enable-semantic-tokens
 }
 
 remove-hooks global lsp-filetype-rust
@@ -282,11 +276,52 @@ hook -group lsp-filetype-rust global BufSetOption filetype=rust %{
     }
 }
 
-rmhooks global lsp-filetype-devicetree
-hook -group lsp-filetype-devicetree global BufSetOption filetype=devicetree %{
-  set-option buffer lsp_servers %exp{
-      [ginko]
-      root_globs = [".git"]
-      command = "ginko_ls"
-  }
+# rmhooks global lsp-filetype-devicetree
+# hook -group lsp-filetype-devicetree global BufSetOption filetype=devicetree %{
+#   set-option buffer lsp_servers %exp{
+#       [ginko]
+#       root_globs = [".git"]
+#       command = "ginko_ls"
+#   }
+# }
+
+
+rmhooks global lsp-project-zephyr
+hook -group lsp-project-zephyr global BufSetOption filetype=(kconfig|conf) %{
+   eval %sh{
+      root=$(eval "$kak_opt_lsp_find_root" .west-lsp $(: kak_buffile))
+      [ -e "$root/.west-lsp" ] || exit 0
+      cat <<EOF
+      set-option buffer lsp_servers %{
+         [west]
+         root = '$root'
+         command = "west-lsp"
+         args = ["kconfig-lsp"]
+      }
+EOF
+   }
 }
+
+hook -group lsp-project-zephyr global BufSetOption filetype=(devicetree) %{
+   eval %sh{
+      root=$(eval "$kak_opt_lsp_find_root" .west/config $(: kak_buffile))
+
+      settings=$(west-lsp dts-lsp-settings --root-dir "$root")
+
+      cat <<EOF
+      set-option buffer lsp_servers %{
+         [devicetree]
+         root = '$root'
+         # command = "npm"
+         # args = ["x", "--", "devicetree-language-server", "--stdio"]
+         command = "node"
+         args = ["/home/topisani/git/dts-lsp/server/dist/server.js", "--stdio"]
+         settings_section = "_"
+
+      $settings
+      }
+EOF
+   }
+}
+
+lsp-setup

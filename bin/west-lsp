@@ -1,0 +1,544 @@
+#!/usr/bin/env -S uv run -s
+#
+# /// script
+# requires-python = ">=3.13"
+# dependencies = [
+#     "lsprotocol==2024.0.0b1",
+#     "pygls==2.0.0a2",
+#     "typer",
+#     "pyyaml",
+#     "toml",
+# ]
+# ///
+
+
+import enum
+import itertools
+import json
+import logging
+import os
+import subprocess
+import sys
+from pathlib import Path
+from typing import Any
+
+import click
+import yaml
+import toml
+
+
+def mod_kconfig_lsp():
+    import re
+    import os.path
+    import importlib
+    from lsprotocol import types
+    from pygls.lsp.server import LanguageServer
+
+    class Filetype(enum.Enum):
+        UNKNOWN = enum.auto()
+        KCONFIG = enum.auto()
+        CONF = enum.auto()
+        DEVICETREE = enum.auto()
+
+        @staticmethod
+        def from_uri(uri: str) -> "Filetype":
+            path = Path.from_uri(uri)
+            if path.name.startswith("Kconfig"):
+                return Filetype.KCONFIG
+            if path.name.endswith("_defconfig"):
+                return Filetype.CONF
+            if path.name.endswith(".conf"):
+                return Filetype.CONF
+            if path.name.endswith(".dts"):
+                return Filetype.DEVICETREE
+            if path.name.endswith(".dtsi"):
+                return Filetype.DEVICETREE
+            if path.name.endswith(".overlay"):
+                return Filetype.DEVICETREE
+            return Filetype.UNKNOWN
+
+        def is_dts(self) -> bool:
+            return self == self.DEVICETREE
+
+        def is_kconfig(self) -> bool:
+            return self == self.KCONFIG or self == self.CONF
+
+    ###############################################################################
+    # Kconfig Language Server                                                     #
+    ###############################################################################
+
+    class KconfigIndex:
+        class Symbol: ...
+
+        def __init__(self):
+            self._init_import()
+            self.kconf = self.__kcl.Kconfig(
+                os.getenv("WEST_LSP_KCONFIG_ROOT"), suppress_traceback=True
+            )
+            self.kconf.load_config()
+
+        def _init_import(self):
+            try:
+                ZEPHYR_BASE = os.getenv("ZEPHYR_BASE")
+                if not ZEPHYR_BASE:
+                    logging.fatal("Missing ZEPHYR_BASE environment variable")
+                    exit(1)
+                sys.path.insert(0, os.path.join(ZEPHYR_BASE, "scripts", "kconfig"))
+                self.__kcl = importlib.import_module("kconfiglib")
+            except ImportError as e:
+                logging.fatal(f"Could not import kconfiglib: {e}")
+                exit(1)
+
+        def symbols(self, visible_only=False) -> list[Symbol]:
+            syms = self.kconf.unique_defined_syms
+            if visible_only:
+                return filter(lambda s: s.visibility != 0, syms)
+            return syms
+
+        def find_symbol(self, name: str) -> Symbol | None:
+            m = re.search("(CONFIG_)?(\\w*)", name)
+            sym_name = m.group(2)
+            if not sym_name:
+                return None
+
+            for sym in self.symbols():
+                if sym.name == sym_name:
+                    return sym
+            else:
+                return None
+
+        def sym_prefix_for(self, document_uri: str) -> str:
+            ft = Filetype.from_uri(document_uri)
+            if ft == Filetype.KCONFIG:
+                return ""
+            return "CONFIG_"
+
+        def filename_to_uri(self, filename: str) -> str:
+            path = Path(filename)
+            if not path.is_absolute():
+                base = os.getenv("srctree")
+                path = base / path
+            return path.resolve().as_uri()
+
+        def sym_prompt(self, sym: Symbol) -> str:
+            prompt = []
+            for node in sym.nodes:
+                if node.prompt:
+                    prompt.append(node.prompt[0])
+            return "\n".join(prompt)
+
+        def sym_help(self, sym: Symbol) -> str:
+            help = []
+            if sym.nodes:
+                for node in sym.nodes:
+                    if node.help:
+                        help.append(node.help)
+            return "\n\n".join(help)
+
+        def sym_value(self, sym: Symbol) -> str:
+            return (
+                sym.str_value
+                if sym.orig_type in self.__kcl._BOOL_TRISTATE
+                else '"{}"'.format(sym.str_value)
+            )
+
+        def sym_description(self, sym: Symbol, prompt=True, nodes=True):
+            """
+            Returns a string with information about the symbol (including its name,
+            value, visibility, and location(s)) when it is evaluated on e.g. the
+            interactive Python prompt.
+            """
+            fields = []
+            add = fields.append
+
+            add(sym.name + "=" + self.sym_value(sym))
+
+            if prompt:
+                promptstr = self.sym_prompt(sym)
+                if promptstr:
+                    add(promptstr)
+                    add("")
+
+            helpstr = self.sym_help(sym)
+            if helpstr:
+                add(helpstr)
+                add("")
+
+            add("type: " + self.__kcl.TYPE_TO_STR[sym.type])
+
+            if not sym.is_constant:
+                # These aren't helpful to show for constant symbols
+
+                # if sym.user_value is not None:
+                #     # Only add quotes for non-bool/tristate symbols
+                #     add(
+                #         "user value: "
+                #         + (
+                #             self.__kcl.TRI_TO_STR[sym.user_value]
+                #             if sym.orig_type in self.__kcl._BOOL_TRISTATE
+                #             else '"{}"'.format(sym.user_value)
+                #         )
+                #     )
+
+                add("visibility: " + self.__kcl.TRI_TO_STR[sym.visibility])
+
+                if sym.choice:
+                    add("choice symbol")
+
+                if sym.is_allnoconfig_y:
+                    add("allnoconfig_y")
+
+                if sym is sym.kconfig.defconfig_list:
+                    add("is the defconfig_list symbol")
+
+                if sym.env_var is not None:
+                    add("from environment variable " + sym.env_var)
+
+                if sym is sym.kconfig.modules:
+                    add("is the modules symbol")
+
+                add(
+                    "direct deps: "
+                    + self.__kcl.TRI_TO_STR[self.__kcl.expr_value(sym.direct_dep)]
+                )
+            if nodes:
+                if sym.nodes:
+                    for node in sym.nodes:
+                        add("")
+                        add("{}:{}".format(node.filename, node.linenr))
+                        add(str(node))
+
+            return "\n".join(fields)
+
+    class KconfLsp(LanguageServer):
+        kc: KconfigIndex
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+        def load_env(self):
+            self.kc = KconfigIndex()
+
+        def kc_sym_at(
+            self, document_uri: str, pos: types.Position
+        ) -> KconfigIndex.Symbol | None:
+            token = self.token_at_cursor(document_uri, pos)
+            return self.kc.find_symbol(token)
+
+        def token_at_cursor(
+            self, document_uri: str, pos: types.Position, before=True, after=True
+        ) -> str | None:
+            document = self.workspace.get_text_document(document_uri)
+
+            def is_word_char(c: str):
+                return c.isalpha() or c.isdigit() or c == "_"
+
+            try:
+                line = document.lines[pos.line]
+
+                start = pos.character
+                end = pos.character
+                if before:
+                    if start > 0 and is_word_char(line[start - 1]):
+                        start -= 1
+                    while start > 0 and is_word_char(line[start]):
+                        start -= 1
+
+                if after:
+                    while end < len(line) and end >= 0 and is_word_char(line[end]):
+                        logging.info(f"  end: {end}")
+                        end += 1
+                res = line[start:end].strip()
+
+                return res
+
+            except IndexError as e:
+                logging.exception(e)
+                return None
+
+    server = KconfLsp("kconfig-lsp", "v0.1")
+
+    @server.feature(types.TEXT_DOCUMENT_HOVER)
+    def hover(ls: KconfLsp, params: types.HoverParams):
+        document_uri = params.text_document.uri
+        pos = params.position
+
+        sym = ls.kc_sym_at(document_uri, pos)
+
+        if not sym:
+            return None
+
+        return types.Hover(
+            contents=types.MarkupContent(
+                kind=types.MarkupKind.PlainText,
+                value=ls.kc.sym_description(sym),
+            ),
+            range=types.Range(
+                start=types.Position(line=pos.line, character=0),
+                end=types.Position(line=pos.line + 1, character=0),
+            ),
+        )
+
+    @server.feature(types.TEXT_DOCUMENT_DEFINITION)
+    def goto_declaration(ls: KconfLsp, params: types.DefinitionParams):
+        """Jump to an object's declaration."""
+        document_uri = params.text_document.uri
+        pos = params.position
+
+        sym = ls.kc_sym_at(document_uri, pos)
+
+        if not sym:
+            return None
+
+        return [
+            types.Location(
+                uri=ls.kc.filename_to_uri(node.filename),
+                range=types.Range(
+                    start=types.Position(line=node.linenr - 1, character=0),
+                    end=types.Position(line=node.linenr - 1, character=0),
+                ),
+            )
+            for node in sym.nodes
+        ]
+
+    @server.feature(
+        types.TEXT_DOCUMENT_COMPLETION,
+        types.CompletionOptions(resolve_provider=True),
+    )
+    def completions(
+        ls: KconfLsp, params: types.CompletionParams | None = None
+    ) -> types.CompletionList:
+        """Returns completion items."""
+        document_uri = params.text_document.uri
+
+        token = ls.token_at_cursor(document_uri, params.position, after=False)
+        if len(token) == 0:
+            return None
+
+        prefix = ls.kc.sym_prefix_for(document_uri)
+
+        symbols = [
+            s
+            for s in ls.kc.symbols(visible_only=True)
+            if (prefix + s.name).startswith(token)
+        ]
+
+        MAX_ITEMS = 20
+        return types.CompletionList(
+            is_incomplete=len(symbols) > MAX_ITEMS,
+            items=itertools.islice(
+                (types.CompletionItem(label=(prefix + s.name)) for s in symbols),
+                MAX_ITEMS,
+            ),
+        )
+
+    @server.feature(types.COMPLETION_ITEM_RESOLVE)
+    def resolve_completion(
+        ls: KconfLsp, item: types.CompletionItem
+    ) -> types.CompletionItem:
+        if s := ls.kc.find_symbol(item.label):
+            item.detail = ls.kc.sym_prompt(s)
+            item.documentation = ls.kc.sym_description(s, prompt=False)
+        return item
+
+    return server
+
+
+###############################################################################
+# Commands                                                                    #
+###############################################################################
+
+CONFIG_FILE_PATH = Path(".west-lsp")
+
+
+@click.group()
+def app():
+    pass
+
+
+def generate_env(kconfig_root, output_file):
+    vars = [
+        "ZEPHYR_BASE",
+        "PYTHON_EXECUTABLE",
+        "srctree",
+        "KERNELVERSION",
+        "APPVERSION",
+        "APP_VERSION_EXTENDED_STRING",
+        "APP_VERSION_TWEAK_STRING",
+        "CONFIG_",
+        "KCONFIG_CONFIG",
+        "KCONFIG_BOARD_DIR",
+        "BOARD",
+        "BOARD_REVISION",
+        "BOARD_QUALIFIERS",
+        "HWM_SCHEME",
+        "KCONFIG_BINARY_DIR",
+        "APPLICATION_SOURCE_DIR",
+        "ZEPHYR_TOOLCHAIN_VARIANT",
+        "TOOLCHAIN_KCONFIG_DIR",
+        "TOOLCHAIN_HAS_NEWLIB",
+        "TOOLCHAIN_HAS_PICOLIBC",
+        "EDT_PICKLE",
+        "ARCH",
+        "ARCH_DIR",
+        "SHIELD_AS_LIST",
+        "DTS_POST_CPP",
+        "DTS_ROOT_BINDINGS",
+    ]
+
+    vals = {k: v for k, v in os.environ.items() if k in vars or k.startswith("ZEPHYR_")}
+
+    vals["WEST_LSP_KCONFIG_ROOT"] = kconfig_root
+
+    bindir = Path(vals["KCONFIG_BINARY_DIR"]).parent
+    build_info = bindir / "build_info.yml"
+    if not build_info.exists():
+        logging.warn("Could not find build_info.yml")
+
+    vals["WEST_LSP_BUILD_INFO"] = build_info
+
+    with open(output_file, "w") as f:
+        f.writelines([f"{k}={v}\n" for k, v in vals.items() if v is not None])
+
+
+@app.command()
+def init(*args):
+    script = __file__
+    subprocess.run(
+        [
+            "west",
+            "build",
+            "-t",
+            "lsp",
+            *args,
+            "--",
+            "-DEXTRA_KCONFIG_TARGETS=lsp",
+            f"-DEXTRA_KCONFIG_TARGET_COMMAND_FOR_lsp={script}",
+        ],
+        env=os.environ | {"WEST_LSP_GENERATE_ENV": CONFIG_FILE_PATH.resolve()},
+    )
+
+
+def get_build_info(root_dir: Path | None = None) -> dict[Path, dict[str, Any]]:
+    if root_dir is None:
+        root_dir = os.getcwd()
+    root_dir = Path(root_dir)
+
+    build_info = {}
+    for root, dirs, files in os.walk(root_dir):
+        for file in files:
+            if file == "build_info.yml":
+                p = Path(root) / file
+                with open(p, "r") as f:
+                    build_info[p] = yaml.safe_load(f)
+
+    build_info = dict(
+        sorted(build_info.items(), key=lambda i: os.path.getmtime(i[0]), reverse=True)
+    )
+
+    return build_info
+
+
+def getkey(d: Any, *args) -> Any:
+    if len(args) == 0:
+        return d
+    try:
+        if len(args) == 1:
+            return d[args[0]]
+        return getkey(d[args[0]], *args[1:])
+    except KeyError:
+        return None
+
+
+@app.command()
+def kconfig_lsp():
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+
+    if CONFIG_FILE_PATH.exists():
+        with open(".west-lsp", "r") as f:
+            for line in f.readlines():
+                s = line.rstrip("\n").split("=", 1)
+                os.environ[s[0]] = s[1]
+    else:
+        # logging.fatal(
+        #     f"Could not find {CONFIG_FILE_PATH}. Consider running '{sys.argv[0]} init' to generate it"
+        # )
+        # exit(0)
+
+        infos = get_build_info()
+
+        env = {}
+        for f, info in infos.items():
+            if (zephyr_sdk := getkey(info, "cmake", "toolchain", "path")):
+                env["ZEPHYR_SDK_VARIANT"] = "host"
+                env["ZEPHYR_SDK_INSTALL_DIR"] = zephyr_sdk
+                break
+
+        for f, info in infos.items():
+            if (
+                (zephyr_base := getkey(info, "cmake", "zephyr", "zephyr-base"))
+                and (board := getkey(info, "cmake", "board"))
+                and (application := getkey(info, "cmake", "application"))
+                and (kconfig := getkey(info, "cmake", "kconfig"))
+            ):
+                build_dir = f.parent
+                env["ZEPHYR_BASE"] = zephyr_base
+                env["APPLICATION_SOURCE_DIR"] = application["source-dir"]
+                env["BOARD"] = board["name"]
+                env["BOARD_QUALIFIERS"] = board["qualifiers"] or ""
+                env["BOARD_REVISION"] = board["revision"] or ""
+                env["KCONFIG_BINARY_DIR"] = (build_dir / "Kconfig").as_posix()
+                env["KCONFIG_BOARD_DIR"] = (build_dir / "Kconfig/boards").as_posix()
+                env["WEST_LSP_KCONFIG_ROOT"] = application["configuration-dir"] + "/Kconfig"
+                env["srctree"] = zephyr_base
+                # env["KCONFIG_CONFIG"] = (buil)
+
+               # env["HWM_SCHEME"] = "v2"
+                break
+
+        logging.info("env: ", json.dumps(env))
+        os.environ.update(env)
+
+    server = mod_kconfig_lsp()
+    server.load_env()
+    server.start_io()
+
+
+@app.command()
+@click.option("--root_dir", required=False)
+@click.option("--fmt", type=click.Choice(["kakoune", "json"]), default="kakoune")
+def dts_lsp_settings(root_dir: Path | None, fmt: str):
+    def context(build_info: dict):
+        try:
+            return {
+                "bindingType": "Zephyr",
+                "zephyrBindings": build_info["cmake"]["devicetree"]["bindings-dirs"],
+                "includePaths": build_info["cmake"]["devicetree"]["include-dirs"],
+                "dtsFile": build_info["cmake"]["devicetree"]["files"][0],
+                "overlays": build_info["cmake"]["devicetree"]["files"][1:],
+            }
+        except KeyError:
+            return None
+
+    build_info = get_build_info(root_dir)
+    res = {
+        "contexts": [c for k, x in build_info.items() if (c := context(x))],
+        "preferredContext": 0,
+    }
+
+    if fmt == "kakoune":
+        res = {"devicetree": {"settings": {"_": {"devicetree": res}}}}
+        print(toml.dumps(res))
+    elif fmt == "json":
+        print(json.dumps(res, indent=4))
+
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        if output_file := os.getenv("WEST_LSP_GENERATE_ENV"):
+            generate_env(sys.argv[1], output_file)
+            exit(0)
+
+    app()
+
+# vim: ft=python

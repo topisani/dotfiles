@@ -1,5 +1,4 @@
 filetype-hook rust %{
-  lsp-setup
   # lsp-enable-semantic-tokens
   lsp-inlay-hints-enable window
   

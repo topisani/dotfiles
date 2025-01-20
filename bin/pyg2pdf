@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# Usage:
+#   ./pyg2pdf index.html
+#   ./pyg2pdf main.go
+#
+# Requirements:
+# - Pygments
+# - wkhtmltopdf
+
+INPUT=$1
+OUTPUT=${INPUT%.*}.pdf
+TMP_HTML=$INPUT.html
+
+pygmentize -f html -Ostyle=colorful,linenos=0 -Ofull -o $TMP_HTML $INPUT
+
+wkhtmltopdf --margin-top 1cm \
+            --margin-right 1.2cm \
+            --margin-bottom 1.5cm \
+            --margin-left 1cm \
+            --page-size A4 \
+            --footer-right "[page] / [topage]" \
+            $TMP_HTML $OUTPUT
+
+rm $TMP_HTML
+# rm $TMP_PNG
+

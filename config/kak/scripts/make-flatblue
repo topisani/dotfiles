@@ -67,11 +67,12 @@ face global annotation                  $gray,             default
 face global DiagnosticWarning           default, default,  bright-yellow       +ca
 face global DiagnosticError             default, default,  bright-red          +ca
 face global DiagnosticInfo              default, default,  bright-green        +ca
-face global DiagnosticHint              default, default,  bright-white         +ca
+face global DiagnosticHint              default, default,  magenta         +ca
 face global LineFlagError               $red,              default       +b
 face global LineFlagWarning             $yellow,           default       +b
 face global LineFlagInfo                $green,            default       +b
 face global LineFlagHint                $gray,             default       +b
+face global LspDocumentLink							,,blue+u
 
 face global Reference                                                    '+b'
 face global ReferenceBind                                                '+bu'
@@ -125,14 +126,16 @@ face global StatusLspError             $red               +fa
 face global StatusLspInfo              $green             +fa
 face global StatusLspHint              $purple_dark       +fa
 
-decl str lsp_diagnostic_line_error_sign
-decl str lsp_diagnostic_line_warning_sign
-decl str lsp_diagnostic_line_info_sign
-decl str lsp_diagnostic_line_hint_sign
+try %{ decl str lsp_diagnostic_line_error_sign }
+try %{ decl str lsp_diagnostic_line_warning_sign }
+try %{ decl str lsp_diagnostic_line_info_sign }
+try %{ decl str lsp_diagnostic_line_hint_sign }
+try %{ decl -hidden str lsp_code_action_indicator }
 set global lsp_diagnostic_line_error_sign '●'
 set global lsp_diagnostic_line_warning_sign '●'
 set global lsp_diagnostic_line_info_sign '●'
 set global lsp_diagnostic_line_hint_sign '●'
+set global lsp_code_action_indicator ''
 # set global lsp_diagnostic_line_error_sign ' '
 # set global lsp_diagnostic_line_warning_sign ' '
 # set global lsp_diagnostic_line_info_sign ' '

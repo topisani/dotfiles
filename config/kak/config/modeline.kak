@@ -74,7 +74,9 @@ hook -group myml global WinSetOption lsp_diagnostic_(\w+)_count.* %{
 
 set-option global modelinefmt %sh{
   tr -d '\n' <<'EOF'
-{annotation}%opt{modeline_lsp_progress} 
+{annotation}%opt{modeline_lsp_progress}
+%opt{lsp_modeline_breadcrumbs}%opt{lsp_modeline_code_actions}
+%opt{lsp_modeline_message_requests}
 {StatusLspError}%opt{myml_lsp_error}
 {StatusLspWarning}%opt{myml_lsp_warning}
 {StatusLspInfo}%opt{myml_lsp_info}

@@ -1,3 +1,3 @@
 
-# Signed-off-by: Tobias Pisani <topisani@hamsterpoison.com>
+# Signed-off-by: Tobias Pisani <mail@topisani.dev>
 
