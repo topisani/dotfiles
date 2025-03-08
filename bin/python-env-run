@@ -21,6 +21,4 @@ fi
 
 # $(pdm venv activate)
 
-# Could support other things than poetry if needed
-
- exec "$@"
+exec uv run "$@"

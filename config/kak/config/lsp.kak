@@ -52,6 +52,7 @@ map global lsp k ': lsp-previous-symbol<ret>' -docstring 'Prev symbol'
 map global lsp J ': lsp-next-function<ret>' -docstring 'Next function'
 map global lsp K ': lsp-previous-function<ret>' -docstring 'Prev function'
 map global lsp "'" ': lsp-code-actions<ret>'    -docstring 'Code Actions...'
+map global lsp <ret> ': lsp-document-link<ret>' -docstring 'Follow document link'
 
 # Recommended mappings
 map global user l %{:enter-user-mode lsp<ret>} -docstring "LSP mode"
@@ -60,27 +61,27 @@ map global goto r '<esc>:lsp-references<ret>' -docstring 'references'
 map global goto y '<esc>:lsp-type-definition<ret>' -docstring 'type definition'
 
 def lsp-setup %{
-  lsp-enable
+  lsp-enable-window
   # lsp-auto-hover-enable
-  lsp-inlay-diagnostics-enable global
-  lsp-inlay-code-lenses-enable global
+  lsp-inlay-diagnostics-enable window
+  lsp-inlay-code-lenses-enable window
 
-  hook -group lsp global InsertCompletionShow .* %{
+  hook -group lsp window InsertCompletionShow .* %{
     unmap window insert <c-n>
   }
-  hook -group lsp global InsertCompletionHide .* %{
+  hook -group lsp window InsertCompletionHide .* %{
     map window insert <c-n> '<a-;>: lsp-snippets-select-next-placeholders<ret>'
   }
 
-  map global insert <c-n> '<a-;>: lsp-snippets-select-next-placeholders<ret>'
+  map window insert <c-n> '<a-;>: lsp-snippets-select-next-placeholders<ret>'
   # map window normal <c-n> ': lsp-snippets-select-next-placeholders<ret>'
 
-  map global object a '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
-  map global object <a-a> '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
-  map global object e '<a-semicolon>lsp-object Function Method<ret>' -docstring 'LSP function or method'
-  map global object k '<a-semicolon>lsp-object Class Interface Struct<ret>' -docstring 'LSP class interface or struct'
-  map global object d '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>' -docstring 'LSP errors and warnings'
-  map global object D '<a-semicolon>lsp-diagnostic-object<ret>' -docstring 'LSP errors'
+  map window object a '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
+  map window object <a-a> '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
+  map window object e '<a-semicolon>lsp-object Function Method<ret>' -docstring 'LSP function or method'
+  map window object k '<a-semicolon>lsp-object Class Interface Struct<ret>' -docstring 'LSP class interface or struct'
+  map window object d '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>' -docstring 'LSP errors and warnings'
+  map window object D '<a-semicolon>lsp-diagnostic-object<ret>' -docstring 'LSP errors'
 }
 
 map global filetype s   ': enter-user-mode lsp<ret>' -docstring 'lsp...'
@@ -122,14 +123,11 @@ def lsp-enable-semantic-tokens %{
   }
 }
 
-filetype-hook (css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml|zig|go|templ) %{
-  lsp-enable-semantic-tokens
-}
 
 # Modeline progress
 declare-option -hidden str modeline_lsp_progress ""
 define-command -hidden -params 6 -override lsp-handle-progress %{
-    set global modeline_lsp_progress %sh{
+    set buffer modeline_lsp_progress %sh{
         if ! "$6"; then
             echo "$2${5:+" ($5%)"}${4:+": $4"} "
         fi
@@ -141,16 +139,16 @@ define-command tsserver-organize-imports -docstring "Ask the typescript language
 }
 
 rmhooks global idetest
-hook global -group idetest WinDisplay .* %{
-  try %{
-    eval %sh{ [ $kak_client = docs ] && echo fail }
-  } catch %{
-    rmhl window/numbers
-    hook window -once -group idetest WinClose .* %{
-      eval -client docs quit
-    }
-  }
-}
+# hook global -group idetest WinDisplay .* %{
+#   try %{
+#     eval %sh{ [ "$kak_client" = docs ] && echo fail }
+#   } catch %{
+#     rmhl window/numbers
+#     hook window -once -group idetest WinClose .* %{
+#       eval -client docs quit
+#     }
+#   }
+# }
 
 set global lsp_semantic_tokens %{
   [
@@ -185,14 +183,18 @@ hook -group lsp-filetype-python global BufSetOption filetype=python %{
     args = ["-c", "cd '$root' && python-env-run pylsp"]
     settings_section = "_"
     root = '$root'
+    # root_globs = ["requirements.txt", "setup.py", "pyproject.toml", ".git", ".hg"]
 
     [pylsp.settings._]
     # See https://github.com/python-lsp/python-lsp-server#configuration
     # pylsp.configurationSources = ["flake8"]
     pylsp.plugins.jedi_completion.include_params = true
-    pylsp.plugins.jedi_completion.fuzzy = true
-    pylsp.plugins.rope_autoimport.enabled = true
-    pylsp.plugins.rope_autoimport.memory = true
+    pylsp.plugins.pycodestyle.enabled = false
+    pylsp.plugins.mccabe.enabled = false
+    pylsp.plugins.autopep8.enabled = false
+    # pylsp.plugins.jedi_completion.fuzzy = true
+    # pylsp.plugins.rope_autoimport.enabled = true
+    # pylsp.plugins.rope_autoimport.memory = true
 
     # [language_server.pyright]
     # filetypes = ["python"]
@@ -218,11 +220,11 @@ EOF
 
 rmhooks global lsp-filetype-c-family
 hook -group lsp-filetype-c-family global BufSetOption filetype=(?:c|cpp|objc) %{
-    set-option buffer lsp_servers %exp{
+    set-option buffer lsp_servers %{
         [clangd]
         command = "sh"
         args = [ '-c', 'TMPDIR=~/.cache/clangd/ clangd --query-driver=/home/topisani/**,/usr/**,arm-none-eabi-gcc,arm-none-eabi-*,arm-none-eabi-g++,**']
-        root = '%sh{eval "$kak_opt_lsp_find_root" compile_commands.json .clangd .git .hg $(: kak_buffile)}'
+        root_globs = ["compile_commands.json", ".clangd", ".git", ".hg"]
     }
 }
 
@@ -312,10 +314,10 @@ hook -group lsp-project-zephyr global BufSetOption filetype=(devicetree) %{
       set-option buffer lsp_servers %{
          [devicetree]
          root = '$root'
-         # command = "npm"
-         # args = ["x", "--", "devicetree-language-server", "--stdio"]
-         command = "node"
-         args = ["/home/topisani/git/dts-lsp/server/dist/server.js", "--stdio"]
+         command = "npm"
+         args = ["x", "--", "devicetree-language-server", "--stdio"]
+         # command = "node"
+         # args = ["/home/topisani/git/dts-lsp/server/dist/server.js", "--stdio"]
          settings_section = "_"
 
       $settings
@@ -324,4 +326,7 @@ EOF
    }
 }
 
-lsp-setup
+filetype-hook (rust|css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml|zig|go|templ|devicetree|kconfig|conf) %{
+  lsp-setup
+  lsp-enable-semantic-tokens
+}

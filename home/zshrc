@@ -112,15 +112,6 @@ iscmd() {
     command -v $1 > /dev/null
 }
 
-export FORGIT_COPY_CMD=clip
-export FORGIT_FZF_DEFAULT_OPTS="--reverse"
-
-export SSH_AUTH_SOCK=/tmp/ssh-agent.$HOST.sock
-ssh-add -l 2>/dev/null >/dev/null
-if [ $? -ge 2 ]; then
-  ssh-agent -a "$SSH_AUTH_SOCK" >/dev/null
-fi
-
 alias ssh="TERM=xterm-256color ssh"
 
 # eval "$(starship init zsh)"

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 setup::install() {
-    yay -S --needed --noconfirm "$@"
+    paru -S --needed --noconfirm "$@"
 }
 
 setup::project() {
@@ -20,7 +20,7 @@ setup::project() {
 mkdir -p ~/git/tools/
 
 setup::install git zsh jq tmux zoxide exa forgit
-setup::install diff-so-fancy bat ripgrep fd git-revise qalc bc
+setup::install diff-so-fancy bat ripgrep fd git-revise git-autofixup libqalculate bc
 setup::install editorconfig-core-c tig fzf
 
 setup::install rustup && (
@@ -84,7 +84,7 @@ setup::install alacritty ttf-jetbrains-mono-nerd
 setup::install hyprland hyprpaper hyprlock xdg-desktop-portal-hyprland hyprcursor hypridle wl-clipboard
 setup::install waybar wofi dunst udiskie
 setup::install breeze breeze5 papirus-icon-theme
-setup::install zathura-git zathura-pdf-poppler imv nemo
+setup::install zathura zathura-pdf-poppler imv nemo
 
 gsettings set org.cinnamon.desktop.default-applications.terminal exec "$(which tmux-term)"
 gsettings set org.cinnamon.desktop.default-applications.terminal exec-arg ""

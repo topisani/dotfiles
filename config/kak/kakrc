@@ -240,23 +240,24 @@ map global goto <up> k
 map global goto <down> j
 map global goto <left> h
 map global goto <right> l
-# map global normal <a-up> <a-k>
-# map global normal <a-down> <a-j>
-# map global normal <a-s-up> <a-s-k>
-# map global normal <a-s-down> <a-s-j>
-map global normal <a-left> <a-h>
-map global normal <a-right> <a-l>
-map global normal <a-s-left> <a-s-h>
-map global normal <a-s-right> <a-s-l>
-map global normal <c-up> <c-k>
-map global normal <c-down> <c-j>
-map global normal <c-left> <c-h>
-map global normal <c-right> <c-l>
+# map global normal <c-up> <c-k>
+# map global normal <c-down> <c-j>
+# map global normal <c-left> <c-h>
+# map global normal <c-right> <c-l>
 
-map global insert <a-left> '<a-;><a-h>'
-map global insert <a-right> '<a-;><a-l>'
-map global insert <a-s-left> '<a-;><a-s-h>'
-map global insert <a-s-right> '<a-;><a-s-l>'
+# map global insert <a-left> '<a-;><a-h>'
+# map global insert <a-right> '<a-;><a-l>'
+# map global insert <a-s-left> '<a-;><a-s-h>'
+# map global insert <a-s-right> '<a-;><a-s-l>'
+ 
+map global normal <a-left> %{:tree-sitter-nav '{ "prev_sibling": {"cousin": false } }'<ret>} -docstring "prev sibling (TS)"
+map global normal <a-right> %{:tree-sitter-nav '{ "next_sibling": {"cousin": false } }'<ret>} -docstring "next sibling (TS)"
+# map global normal <a-s-left> <a-s-k>
+# map global normal <a-s-right> <a-s-j>
+map global normal <a-up> %{:tree-sitter-nav '"parent"'<ret>} -docstring "parent (TS)"
+map global normal <a-down> %{:tree-sitter-nav '"first_child"'<ret>} -docstring "first child (TS)"
+# map global normal <a-s-up> <a-s-h>
+# map global normal <a-s-down> <a-s-l>
 
 # Prompt mode ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 

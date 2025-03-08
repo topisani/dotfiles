@@ -214,3 +214,19 @@ source = { git = { url = "https://github.com/DariusCorvus/tree-sitter-surrealdb"
 path = "queries"
 
 
+
+[language.typst.grammar]
+source = { git = { url = "https://github.com/uben0/tree-sitter-typst", pin = "46cf4ded12ee974a70bf8457263b67ad7ee0379d" }}
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "../scanner.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "scanner.o", "-o", "typst.so"]
+link_flags = ["-O3"]
+
+[language.typst.queries]
+source = { git = { url = "https://github.com/uben0/tree-sitter-typst", pin = "46cf4ded12ee974a70bf8457263b67ad7ee0379d" }}
+path = "queries/typst"
+
+

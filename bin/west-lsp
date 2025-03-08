@@ -505,7 +505,7 @@ def kconfig_lsp():
 
 
 @app.command()
-@click.option("--root_dir", required=False)
+@click.option("--root-dir", required=False)
 @click.option("--fmt", type=click.Choice(["kakoune", "json"]), default="kakoune")
 def dts_lsp_settings(root_dir: Path | None, fmt: str):
     def context(build_info: dict):

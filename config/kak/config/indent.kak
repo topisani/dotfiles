@@ -34,7 +34,7 @@ define-command editorconfig-load -override -params ..1 -docstring "editorconfig-
       /*) # $kak_buffile is a full path that starts with a '/'
         editorconfig "$file" | awk -v file="$file" -F= -- '
           $1 == "indent_style"             { indent_style = $2 }
-          $1 == "indent_size"              { indent_size = $2 == "tab" ? 4 : $2 }
+          $1 == "indent_size"              { indent_size = $2 == "tab" ? 8 : $2 }
           $1 == "tab_width"                { tab_width = $2 }
           $1 == "end_of_line"              { end_of_line = $2 }
           $1 == "charset"                  { charset = $2 }
