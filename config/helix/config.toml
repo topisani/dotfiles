@@ -1,0 +1,41 @@
+theme = "flatblue-dark"
+
+[editor]
+color-modes = true
+end-of-line-diagnostics = "hint"
+clipboard-provider = "termcode"
+auto-format = false
+middle-click-paste = false
+
+[editor.inline-diagnostics]
+# cursor-line = "warning"
+cursor-line = "disable"
+
+[editor.lsp]
+display-inlay-hints = true
+
+[editor.indent-guides]
+render = true
+character = "▏"
+skip-levels = 1
+
+[editor.statusline]
+left = ["mode", "spinner", "file-name"]
+center = []
+right = ["diagnostics", "selections", "position", "file-encoding", "file-line-ending", "file-type"]
+separator = "│"
+mode.normal = "NOR"
+mode.insert = "INS"
+mode.select = "SEL"
+
+[keys.normal]
+# Remap gw to t
+t = "goto_word"
+"#" = "toggle_comments"
+
+[keys.select]
+# Remap gw to t
+t = "extend_to_word"
+"#" = "toggle_comments"
+
+[keys.insert]

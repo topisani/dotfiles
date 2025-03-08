@@ -1,0 +1,159 @@
+inherits = "gruvbox"
+
+"annotation" = { fg = "fg1" }
+
+"attribute" = { fg = "aqua0", modifiers = ["italic"] }
+
+"comment" = { fg = "gray", modifiers = ["italic"] }
+
+"constant" = { fg = "aqua0" }
+"constant.character" = { fg = "purple0" }
+"constant.character.escape" = { fg = "orange1" }
+"constant.macro" = { fg = "purple1" }
+"constructor" = { fg = "blue2" }
+
+"definition" = { underline = { color = "aqua1" } }
+
+"diagnostic" = { underline = { color = "orange1", style = "curl" } }
+"diagnostic.deprecated" = { modifiers = ["crossed_out"] }
+"diagnostic.error" = { underline = { color = "red1", style = "curl" } }
+"diagnostic.hint" = { underline = { color = "blue1", style = "curl" } }
+"diagnostic.info" = { underline = { color = "aqua1", style = "curl" } }
+"diagnostic.warning" = { underline = { color = "yellow1", style = "curl" } }
+# "diagnostic.unnecessary" = { modifiers = ["dim"] }  # do not remove this for future resolving
+
+"error" = { fg = "red1" }
+"hint" = { fg = "blue1" }
+"info" = { fg = "aqua1" }
+"warning" = { fg = "yellow1" }
+
+"diff.delta" = { fg = "yellow1" }
+"diff.minus" = { fg = "red1" }
+"diff.plus" = { fg = "green1" }
+
+"function" = { fg = "yellow2" }
+"function.builtin" = { fg = "yellow2" }
+"function.macro" = { fg = "purple2" }
+
+"keyword" = { fg = "red1" }
+"keyword.control.import" = { fg = "red1" }
+
+"label" = { fg = "red1" }
+
+"markup.bold" = { modifiers = ["bold"] }
+"markup.heading" = "aqua1"
+"markup.italic" = { modifiers = ["italic"] }
+"markup.link.text" = "red1"
+"markup.link.url" = { fg = "green1", modifiers = ["underlined"] }
+"markup.raw" = "red1"
+"markup.strikethrough" = { modifiers = ["crossed_out"] }
+
+"module" = { fg = "orange1" }
+
+"namespace" = { fg = "orange1" }
+
+"operator" = { fg = "fg2" }
+
+"punctuation" = { fg = "orange1" }
+
+"special" = { fg = "purple0" }
+
+"string" = { fg = "green1" }
+"string.regexp" = { fg = "orange1" }
+"string.special" = { fg = "orange1" }
+"string.symbol" = { fg = "yellow1" }
+
+"tag" = { fg = "aqua1" }
+
+"type" = { fg = "blue2" }
+"type.enum.variant" = { modifiers = ["italic"] }
+
+"ui.background" = { bg = "default" }
+"ui.bufferline" = { fg = "fg1", bg = "bg1" }
+"ui.bufferline.active" = { fg = "bg0", bg = "yellow0" }
+"ui.bufferline.background" = { bg = "bg2" }
+
+"ui.cursor" = { fg = "bg1", bg = "bg2" }
+"ui.cursor.insert" = { fg = "bg1", bg = "blue0" }
+"ui.cursor.normal" = { fg = "bg1", bg = "gray" }
+"ui.cursor.select" = { fg = "bg1", bg = "orange0" }
+"ui.cursor.match" = { fg = "fg3", bg = "bg3" }
+
+"ui.cursor.primary" = { bg = "fg3", fg = "bg1" }
+"ui.cursor.primary.insert" = { fg = "bg1", bg = "blue1" }
+"ui.cursor.primary.normal" = { fg = "bg1", bg = "fg3" }
+"ui.cursor.primary.select" = { fg = "bg1", bg = "orange1" }
+
+"ui.cursorline" = { bg = "bg0_s" }
+"ui.cursorline.primary" = { bg = "bg1" }
+
+"ui.help" = { bg = "bg1", fg = "fg1" }
+"ui.linenr" = { fg = "bg3" }
+"ui.linenr.selected" = { fg = "yellow1" }
+"ui.menu" = { fg = "fg1", bg = "bg2" }
+"ui.menu.selected" = { fg = "bg2", bg = "blue1", modifiers = ["bold"] }
+"ui.popup" = { bg = "bg1" }
+"ui.picker.header.column" = { underline.style = "line" }
+"ui.picker.header.column.active" = { modifiers = ["bold"], underline.style = "line" }
+"ui.selection" = { bg = "bg2" }
+"ui.selection.primary" = { bg = "bg3" }
+
+"ui.statusline" = { fg = "fg1", bg = "bg2" }
+"ui.statusline.inactive" = { fg = "fg4", bg = "bg2" }
+"ui.statusline.insert" = { fg = "bg1", bg = "blue1", modifiers = ["bold"] }
+"ui.statusline.normal" = { fg = "bg1", bg = "fg3", modifiers = ["bold"] }
+"ui.statusline.select" = { fg = "bg1", bg = "orange1", modifiers = ["bold"] }
+
+"ui.text" = { fg = "fg1" }
+"ui.text.directory" = { fg = "blue1" }
+"ui.virtual.inlay-hint" = { fg = "gray" }
+"ui.virtual.jump-label" = { fg = "purple0", modifiers = ["bold"] }
+"ui.virtual.ruler" = { bg = "bg1" }
+"ui.virtual.whitespace" = "bg2"
+"ui.virtual.wrap" = { fg = "bg2" }
+"ui.window" = { bg = "bg1" }
+
+"variable" = { fg = "aqua0" }
+"variable.builtin" = { fg = "purple0", modifiers = ["italic"] }
+"variable.other.member" = { fg = "aqua0", modifiers = ["italic"] }
+"variable.parameter" = { fg = "blue1", modifiers = ["italic"] }
+
+# "ui.cursor.primary" = { modifiers = ["reversed"] }
+# "ui.cursor.match" = { bg = "bg2" }
+
+# "diagnostic.error" = { underline = { color = "red0", style = "curl"} }
+
+[palette]
+bg0 = "#000000"   # main background
+bg0_s = "#32302f"
+bg1 = "#0a0b15"
+bg2 = "#181b2e"
+bg3 = "#323037"
+bg4 = "#2d334e"
+
+fg0="#ffffdf"
+# fg1="#fdf4d1" # Softer variant
+fg1="#fcfcfd"
+fg2="#f4e8ca"
+fg3="#cbdbe2"
+fg4="#8899a4"
+
+gray="#565f6f"
+
+red0="#d92817"
+red1="#f24130"
+green0="#00af5f"
+green1="#71ba51"
+yellow0="#f39c12"
+yellow1="#f2bb13"
+yellow2="#ffe000"
+blue0="#005973"
+blue1="#178ca6"
+blue2="#07b0ff"
+purple0="#dd465a"
+purple1="#ff669a"
+# purple_dark="#8f3f71"
+aqua0="#249991"
+aqua1="#67c5b4"
+orange0="#de5019"
+orange1="#fe8019"

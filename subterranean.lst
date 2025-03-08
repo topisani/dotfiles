@@ -58,3 +58,4 @@
 ~/.config/fish;config/fish
 ~/.config/niri;config/niri
 ~/.XCompose;home/.XCompose
+~/.config/helix;config/helix
