@@ -282,14 +282,15 @@ hook -group lsp-filetype-rust global BufSetOption filetype=rust %{
     }
 }
 
-# rmhooks global lsp-filetype-devicetree
-# hook -group lsp-filetype-devicetree global BufSetOption filetype=devicetree %{
-#   set-option buffer lsp_servers %exp{
-#       [ginko]
-#       root_globs = [".git"]
-#       command = "ginko_ls"
-#   }
-# }
+rmhooks global lsp-filetype-janet
+hook -group lsp-filetype-janet global BufSetOption filetype=janet %{
+  set-option buffer lsp_servers %exp{
+      [ginko]
+      root_globs = [".git", "project.janet"]
+      command = "janet-lsp"
+      args = ["--stdio"]
+  }
+}
 
 
 rmhooks global lsp-project-zephyr
@@ -330,7 +331,7 @@ EOF
    }
 }
 
-filetype-hook (rust|css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml|zig|go|templ|devicetree|kconfig|conf) %{
+filetype-hook (rust|css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml|zig|go|templ|devicetree|kconfig|conf|janet) %{
   lsp-setup
   lsp-enable-semantic-tokens
 }

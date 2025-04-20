@@ -42,7 +42,7 @@ face global MatchingChar                                                '+b'
 face global BufferPadding               $bg2,              default
 face global Whitespace                  $bg1,              default      +f
 face global WhitespaceIndent            $bg2,              default      +f
-face global WhitespaceTrailing          ,                  rgba:FF555520
+face global WhitespaceTrailing          $bg1,              rgba:FF555520
 face global Information                 $blue,             $float_bg
 
 face global GitBlame                    $fg2,              default

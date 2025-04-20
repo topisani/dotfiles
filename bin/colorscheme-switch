@@ -217,11 +217,10 @@ update_gtk() {
 }
 
 toggle_gtk_dark() {
-    gtk_theme="Adwaita Dark"
+    gtk_theme="Adwaita-dark"
     icon_theme="Papirus-Dark"
-    if gsettings get org.gnome.desktop.interface gtk-theme | grep -i dark; then
+    if gsettings get org.gnome.desktop.interface gtk-theme | grep -qi dark; then
         gtk_theme="Adwaita"
-        icon_theme="Papirus-Light"
     fi
 
     # gsettings works in wayland

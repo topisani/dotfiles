@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 EDP1_SCALE=1
 
@@ -23,24 +23,13 @@ _old_layout_office_triple_vert() {
 }
 
 _layout_cpi() {
-  echo "desc:Dell Inc. DELL U2412M 0FFXD45N5R8S',highres,0x0,1"
-  echo "desc:Dell Inc. DELL 2405FPW M675459U1TTS',highres,1920x0,1"
+  echo "desc:Lenovo Group Limited LEN T25d-10 VKKC0608,1920x1200,0x0,1"
+  echo "desc:Lenovo Group Limited LEN T25d-10 VKKC0338,1920x1200,1920x0,1"
   echo "eDP-1,highres,0x1200,$EDP1_SCALE"
 }
 
 _layout_single() {
   echo "eDP-1,highres,0x0,$EDP1_SCALE"
-}
-
-_layout_tv() {
-  echo "'desc:Philips Consumer Electronics Company Philips FTV 0x00000101' 0 0"
-  echo "eDP-1,highres,960x2160,$EDP1_SCALE"
-}
-
-_layout_umag() {
-  echo "'desc:Unknown MSI G241 0x000004CE',highres,0x0,1,transform,3"
-  echo "'desc:Unknown MSI G241 0x000004E1',highres,1080x0,1,transform,1"
-  echo "eDP-1,highres,120x1920,$EDP1_SCALE"
 }
 
 _layout_home() {
@@ -58,11 +47,10 @@ _layout_mirror() {
 
 _layout_auto() {
   serials=$(hyprctl monitors -j | jq -r '.[].serial')
-  echo "$serials" > /dev/stderr
   layout=$(
-    if echo "$serials" | grep 7NRBS83 -q; then
+    if echo "$serials" | grep "7NRBS83" -q; then
       _layout_office_triple_vert
-    elif echo "$serials" | grep 0FFXD45N5R8S -q; then
+    elif echo "$serials" | grep VKKC0608 -q; then
       _layout_cpi
     elif echo "$serials" | grep CH3CM43 -q; then
       _layout_home
@@ -99,7 +87,7 @@ _echorun() {
 #       _echorun swaymsg "output '$name' enable pos $x $y transform $trans"
 #     fi
 #   done
-  
+#
 #   # Set scale of display at home
 #   _echorun swaymsg "output 'Dell Inc. DELL S2721QS CH3CM43' scale 1.25"
 # }

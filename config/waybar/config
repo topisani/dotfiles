@@ -1,10 +1,10 @@
 {
     "layer": "top", // Waybar at top layer
     "position": "top", // Waybar position (top|bottom|left|right)
-    "height": 21, // Waybar height (to be removed for auto height)
+    "height": 22, // Waybar height (to be removed for auto height)
     // Choose the order of the modules
     "modules-left": ["hyprland/workspaces", "hyprland/submap", "niri/workspaces"],
-    "modules-center": ["custom/window", "niri/window"],
+    "modules-center": ["hyprland/window", "niri/window"],
     "modules-right": ["custom/agenda", "hyprland/language", "idle_inhibitor", "pulseaudio", "battery", "clock", "tray"],
     // Modules configuration
     "hyprland/workspaces": {
@@ -27,6 +27,15 @@
         "on-scroll-up": "$HOME/.config/hypr/groupnav.sh group f",
         "on-scroll-down": "$HOME/.config/hypr/groupnav.sh group b",
     },
+
+    "hyprland/window": {
+      "format": "{title}",
+      "icon": false,
+      "separate-outputs": true,
+      // "on-click": "rofi -show-icons -show window -modi window",
+      // "on-click-right": "hyprctl dispatch killactive",
+    },
+
     "mpd": {
         "format": "{stateIcon} {consumeIcon}{randomIcon}{repeatIcon}{singleIcon}{artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ",
         "format-disconnected": "Disconnected ",
@@ -53,6 +62,7 @@
         "tooltip-format": "MPD (connected)",
         "tooltip-format-disconnected": "MPD (disconnected)",
     },
+
     "idle_inhibitor": {
         "format": "{icon} ",
         "format-icons": {

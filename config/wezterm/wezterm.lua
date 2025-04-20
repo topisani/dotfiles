@@ -32,8 +32,6 @@ local autosplit_action = wezterm.action_callback(function(win, pane)
     local cols = pane:get_dimensions().cols
     local rows = pane:get_dimensions().viewport_rows
 
-    wezterm.log_info(win, pane, w, h)
-
     local dir = "Right"
 
     if (rows * 5) > (cols * 2) then

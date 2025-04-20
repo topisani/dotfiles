@@ -1,0 +1,14 @@
+font=sans 10
+default-timeout=5000
+border-radius=5
+border-size=0
+padding=12,15
+icons=1
+background-color=#005973FF
+progress-color=source #178CA6FF
+max-icon-size=96
+
+[urgency=critical]
+default-timeout=10000
+# width=100
+background-color=#F24130FF

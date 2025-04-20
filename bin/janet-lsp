@@ -1,0 +1,11 @@
+#!/bin/sh
+
+jimage_path=~/.cache/janet-lsp.jimage
+
+get_lsp() {
+    wget https://github.com/CFiggers/janet-lsp/releases/download/v0.0.10/janet-lsp.jimage -O $jimage_path
+}
+
+[ -e $jimage_path ] || get_lsp
+
+exec jpm janet -i $jimage_path "$@"
