@@ -196,14 +196,18 @@ hook -group lsp-filetype-python global BufSetOption filetype=python %{
     # pylsp.plugins.rope_autoimport.enabled = true
     # pylsp.plugins.rope_autoimport.memory = true
 
-    # [language_server.pyright]
-    # filetypes = ["python"]
-    # roots = ["pyproject.toml", "requirements.txt", ".git"]
-    # command = "python-env-run"
-    # args = ["pyright-langserver", "--stdio"]
-    # settings_section = "pyright"
-
-    # [language_server.pyright.settings._]
+    # [basedpyright]
+    # command = "sh"
+    # args = ["-c", "cd '$root' && python-env-run basedpyright-langserver --stdio"]
+    # settings_section = "_"
+    # root = '$root'
+    # # root_globs = ["requirements.txt", "setup.py", "pyproject.toml", ".git", ".hg"]
+     
+    # [jedi]
+    # command = "uvx"
+    # args = ["jedi-language-server"]
+    # settings_section = "_"
+    # root_globs = ["requirements.txt", "setup.py", "pyproject.toml", ".git", ".hg"]
 
     [ruff]
     command = "sh"

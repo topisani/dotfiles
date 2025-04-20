@@ -386,7 +386,10 @@ def generate_env(kconfig_root, output_file):
         "DTS_ROOT_BINDINGS",
     ]
 
-    vals = {k: v for k, v in os.environ.items() if k in vars or k.startswith("ZEPHYR_")}
+    def envfilt(k: str) -> bool:
+        return k in vars or k.startswith("ZEPHYR_") or k.startswith("NCS_")
+
+    vals = {k: v for k, v in os.environ.items() if envfilt(k)}
 
     vals["WEST_LSP_KCONFIG_ROOT"] = kconfig_root
 
@@ -425,7 +428,7 @@ def get_build_info(root_dir: Path | None = None) -> dict[Path, dict[str, Any]]:
     root_dir = Path(root_dir)
 
     build_info = {}
-    for root, dirs, files in os.walk(root_dir):
+    for root, dirs, files in os.walk(root_dir, topdown=False):
         for file in files:
             if file == "build_info.yml":
                 p = Path(root) / file
