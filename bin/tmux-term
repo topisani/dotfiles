@@ -1,11 +1,11 @@
 #!/bin/bash
 
-exec wezterm start -- "$@"
-exit $?
+# exec wezterm start -- "$@"
+# exit $?
 
 setup_term() {
-    # TERM=tmux-256color tmux new-session "$*"\; set destroy-unattached on\; set status off\; attach
-    zellij
+    TERM=tmux-256color tmux new-session "$*"\; set destroy-unattached on\; set status off\; attach
+    # zellij
 }
 
 if [[ "$1" == "--setup" ]]; then
@@ -13,5 +13,6 @@ if [[ "$1" == "--setup" ]]; then
     setup_term "$*"
 else
     args="$*"
-    alacritty --title="Terminal" -e sh -c "$0 --setup $args"
+    # alacritty --title="Terminal" -e sh -c "$0 --setup $args"
+    ghostty --gtk-single-instance=true --command="$0 --setup $args"
 fi

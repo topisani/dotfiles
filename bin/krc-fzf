@@ -1,0 +1,267 @@
+#!/bin/bash
+
+KRC_FZF=$0
+
+# Automatic FZF preview position based on aspect ratio
+read -r LINES COLUMNS < <(stty size < /dev/tty)
+if (( LINES > COLUMNS / 2 )); then
+  FZF_PREVIEW_OPTS="--preview-window=up --preview-border=bottom"
+else
+  FZF_PREVIEW_OPTS="--preview-window=right --preview-border=left"
+fi
+FZF_PREVIEW_OPTS="$FZF_PREVIEW_OPTS --info=inline-right --input-label-pos=2 --input-border=top"
+
+
+krc_fzf__files_conf_load() {
+  source $KRC_FZF_FILES_CONF_PATH 2> /dev/null
+}
+
+krc_fzf__files_conf_update() {
+  if ! [ -e "$KRC_FZF_FILES_CONF_PATH" ]; then
+    export KRC_FZF_FILES_CONF_PATH=$(mktemp --suffix krc-fzf)
+    trap 'rm "$KRC_FZF_FILES_CONF_PATH"' EXIT
+    KRC_FZF_ROOT=$(realpath "${1:-.}")
+    KRC_FZF_PATHS=( "$@" )
+  fi
+
+  KRC_FZF_CMD=${KRC_FZF_CMD:-fd}
+  echo "KRC_FZF_ROOT=$KRC_FZF_ROOT" > $KRC_FZF_FILES_CONF_PATH
+  echo "KRC_FZF_HIDDEN=$KRC_FZF_HIDDEN" >> $KRC_FZF_FILES_CONF_PATH
+  echo "KRC_FZF_TYPES=$KRC_FZF_TYPES" >> $KRC_FZF_FILES_CONF_PATH
+  echo "KRC_FZF_CMD=$KRC_FZF_CMD" >> $KRC_FZF_FILES_CONF_PATH
+  echo "KRC_FZF_PATHS=()" >> $KRC_FZF_FILES_CONF_PATH
+  for path in ${KRC_FZF_PATHS[@]}; do
+    printf "%s\n" "KRC_FZF_PATHS+=(\"$path\")" >> $KRC_FZF_FILES_CONF_PATH
+  done
+}
+
+krc_fzf__files_list() {
+  krc_fzf__files_conf_load && cd "$KRC_FZF_ROOT"
+  case $KRC_FZF_CMD in
+    rg)
+      (( ${#1} < 1 )) && exit 0;
+      rg --color=always $KRC_FZF_HIDDEN --column --with-filename --fixed-strings -- "$@" "${KRC_FZF_PATHS[@]}"
+      ;;
+    fd)
+      fd --color=always ${KRC_FZF_TYPES} $KRC_FZF_HIDDEN . "${KRC_FZF_PATHS[@]}"
+      ;;
+  esac
+}
+
+krc_fzf__files_action() {
+  krc_fzf__files_conf_load
+
+  action=$1; shift
+  case $action in
+    toggle_hidden)
+      KRC_FZF_HIDDEN=$([ -z "$KRC_FZF_HIDDEN" ] && echo "-u" || echo "")
+      ;;
+    toggle_types)
+      case $KRC_FZF_TYPES in
+        -td)
+          KRC_FZF_TYPES=-tf
+          ;;
+        -tf)
+          KRC_FZF_TYPES=
+          ;;
+        *)
+          KRC_FZF_TYPES=-td
+          ;;
+      esac
+      ;;
+    up)
+      KRC_FZF_ROOT=$(realpath "$KRC_FZF_ROOT/..")
+      printf "clear-query+"
+      ;;
+    accept_query)
+      set -- "$FZF_QUERY"
+      ;&
+    accept)
+      cd $KRC_FZF_ROOT
+      if [ -d "$1" ]; then
+        KRC_FZF_ROOT=$(realpath "$1")
+        printf "clear-query+"
+      else
+        echo "accept"
+        exit 0
+      fi
+      ;;
+    kak_cd)
+      krc send cd "$KRC_FZF_ROOT"
+      krc send echo "$KRC_FZF_ROOT"
+      echo "abort"
+      exit 0;
+      ;;
+  esac
+
+  krc_fzf__files_conf_update
+
+  header=$(echo $KRC_FZF_CMD $KRC_FZF_TYPES $KRC_FZF_HIDDEN)
+
+  printf "change-prompt(%s/)+" $(basename "$KRC_FZF_ROOT")
+  printf "change-input-label( $header )+"
+  printf "reload($KRC_FZF _files_list {q})"
+}
+
+krc_fzf__files_preview() {
+  IFS=: read -r path line col rest <<< "$1"
+
+  krc_fzf__files_conf_load && cd "$KRC_FZF_ROOT"
+
+  if [ -d "$path" ]; then
+    tree "$path"
+  else
+    local bat_args=
+    if [[ -n "$line" ]]; then
+      local start=$((line - (FZF_PREVIEW_LINES / 2)))
+      (( start < 1 )) && start=1
+      local end=$((start + FZF_PREVIEW_LINES))
+      bat_args="--line-range $start:$end --highlight-line $line"
+    fi
+    bat --color=always -p $bat_args "$path"
+  fi
+}
+
+krc_fzf__files_fzf() {
+  printf "" | fzf \
+    --ansi \
+    --tiebreak=length,pathname \
+    --bind="start:transform($KRC_FZF _files_action start)" \
+    --bind="ctrl-t:jump" \
+    --bind="jump:transform($KRC_FZF _files_action accept {})" \
+    --bind="ctrl-r:reload($KRC_FZF _files_list {q})" \
+    --bind="ctrl-h:transform($KRC_FZF _files_action toggle_hidden)" \
+    --bind="enter:transform($KRC_FZF _files_action accept {})" \
+    --bind="ctrl-o:execute(yazi)" \
+    --input-label="" \
+    $FZF_PREVIEW_OPTS \
+    --preview="$KRC_FZF _files_preview {}" \
+    "$@" \
+    | while IFS=: read path line col rest; do
+      krc_fzf__files_conf_load && cd "$KRC_FZF_ROOT"
+      krc edit "$(realpath "$path")" $line $col
+    done
+}
+
+krc_fzf_files() {
+  krc_fzf__files_conf_load
+  KRC_FZF_CMD=fd
+  krc_fzf__files_conf_update "$@"
+
+  krc_fzf__files_fzf \
+    --bind="ctrl-f:transform($KRC_FZF _files_action toggle_types)" \
+    --bind="backward-eof:transform($KRC_FZF _files_action up)" \
+    --bind="ctrl-d:transform($KRC_FZF _files_action kak_cd)" \
+    --bind="ctrl-x:transform($KRC_FZF _files_action accept_query)" \
+    --bind="ctrl-b:become($KRC_FZF buffers)" \
+    --bind="ctrl-g:become($KRC_FZF grep)"
+}
+
+krc_fzf_grep() {
+  krc_fzf__files_conf_load
+  KRC_FZF_CMD=rg
+  krc_fzf__files_conf_update "$@"
+
+  krc_fzf__files_fzf \
+    --delimiter=: \
+    --phony \
+    --bind="change:reload($KRC_FZF _files_list {q})" \
+    --bind="ctrl-b:become($KRC_FZF buffers)" \
+    --bind="ctrl-g:become($KRC_FZF files)"
+}
+
+
+krc_fzf__buffers_preview() {
+  bufname=$1
+  export PREVIEW_PATH=$(mktemp)
+  trap 'rm "$PREVIEW_PATH"' EXIT
+
+  echo "eval -draft %{
+    buffer '$bufname'
+    write -force '$PREVIEW_PATH'
+  }" | krc raw-send-sync
+
+  bat --color=always -p "$PREVIEW_PATH" --file-name $bufname
+}
+
+krc_fzf_buffers() {
+  bufname=$(krc get %val[bufname])
+  (
+    (krc get %val[buflist] | grep -vF "$bufname")
+    printf '%s\n' "$bufname"
+  ) |
+  grep -F "$*" |
+  fzf \
+    --input-label=' buffers ' \
+    --prompt='(b)>' \
+    --no-sort \
+    --bind="ctrl-t:jump" \
+    --bind="jump:accept" \
+    --bind="ctrl-b:become($KRC_FZF files)" \
+    $FZF_PREVIEW_OPTS \
+    --preview="$KRC_FZF _buffers_preview {}" \
+    |
+  # Open buffers
+  while read name; do
+    krc send buffer "$name"
+  done
+}
+
+krc_fzf_menu() {
+  local i=0
+  local cmds=( )
+  local labels=( )
+  local i_width=$(echo -n "$#" | wc -c)
+  while [[ "$#" -gt "0" ]]; do
+    label=$(printf "%${i_width}d: %s" "$i" "$1"); shift
+    labels+=( "$label" )
+    cmds+=( "$1" ); shift
+    i=$(( i + 1 ))
+  done
+
+  local selected=$(for label in "${labels[@]}"; do echo "$label"; done | fzf | cut -d: -f1)
+  [[ -n "$selected" ]] || return 0
+  echo ${cmds[$selected]} | krc raw-send
+}
+
+
+krc_fzf__jump_preview() {
+  local file=${1:-$FZF_JUMP_FIXED_PATH}
+  local line=$2
+  local col=$3
+  local start=$((line - (FZF_PREVIEW_LINES / 2)))
+  (( start < 1 )) && start=1
+  local end=$((start + FZF_PREVIEW_LINES))
+  bat --style=numbers --color=always --line-range "$start:$end" --highlight-line $line "$file" 2> /dev/null
+  krc edit "$file" $line $col
+}
+
+krc_fzf_jump() {
+  local bufname=$1
+  export JUMPLIST_PATH=$(mktemp --suffix krc-fzf-jump)
+  trap 'rm "$JUMPLIST_PATH"' EXIT
+
+  echo "eval -draft %{
+    buffer '$bufname'
+    write -force '$JUMPLIST_PATH'
+  }" | krc raw-send-sync
+
+  # For the lsp-document-symbols shorthand syntax
+  export FZF_JUMP_FIXED_PATH=$(head -n1 $JUMPLIST_PATH | grep -v :)
+
+  cat "$JUMPLIST_PATH" |
+    grep : |
+    sed "s/^%:/:/" |
+    fzf --delimiter ':' \
+    --preview="$KRC_FZF _jump_preview {1} {2} {3}" \
+    $FZF_PREVIEW_OPTS \
+    --bind="ctrl-t:jump" \
+    --bind="jump:accept" \
+    --prompt='>' \
+  | while IFS=: read name line col rest; do
+      [[ -z "$name" ]] && name=$FZF_JUMP_FIXED_PATH
+      krc edit "$name" $line $col
+    done
+}
+
+"krc_fzf_$@"

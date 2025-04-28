@@ -78,7 +78,7 @@ face global Reference                                                    '+b'
 face global ReferenceBind                                                '+bu'
 
 # Plugs
-face global PhantomSelection            $bg,               $(alpha $yellow 20)
+face global PhantomSelection            ,               $(alpha $green 30)
 face global Search                      $fg,               $bg3
 face global PrimarySelectionDefault     $fg,               $blue
 face global PrimarySelectionSearch      $fg,               $blue

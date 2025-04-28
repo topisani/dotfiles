@@ -32,6 +32,23 @@ mode.select = "SEL"
 # Remap gw to t
 t = "goto_word"
 "#" = "toggle_comments"
+C-h = "hover"
+C-y = [
+  ':sh rm -f /tmp/yazi-helix',
+  ':insert-output yazi %{buffer_name} --chooser-file=/tmp/yazi-helix',
+  ':insert-output echo "\x1b[?1049h\x1b[?2004h" > /dev/tty',
+  ':open %sh{cat /tmp/yazi-helix}',
+  ':redraw',
+]
+
+[keys.normal.space]
+tab = [
+  ':sh rm -f /tmp/yazi-helix',
+  ':insert-output yazi %{buffer_name} --chooser-file=/tmp/yazi-helix',
+  ':insert-output echo "\x1b[?1049h\x1b[?2004h" > /dev/tty',
+  ':open %sh{cat /tmp/yazi-helix}',
+  ':redraw',
+]
 
 [keys.select]
 # Remap gw to t
@@ -39,3 +56,4 @@ t = "extend_to_word"
 "#" = "toggle_comments"
 
 [keys.insert]
+

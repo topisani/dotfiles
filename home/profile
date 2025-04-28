@@ -48,7 +48,7 @@ purple=$(tput setaf 5)
 orange=$(tput setaf 9)
 
 export LESS="$LESS --mouse"
-export PAGER=less # Less colors for man pages
+export PAGER="less -R" # Less colors for man pages
 # export LESS="--mouse --wheel-lines 3"
 # export LESS_TERMCAP_mb=$red # Begin blinking
 # export LESS_TERMCAP_md=$orange # Begin bold
@@ -58,9 +58,16 @@ export PAGER=less # Less colors for man pages
 # export LESS_TERMCAP_ue=$default # End underline
 # export LESS_TERMCAP_us=$green # Begin underline
 
-export EDITOR='k'
+export EDITOR='kak'
 # Breaks forgit
 # export FZF_DEFAULT_OPTS='--preview-window=right,border-left,<30(up,30%,border-bottom)'
+
+
+export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS"\
+" --color=bg:0,fg:7,hl:3"\
+" --color=bg+:233,fg+:-1:bold,hl+:11"\
+" --color=info:4,border:4,prompt:12:regular"\
+" --color=pointer:4,marker:9,spinner:9,header:2"
 
 # kak: filetype=sh
 

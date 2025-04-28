@@ -110,8 +110,20 @@ def -hidden -override lsp-show-error -params 1 -docstring "Render error" %{
 # }
 
 # def -hidden -override lsp-show-goto-choices -params 2 -docstring "Render goto choices" %{
-#   connect bottom-panel sh -c "echo '%arg{@}' | krc-fzf jump"
+#   winplace bottom-panel connect terminal krc-fzf grep sh -c "echo '%arg{@}' | krc-fzf jump"
 # }
+
+define-command -hidden -override lsp-show-goto-buffer -params 4 %{
+    evaluate-commands -save-regs '"' -try-client %opt[toolsclient] %{
+        edit! -scratch %arg{1}
+        set-option buffer filetype %arg{2}
+        set-option buffer jump_current_line 0
+        set-option buffer lsp_project_root "%arg{3}/"
+        set-register '"' %arg{4}
+        execute-keys Rgg
+    }
+    winplace popup connect terminal krc-fzf jump %arg{1}
+}
 
 def lsp-enable-semantic-tokens %{
   hook window -group lsp-semantic-tokens BufReload .* lsp-semantic-tokens

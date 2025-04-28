@@ -56,3 +56,36 @@ include "%L"
 <Multi_key> <g> <q> <p> : "ψ"    U03C8    # GREEK SMALL LETTER PSI
 <Multi_key> <g> <q> <s> : "ς"    U03C2    # GREEK SMALL LETTER FINAL SIGMA
 <Multi_key> <g> <q> <x> : "ξ"    U03BE    # GREEK SMALL LETTER XI
+
+
+# Arrows
+<Multi_key> <minus> <less>		: "←"	leftarrow	# LEFTWARDS ARROW
+<Multi_key> <minus> <asciicircum>	: "↑"	uparrow		# UPWARDS ARROW
+<Multi_key> <minus> <greater>		: "→"	rightarrow	# RIGHTWARDS ARROW
+<Multi_key> <minus> <v>			: "↓"	downarrow	# DOWNWARDS ARROW
+<Multi_key> <less> <minus> <greater>	: "↔"	U2194           # LEFT RIGHT ARROW (kragen's)
+
+<Multi_key> <Left> <Left>		: "←"	leftarrow	# LEFTWARDS ARROW
+<Multi_key> <Up> <Up>			: "↑"	uparrow		# UPWARDS ARROW
+<Multi_key> <Right> <Right>		: "→"	rightarrow	# RIGHTWARDS ARROW
+<Multi_key> <Down> <Down>		: "↓"	downarrow	# DOWNWARDS ARROW
+<Multi_key> <Left> <Right>		: "↔"	U2194           # LEFT RIGHT ARROW (kragen's)
+<Multi_key> <Right> <Left>		: "↔"	U2194           # LEFT RIGHT ARROW (kragen's)
+<Multi_key> <Up> <Down>			: "↕"	U2195           # UP DOWN ARROW (kragen's)
+<Multi_key> <Up> <ampersand> <Down>     : "⇵"	U21F5		# DOWNWARDS ARROW LEFTWARDS OF UPWARDS ARROW
+<Multi_key> <Down> <Left>		: "↵"	U21B5		# DOWNWARDS ARROW WITH CORNER LEFTWARDS
+<Multi_key> <Left> <o>			: "⟲"	U27F2		# ANTICLOCKWISE GAPPED CIRCLE ARROW
+<Multi_key> <Right> <o>			: "⟳"	U27F3		# CLOCKWISE GAPPED CIRCLE ARROW
+<Multi_key> <Left> <c>			: "↺"	U21BA		# ANTICLOCKWISE OPEN CIRCLE ARROW
+<Multi_key> <Right> <c>			: "↻"	U21BB		# CLOCKWISE OPEN CIRCLE ARROW
+<Multi_key> <Left> <asciitilde>		: "⇜"	U21DC		# LEFTWARDS SQUIGGLE ARROW
+<Multi_key> <asciitilde> <Left> <asciitilde>    : "⬳"  U2B33    # LONG LEFTWARDS SQUIGGLE ARROW
+<Multi_key> <Right> <asciitilde>	: "⇝"	U21DD		# RIGHTWARDS SQUIGGLE ARROW
+<Multi_key> <asciitilde> <Right> <asciitilde>   : "⟿"  U27FF    # LONG RIGHTWARDS SQUIGGLE ARROW
+<Multi_key> <Left> <bar>       		: "⇤"	U21E4		# LEFTWARDS ARROW TO BAR
+<Multi_key> <Right> <bar>       	: "⇥"	U21E5		# RIGHTWARDS ARROW TO BAR
+<Multi_key> <Left> <minus>     		: "⇠"	U21E0		# LEFTWARDS DASHED ARROW
+<Multi_key> <Up> <minus>     		: "⇡"	U21E1		# UPWARDS DASHED ARROW
+<Multi_key> <Right> <minus>     	: "⇢"	U21E2		# RIGHTWARDS DASHED ARROW
+<Multi_key> <Down> <minus>      	: "⇣"	U21E3		# DOWNWARDS DASHED ARROW
+<Multi_key> <z> <z> <greater>           : "↯"   U21AF           # DOWNWARDS ZIGZAG ARROW

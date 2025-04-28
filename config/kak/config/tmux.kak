@@ -25,7 +25,7 @@ hook global ModuleLoaded tmux %{
     complete-command tmux-terminal-popup shell
 
     define-command -override tmux-terminal-panel -params .. -docstring 'tmux-terminal-panel [<program>] [<arguments>]: Creates a new terminal as a tmux panel.' %{
-      tmux_impl split-window -e "KAKOUNE_SESSION=%val{session}" -e "KAKOUNE_CLIENT=%val{client}" -h -b -l 30 -t '{left}' %arg{@}
+      tmux_impl split-window -e "KAKOUNE_SESSION=%val{session}" -e "KAKOUNE_CLIENT=%val{client}" -h -b -l 35 -t '{left}' %arg{@}
     }
 
     complete-command tmux-terminal-panel shell
@@ -97,7 +97,7 @@ hook global ModuleLoaded tmux %{
           esac
         done
         TMUX=$kak_client_env_TMUX TMUX_PANE=$kak_client_env_TMUX_PANE nohup tmux \
-          display-popup -e "KAKOUNE_SESSION=$kak_session" -e "KAKOUNE_CLIENT=$kak_client" -d $PWD -T "$title" $popup_args -E "$@" \
+          display-popup -e "KAKOUNE_SESSION=$kak_session" -e "KAKOUNE_CLIENT=$kak_client" -d $PWD -T "$title" $popup_args -w 80% -h 80% -E "$@" \
           < /dev/null > /dev/null 2>&1 &
       }
     }

@@ -207,8 +207,18 @@ updateKak() {
 }
 
 update_wezterm() {
-    echo "colorscheme $COLORSCHEME_NAME" | kak -p $session
     sed -i "s/^config.color_scheme\s*=\s'[^']*'/config.color_scheme = '$COLORSCHEME_NAME'/" ~/.config/wezterm/wezterm.lua
+}
+
+update_ghostty() {
+    sed -i "s/^theme\s*=.*$/theme = $COLORSCHEME_NAME/" ~/.config/ghostty/config
+    # There is no way to trigger ghostty config reload from the terminal, so this sends
+    # a shortcut to all ghostty windows using hyprctl
+    hyprctl clients -j |
+        jq -r '.[] | select(.class == "com.mitchellh.ghostty") | .address' |
+        while read addr;
+            do hyprctl dispatch sendshortcut "CTRL SHIFT,COMMA,address:$addr";
+        done
 }
 
 update_gtk() {
@@ -219,13 +229,16 @@ update_gtk() {
 toggle_gtk_dark() {
     gtk_theme="Adwaita-dark"
     icon_theme="Papirus-Dark"
+    color_scheme="prefer-dark"
     if gsettings get org.gnome.desktop.interface gtk-theme | grep -qi dark; then
         gtk_theme="Adwaita"
+        color_scheme="prefer-light"
     fi
 
     # gsettings works in wayland
     gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme"
     gsettings set org.gnome.desktop.interface icon-theme "$icon_theme"
+    gsettings set org.gnome.desktop.interface color-scheme $color_scheme
 
     # xsettingsd works in x
     echo "Net/ThemeName \"$gtk_theme\"" > $HOME/.config/xsettingsd/xsettingsd.conf
@@ -278,6 +291,7 @@ switch() {
         echo "$COLORSCHEME_NAME" > $COLORSCHEME_PATH/current
         updateXrdb
         updateKak
+        update_ghostty
         # updateTerminals
         # updateTermite
         update_kitty

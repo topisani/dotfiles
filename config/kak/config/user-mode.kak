@@ -34,7 +34,7 @@ def -hidden -override my-fzf-bundle-popup %{
     winplace popup connect terminal krc-fzf files %sh{printf '%s' "$HOME/.config/kak/bundle"}
 }
 
-def sidetree -override %{ winplace panel connect terminal sidetree --select %val{buffile} }
+def sidetree -override %{ winplace panel connect terminal sidetree --select "%val{buffile}" }
 
 def broot -override -params .. %{
   connect terminal sh -c %{
@@ -91,18 +91,16 @@ map global undo k '<c-k>' -docstring "move backward in changes history"
 # map global files F ':winplace popup connect terminal -title "Open file (all)..." krc-fzf files -uuu<ret>'  -docstring 'List files (including hidden)'
 map global files f ':winplace popup connect terminal krc-fzf files<ret>'             -docstring 'List files'
 map global files F ':winplace popup connect terminal krc-fzf files -uuu<ret>'        -docstring 'List files (including hidden)'
-map global files b ':winplace popup connect broot<ret>'                                        -docstring 'broot popup'
-map global files B ':winplace window connect broot<ret>'                                       -docstring 'broot window'
-map global files e ':winplace panel connect broot<ret>'                                        -docstring 'broot panel'
-map global files w ':w<ret>'                                                           -docstring 'Write file'
-map global files c ":my-fzf-config-popup<ret>"                                         -docstring 'Open config dir'
-map global files C ":my-fzf-bundle-popup<ret>"                                         -docstring 'Open plugin dir'
-map global files d ':my-file-delete<ret>'                                              -docstring 'Delete current file'
-map global files r ':my-file-rename<ret>'                                              -docstring 'Rename current file'
-map global files R ':winplace window connect terminal yazi %reg[%]<ret>'                     -docstring 'Yazi'
-map global files h ':winplace popup connect yazi<ret>'                                       -docstring 'Yazi'
+map global files w ':w<ret>'                                                         -docstring 'Write file'
+map global files c ":my-fzf-config-popup<ret>"                                       -docstring 'Open config dir'
+map global files C ":my-fzf-bundle-popup<ret>"                                       -docstring 'Open plugin dir'
+map global files d ':my-file-delete<ret>'                                            -docstring 'Delete current file'
+map global files r ':my-file-rename<ret>'                                            -docstring 'Rename current file'
+map global files y ':winplace window connect terminal yazi %reg[%]<ret>'             -docstring 'Yazi'
+map global files h ':winplace popup connect yazi<ret>'                      -docstring 'Yazi'
+map global files g ':winplace popup connect terminal krc-fzf grep<ret>'                       -docstring 'Grep...'
 
-map global buffers b ':winplace popup connect terminal krc-fzf buffers<ret>'                   -docstring "List Buffers"
+map global buffers b ':winplace popup connect terminal krc-fzf buffers<ret>'           -docstring "List Buffers"
 map global buffers n ':buffer-next<ret>'                                               -docstring "Next Buffer"
 map global buffers p ':buffer-previous<ret>'                                           -docstring "Prev buffer"
 map global buffers d ':delete-buffer<ret>'                                             -docstring "Delete buffer"

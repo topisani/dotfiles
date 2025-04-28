@@ -27,7 +27,7 @@ declare-option str bufname_abbrev
 
 define-command -hidden -override update-bufname-abbrev %{
   set-option window bufname_abbrev %sh{
-    if [ ${#kak_bufname} -gt $(($kak_window_width / 3)) ]; then
+    if [ ${#kak_bufname} -gt $((${kak_window_width:-10000} / 3)) ]; then
       echo $kak_bufname | sed "s:\([^/]\)[^/]*/:\1/:g"
     else
       echo $kak_bufname
@@ -72,7 +72,8 @@ hook -group myml global WinSetOption lsp_diagnostic_(\w+)_count.* %{
   }
 }
 
-set-option global modelinefmt %sh{
+def -hidden set-my-modelinefmt %{
+  set-option global modelinefmt %sh{
   tr -d '\n' <<'EOF'
 {annotation}%opt{modeline_lsp_progress}
 %opt{lsp_modeline_breadcrumbs}%opt{lsp_modeline_code_actions}
@@ -92,4 +93,5 @@ set-option global modelinefmt %sh{
 {cyan}U+%sh{printf '%04X' "$kak_cursor_char_value"}{default} 
 {+r@StatusLineMode} %opt{myml_mode_str} 
 EOF
+  }
 }

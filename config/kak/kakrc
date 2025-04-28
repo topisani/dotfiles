@@ -59,6 +59,12 @@ def toggle-numbers -override %{
   }
 }
 
+def toggle-modeline -override %{
+  eval %sh{
+    [ -z "$kak_opt_modelinefmt" ] && echo set-my-modelinefmt || echo set global modelinefmt "%{}"
+  }
+}
+
 # Window-based settings
 hook global WinCreate .* %{
   addhl window/matching show-matching
@@ -69,6 +75,11 @@ hook global WinCreate .* %{
 }
 
 load-conf windowing
+
+# Push most recent buffer to the front of the buflist
+hook global WinDisplay .* %{
+  arrange-buffers %val{bufname}
+}
 
 # Plugins ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
@@ -139,14 +150,14 @@ bundle-customload kakoune-boost https://github.com/krobelus/kakoune-boost %{
 bundle kakoune-phantom-selection https://github.com/occivink/kakoune-phantom-selection %{
   map global user t     ": phantom-selection-add-selection<ret>"                        -docstring "Phantom add"
   map global user T     ": phantom-selection-select-all; phantom-selection-clear<ret>"  -docstring "Phantom select all"
-  map global user <a-t> ": phantom-selection-iterate-next<ret>"                         -docstring "Phantom next"
-  map global user <a-T> ": phantom-selection-iterate-prev<ret>"                         -docstring "Phantom prev"
+  map global normal <a-t> ": phantom-selection-iterate-next<ret>"                         -docstring "Phantom next"
+  map global normal <a-T> ": phantom-selection-iterate-prev<ret>"                         -docstring "Phantom prev"
 }
 
 bundle reasymotion https://github.com/astaugaard/reasymotion %{
   evaluate-commands %sh{ rkak_easymotion start }
   set global reasymotion_keys "thnesirayfoluckpdg,m.w/xjbvq"
-  map global normal <a-t> ':reasymotion-selection<ret>'
+  # map global normal <a-t> ':reasymotion-selection<ret>'
   map global normal t ':reasymotion-word<ret>'
   map global normal T ':reasymotion-selection<ret>'
 }
@@ -296,7 +307,7 @@ load-conf rust
 
 
 def -override debughl %{
-    echo -to-file "/tmp/kak-debughl.txt" "%opt[kts_highlighter_ranges] %opt[lsp_semantic_tokens]"
+    echo -to-file "/tmp/kak-debughl.txt" "%opt[tree_sitter_hl_ranges] %opt[lsp_semantic_tokens]"
     info %sh{
         line=$kak_cursor_line
         col=$kak_cursor_column
@@ -362,10 +373,6 @@ filetype-hook kdl %{
   set window comment_line '//'
 }
 
-filetype-hook lsp-goto %{
-  set buffer buffer_kind jump
-}
-
 filetype-hook devicetree %{
   set window comment_line '//'
 }
@@ -421,13 +428,6 @@ def -override markdown-live %{
 
 load-conf user-mode
 load-conf himalaya
-
-
-# ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
-# # taupiqueur's jump mode
-# map -docstring 'enter jump mode (select mode: replace)' global normal t ':enter_jump_mode_with_replace_select_mode<ret>'
-# map -docstring 'enter jump mode (select mode: extend)' global normal T ':enter_jump_mode_with_extend_select_mode<ret>'
-# map -docstring 'enter jump mode (select mode: append)' global normal <a-t> ':enter_jump_mode_with_append_select_mode<ret>'
 
 
 # ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
