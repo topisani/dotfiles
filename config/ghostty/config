@@ -1,0 +1,160 @@
+# vim: ft=conf
+# This is the configuration file for Ghostty.
+#
+# This template file has been automatically created at the following
+# path since Ghostty couldn't find any existing config files on your system:
+#
+#   /home/topisani/.config/ghostty/config
+#
+# The template does not set any default options, since Ghostty ships
+# with sensible defaults for all options. Users should only need to set
+# options that they want to change from the default.
+#
+# Run `ghostty +show-config --default --docs` to view a list of
+# all available config options and their default values.
+#
+# Additionally, each config option is also explained in detail
+# on Ghostty's website, at https://ghostty.org/docs/config.
+
+# Config syntax crash course
+# ==========================
+# # The config file consists of simple key-value pairs,
+# # separated by equals signs.
+font-family = ""
+font-family = "JetBrainsMono Nerd Font"
+font-size = 9
+# disable ligatures:
+font-feature = -calt
+adjust-cell-height=-1
+window-inherit-font-size=false
+window-padding-x=1
+window-padding-y=1
+window-padding-balance=true
+window-padding-color=background
+
+resize-overlay=never
+clipboard-read=ask
+clipboard-write=allow
+shell-integration=fish
+
+mouse-shift-capture=true
+
+# theme=dark:flatblue-dark,light:flatblue-light
+theme = flatblue-dark
+
+keybind = shift+insert=paste_from_selection
+keybind = ctrl+shift+v=paste_from_clipboard
+keybind = ctrl+shift+c=copy_to_clipboard
+keybind = ctrl+shift+comma=reload_config
+keybind = ctrl+zero=reset_font_size
+keybind = ctrl+minus=decrease_font_size:1
+keybind = ctrl+equal=increase_font_size:1
+keybind = ctrl+plus=increase_font_size:1
+
+# unbind default keybinds:
+
+#open_config
+keybind = ctrl+comma=unbind
+#next_tab
+keybind = ctrl+page_down=unbind
+#goto_split:up
+keybind = ctrl+alt+up=unbind
+#select_all
+keybind = ctrl+shift+a=unbind
+#equalize_splits
+keybind = super+ctrl+shift+plus=unbind
+#adjust_selection:up
+keybind = shift+up=unbind
+#goto_tab:5
+keybind = alt+five=unbind
+#goto_split:next
+keybind = super+ctrl+right_bracket=unbind
+#new_split:right
+keybind = ctrl+shift+o=unbind
+#copy_to_clipboard
+keybind = ctrl+shift+c=unbind
+#quit
+keybind = ctrl+shift+q=unbind
+#new_window
+keybind = ctrl+shift+n=unbind
+#jump_to_prompt:1
+keybind = ctrl+shift+page_down=unbind
+#adjust_selection:left
+keybind = shift+left=unbind
+#resize_split:up,10
+keybind = super+ctrl+shift+up=unbind
+#goto_tab:8
+keybind = alt+eight=unbind
+#scroll_page_up
+keybind = shift+page_up=unbind
+#write_screen_file:open
+keybind = ctrl+alt+shift+j=unbind
+#previous_tab
+keybind = ctrl+shift+left=unbind
+#close_tab
+keybind = ctrl+shift+w=unbind
+#scroll_to_bottom
+keybind = shift+end=unbind
+#goto_tab:3
+keybind = alt+three=unbind
+#write_screen_file:paste
+keybind = ctrl+shift+j=unbind
+#toggle_fullscreen
+keybind = ctrl+enter=unbind
+#previous_tab
+keybind = ctrl+page_up=unbind
+#adjust_selection:right
+keybind = shift+right=unbind
+#next_tab
+keybind = ctrl+tab=unbind
+#goto_split:left
+keybind = ctrl+alt+left=unbind
+#scroll_page_down
+keybind = shift+page_down=unbind
+#next_tab
+keybind = ctrl+shift+right=unbind
+#jump_to_prompt:-1
+keybind = ctrl+shift+page_up=unbind
+#last_tab
+keybind = alt+nine=unbind
+#new_tab
+keybind = ctrl+shift+t=unbind
+#adjust_selection:down
+keybind = shift+down=unbind
+#resize_split:left,10
+keybind = super+ctrl+shift+left=unbind
+#previous_tab
+keybind = ctrl+shift+tab=unbind
+#goto_tab:2
+keybind = alt+two=unbind
+#goto_split:down
+keybind = ctrl+alt+down=unbind
+#resize_split:down,10
+keybind = super+ctrl+shift+down=unbind
+#resize_split:right,10
+keybind = super+ctrl+shift+right=unbind
+#goto_tab:4
+keybind = alt+four=unbind
+#copy_to_clipboard
+keybind = ctrl+insert=unbind
+#new_split:down
+keybind = ctrl+shift+e=unbind
+#goto_split:right
+keybind = ctrl+alt+right=unbind
+#close_window
+keybind = alt+f4=unbind
+#goto_tab:1
+keybind = alt+one=unbind
+#toggle_split_zoom
+keybind = ctrl+shift+enter=unbind
+#scroll_to_top
+keybind = shift+home=unbind
+#goto_split:previous
+keybind = super+ctrl+left_bracket=unbind
+#inspector:toggle
+keybind = ctrl+shift+i=unbind
+#goto_tab:6
+keybind = alt+six=unbind
+#goto_tab:7
+keybind = alt+seven=unbind
+

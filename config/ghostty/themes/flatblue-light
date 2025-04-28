@@ -1,0 +1,58 @@
+# vim: ft=conf
+# flatblue-light theme
+
+# special
+foreground=#18191c
+background=#fbf8f8
+cursor-color=#1E1F21
+
+# black
+palette = 0=#ffffff
+palette = 8=#b8b9b4
+# red
+palette = 1=#f24130
+palette = 9=#d92817
+# green
+palette = 2=#71ba51
+palette = 10=#3e871e
+# yellow
+palette = 3=#ffe000
+palette = 11=#f2bb13
+# blue
+palette = 4=#07b0ff
+palette = 12=#178ca6
+# magenta
+palette = 5=#ff465a
+palette = 13=#dd465a
+# cyan
+palette = 6=#67c5b4
+palette = 14=#249991
+# white
+palette = 7=#1E1F21
+palette = 15=#323037
+
+# Grays (dark to light)
+palette = 232=#F4F4F4
+palette = 233=#E9E9E9
+palette = 234=#DFDFDF
+palette = 235=#D5D5D5
+palette = 236=#CACACA
+palette = 237=#C0C0C0
+palette = 238=#B6B6B6
+palette = 239=#ACACAC
+palette = 240=#A1A1A1
+palette = 241=#979797
+palette = 242=#8D8D8D
+palette = 243=#838383
+palette = 244=#787878
+palette = 245=#6E6E6E
+palette = 246=#646464
+palette = 247=#5A5A5A
+palette = 248=#4F4F4F
+palette = 249=#454545
+palette = 250=#3B3B3B
+palette = 251=#313131
+palette = 252=#262626
+palette = 253=#1C1C1C
+palette = 254=#121212
+palette = 255=#080808
