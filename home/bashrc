@@ -2,9 +2,22 @@
 # ~/.bashrc
 #
 
-[ -r /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
+if [ -z "$_HOME_DOT_PROFILE_INCLUDED" ]; then
+    source ~/.profile
+fi
 
-export TMPDIR="/tmp"
+# Only continue for interactive shells
+[[ $- != *i* ]] && return
+
+# Disable special handing of <c-s> and <c-q>
+stty -ixon -ixoff
+
+if [[ $(ps --no-header --pid=$PPID --format=comm) != "zsh" && -z ${BASH_EXECUTION_STRING} && ${SHLVL} ]]
+then
+	shopt -q login_shell && LOGIN_OPTION='--login' || LOGIN_OPTION=''
+	exec zsh $LOGIN_OPTION
+	exit $?
+fi
 
 complete -cf sudo
 
@@ -33,38 +46,15 @@ shopt -s expand_aliases
 # xhost to allow remote X connections
 # xhost +local:root > /dev/null 2>&1
 
+[ -r /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
+
 # Configuration
-# source ~/.config/bash/aliases.sh
-# source ~/.config/bash/git.sh
+source ~/.config/bash/aliases.sh
+source ~/.config/bash/git.sh
 
-# Node Version Manager
-test -r /usr/share/nvm/init-nvm.sh && source /usr/share/nvm/init-nvm.sh
-
-# Opam: Ocaml package manager
-command -v opam &> /dev/null && eval $(opam config env)
-
-if [ -z "$_HOME_DOT_PROFILE_INCLUDED" ]; then
-    source ~/.profile
-fi
-
-# Only continue for interactive shells
-[[ $- != *i* ]] && return
-
-# Disable special handing of <c-s> and <c-q>
-stty -ixon -ixoff
-
-if [[ $(ps --no-header --pid=$PPID --format=comm) != "fish" && -z ${BASH_EXECUTION_STRING} && ${SHLVL} ]]
-then
-	shopt -q login_shell && LOGIN_OPTION='--login' || LOGIN_OPTION=''
-	exec fish $LOGIN_OPTION
-	exit $?
-fi
-
-# Starship prompt
-# eval "$(starship init bash)"
-
-# https://github.com/ajeetdsouza/zoxide
-eval "$(zoxide init bash)"
+source <(starship init bash)
+source <(zoxide init bash)
+source <(COMPLETE=bash jj)
 
 # Enhanced file path completion in bash - https://github.com/sio/bash-complete-partial-path
 if [ -s "$HOME/.config/bash-complete-partial-path/bash_completion" ]
@@ -72,6 +62,3 @@ then
   source "$HOME/.config/bash-complete-partial-path/bash_completion"
   _bcpp --defaults
 fi
-
-
-# source /home/topisani/.config/broot/launcher/bash/br

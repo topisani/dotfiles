@@ -7,15 +7,15 @@ append_previewers = [
   { name = "*", run = "hexyl" },
 ]
 
-# [[plugin.prepend_fetchers]]
-# id   = "git"
-# name = "*"
-# run  = "git"
+[[plugin.prepend_fetchers]]
+id   = "git"
+name = "*"
+run  = "git"
 
-# [[plugin.prepend_fetchers]]
-# id   = "git"
-# name = "*/"
-# run  = "git"
+[[plugin.prepend_fetchers]]
+id   = "git"
+name = "*/"
+run  = "git"
 
 [opener]
 open = [

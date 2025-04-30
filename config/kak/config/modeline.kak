@@ -95,3 +95,5 @@ def -hidden set-my-modelinefmt %{
 EOF
   }
 }
+
+set-my-modelinefmt
