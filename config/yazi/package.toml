@@ -1,14 +1,4 @@
 [[plugin.deps]]
-use = "Reledia/glow"
-rev = "2da96e3"
-hash = "f9ee1436e3b853508d87f7d49dce56e6"
-
-[[plugin.deps]]
-use = "yazi-rs/plugins:git"
-rev = "864a021"
-hash = "e0ada736ea676c2bbb3ec705a49526ef"
-
-[[plugin.deps]]
 use = "yazi-rs/plugins:mount"
 rev = "864a021"
 hash = "dd97eede8e20e59cd2604e8006e470e2"
@@ -20,8 +10,13 @@ hash = "2f1053f89d1a301a648ab181d0948e38"
 
 [[plugin.deps]]
 use = "hankertrix/augment-command"
-rev = "91ba6c5"
-hash = "6ac13898ec80c623e2d9ea90b947c86a"
+rev = "04cda98"
+hash = "3ec6486539188b1e1932ac27f3582917"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:git"
+rev = "864a021"
+hash = "e0ada736ea676c2bbb3ec705a49526ef"
 
 [flavor]
 deps = []

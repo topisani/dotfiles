@@ -1,14 +1,15 @@
-#!/bin/bash
+#!/bin/sh
 
 # exec wezterm start -- "$@"
 # exit $?
 
 setup_term() {
-    TERM=tmux-256color tmux new-session "$*"\; set destroy-unattached on\; set status off\; attach
+    export TERM=tmux-256color
+    exec tmux new-session "$*"\; set destroy-unattached on\; set status off\; attach
     # zellij
 }
 
-if [[ "$1" == "--setup" ]]; then
+if [ "$1" == "--setup" ]; then
     shift;
     setup_term "$*"
 else

@@ -7,7 +7,7 @@ if [ -z "$_HOME_DOT_PROFILE_INCLUDED" ]; then
 fi
 
 # Only continue for interactive shells
-[[ $- != *i* ]] && return
+[[ $- != *i* ]] && return 0
 
 # Disable special handing of <c-s> and <c-q>
 stty -ixon -ixoff
