@@ -43,23 +43,8 @@ alias pud=pushd
 alias popd='popd > /dev/null'
 alias dirs='dirs -p'
 
-function mkcd {
-  mkdir -p "$1"
-  cd "$1"
-}
-
 alias st=subterranean
 alias j=just
-
-alias nv=nvim
-
-# Change the current directory for a tmux session, which determines
-# the starting dir for new windows/panes:
-tmux-cwd() {
-  tmux command-prompt -I $PWD -p "New session dir:" "attach -c %1"
-}
-
-alias tcd='tmux-cwd'
 
 alias ssh="TERM=xterm-256color ssh"
 
@@ -69,10 +54,8 @@ less_or_ls() {
 }
 alias ls=less_or_ls
 
-mkcd() {
-    mkdir -p "$@"
-    cd "$@"
-}
+function mkd() { [[ $# == 1 ]] && mkdir -p -- "$1" && cd -- "$1" }
+compdef _directories mkd
 
 # Calculator
 calc() {
@@ -90,7 +73,6 @@ git_release() {
 }
 
 alias grel=git_release
-
 
 whichpkg() (
     set -e

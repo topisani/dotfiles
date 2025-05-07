@@ -20,7 +20,7 @@ function krc-:send { krc send-fg "$@"; }
 function krc-send-sync { krc send-sync "$@"; }
 
 function krc-buffers {
-    eval set -- $(krc get '%val[buflist]')
+    set -- $(krc get '%val[buflist]')
     printf "%s\n" "$@"
 }
 

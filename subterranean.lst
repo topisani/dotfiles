@@ -61,3 +61,5 @@
 ~/.config/helix;config/helix
 ~/.config/mako/config;config/mako/config
 ~/.config/ghostty;config/ghostty
+~/.zsh_plugins.txt;home/zsh_plugins.txt
+~/.config/xdg-desktop-portal;config/xdg-desktop-portal

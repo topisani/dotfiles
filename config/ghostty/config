@@ -35,7 +35,7 @@ window-padding-color=background
 resize-overlay=never
 clipboard-read=ask
 clipboard-write=allow
-shell-integration=fish
+shell-integration=zsh
 
 mouse-shift-capture=true
 

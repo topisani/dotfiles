@@ -60,8 +60,6 @@ export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS"\
 " --color=info:4,border:4,prompt:12:regular"\
 " --color=pointer:4,marker:9,spinner:9,header:2"
 
-# kak: filetype=sh
-
 export PATH="$HOME/.poetry/bin:$PATH"
 
 export TMPDIR="/tmp"
@@ -69,9 +67,9 @@ export TMPDIR="/tmp"
 export FORGIT_COPY_CMD=clip
 export FORGIT_FZF_DEFAULT_OPTS="--reverse"
 
-export SSH_AUTH_SOCK=/tmp/ssh-agent.$HOST.sock
-
 export POETRY_VIRTUALENVS_IN_PROJECT=true
+
+export SSH_AUTH_SOCK=/tmp/ssh-agent.$HOST.sock
 
 ssh-add -l 2>/dev/null >/dev/null
 if [ $? -ge 2 ]; then
