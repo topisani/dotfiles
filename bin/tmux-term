@@ -9,7 +9,7 @@ setup_term() {
     # zellij
 }
 
-if [ "$1" == "--setup" ]; then
+if [ "$1" = "--setup" ]; then
     shift;
     setup_term "$*"
 else
