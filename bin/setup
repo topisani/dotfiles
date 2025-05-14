@@ -98,10 +98,17 @@ EOF
 # )
 
 # GUI
+setup::install waybar wofi dunst udiskie
+setup::install hyprland hyprpaper hyprlock xdg-desktop-portal-hyprland hyprcursor hypridle wl-clipboard hyprpolkitagent uwsm
+(
+    systemctl --user enable hyprpaper.service
+    systemctl --user enable hyprpolkitagent.service
+    systemctl --user enable hypridle.service
+    systemctl --user enable waybar.service
+)
+
 setup::install ghostty
 setup::install ttf-jetbrains-mono-nerd
-setup::install hyprland hyprpaper hyprlock xdg-desktop-portal-hyprland hyprcursor hypridle wl-clipboard
-setup::install waybar wofi dunst udiskie
 setup::install breeze breeze5 papirus-icon-theme
 setup::install zathura zathura-pdf-mupdf imv nemo
 
