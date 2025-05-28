@@ -48,10 +48,10 @@
 
 [url "gitlab-as-move:move-innovation/"]
 	insteadOf = https://gitlab.com/move-innovation/
-	
+
 [url "gitlab-as-move:move-innovation/"]
 	insteadOf = git@gitlab.com:move-innovation/
-	
+
 [push]
 	default = current
 	autoSetupRemote = true

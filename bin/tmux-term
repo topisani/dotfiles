@@ -11,9 +11,8 @@ setup_term() {
 
 if [ "$1" = "--setup" ]; then
     shift;
-    setup_term "$*"
+    setup_term "$@"
 else
-    args="$*"
-    # alacritty --title="Terminal" -e sh -c "$0 --setup $args"
+    # notify-send "$*"
     ghostty --gtk-single-instance=true --command="$0 --setup $args"
 fi
