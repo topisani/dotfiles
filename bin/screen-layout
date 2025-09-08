@@ -33,8 +33,8 @@ _layout_single() {
 }
 
 _layout_home() {
-  echo "desc:Dell Inc. DELL S2721QS CH3CM43,highres,0x0,1.25"
-  echo "eDP-1,highres,960x2160,$EDP1_SCALE"
+  echo "desc:Dell Inc. DELL S2721QS CH3CM43,preferred,0x0,1.25" # bitdepth, 10, cm, hdr, sdrbrightness, 1.0"
+  echo "eDP-1,preferred,0x1728,$EDP1_SCALE"
 }
 
 _layout_mirror() {
@@ -99,14 +99,20 @@ _apply_hyprland() {
 }
 
 _daemon() {
-  layout=""
-  while true; do
-    new_layout=$(_layout_auto)
-    if [[ "$layout" != "$new_layout" ]]; then
-      layout="$new_layout"
-      echo "$layout" | "_apply_$method"
-    fi
-    sleep 5
+  (
+      echo "update"
+      socat - UNIX-CONNECT:$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock | grep '^monitor\(added\|removed\)v2>>' &
+      while sleep 30; do echo "update"; done
+  ) | while read args; do
+      local prev_layout=""
+      while true; do
+        local layout=$(_layout_auto)
+        if [[ "$layout" != "$prev_layout" ]]; then
+          echo "$layout" | "_apply_$method"
+        fi
+        prev_layout=$layout
+        sleep 5
+      done
   done
 }
 

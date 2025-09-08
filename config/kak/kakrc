@@ -141,7 +141,7 @@ bundle kak-ansi https://github.com/eraserhd/kak-ansi
 bundle-customload kakoune-boost https://github.com/krobelus/kakoune-boost %{
   source "%opt{bundle_path}/kakoune-boost/surround.kak"
   source "%opt{bundle_path}/kakoune-boost/git.kak"
-  source "%opt{bundle_path}/kakoune-boost/jj.kak"
+  # source "%opt{bundle_path}/kakoune-boost/jj.kak"
   source "%opt{bundle_path}/kakoune-boost/doc.kak"
   load-conf git
   load-conf ide
@@ -343,6 +343,7 @@ filetype-assign .*\.typst typst
 filetype-assign .*\.env sh
 filetype-assign .*\.jjdescription jj-describe
 filetype-assign .*\.surql surrealdb
+filetype-assign .*\.scad openscad
 
 filetype-hook jj-describe %{
   # set window comment_line 'JJ:'

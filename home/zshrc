@@ -50,3 +50,4 @@ iscmd jj && source <(COMPLETE=zsh jj)
 [[ -e /opt/google-cloud-sdk/completion.zsh.inc ]] && source /opt/google-cloud-sdk/completion.zsh.inc
 
 iscmd starship && source <(starship init zsh)
+iscmd atuin && source <(atuin init zsh --disable-up-arrow)

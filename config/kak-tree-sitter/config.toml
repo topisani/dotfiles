@@ -230,3 +230,19 @@ source = { git = { url = "https://github.com/uben0/tree-sitter-typst", pin = "46
 path = "queries/typst"
 
 
+
+[language.openscad.grammar]
+source = { git = { url = "https://github.com/openscad/tree-sitter-openscad", pin = "5771b531d5b5f8042b983f7ac31e757831035b1e" }}
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "-o", "openscad.so"]
+link_flags = ["-O3"]
+
+[language.openscad.queries]
+source = { git = { url = "https://github.com/openscad/tree-sitter-openscad", pin = "5771b531d5b5f8042b983f7ac31e757831035b1e" }}
+path = "queries"
+
+

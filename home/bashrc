@@ -62,3 +62,9 @@ then
   source "$HOME/.config/bash-complete-partial-path/bash_completion"
   _bcpp --defaults
 fi
+
+PATH="/home/topisani/perl5/bin${PATH:+:${PATH}}"; export PATH;
+PERL5LIB="/home/topisani/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
+PERL_LOCAL_LIB_ROOT="/home/topisani/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
+PERL_MB_OPT="--install_base \"/home/topisani/perl5\""; export PERL_MB_OPT;
+PERL_MM_OPT="INSTALL_BASE=/home/topisani/perl5"; export PERL_MM_OPT;

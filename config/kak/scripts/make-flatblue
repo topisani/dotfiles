@@ -72,7 +72,7 @@ face global LineFlagError               $red,              default       +b
 face global LineFlagWarning             $yellow,           default       +b
 face global LineFlagInfo                $green,            default       +b
 face global LineFlagHint                $gray,             default       +b
-face global LspDocumentLink							,,blue+u
+face global LspDocumentLink							,,$blue_dark+u
 
 face global Reference                                                    '+b'
 face global ReferenceBind                                                '+bu'

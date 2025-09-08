@@ -343,7 +343,17 @@ EOF
    }
 }
 
-filetype-hook (rust|css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml|zig|go|templ|devicetree|kconfig|conf|janet) %{
+rmhooks global lsp-openscad
+hook -group lsp-openscad global BufSetOption filetype=openscad %{
+  set-option buffer lsp_servers %exp{
+      [openscad-lsp]
+      root_globs = [".git"]
+      command = "openscad-lsp"
+      args = ["--stdio", "--indent", "    "]
+  }
+}
+
+filetype-hook (rust|css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml|zig|go|templ|devicetree|kconfig|conf|janet|openscad) %{
   lsp-setup
   lsp-enable-semantic-tokens
 }
