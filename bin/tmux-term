@@ -1,18 +1,16 @@
 #!/bin/sh
 
-# exec wezterm start -- "$@"
-# exit $?
-
 setup_term() {
     export TERM=tmux-256color
-    exec tmux new-session "$*"\; set destroy-unattached on\; set status off\; attach
-    # zellij
+    CMD=${1:-$SHELL}
+    exec tmux new-session "$CMD" \; set destroy-unattached on \; set status off \; attach
 }
 
 if [ "$1" = "--setup" ]; then
-    shift;
-    setup_term "$@"
+    setup_term "$2"
 else
-    # notify-send "$*"
-    ghostty --gtk-single-instance=true --command="$0 --setup $args"
+    CMD=$(printf '%q ' "$@")
+    # Ghostty launches faster when no -e is given, so for all standard empty terminals, launch this directly
+    [ $# = 0 ] && exec ghostty --gtk-single-instance=true --command="$0 --setup"
+    exec ghostty --gtk-single-instance=true -e "$0 --setup '$CMD'"
 fi

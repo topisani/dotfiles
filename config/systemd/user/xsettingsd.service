@@ -1,0 +1,11 @@
+[Unit]
+After=graphical-session.target
+
+[Service]
+Type=exec
+ExecStart=xsettingsd
+Restart=on-failure
+Slice=app-graphical.slice
+
+[Install]
+WantedBy=graphical-session.target

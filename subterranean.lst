@@ -64,3 +64,4 @@
 ~/.zsh_plugins.txt;home/zsh_plugins.txt
 ~/.config/xdg-desktop-portal;config/xdg-desktop-portal
 ~/.config/uwsm;config/uwsm
+~/.config/systemd/user;config/systemd/user
