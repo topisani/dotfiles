@@ -23,6 +23,25 @@ setup::install git zsh jq tmux zoxide exa forgit jujutsu
 setup::install diff-so-fancy bat ripgrep fd git-revise git-autofixup libqalculate bc
 setup::install editorconfig-core-c tig fzf
 
+setup::install waybar wofi dunst udiskie
+setup::install hyprland hyprpaper hyprlock xdg-desktop-portal-hyprland hyprcursor hypridle wl-clipboard hyprpolkitagent uwsm
+(
+    systemctl --user enable hyprpaper.service
+    systemctl --user enable hyprpolkitagent.service
+    systemctl --user enable hypridle.service
+    systemctl --user enable waybar.service
+)
+
+setup::install ghostty
+setup::install ttf-jetbrains-mono-nerd
+setup::install breeze breeze5 papirus-icon-theme
+setup::install zathura zathura-pdf-mupdf imv nemo
+
+gsettings set org.cinnamon.desktop.default-applications.terminal exec "$(which tmux-term)"
+gsettings set org.cinnamon.desktop.default-applications.terminal exec-arg ""
+gsettings set org.gnome.desktop.default-applications.terminal exec "$(which tmux-term)"
+gsettings set org.gnome.desktop.default-applications.terminal exec-arg ""
+
 setup::install rustup && (
     rustup default || rustup default stable
     rustup component add rust-src
@@ -50,7 +69,7 @@ setup::project https://github.com/topisani/kak-tree-sitter && (
     # git reset --hard upstream/master
     cargo install --locked --path kak-tree-sitter
     cargo install --locked --path ktsctl
-    ktsctl sync -a 
+    # ktsctl sync -a 
 )
 
 setup::project https://github.com/topisani/sidetree && (
@@ -98,21 +117,3 @@ EOF
 # )
 
 # GUI
-setup::install waybar wofi dunst udiskie
-setup::install hyprland hyprpaper hyprlock xdg-desktop-portal-hyprland hyprcursor hypridle wl-clipboard hyprpolkitagent uwsm
-(
-    systemctl --user enable hyprpaper.service
-    systemctl --user enable hyprpolkitagent.service
-    systemctl --user enable hypridle.service
-    systemctl --user enable waybar.service
-)
-
-setup::install ghostty
-setup::install ttf-jetbrains-mono-nerd
-setup::install breeze breeze5 papirus-icon-theme
-setup::install zathura zathura-pdf-mupdf imv nemo
-
-gsettings set org.cinnamon.desktop.default-applications.terminal exec "$(which tmux-term)"
-gsettings set org.cinnamon.desktop.default-applications.terminal exec-arg ""
-gsettings set org.gnome.desktop.default-applications.terminal exec "$(which tmux-term)"
-gsettings set org.gnome.desktop.default-applications.terminal exec-arg ""

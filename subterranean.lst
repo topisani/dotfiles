@@ -63,3 +63,4 @@
 ~/.config/ghostty;config/ghostty
 ~/.zsh_plugins.txt;home/zsh_plugins.txt
 ~/.config/xdg-desktop-portal;config/xdg-desktop-portal
+~/.config/uwsm;config/uwsm
