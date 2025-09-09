@@ -64,4 +64,9 @@
 ~/.zsh_plugins.txt;home/zsh_plugins.txt
 ~/.config/xdg-desktop-portal;config/xdg-desktop-portal
 ~/.config/uwsm;config/uwsm
-~/.config/systemd/user;config/systemd/user
+~/.config/systemd/user/nm-applet.service;config/systemd/user/nm-applet.service
+~/.config/systemd/user/udiskie.service;config/systemd/user/udiskie.service
+~/.config/systemd/user/xsettingsd.service;config/systemd/user/xsettingsd.service
+~/.config/systemd/user/graphical-session.target.wants/nm-applet.service;config/systemd/user/graphical-session.target.wants/nm-applet.service
+~/.config/systemd/user/graphical-session.target.wants/udiskie.service;config/systemd/user/graphical-session.target.wants/udiskie.service
+~/.config/systemd/user/graphical-session.target.wants/xsettingsd.service;config/systemd/user/graphical-session.target.wants/xsettingsd.service
