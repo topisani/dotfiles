@@ -1,53 +1,37 @@
-/* Autohide navigation bar. Gives some issue with urlbar placement sometimes */
-:root[sessionrestored]:not([customizing]) #navigator-toolbox:not(:hover):not(:focus-within) #nav-bar {
-    max-height: 0 !important;
-    min-height: 0 !important;
-    overflow: hidden;
-    /*margin-bottom: 0px;
-    opacity: 0;
-    /* Wait 500ms before hiding the nav bar on unfocus */
-    transition: all 250ms ease 500ms;
-}
-
-:root[sessionrestored] #nav-bar {
-    /* Max height must be set to something here to be animated */
-    max-height: 100px;
-    min-height: 0;
-    transition: all 250ms ease 00ms;
-}
-
 /* Smaller tabs */
 @media (min-width: 0px) {
-
-    #navigator-toolbox {
-      --tab-min-height: 24px !important;
-      --tab-border-radius: 0px;
-    }
-    #navigator-toolbox tab {
-      max-height: var(--tab-min-height);
+    :root[uidensity="compact"] {
+        --tab-min-height: 24px !important;
+        --tabstrip-min-height: 24px !important;
+        --tab-block-margin: 0px !important;
+        --tab-border-radius: 0px !important;
     }
 
-    #navigator-toolbox .tab-background {
-      margin: 0px !important;
-      border-radius: 0px !important;
+    #tabbrowser-tabs:not([secondarytext-unsupported], [orient="vertical"]) {
+        .tab-label-container {
+            height: inherit !important;
+        }
+    }
+}
+
+@media (min-width: 10000px) {
+
+    /* Autohide navigation bar. Gives some issue with urlbar placement sometimes */
+    :root[sessionrestored]:not([customizing]) #navigator-toolbox:not(:hover):not(:focus-within) #nav-bar {
+        max-height: 0 !important;
+        min-height: 0 !important;
+        overflow: hidden;
+        /*margin-bottom: 0px;
+        opacity: 0;
+        /* Wait 500ms before hiding the nav bar on unfocus */
+        transition: all 250ms ease 500ms;
     }
 
-    .tab-throbber-tabslist, .tab-throbber, .tab-icon-pending, .tab-icon-image, .tab-sharing-icon-overlay, .tab-icon-overlay {
-      height: 14px !important;
-      width: 14px !important;;
-    }
-
-    .tabbrowser-tab {
-      font-size: 13px;
-    }
-    
-    .tabbrowser-tab[usercontextid] > .tab-stack > .tab-background > .tab-context-line {
-        height: 1px !important;
-        margin:  0 !important;
-        bottom: 0px;
-        position: absolute;
-        width: 100%;
-        opacity: 0.65;
+    :root[sessionrestored] #nav-bar {
+        /* Max height must be set to something here to be animated */
+        max-height: 100px;
+        min-height: 0;
+        transition: all 250ms ease 00ms;
     }
 }
 

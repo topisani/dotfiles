@@ -1,0 +1,35 @@
+#!/bin/bash
+
+function disable() {
+  for c in $(seq 0 $(cat /sys/devices/system/cpu/present | awk -F- '{print $2}')); do
+    cpu_sibling_file=/sys/devices/system/cpu/cpu$c/topology/thread_siblings_list
+    if [ -f $cpu_sibling_file ]; then
+      id=$(cat $cpu_sibling_file | awk -F, '{print $1}')
+      if [ "$c" != "$id" ]; then
+        echo 0 | sudo tee /sys/devices/system/cpu/cpu$c/online > /dev/null
+      else
+        sudo cpupower -c $c frequency-set -g performance
+      fi
+    fi
+  done
+}
+
+function enable() {
+  for c in $(seq 1 $(cat /sys/devices/system/cpu/present | awk -F- '{print $2}')); do
+    echo 1  | sudo tee /sys/devices/system/cpu/cpu$c/online > /dev/null
+    sudo cpupower -c $c frequency-set -g ondemand
+  done
+}
+
+function status() {
+  grep -E '^model name|^cpu MHz' /proc/cpuinfo
+}
+
+if [ "$1" == "enable" ] || [ "$1" == "disable" ] || [ "$1" == "status" ]; then
+  $1
+  [ "$1" != "status" ] && status
+  exit 0
+else
+  echo "Unknown smt setup" >&2
+  exit -1
+fi

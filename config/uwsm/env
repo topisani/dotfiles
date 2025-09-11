@@ -2,12 +2,12 @@ export XCURSOR_SIZE=24
 export XCURSOR_THEME=xcursor-breeze
 
 # Fix various UI systems
-export GDK_BACKEND=wayland,11
+export GDK_BACKEND=wayland,x11,*
 export SDL_VIDEODRIVER=wayland
 export CLUTTER_BACKEND=wayland
 export QT_QPA_PLATFORM=wayland;xcb
 export QT_AUTO_SCREEN_SCALE_FACTOR=1
-export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+# export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 export QT_QPA_PLATFORMTHEME=qt5ct
 export ELECTRON_OZONE_PLATFORM_HINT=wayland
 
