@@ -106,7 +106,7 @@ output "eDP-1" {
 // https://github.com/YaLTeR/niri/wiki/Configuration:-Layout
 layout {
     // Set gaps around windows in logical pixels.
-    gaps 16
+    gaps 8
 
     // When to center a column when changing focus, options are:
     // - "never", default behavior, focusing an off-screen column will keep at the left
@@ -155,7 +155,7 @@ layout {
         // off
 
         // How many logical pixels the ring extends out from the windows.
-        width  4
+        width  2
 
         // Colors can be set in a variety of ways:
         // - CSS named colors: "red"
@@ -251,16 +251,16 @@ layout {
     }
 }
 
-workspace "0"
-workspace "9"
-workspace "8"
-workspace "7"
-workspace "6"
-workspace "5"
-workspace "4"
-workspace "3"
-workspace "2"
-workspace "1"
+// workspace "1"
+// workspace "2"
+// workspace "3"
+// workspace "4"
+// workspace "5"
+// workspace "6"
+// workspace "7"
+// workspace "8"
+// workspace "9"
+// workspace "0"
 
 // Add lines like this to spawn processes at startup.
 // Note that running niri as a session supports xdg-desktop-autostart,
@@ -269,6 +269,27 @@ workspace "1"
 
 // This line starts waybar, a commonly used bar for Wayland compositors.
 // spawn-at-startup "waybar"
+
+environment {
+
+      XCURSOR_SIZE "24"
+      XCURSOR_THEME "xcursor-breeze"
+
+    // Fix various UI systems
+      GDK_BACKEND "wayland,x11,*"
+      SDL_VIDEODRIVER "wayland"
+      CLUTTER_BACKEND "wayland"
+      QT_QPA_PLATFORM "wayland;xcb"
+      QT_AUTO_SCREEN_SCALE_FACTOR "1"
+    // QT_WAYLAND_DISABLE_WINDOWDECORATION "1"
+      QT_QPA_PLATFORMTHEME "qt5ct"
+      ELECTRON_OZONE_PLATFORM_HINT "wayland"
+
+}
+
+clipboard {
+    disable-primary
+}
 
 // Uncomment this line to ask the clients to omit their client-side decorations if possible.
 // If the client will specifically ask for CSD, the request will be honored.
@@ -280,7 +301,7 @@ prefer-no-csd
 // You can change the path where screenshots are saved.
 // A ~ at the front will be expanded to the home directory.
 // The path is formatted with strftime(3) to give you the screenshot date and time.
-screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
+screenshot-path "~/Pictures/Screenshots/Screenshot.%Y-%m-%d_%H-%M-%S.png"
 
 // You can also set this to null to disable saving screenshots to disk.
 // screenshot-path null
@@ -358,8 +379,8 @@ binds {
     Mod+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
 
-    Mod+Return { spawn "uwsm-app" "tmux-term"; }
-    Mod+Space { spawn "uwsm-app" "wofi"; }
+    Mod+Return { spawn "tmux-term"; }
+    Mod+Space { spawn "wofi"; }
 
     // You can also use a shell. Do this if you need pipes, multiple commands, etc.
     // Note: the entire command goes as a single argument in the end.
@@ -367,15 +388,16 @@ binds {
 
     // Example volume keys mappings for PipeWire & WirePlumber.
     // The allow-when-locked=true property makes them work even when the session is locked.
-    XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+"; }
-    XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-"; }
-    XF86AudioMute        allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
-    XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "volume" "-n" "volume" "up"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "volume" "-n" "volume" "down"; }
+    XF86AudioMute        allow-when-locked=true { spawn "volume" "-n" "mute" "toggle"; }
+    // XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
 
     // Open/close the Overview: a zoomed-out view of workspaces and windows.
     // You can also move the mouse into the top-left hot corner,
     // or do a four-finger swipe up on a touchpad.
     Mod+O repeat=false { toggle-overview; }
+    Mod+Tab repeat=false { toggle-overview; }
 
     Mod+Q { close-window; }
 
@@ -388,14 +410,14 @@ binds {
     Mod+K     { focus-window-up; }
     Mod+L     { focus-column-right; }
 
-    Mod+Ctrl+Left  { move-column-left; }
-    Mod+Ctrl+Down  { move-window-down; }
-    Mod+Ctrl+Up    { move-window-up; }
-    Mod+Ctrl+Right { move-column-right; }
-    Mod+Ctrl+H     { move-column-left; }
-    Mod+Ctrl+J     { move-window-down; }
-    Mod+Ctrl+K     { move-window-up; }
-    Mod+Ctrl+L     { move-column-right; }
+    Mod+Shift+Left  { move-column-left; }
+    Mod+Shift+Down  { move-window-down; }
+    Mod+Shift+Up    { move-window-up; }
+    Mod+Shift+Right { move-column-right; }
+    Mod+Shift+H     { move-column-left; }
+    Mod+Shift+J     { move-window-down; }
+    Mod+Shift+K     { move-window-up; }
+    Mod+Shift+L     { move-column-right; }
 
     // Alternative commands that move across workspaces when reaching
     // the first or last window in a column.
@@ -409,23 +431,23 @@ binds {
     Mod+Ctrl+Home { move-column-to-first; }
     Mod+Ctrl+End  { move-column-to-last; }
 
-    Mod+Shift+Left  { focus-monitor-left; }
-    Mod+Shift+Down  { focus-monitor-down; }
-    Mod+Shift+Up    { focus-monitor-up; }
-    Mod+Shift+Right { focus-monitor-right; }
-    Mod+Shift+H     { focus-monitor-left; }
-    Mod+Shift+J     { focus-monitor-down; }
-    Mod+Shift+K     { focus-monitor-up; }
-    Mod+Shift+L     { focus-monitor-right; }
+    // Mod+Shift+Left  { focus-monitor-left; }
+    // Mod+Shift+Down  { focus-monitor-down; }
+    // Mod+Shift+Up    { focus-monitor-up; }
+    // Mod+Shift+Right { focus-monitor-right; }
+    // Mod+Shift+H     { focus-monitor-left; }
+    // Mod+Shift+J     { focus-monitor-down; }
+    // Mod+Shift+K     { focus-monitor-up; }
+    // Mod+Shift+L     { focus-monitor-right; }
 
-    Mod+Shift+Ctrl+Left  { move-column-to-monitor-left; }
-    Mod+Shift+Ctrl+Down  { move-column-to-monitor-down; }
-    Mod+Shift+Ctrl+Up    { move-column-to-monitor-up; }
-    Mod+Shift+Ctrl+Right { move-column-to-monitor-right; }
-    Mod+Shift+Ctrl+H     { move-column-to-monitor-left; }
-    Mod+Shift+Ctrl+J     { move-column-to-monitor-down; }
-    Mod+Shift+Ctrl+K     { move-column-to-monitor-up; }
-    Mod+Shift+Ctrl+L     { move-column-to-monitor-right; }
+    // Mod+Shift+Ctrl+Left  { move-column-to-monitor-left; }
+    // Mod+Shift+Ctrl+Down  { move-column-to-monitor-down; }
+    // Mod+Shift+Ctrl+Up    { move-column-to-monitor-up; }
+    // Mod+Shift+Ctrl+Right { move-column-to-monitor-right; }
+    // Mod+Shift+Ctrl+H     { move-column-to-monitor-left; }
+    // Mod+Shift+Ctrl+J     { move-column-to-monitor-down; }
+    // Mod+Shift+Ctrl+K     { move-column-to-monitor-up; }
+    // Mod+Shift+Ctrl+L     { move-column-to-monitor-right; }
 
     // Alternatively, there are commands to move just a single window:
     // Mod+Shift+Ctrl+Left  { move-window-to-monitor-left; }
@@ -493,26 +515,50 @@ binds {
     //
     // For example, with 2 workspaces + 1 empty, indices 3, 4, 5 and so on
     // will all refer to the 3rd workspace.
-    Mod+1 { focus-workspace "1"; }
-    Mod+2 { focus-workspace "2"; }
-    Mod+3 { focus-workspace "3"; }
-    Mod+4 { focus-workspace "4"; }
-    Mod+5 { focus-workspace "5"; }
-    Mod+6 { focus-workspace "6"; }
-    Mod+7 { focus-workspace "7"; }
-    Mod+8 { focus-workspace "8"; }
-    Mod+9 { focus-workspace "9"; }
-    Mod+0 { focus-workspace "0"; }
-    Mod+Shift+1 { move-column-to-workspace "1"; }
-    Mod+Shift+2 { move-column-to-workspace "2"; }
-    Mod+Shift+3 { move-column-to-workspace "3"; }
-    Mod+Shift+4 { move-column-to-workspace "4"; }
-    Mod+Shift+5 { move-column-to-workspace "5"; }
-    Mod+Shift+6 { move-column-to-workspace "6"; }
-    Mod+Shift+7 { move-column-to-workspace "7"; }
-    Mod+Shift+8 { move-column-to-workspace "8"; }
-    Mod+Shift+9 { move-column-to-workspace "9"; }
-    Mod+Shift+0 { move-column-to-workspace "0"; }
+    // Mod+1 { focus-workspace "1"; }
+    // Mod+2 { focus-workspace "2"; }
+    // Mod+3 { focus-workspace "3"; }
+    // Mod+4 { focus-workspace "4"; }
+    // Mod+5 { focus-workspace "5"; }
+    // Mod+6 { focus-workspace "6"; }
+    // Mod+7 { focus-workspace "7"; }
+    // Mod+8 { focus-workspace "8"; }
+    // Mod+9 { focus-workspace "9"; }
+    // Mod+0 { focus-workspace "0"; }
+    // Mod+Shift+1 { move-column-to-workspace "1"; }
+    // Mod+Shift+2 { move-column-to-workspace "2"; }
+    // Mod+Shift+3 { move-column-to-workspace "3"; }
+    // Mod+Shift+4 { move-column-to-workspace "4"; }
+    // Mod+Shift+5 { move-column-to-workspace "5"; }
+    // Mod+Shift+6 { move-column-to-workspace "6"; }
+    // Mod+Shift+7 { move-column-to-workspace "7"; }
+    // Mod+Shift+8 { move-column-to-workspace "8"; }
+    // Mod+Shift+9 { move-column-to-workspace "9"; }
+    // Mod+Shift+0 { move-column-to-workspace "0"; }
+
+    // MARKS
+
+    Mod+1 { spawn "~/.config/niri/scripts/mark.sh" "focus" "1"; }
+    Mod+2 { spawn "~/.config/niri/scripts/mark.sh" "focus" "2"; }
+    Mod+3 { spawn "~/.config/niri/scripts/mark.sh" "focus" "3"; }
+    Mod+4 { spawn "~/.config/niri/scripts/mark.sh" "focus" "4"; }
+    Mod+5 { spawn "~/.config/niri/scripts/mark.sh" "focus" "5"; }
+    Mod+6 { spawn "~/.config/niri/scripts/mark.sh" "focus" "6"; }
+    Mod+7 { spawn "~/.config/niri/scripts/mark.sh" "focus" "7"; }
+    Mod+8 { spawn "~/.config/niri/scripts/mark.sh" "focus" "8"; }
+    Mod+9 { spawn "~/.config/niri/scripts/mark.sh" "focus" "9"; }
+    Mod+0 { spawn "~/.config/niri/scripts/mark.sh" "focus" "0"; }
+
+    Mod+Shift+1 { spawn "~/.config/niri/scripts/mark.sh" "set" "1"; }
+    Mod+Shift+2 { spawn "~/.config/niri/scripts/mark.sh" "set" "2"; }
+    Mod+Shift+3 { spawn "~/.config/niri/scripts/mark.sh" "set" "3"; }
+    Mod+Shift+4 { spawn "~/.config/niri/scripts/mark.sh" "set" "4"; }
+    Mod+Shift+5 { spawn "~/.config/niri/scripts/mark.sh" "set" "5"; }
+    Mod+Shift+6 { spawn "~/.config/niri/scripts/mark.sh" "set" "6"; }
+    Mod+Shift+7 { spawn "~/.config/niri/scripts/mark.sh" "set" "7"; }
+    Mod+Shift+8 { spawn "~/.config/niri/scripts/mark.sh" "set" "8"; }
+    Mod+Shift+9 { spawn "~/.config/niri/scripts/mark.sh" "set" "9"; }
+    Mod+Shift+0 { spawn "~/.config/niri/scripts/mark.sh" "set" "0"; }
 
     // Alternatively, there are commands to move just a single window:
     // Mod+Ctrl+1 { move-window-to-workspace 1; }

@@ -33,7 +33,7 @@ _layout_single() {
 }
 
 _layout_home() {
-  echo "desc:Dell Inc. DELL S2721QS CH3CM43,preferred,0x0,1.25" # bitdepth, 10, cm, hdr, sdrbrightness, 1.0"
+  echo "desc:Dell Inc. DELL S2721QS CH3CM43,preferred,0x0,1.25, bitdepth, 10, cm, auto, sdrbrightness, 1.0"
   echo "eDP-1,preferred,0x1728,$EDP1_SCALE"
 }
 
