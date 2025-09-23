@@ -418,6 +418,10 @@ binds {
     Mod+Ctrl+Right { spawn "~/.config/niri/scripts/resize-snap.sh" "width" "12.5"; }
     Mod+Ctrl+Down { spawn "~/.config/niri/scripts/resize-snap.sh" "height" "-12.5"; }
     Mod+Ctrl+Up { spawn "~/.config/niri/scripts/resize-snap.sh" "height" "12.5"; }
+    Mod+Ctrl+H { spawn "~/.config/niri/scripts/resize-snap.sh" "width" "-12.5"; }
+    Mod+Ctrl+J { spawn "~/.config/niri/scripts/resize-snap.sh" "height" "-12.5"; }
+    Mod+Ctrl+K { spawn "~/.config/niri/scripts/resize-snap.sh" "height" "12.5"; }
+    Mod+Ctrl+L { spawn "~/.config/niri/scripts/resize-snap.sh" "width" "12.5"; }
 
     // Alternative commands that move across workspaces when reaching
     // the first or last window in a column.
