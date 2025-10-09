@@ -26,6 +26,7 @@
         "return-type": "json",
         "on-scroll-up": "hyprctl dispatch 'layoutmsg move +col'",
         "on-scroll-down": "hyprctl dispatch 'layoutmsg move -col'",
+        "on-click": "hyprctl dispatch hyprexpo:expo on",
     },
     "custom/hyprsunset": {
         "exec": "~/.config/waybar/hyprsunset.sh",
