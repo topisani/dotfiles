@@ -16,18 +16,19 @@ bar_format() {
             | group_by(.at[0])
             | map(sort_by(.at[1])) as $columns
         | ($columns | map(map(.address)) | to_entries | map(select(.value | contains([$focused_addr]))) | .[0].key) as $focused_col_idx
-        | {
-            "1": "•"
-            # "1": "·",
-            # "2": ":",
-            # "3": "⁝",
-            # "4": "⋮"
-        } as $box_chars
+        # | {
+        #     "1": "•"
+        #     # "1": "·",
+        #     # "2": ":",
+        #     # "3": "⁝",
+        #     # "4": "⋮"
+        # } as $box_chars
         | ([$columns[:$focused_col_idx][], $focused.title, $columns[$focused_col_idx + 1:][]]
               | map(if type == "string" then
                   gsub("&"; "&amp;") # Escape ampersand in title
                 else
-                  (length as $count | "<span foreground=\"gray\" weight=\"heavy\"> \($box_chars[$count | tostring] // $box_chars["1"]) </span>")
+                  "<span foreground=\"gray\" weight=\"heavy\"> • </span>"
+                  # (length as $count | "<span foreground=\"gray\" weight=\"heavy\"> \($box_chars[$count | tostring] // $box_chars["1"]) </span>")
                 end)
           )
         | join(" ")

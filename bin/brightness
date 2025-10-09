@@ -7,7 +7,7 @@ show_help() {
 }
 
 query() {
-    res=$(brightnessctl --class backlight info | grep -oP "\(\K\d+%\)")
+    res=$(brightnessctl --class backlight info 2> /dev/null | grep -oP "\(\K\d+%\)" || (ddcutil getvcp 10  -t | cut -d' ' -f4))
     echo ${res//%)/}
 }
 
@@ -34,8 +34,10 @@ send_notification() {
 }
 
 brightness_set() {
-    percent=$1
-    brightnessctl --class backlight set $percent%
+    percent=${1#[+-]}
+    [[ "${1:0:1}" =~ [+-] ]] && prefix="${1:0:1}" || prefix=""
+
+    brightnessctl --class backlight set $percent%$prefix 2> /dev/null
 
     # Set external monitor brightness through ddcutil
 
@@ -50,7 +52,7 @@ brightness_set() {
     while read BUS; do
             # --bus to send over I2C, which has the least overhead.
             # --noverify to skip waiting for acknowledgement packet.
-            ddcutil --bus $BUS setvcp $VCP $percent --noverify &
+            ddcutil --bus $BUS setvcp $VCP $prefix $percent --noverify --edid-read-size=128 &
     done < /tmp/monitor-i2c-buses
     wait
 }
@@ -62,19 +64,6 @@ while (( $# )); do
         -h|-\?|--help)
             show_help
             ;;
-        query)
-            query
-            ;;
-        up)
-            brightnessctl --class backlight set +5%
-            ;;
-        down)
-            brightnessctl --class backlight set 5%-
-            ;;
-        set)
-            shift
-            brightness_set $1
-            ;;
         --notify|-n)
             notify=1
             ;;
@@ -84,6 +73,8 @@ while (( $# )); do
     esac
     shift
 done
+
+(( $# == 0)) && query || brightness_set $1
 
 if (( $notify )); then
     send_notification
