@@ -227,12 +227,12 @@ update_gtk() {
 }
 
 toggle_gtk_dark() {
-    gtk_theme="Adwaita-dark"
-    icon_theme="Papirus-Dark"
+    gtk_theme="adw-gtk3-dark"
+    icon_theme="Adwaita"
     color_scheme="prefer-dark"
     if gsettings get org.gnome.desktop.interface gtk-theme | grep -qi dark; then
-        gtk_theme="Adwaita"
-        icon_theme="Papirus"
+        gtk_theme="adw-gtk3"
+        icon_theme="Adwaita"
         color_scheme="prefer-light"
     fi
 

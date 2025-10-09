@@ -246,3 +246,17 @@ source = { git = { url = "https://github.com/openscad/tree-sitter-openscad", pin
 path = "queries"
 
 
+
+[language.beancount.grammar]
+source = { git = { url = "https://github.com/polarmutex/tree-sitter-beancount", pin = "b7a2557e6c8cf1dc70a52cece1861522ad3903fc" }}
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "../scanner.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "scanner.o", "-o", "beancount.so"]
+link_flags = ["-O3"]
+
+[language.beancount.queries]
+source = { git = { url = "https://github.com/helix-editor/helix", pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7" }}
+path = "runtime/queries/beancount"

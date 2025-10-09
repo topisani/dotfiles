@@ -376,7 +376,9 @@ binds {
     XF86AudioRaiseVolume allow-when-locked=true { spawn "volume" "-n" "volume" "up"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn "volume" "-n" "volume" "down"; }
     XF86AudioMute        allow-when-locked=true { spawn "volume" "-n" "mute" "toggle"; }
-    // XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
+    XF86MonBrightnessUp   allow-when-locked=true { spawn "brightness" "-n" "up"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "brightness" "-n" "down"; }
+ // XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
 
     // Open/close the Overview: a zoomed-out view of workspaces and windows.
     // You can also move the mouse into the top-left hot corner,

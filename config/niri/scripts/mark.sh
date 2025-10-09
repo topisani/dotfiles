@@ -36,6 +36,7 @@ nmark::set() {
     key=$1
     window=$2
     [ -n "$window" ] || window=$(niri msg -j focused-window | jq -r .id)
+    marks=$(nmark::read)
 
     # Update the marks file
     newmarks=$(nmark::read | jq --arg key "$key" --arg window "$window" '.[$key | tostring] = ($window | tonumber)')
