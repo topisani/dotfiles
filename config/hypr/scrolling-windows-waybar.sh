@@ -25,7 +25,7 @@ bar_format() {
         } as $box_chars
         | ([$columns[:$focused_col_idx][], $focused.title, $columns[$focused_col_idx + 1:][]]
               | map(if type == "string" then
-                  "<span>" + . + "</span>"
+                  gsub("&"; "&amp;") # Escape ampersand in title
                 else
                   (length as $count | "<span foreground=\"gray\" weight=\"heavy\"> \($box_chars[$count | tostring] // $box_chars["1"]) </span>")
                 end)
