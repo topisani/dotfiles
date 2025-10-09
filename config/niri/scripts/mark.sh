@@ -8,7 +8,7 @@ fi
 NMARK_FILE=${NIRI_SOCKET%%.sock}.marks.list
 
 nmark::read() {
-    marks=$(cat $NMARK_FILE 2> /dev/null)
+    marks=$(cat "$NMARK_FILE")
     empty="{}"
     echo "${marks:-$empty}"
 }
@@ -38,7 +38,8 @@ nmark::set() {
     [ -n "$window" ] || window=$(niri msg -j focused-window | jq -r .id)
 
     # Update the marks file
-    nmark::read | jq --arg key "$key" --arg window "$window" '.[$key] = ($window | tonumber)' > "$NMARK_FILE"
+    newmarks=$(nmark::read | jq --arg key "$key" --arg window "$window" '.[$key | tostring] = ($window | tonumber)')
+    echo "$newmarks" > "$NMARK_FILE"
     echo "Set mark $key to window $window"
 }
 
@@ -104,6 +105,9 @@ case $cmd in
         ;;
     get)
         nmark::get "$@"
+        ;;
+    read)
+        nmark::read "$2"
         ;;
     *)
         nmark::usage

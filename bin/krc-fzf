@@ -226,7 +226,7 @@ krc_fzf_menu() {
 
 
 krc_fzf__jump_preview() {
-  local file=${1:-$FZF_JUMP_FIXED_PATH}
+  local file=$FZF_JUMP_PREFIX${1:-$FZF_JUMP_FIXED_PATH}
   local line=$2
   local col=$3
   local start=$((line - (FZF_PREVIEW_LINES / 2)))
@@ -238,6 +238,7 @@ krc_fzf__jump_preview() {
 
 krc_fzf_jump() {
   local bufname=$1
+  local prefix=$2
   export JUMPLIST_PATH=$(mktemp --suffix krc-fzf-jump)
   trap 'rm "$JUMPLIST_PATH"' EXIT
 
@@ -247,6 +248,7 @@ krc_fzf_jump() {
   }" | krc raw-send-sync
 
   # For the lsp-document-symbols shorthand syntax
+  export FZF_JUMP_PREFIX=$prefix
   export FZF_JUMP_FIXED_PATH=$(head -n1 $JUMPLIST_PATH | grep -v :)
 
   cat "$JUMPLIST_PATH" |
@@ -260,7 +262,8 @@ krc_fzf_jump() {
     --prompt='>' \
   | while IFS=: read name line col rest; do
       [[ -z "$name" ]] && name=$FZF_JUMP_FIXED_PATH
-      krc edit "$name" $line $col
+      file=$FZF_JUMP_PREFIX$name
+      krc edit "$file" $line $col
     done
 }
 

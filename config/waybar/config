@@ -4,7 +4,7 @@
     "height": 20, // Waybar height (to be removed for auto height)
     // Choose the order of the modules
     "modules-left": ["hyprland/workspaces", "hyprland/submap", "niri/workspaces"],
-    "modules-center": ["hyprland/window", "niri/window"],
+    "modules-center": ["custom/window", "niri/window"],
     "modules-right": ["custom/agenda", "hyprland/language", "idle_inhibitor", "pulseaudio", "battery", "clock", "tray"],
     // Modules configuration
     "hyprland/workspaces": {
@@ -22,10 +22,10 @@
         "format-dk": "DA",
     },
     "custom/window": {
-        "exec": "$HOME/.config/hypr/groupnav.sh bar $WAYBAR_OUTPUT_NAME",
+        "exec": "$HOME/.config/hypr/scrolling-windows-waybar.sh $WAYBAR_OUTPUT_NAME",
         "return-type": "json",
-        "on-scroll-up": "$HOME/.config/hypr/groupnav.sh group f",
-        "on-scroll-down": "$HOME/.config/hypr/groupnav.sh group b",
+        "on-scroll-up": "hyprctl dispatch 'layoutmsg move +col'",
+        "on-scroll-down": "hyprctl dispatch 'layoutmsg move -col'",
     },
 
     "hyprland/window": {
@@ -75,6 +75,7 @@
         "spacing": 10,
     },
     "clock": {
+        "format": "{:%Y-%m-%d %H:%M}",
         "tooltip-format": "{:%Y-%m-%d | %H:%M}",
         "format-alt": "{:%Y-%m-%d}",
     },

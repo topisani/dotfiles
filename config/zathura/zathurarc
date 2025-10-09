@@ -12,3 +12,4 @@ set recolor-keephue "true"
 
 set synctex true
 set synctex-editor-command "k %{input} +%{line}"
+set selection-clipboard clipboard

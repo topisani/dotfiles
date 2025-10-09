@@ -30,7 +30,7 @@ get_current_size_percent() {
         local window_size=$(echo "$focused_window" | jq -r '.layout.window_size[1]')
         local screen_size=$(niri msg -j focused-output | jq -r '.logical.height')
     fi
-    
+
     # Calculate percentage with decimal precision using bc
     local current_percent=$(echo "scale=2; $window_size * 100 / $screen_size" | bc)
     echo "$current_percent"
@@ -83,7 +83,7 @@ numbers_equal() {
     local num1="$1"
     local num2="$2"
     local threshold="0.01"  # Consider equal if difference is less than 0.01%
-    
+
     local diff=$(echo "scale=4; ($num1 - $num2)" | bc | sed 's/^-//')
     (( $(echo "$diff < $threshold" | bc -l) ))
 }
@@ -108,7 +108,7 @@ main() {
     if ! numbers_equal "$current_percent" "$new_percent"; then
         local formatted_percent
         formatted_percent=$(format_percent_for_niri "$new_percent")
-        
+
         if [ "$AXIS" = "width" ]; then
             niri msg action set-column-width "${formatted_percent}%"
         else

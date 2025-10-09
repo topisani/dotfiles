@@ -122,7 +122,7 @@ define-command -hidden -override lsp-show-goto-buffer -params 4 %{
         set-register '"' %arg{4}
         execute-keys Rgg
     }
-    winplace popup connect terminal krc-fzf jump %arg{1}
+    winplace popup connect terminal krc-fzf jump %arg{1} "%arg{3}/"
 }
 
 def lsp-enable-semantic-tokens %{

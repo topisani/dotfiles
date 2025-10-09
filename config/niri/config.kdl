@@ -395,23 +395,23 @@ binds {
     Mod+K     { focus-window-up; }
     Mod+L     { focus-column-right; }
 
-    Mod+Shift+Left  { consume-or-expel-window-left; }
-    Mod+Shift+Down  { move-window-down; }
-    Mod+Shift+Up    { move-window-up; }
-    Mod+Shift+Right { consume-or-expel-window-right; }
-    Mod+Shift+H     { consume-or-expel-window-left; }
-    Mod+Shift+J     { move-window-down; }
-    Mod+Shift+K     { move-window-up; }
-    Mod+Shift+L     { consume-or-expel-window-right; }
+    Mod+Ctrl+Shift+Left  { consume-or-expel-window-left; }
+    Mod+Ctrl+Shift+Down  { move-window-down; }
+    Mod+Ctrl+Shift+Up    { move-window-up; }
+    Mod+Ctrl+Shift+Right { consume-or-expel-window-right; }
+    Mod+Ctrl+Shift+H     { consume-or-expel-window-left; }
+    Mod+Ctrl+Shift+J     { move-window-down; }
+    Mod+Ctrl+Shift+K     { move-window-up; }
+    Mod+Ctrl+Shift+L     { consume-or-expel-window-right; }
 
-    Mod+Shift+Ctrl+Left  { move-column-left; }
-    Mod+Shift+Ctrl+Down  { move-column-to-workspace-down; }
-    Mod+Shift+Ctrl+Up    { move-column-to-workspace-up; }
-    Mod+Shift+Ctrl+Right { move-column-right; }
-    Mod+Shift+Ctrl+H     { move-column-left; }
-    Mod+Shift+Ctrl+J     { move-column-to-workspace-down; }
-    Mod+Shift+Ctrl+K     { move-column-to-workspace-up; }
-    Mod+Shift+Ctrl+L     { move-column-right; }
+    Mod+Shift+Left  { move-column-left; }
+    Mod+Shift+Down  { move-column-to-workspace-down; }
+    Mod+Shift+Up    { move-column-to-workspace-up; }
+    Mod+Shift+Right { move-column-right; }
+    Mod+Shift+H     { move-column-left; }
+    Mod+Shift+J     { move-column-to-workspace-down; }
+    Mod+Shift+K     { move-column-to-workspace-up; }
+    Mod+Shift+L     { move-column-right; }
 
     // Resize windows
     Mod+Ctrl+Left { spawn "~/.config/niri/scripts/resize-snap.sh" "width" "-12.5"; }
@@ -504,50 +504,50 @@ binds {
     //
     // For example, with 2 workspaces + 1 empty, indices 3, 4, 5 and so on
     // will all refer to the 3rd workspace.
-    // Mod+1 { focus-workspace "1"; }
-    // Mod+2 { focus-workspace "2"; }
-    // Mod+3 { focus-workspace "3"; }
-    // Mod+4 { focus-workspace "4"; }
-    // Mod+5 { focus-workspace "5"; }
-    // Mod+6 { focus-workspace "6"; }
-    // Mod+7 { focus-workspace "7"; }
-    // Mod+8 { focus-workspace "8"; }
-    // Mod+9 { focus-workspace "9"; }
-    // Mod+0 { focus-workspace "0"; }
-    // Mod+Shift+1 { move-column-to-workspace "1"; }
-    // Mod+Shift+2 { move-column-to-workspace "2"; }
-    // Mod+Shift+3 { move-column-to-workspace "3"; }
-    // Mod+Shift+4 { move-column-to-workspace "4"; }
-    // Mod+Shift+5 { move-column-to-workspace "5"; }
-    // Mod+Shift+6 { move-column-to-workspace "6"; }
-    // Mod+Shift+7 { move-column-to-workspace "7"; }
-    // Mod+Shift+8 { move-column-to-workspace "8"; }
-    // Mod+Shift+9 { move-column-to-workspace "9"; }
-    // Mod+Shift+0 { move-column-to-workspace "0"; }
+    Mod+1 { focus-workspace 1; }
+    Mod+2 { focus-workspace 2; }
+    Mod+3 { focus-workspace 3; }
+    Mod+4 { focus-workspace 4; }
+    Mod+5 { focus-workspace 5; }
+    Mod+6 { focus-workspace 6; }
+    Mod+7 { focus-workspace 7; }
+    Mod+8 { focus-workspace 8; }
+    Mod+9 { focus-workspace 9; }
+    Mod+0 { focus-workspace 10; }
+    Mod+Shift+1 { move-column-to-workspace 1; }
+    Mod+Shift+2 { move-column-to-workspace 2; }
+    Mod+Shift+3 { move-column-to-workspace 3; }
+    Mod+Shift+4 { move-column-to-workspace 4; }
+    Mod+Shift+5 { move-column-to-workspace 5; }
+    Mod+Shift+6 { move-column-to-workspace 6; }
+    Mod+Shift+7 { move-column-to-workspace 7; }
+    Mod+Shift+8 { move-column-to-workspace 8; }
+    Mod+Shift+9 { move-column-to-workspace 9; }
+    Mod+Shift+0 { move-column-to-workspace 10; }
 
     // MARKS
 
-    Mod+1 { spawn "~/.config/niri/scripts/mark.sh" "focus" "1"; }
-    Mod+2 { spawn "~/.config/niri/scripts/mark.sh" "focus" "2"; }
-    Mod+3 { spawn "~/.config/niri/scripts/mark.sh" "focus" "3"; }
-    Mod+4 { spawn "~/.config/niri/scripts/mark.sh" "focus" "4"; }
-    Mod+5 { spawn "~/.config/niri/scripts/mark.sh" "focus" "5"; }
-    Mod+6 { spawn "~/.config/niri/scripts/mark.sh" "focus" "6"; }
-    Mod+7 { spawn "~/.config/niri/scripts/mark.sh" "focus" "7"; }
-    Mod+8 { spawn "~/.config/niri/scripts/mark.sh" "focus" "8"; }
-    Mod+9 { spawn "~/.config/niri/scripts/mark.sh" "focus" "9"; }
-    Mod+0 { spawn "~/.config/niri/scripts/mark.sh" "focus" "0"; }
+    // Mod+1 { spawn "~/.config/niri/scripts/mark.sh" "focus" "1"; }
+    // Mod+2 { spawn "~/.config/niri/scripts/mark.sh" "focus" "2"; }
+    // Mod+3 { spawn "~/.config/niri/scripts/mark.sh" "focus" "3"; }
+    // Mod+4 { spawn "~/.config/niri/scripts/mark.sh" "focus" "4"; }
+    // Mod+5 { spawn "~/.config/niri/scripts/mark.sh" "focus" "5"; }
+    // Mod+6 { spawn "~/.config/niri/scripts/mark.sh" "focus" "6"; }
+    // Mod+7 { spawn "~/.config/niri/scripts/mark.sh" "focus" "7"; }
+    // Mod+8 { spawn "~/.config/niri/scripts/mark.sh" "focus" "8"; }
+    // Mod+9 { spawn "~/.config/niri/scripts/mark.sh" "focus" "9"; }
+    // Mod+0 { spawn "~/.config/niri/scripts/mark.sh" "focus" "0"; }
 
-    Mod+Shift+1 { spawn "~/.config/niri/scripts/mark.sh" "set" "1"; }
-    Mod+Shift+2 { spawn "~/.config/niri/scripts/mark.sh" "set" "2"; }
-    Mod+Shift+3 { spawn "~/.config/niri/scripts/mark.sh" "set" "3"; }
-    Mod+Shift+4 { spawn "~/.config/niri/scripts/mark.sh" "set" "4"; }
-    Mod+Shift+5 { spawn "~/.config/niri/scripts/mark.sh" "set" "5"; }
-    Mod+Shift+6 { spawn "~/.config/niri/scripts/mark.sh" "set" "6"; }
-    Mod+Shift+7 { spawn "~/.config/niri/scripts/mark.sh" "set" "7"; }
-    Mod+Shift+8 { spawn "~/.config/niri/scripts/mark.sh" "set" "8"; }
-    Mod+Shift+9 { spawn "~/.config/niri/scripts/mark.sh" "set" "9"; }
-    Mod+Shift+0 { spawn "~/.config/niri/scripts/mark.sh" "set" "0"; }
+    // Mod+Shift+1 { spawn "~/.config/niri/scripts/mark.sh" "set" "1"; }
+    // Mod+Shift+2 { spawn "~/.config/niri/scripts/mark.sh" "set" "2"; }
+    // Mod+Shift+3 { spawn "~/.config/niri/scripts/mark.sh" "set" "3"; }
+    // Mod+Shift+4 { spawn "~/.config/niri/scripts/mark.sh" "set" "4"; }
+    // Mod+Shift+5 { spawn "~/.config/niri/scripts/mark.sh" "set" "5"; }
+    // Mod+Shift+6 { spawn "~/.config/niri/scripts/mark.sh" "set" "6"; }
+    // Mod+Shift+7 { spawn "~/.config/niri/scripts/mark.sh" "set" "7"; }
+    // Mod+Shift+8 { spawn "~/.config/niri/scripts/mark.sh" "set" "8"; }
+    // Mod+Shift+9 { spawn "~/.config/niri/scripts/mark.sh" "set" "9"; }
+    // Mod+Shift+0 { spawn "~/.config/niri/scripts/mark.sh" "set" "0"; }
 
     // Alternatively, there are commands to move just a single window:
     // Mod+Ctrl+1 { move-window-to-workspace 1; }
@@ -569,6 +569,7 @@ binds {
     Mod+Shift+T { center-visible-columns; }
 
     Mod+Ctrl+C { spawn "colorscheme-switch" "--gtk"; }
+    Mod+Shift+C { spawn "colorscheme-switch"; }
     // Move the focused window between the floating and the tiling layout.
     Mod+V       { toggle-window-floating; }
     Mod+Shift+V { switch-focus-between-floating-and-tiling; }
