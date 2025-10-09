@@ -5,7 +5,7 @@
     // Choose the order of the modules
     "modules-left": ["hyprland/workspaces", "hyprland/submap", "niri/workspaces"],
     "modules-center": ["custom/window", "niri/window"],
-    "modules-right": ["custom/agenda", "hyprland/language", "idle_inhibitor", "pulseaudio", "battery", "clock", "tray"],
+    "modules-right": ["custom/agenda", "custom/hyprsunset", "hyprland/language", "idle_inhibitor", "pulseaudio", "battery", "clock", "tray"],
     // Modules configuration
     "hyprland/workspaces": {
     },
@@ -27,7 +27,16 @@
         "on-scroll-up": "hyprctl dispatch 'layoutmsg move +col'",
         "on-scroll-down": "hyprctl dispatch 'layoutmsg move -col'",
     },
-
+    "custom/hyprsunset": {
+        "exec": "~/.config/waybar/hyprsunset.sh",
+        "return-type": "json",
+        "interval": 5,
+        "on-click": "~/.config/waybar/hyprsunset.sh toggle && pkill -RTMIN+8 waybar",
+        "signal": 8,
+        "format": "{}",
+        "on-scroll-up": "~/.config/waybar/hyprsunset.sh up && pkill -RTMIN+8 waybar",
+        "on-scroll-down": "~/.config/waybar/hyprsunset.sh down && pkill -RTMIN+8 waybar",
+    },
     "hyprland/window": {
       "format": "{title}",
       "icon": false,
