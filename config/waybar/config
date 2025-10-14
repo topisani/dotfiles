@@ -77,7 +77,7 @@
         "format": "{icon} ",
         "format-icons": {
             "activated": "",
-            "deactivated": ""
+            "deactivated": "<span color=\"gray\"></span>"
         },
     },
     "tray": {

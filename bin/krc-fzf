@@ -226,7 +226,8 @@ krc_fzf_menu() {
 
 
 krc_fzf__jump_preview() {
-  local file=$FZF_JUMP_PREFIX${1:-$FZF_JUMP_FIXED_PATH}
+  local file=${1:-$FZF_JUMP_FIXED_PATH}
+  [[ $file = /* ]] || file=$FZF_JUMP_PREFIX$file
   local line=$2
   local col=$3
   local start=$((line - (FZF_PREVIEW_LINES / 2)))
@@ -262,7 +263,8 @@ krc_fzf_jump() {
     --prompt='>' \
   | while IFS=: read name line col rest; do
       [[ -z "$name" ]] && name=$FZF_JUMP_FIXED_PATH
-      file=$FZF_JUMP_PREFIX$name
+      file=$name
+      [[ $file = /* ]] || file=$FZF_JUMP_PREFIX$file
       krc edit "$file" $line $col
     done
 }

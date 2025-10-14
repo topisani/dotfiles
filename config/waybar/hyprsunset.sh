@@ -5,10 +5,10 @@
 get_status() {
     if systemctl --user is-active --quiet hyprsunset.service; then
         temp=$(hyprctl hyprsunset temperature 2>/dev/null | grep -oP '\d+' || echo "N/A")
-        echo "{\"text\": \"󰖨 \", \"tooltip\": \"Hyprsunset: Active\\nTemperature: ${temp}K\", \"class\": \"active\"}"
+        echo "{\"text\": \" \", \"tooltip\": \"Hyprsunset: Active\\nTemperature: ${temp}K\", \"class\": \"active\"}"
     else
-        echo '{"text": "<span foreground=\"gray\">󰖨 </span>", "tooltip": "Hyprsunset: Inactive", "class": "inactive"}'
-    fi
+        echo '{"text": "<span foreground=\"gray\"> </span>", "tooltip": "Hyprsunset: Inactive", "class": "inactive"}'
+    fi # 󰖨
 }
 
 toggle_service() {

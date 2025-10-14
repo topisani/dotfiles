@@ -334,7 +334,7 @@ hook -group lsp-project-zephyr global BufSetOption filetype=(devicetree) %{
          command = "npm"
          args = ["x", "--", "devicetree-language-server", "--stdio"]
          # command = "node"
-         # args = ["/home/topisani/git/dts-lsp/server/dist/server.js", "--stdio"]
+         # args = ["/home/topisani/git/tools/dts-lsp/server/dist/server.js", "--stdio"]
          settings_section = "_"
 
       $settings
