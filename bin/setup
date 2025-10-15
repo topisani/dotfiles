@@ -103,6 +103,8 @@ setup::install fish && (
 EOF
 )
 
+cargo install mixxc --locked --features Sass,Wayland
+
 # setup::project https://github.com/ayosec/alacritty && (
 #     git switch graphics
 #     cargo build --release

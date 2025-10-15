@@ -160,7 +160,8 @@
             "car": "",
             "default": ["", "", ""]
         },
-        "on-click": "pavucontrol",
+        "on-click": "pkill mixxc || mixxc -M -i -a t -m 20 -a r -m 30 -A ",
+        "on-right-click": "pavucontrol",
     },
     "custom/media": {
         "format": "{icon} {}",
