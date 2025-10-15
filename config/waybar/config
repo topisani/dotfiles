@@ -5,7 +5,7 @@
     // Choose the order of the modules
     "modules-left": ["hyprland/workspaces", "hyprland/submap", "niri/workspaces"],
     "modules-center": ["custom/window", "niri/window"],
-    "modules-right": ["custom/agenda", "custom/hyprsunset", "hyprland/language", "idle_inhibitor", "pulseaudio", "battery", "clock", "tray"],
+    "modules-right": ["custom/timetagger", "custom/hyprsunset", "hyprland/language", "idle_inhibitor", "pulseaudio", "battery", "clock", "tray"],
     // Modules configuration
     "hyprland/workspaces": {
     },
@@ -37,6 +37,16 @@
         "format": "{}",
         "on-scroll-up": "~/.config/waybar/hyprsunset.sh up && pkill -RTMIN+8 waybar",
         "on-scroll-down": "~/.config/waybar/hyprsunset.sh down && pkill -RTMIN+8 waybar",
+    },
+    "custom/timetagger": {
+        "exec": "$HOME/.config/waybar/timetagger.py",
+        "return-type": "json",
+        "signal": 9,
+        "interval": 60,
+        "on-click": "pkill -RTMIN+9 waybar"
+        // "on-scroll-up": "hyprctl dispatch 'layoutmsg move +col'",
+        // "on-scroll-down": "hyprctl dispatch 'layoutmsg move -col'",
+        // "on-click": "hyprctl dispatch hyprexpo:expo on",
     },
     "hyprland/window": {
       "format": "{title}",
@@ -87,7 +97,7 @@
     "clock": {
         "format": "{:%Y-%m-%d %H:%M}",
         "tooltip-format": "{:%Y-%m-%d | %H:%M}",
-        "format-alt": "{:%Y-%m-%d}",
+        // "format-alt": "{:%Y-%m-%d}",
     },
     "cpu": {
         "format": "{usage}%  ",
@@ -116,9 +126,9 @@
             "critical": 15
         },
         "format": "{capacity}% {icon} ",
-        "format-charging": "{capacity}%  ",
-        "format-plugged": "{capacity}%  ",
-        "format-alt": "{time} {icon} ",
+        "format-charging": "{capacity}% ",
+        "format-plugged": "{capacity}% ",
+        "format-alt": "{time} {icon}",
         // "format-good": "", // An empty format will hide the module
         // "format-full": "",
         "format-icons": ["", "", "", "", ""],

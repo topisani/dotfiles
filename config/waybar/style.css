@@ -18,22 +18,6 @@ window#waybar.hidden {
     opacity: 0.;
 }
 
-/*
-window#waybar.empty {
-    background: transparent;
-}
-window#waybar.solo {
-    background: #FFFFFF;
-}
-*/
-
-window#waybar.termite {
-}
-/*
-window#waybar.firefox {
-    border-bottom: 2px solid orange;
-}*/
-
 /* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
 #workspaces button {
     padding: 0 5px;
@@ -66,18 +50,9 @@ window#waybar.firefox {
     border-bottom: 0px solid #ffffff;
 }
 
-#clock, #battery, #cpu, #memory, #temperature, #backlight, #network, #pulseaudio, #custom-media, #tray, #mode, #idle_inhibitor {
+#clock, #battery, #cpu, #memory, #temperature, #backlight, #network, #pulseaudio, #custom-media, #tray, #mode, #idle_inhibitor, #custom-hyprsunset, #custom-timetagger {
     padding: 0 3px;
-    margin: 0 5px;
-}
-
-#clock {
-}
-
-#battery {
-}
-
-#battery.charging {
+    margin-left: 5px;
 }
 
 @keyframes blink {
@@ -95,67 +70,13 @@ window#waybar.firefox {
     animation-direction: alternate;
 }
 
-label:focus {
+#custom-timetagger {
+    padding: 0 7px;
 }
 
-#cpu {
+#custom-timetagger.running {
+    background-color: #7e3661;
 }
 
-#memory {
-}
-
-#backlight {
-}
-
-#network {
-}
-
-#network.disconnected {
-}
-
-#pulseaudio {
-}
-
-#pulseaudio.muted {
-}
-
-#custom-media {
-    min-width: 100px;
-}
-
-#custom-agenda {
-    color: gray
-}
-
-.custom-spotify {
-}
-
-.custom-vlc {
-}
-
-#temperature {
-}
-
-#temperature.critical {
-}
-
-#tray {
-}
-
-#idle_inhibitor {
-}
-
-#idle_inhibitor.activated {
-}
-
-#mpd {
-}
-
-#mpd.disconnected {
-}
-
-#mpd.stopped {
-}
-
-#mpd.paused {
+#custom-window {
 }

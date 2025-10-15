@@ -353,7 +353,16 @@ hook -group lsp-openscad global BufSetOption filetype=openscad %{
   }
 }
 
-filetype-hook (rust|css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml|zig|go|templ|devicetree|kconfig|conf|janet|openscad) %{
+rmhooks global lsp-qml
+hook -group lsp-qml global BufSetOption filetype=qml %{
+  set-option buffer lsp_servers %exp{
+      [qmlls]
+      root_globs = [".qmlls.ini", ".git"]
+      command = "qmlls6"
+  }
+}
+
+filetype-hook (rust|css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml|zig|go|templ|devicetree|kconfig|conf|janet|openscad|qml) %{
   lsp-setup
   lsp-enable-semantic-tokens
 }

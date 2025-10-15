@@ -35,12 +35,15 @@ setup::install hyprland hyprpaper hyprlock xdg-desktop-portal-hyprland hyprcurso
 setup::install ghostty
 setup::install ttf-jetbrains-mono-nerd
 setup::install breeze breeze5 papirus-icon-theme
-setup::install zathura zathura-pdf-mupdf imv nemo
+setup::install zathura zathura-pdf-mupdf imv nautilus nautilus-open-any-terminal
 
 gsettings set org.cinnamon.desktop.default-applications.terminal exec "$(which tmux-term)"
 gsettings set org.cinnamon.desktop.default-applications.terminal exec-arg ""
 gsettings set org.gnome.desktop.default-applications.terminal exec "$(which tmux-term)"
 gsettings set org.gnome.desktop.default-applications.terminal exec-arg ""
+gsettings set com.github.stunkymonkey.nautilus-open-any-terminal terminal "ghostty"
+# gsettings set com.github.stunkymonkey.nautilus-open-any-terminal custom-local-command "$(which tmux-term)"
+gsettings set com.github.stunkymonkey.nautilus-open-any-terminal keybindings '<Ctrl><Alt>t'
 
 setup::install rustup && (
     rustup default || rustup default stable
