@@ -362,7 +362,15 @@ hook -group lsp-qml global BufSetOption filetype=qml %{
   }
 }
 
-filetype-hook (rust|css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml|zig|go|templ|devicetree|kconfig|conf|janet|openscad|qml) %{
+rmhooks global lsp-slint
+hook -group lsp-slint global BufSetOption filetype=slint %{
+  set-option buffer lsp_servers %exp{
+      [slint-lsp]
+      root_globs = [".git"]
+  }
+}
+
+filetype-hook (rust|css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml|zig|go|templ|devicetree|kconfig|conf|janet|openscad|qml|slint) %{
   lsp-setup
   lsp-enable-semantic-tokens
 }

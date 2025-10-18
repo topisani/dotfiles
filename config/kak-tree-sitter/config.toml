@@ -260,3 +260,18 @@ link_flags = ["-O3"]
 [language.beancount.queries]
 source = { git = { url = "https://github.com/helix-editor/helix", pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7" }}
 path = "runtime/queries/beancount"
+
+
+[language.slint.grammar]
+source = { git = { url = "https://github.com/slint-ui/tree-sitter-slint", pin = "927f3e2f0213d0eea7f12c978c81067c3dc4289d" }}
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "-o", "slint.so"]
+link_flags = ["-O3"]
+
+[language.slint.queries]
+source = { git = { url = "https://github.com/helix-editor/helix", pin = "e22bbf5489ba95b643b9751038046d736aa92ad1" }}
+path = "runtime/queries/slint"

@@ -214,12 +214,9 @@ update_ghostty() {
     sed -i "s/^theme\s*=.*$/theme = $COLORSCHEME_NAME/" ~/.config/ghostty/config
     # There is no way to trigger ghostty config reload from the terminal, so this sends
     # a shortcut to all ghostty windows using hyprctl
-    hyprctl clients -j |
-        jq -r '.[] | select(.class == "com.mitchellh.ghostty") | .address' |
-        while read addr;
-            do hyprctl dispatch sendshortcut "CTRL SHIFT,COMMA,address:$addr";
-        done
+    hyprctl dispatch sendshortcut "SHIFT CTRL,comma,class:com.mitchellh.ghostty"
 }
+
 
 update_gtk() {
     gsettings set org.gnome.desktop.interface gtk-theme $(xrdb -query | grep -Po "gtk-theme:\h*\K.*")

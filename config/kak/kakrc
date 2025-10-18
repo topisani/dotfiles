@@ -345,6 +345,7 @@ filetype-assign .*\.jjdescription jj-describe
 filetype-assign .*\.surql surrealdb
 filetype-assign .*\.scad openscad
 filetype-assign .*\.bean beancount
+filetype-assign .*\.slint slint
 
 filetype-hook jj-describe %{
   # set window comment_line 'JJ:'
@@ -393,6 +394,10 @@ filetype-hook surrealdb %{
 
 filetype-hook beancount %{
   set window comment_line ';'
+}
+
+filetype-hook slint %{
+  set window comment_line '//'
 }
 
 # Global highlighter ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈

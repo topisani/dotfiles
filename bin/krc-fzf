@@ -106,7 +106,7 @@ krc_fzf__files_action() {
 krc_fzf__files_preview() {
   IFS=: read -r path line col rest <<< "$1"
 
-  krc_fzf__files_conf_load && cd "$KRC_FZF_ROOT"
+  krc_fzf__files_conf_load && cd "${KRC_FZF_ROOT:-.}"
 
   if [ -d "$path" ]; then
     tree "$path"
