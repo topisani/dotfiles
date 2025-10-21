@@ -345,6 +345,7 @@ filetype-assign .*\.jjdescription jj-describe
 filetype-assign .*\.surql surrealdb
 filetype-assign .*\.scad openscad
 filetype-assign .*\.bean beancount
+filetype-assign .*\.corn corn
 filetype-assign .*\.slint slint
 
 filetype-hook jj-describe %{
@@ -397,6 +398,11 @@ filetype-hook beancount %{
 }
 
 filetype-hook slint %{
+  set window comment_line '//'
+}
+
+filetype-assign .*\.corn corn
+filetype-hook corn %{
   set window comment_line '//'
 }
 

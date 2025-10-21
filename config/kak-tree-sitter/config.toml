@@ -275,3 +275,18 @@ link_flags = ["-O3"]
 [language.slint.queries]
 source = { git = { url = "https://github.com/helix-editor/helix", pin = "e22bbf5489ba95b643b9751038046d736aa92ad1" }}
 path = "runtime/queries/slint"
+
+
+[language.corn.grammar]
+source = { git = { url = "https://github.com/corn-config/tree-sitter-corn", pin = "464654742cbfd3a3de560aba120998f1d5dfa844" }}
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "-o", "corn.so"]
+link_flags = ["-O3"]
+
+[language.corn.queries]
+source = { git = { url = "https://github.com/corn-config/tree-sitter-corn", pin = "464654742cbfd3a3de560aba120998f1d5dfa844" }}
+path = "queries"
