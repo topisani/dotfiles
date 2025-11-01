@@ -70,3 +70,4 @@
 ~/.config/systemd/user/graphical-session.target.wants/nm-applet.service;config/systemd/user/graphical-session.target.wants/nm-applet.service
 ~/.config/systemd/user/graphical-session.target.wants/udiskie.service;config/systemd/user/graphical-session.target.wants/udiskie.service
 ~/.config/systemd/user/graphical-session.target.wants/xsettingsd.service;config/systemd/user/graphical-session.target.wants/xsettingsd.service
+~/.config/nix;config/nix
