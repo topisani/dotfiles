@@ -71,3 +71,5 @@
 ~/.config/systemd/user/graphical-session.target.wants/udiskie.service;config/systemd/user/graphical-session.target.wants/udiskie.service
 ~/.config/systemd/user/graphical-session.target.wants/xsettingsd.service;config/systemd/user/graphical-session.target.wants/xsettingsd.service
 ~/.config/nix;config/nix
+~/.config/systemd/user/battery-notifyd.service;config/systemd/user/battery-notifyd.service
+~/.config/systemd/user/swaybg.service;config/systemd/user/swaybg.service
