@@ -13,7 +13,7 @@ alias np='nano -w PKGBUILD'
 alias more=less
 export LESS="$LESS --mouse"
 
-alias l='exa --group-directories-first -F'
+alias l='eza --group-directories-first -F'
 alias ll='l -lh --git'
 alias la='ll -a'
 alias llg='ll --grid'

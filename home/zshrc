@@ -4,10 +4,11 @@ if [ -z "$_HOME_DOT_PROFILE_INCLUDED" ]; then
     source ~/.profile
 fi
 
+fpath=($HOME/.local/share/zsh-antidote/functions $fpath)
 fpath=(/usr/share/zsh-antidote/functions $fpath)
 autoload -Uz antidote
 
-zsh_plugins=${ZDOTDIR:-$HOME}/.zsh_plugins
+zsh_plugins=$HOME/.zsh_plugins
 if [[ ! ${zsh_plugins}.zsh -nt ${zsh_plugins}.txt ]]; then
     antidote bundle <${zsh_plugins}.txt >${zsh_plugins}.zsh
 fi
@@ -38,7 +39,7 @@ setopt glob_dots     # no special treatment for file names with a leading dot
 setopt no_extended_glob # extended glob syntax often breaks git commands
 
 iscmd() {
-    which $1 > /dev/null
+    which $1 &> /dev/null
 }
 
 iscmd zoxide && source <(zoxide init zsh)

@@ -22,7 +22,7 @@
 # # separated by equals signs.
 font-family = ""
 font-family = "JetBrainsMono Nerd Font"
-font-size = 9
+font-size = 11
 # disable ligatures:
 font-feature = -calt
 adjust-cell-height=-1

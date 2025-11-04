@@ -17,6 +17,8 @@ then
 	shopt -q login_shell && LOGIN_OPTION='--login' || LOGIN_OPTION=''
 	exec zsh $LOGIN_OPTION
 	exit $?
+else
+	echo $(ps --no-header --pid=$PPID --format=comm)
 fi
 
 complete -cf sudo

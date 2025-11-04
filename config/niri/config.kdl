@@ -83,7 +83,7 @@ output "eDP-1" {
     // mode "1920x1080@120.030"
 
     // You can use integer or fractional scale, for example use 1.5 for 150% scale.
-    scale 1.5
+    scale 1.25
 
     // Transform allows to rotate the output counter-clockwise, valid values are:
     // normal, 90, 180, 270, flipped, flipped-90, flipped-180 and flipped-270.
@@ -110,7 +110,7 @@ output "Dell Inc. DELL S2721QS CH3CM43" {
 // https://github.com/YaLTeR/niri/wiki/Configuration:-Layout
 layout {
     // Set gaps around windows in logical pixels.
-    gaps 8
+    gaps 0
 
     // When to center a column when changing focus, options are:
     // - "never", default behavior, focusing an off-screen column will keep at the left
@@ -157,7 +157,7 @@ layout {
     // You can change how the focus ring looks.
     focus-ring {
         // Uncomment this line to disable the focus ring.
-        // off
+        off
 
         // How many logical pixels the ring extends out from the windows.
         width  2
@@ -193,16 +193,16 @@ layout {
     border {
         // The settings are the same as for the focus ring.
         // If you enable the border, you probably want to disable the focus ring.
-        off
+        on
 
-        width 1
-        active-color "#7fc8ff"
+        width 2
+        active-color "#178ca6"
         inactive-color "#000000"
 
         // Color of the border around windows that request your attention.
         urgent-color "#9b0000"
 
-        // active-gradient from="#ffbb66" to="#ffc880" angle=45 relative-to="workspace-view"
+        // active-gradient from="#66ffbb" to="#7fc8ff" angle=45 relative-to="workspace-view"
         // inactive-gradient from="#505050" to="#808080" angle=45 relative-to="workspace-view"
     }
 
@@ -249,26 +249,33 @@ layout {
     // Top and bottom struts will simply add outer gaps in addition to the area occupied by
     // layer-shell panels and regular gaps.
     /-struts {
-        left -16
-        right -16
-        top -16
-        bottom -16
+        left 16
+        right 16
+        top 0
+        bottom 0
     }
 }
 
+// enable rounded corners for all windows.
+window-rule {
+    geometry-corner-radius 0
+    clip-to-geometry true
+}
+
+
 environment {
-      XCURSOR_SIZE "24"
-      XCURSOR_THEME "xcursor-breeze"
+    XCURSOR_SIZE "24"
+    XCURSOR_THEME "xcursor-breeze"
 
     // Fix various UI systems
-      GDK_BACKEND "wayland"
-      SDL_VIDEODRIVER "wayland"
-      CLUTTER_BACKEND "wayland"
-      QT_QPA_PLATFORM "wayland;xcb"
-      QT_AUTO_SCREEN_SCALE_FACTOR "1"
+    GDK_BACKEND "wayland"
+    SDL_VIDEODRIVER "wayland"
+    CLUTTER_BACKEND "wayland"
+    QT_QPA_PLATFORM "wayland;xcb"
+    QT_AUTO_SCREEN_SCALE_FACTOR "1"
     // QT_WAYLAND_DISABLE_WINDOWDECORATION "1"
-      QT_QPA_PLATFORMTHEME "qt5ct"
-      ELECTRON_OZONE_PLATFORM_HINT "wayland"
+    QT_QPA_PLATFORMTHEME "qt5ct"
+    ELECTRON_OZONE_PLATFORM_HINT "wayland"
 
 }
 
@@ -337,13 +344,6 @@ window-rule {
     // block-out-from "screencast"
 }
 
-// Example: enable rounded corners for all windows.
-// (This example rule is commented out with a "/-" in front.)
-/-window-rule {
-    geometry-corner-radius 0
-    clip-to-geometry true
-}
-
 binds {
     // Keys consist of modifiers separated by + signs, followed by an XKB key name
     // in the end. To find an XKB name for a particular key, you may use a program
@@ -366,7 +366,7 @@ binds {
 
     Mod+Return { spawn "tmux-term"; }
     Mod+Space { spawn "wofi"; }
-
+    Mod+P { spawn "killall" "-SIGUSR1" "waybar"; }
     // You can also use a shell. Do this if you need pipes, multiple commands, etc.
     // Note: the entire command goes as a single argument in the end.
     // Mod+T { spawn "bash" "-c" "notify-send hello && exec alacritty"; }
@@ -376,8 +376,8 @@ binds {
     XF86AudioRaiseVolume allow-when-locked=true { spawn "volume" "-n" "volume" "up"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn "volume" "-n" "volume" "down"; }
     XF86AudioMute        allow-when-locked=true { spawn "volume" "-n" "mute" "toggle"; }
-    XF86MonBrightnessUp   allow-when-locked=true { spawn "brightness" "-n" "up"; }
-    XF86MonBrightnessDown allow-when-locked=true { spawn "brightness" "-n" "down"; }
+    XF86MonBrightnessUp   allow-when-locked=true { spawn "brightness" "-n" "+5"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "brightness" "-n" "+5"; }
  // XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
 
     // Open/close the Overview: a zoomed-out view of workspaces and windows.
@@ -386,7 +386,7 @@ binds {
     Mod+O repeat=false { toggle-overview; }
     Mod+Tab repeat=false { toggle-overview; }
 
-    Mod+Q { close-window; }
+    Mod+Q repeat=false { close-window; }
 
     Mod+Left  { focus-column-left; }
     Mod+Down  { focus-window-down; }
@@ -560,8 +560,8 @@ binds {
     Mod+R { switch-preset-column-width; }
     Mod+Shift+R { switch-preset-window-height; }
     Mod+Ctrl+R { reset-window-height; }
-    Mod+M { maximize-column; }
-    Mod+F { fullscreen-window; }
+    Mod+M { maximize-window-to-edges; }
+    // Mod+F { fullscreen-window; }
 
     // Expand the focused column to space not taken up by other fully visible columns.
     // Makes the column "fill the rest of the space".
@@ -573,8 +573,8 @@ binds {
     Mod+Ctrl+C { spawn "colorscheme-switch" "--gtk"; }
     Mod+Shift+C { spawn "colorscheme-switch"; }
     // Move the focused window between the floating and the tiling layout.
-    Mod+V       { toggle-window-floating; }
-    Mod+Shift+V { switch-focus-between-floating-and-tiling; }
+    Mod+F       { toggle-window-floating; }
+    Mod+Shift+F { switch-focus-between-floating-and-tiling; }
 
     // Toggle tabbed column display mode.
     // Windows in this column will appear as vertical tabs,
