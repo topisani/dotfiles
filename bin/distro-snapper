@@ -1,0 +1,322 @@
+#!/bin/bash
+set -e
+
+VERSION="0.1.0"
+
+function make_snapshot() {
+  containername="$1"
+  snapshotid=$(calc_snapshot_id "$containername")
+  # First make a snapshot of the current state
+  # Save it as a new image with the current date appended, so we don't overwrite another image
+  podman container commit -p "$containername" "$snapshotid-$(date -u +%Y-%m-%dt%H-%M-%S)"
+}
+
+function prune_snapshots() {
+  containername="$1"
+  snapshotid=$(calc_snapshot_id "$containername")
+  num_of_snapshots="$2"
+
+  # Get current image
+  current_image=$(current_container_image "$containername")
+
+  # Prune the snapshots
+  # 1. podman sorts images according to creation date. 
+  # 2. Filter out the currently used image.
+  # 3. tail-syntax needs us to add one to the number of lines we want to skip
+  # 4. and xargs will remove all remaining images
+  tail_num=$((num_of_snapshots+1))
+  podman images --no-trunc --format "{{.Id}}" --filter "reference=$snapshotid-*" | grep -v "$current_image" | tail -n +$tail_num | xargs -r podman rmi
+}
+
+function update_container() {
+  containername="$1"
+  num_of_snapshots="$2"
+
+  make_snapshot "$containername"
+
+  # Then run the updates on it
+  distrobox upgrade "$containername"
+
+  prune_snapshots "$containername" "$num_of_snapshots"
+}
+
+function list_snapshots() {
+  containername="$1"
+  snapshotid=$(calc_snapshot_id "$containername")
+  podman images --no-trunc --format "{{.Repository}}" --filter "reference=$snapshotid-*"
+}
+
+function export_snapshot() {
+  containername="$1"
+  snapshot_image="$2"
+  target_dir="$3"
+
+  # Replacing the snapshot-ID with the actual container name
+  snapshotid=$(calc_snapshot_id "$containername")
+  tarballname=$(echo "$snapshot_image" | sed "s|localhost/$snapshotid|$containername|")
+  mkdir -p "$target_dir"
+  podman save "$snapshot_image" | bzip2 > "$target_dir/$tarballname.tar.bz"
+}
+
+function current_container_image() {
+  containername="$1"
+  podman container ls -a --no-trunc --format "{{.ImageID}}" --filter "name=$containername"
+}
+
+function calc_snapshot_id() {
+  containername="$1"
+  # We can't use the containername directly, because it can contain
+  # many characters that image-names are not allowed to use.
+  # So we simply hash the containername and use that.
+  echo "$containername" | sha1sum | cut -f1 -d " "
+}
+
+function rollback_to_image() {
+  containername="$1"
+  rollback_image="$2"
+
+  # Get current image
+  current_image=$(current_container_image "$containername")
+
+  podman container stop "$containername"
+  podman container rm "$containername"
+
+  distrobox create -i "$rollback_image" -n "$containername"
+
+  # Remove no longer used current image
+  # podman rmi "$current_image"
+}
+
+function run_current() {
+  if [ $# -ne 2 ]; then
+    print_current_usage_and_exit
+  fi
+  
+  containername="$2"
+  podman container ls -a --no-trunc --format "{{.Image}}" --filter "name=$containername"
+}
+
+function run_list() {
+  if [ $# -ne 2 ]; then
+    print_list_usage_and_exit
+  fi
+  
+  containername="$2"
+  list_snapshots "$containername"
+}
+
+function run_create() {
+  if [ $# -ne 2 ]; then
+    print_create_usage_and_exit
+  fi
+  
+  containername="$2"
+  make_snapshot "$containername"
+}
+
+function run_remove() {
+  if [ $# -ne 2 ]; then
+    print_remove_usage_and_exit
+  fi
+  
+  containerid="$2"
+  podman rmi "$containerid"
+}
+
+function run_prune() {
+  if [ $# -ne 3 ]; then
+    print_prune_usage_and_exit
+  fi
+  
+  containername="$2"
+  num_of_snapshots="$3"
+  prune_snapshots "$containername" "$num_of_snapshots"
+}
+
+function run_rollback() {
+  if [ $# -ne 3 ]; then
+    print_rollback_usage_and_exit
+  fi
+  
+  containername="$2"
+  rollback_image="$3"
+  rollback_to_image "$containername" "$rollback_image" 
+}
+
+function run_update() {
+  if [ $# -ne 3 ]; then
+    print_update_usage_and_exit
+  fi
+  
+  containername="$2"
+  num_of_snapshots="$3"
+  update_container "$containername" "$num_of_snapshots"
+}
+
+function run_export() {
+  if [ $# -ne 4 ]; then
+    print_export_usage_and_exit
+  fi
+
+  containername="$2"
+  snapshot_image="$3"
+  target_dir="$4"
+  export_snapshot "$containername" "$snapshot_image" "$target_dir"
+}
+
+function run_import() {
+  if [ $# -ne 2 ]; then
+    print_import_usage_and_exit
+  fi
+
+  tarball="$2"
+  podman load < "$tarball"
+}
+
+function main() {
+  # Exit script on CTRL+C
+  trap "exit" INT
+
+  if [ $# -le 0 ]; then
+    print_main_usage_and_exit
+  fi
+  
+  case "$1" in
+      current)
+        run_current "$@"
+        shift
+        ;;
+      list|ls)
+        run_list "$@"
+        shift
+        ;;
+      create)
+        run_create "$@"
+        shift
+        ;;
+      remove|rm)
+        run_remove "$@"
+        shift
+        ;;
+      prune)
+        run_prune "$@"
+        shift
+        ;;
+      rollback)
+        run_rollback "$@"
+        shift
+        ;;
+      update)
+        run_update "$@"
+        shift
+        ;;
+      export)
+        run_export "$@"
+        shift
+        ;;
+      import)
+        run_import "$@"
+        shift
+        ;;
+      *)
+        print_main_usage_and_exit
+        ;;
+    esac
+}
+
+function print_current_usage_and_exit() {
+  echo "Usage: distro-snapper current DISTROBOX_NAME"
+  echo ""
+  echo "Options:"
+  echo "    DISTROBOX_NAME: Which snapshot is this container running on"
+  exit 1
+}
+
+function print_list_usage_and_exit() {
+  echo "Usage: distro-snapper list DISTROBOX_NAME"
+  echo ""
+  echo "Options:"
+  echo "    DISTROBOX_NAME: Snapshots of which distrobox should be listed"
+  exit 1
+}
+
+function print_remove_usage_and_exit() {
+  echo "Usage: distro-snapper remove SNAPSHOT"
+  echo ""
+  echo "Options:"
+  echo "    SNAPSHOT: Which snapshot should be removed"
+  exit 1
+}
+
+function print_create_usage_and_exit() {
+  echo "Usage: distro-snapper create DISTROBOX_NAME"
+  echo ""
+  echo "Options:"
+  echo "    DISTROBOX_NAME: Which container to snapshot"
+  exit 1
+}
+
+function print_prune_usage_and_exit() {
+  echo "Usage: distro-snapper prune DISTROBOX_NAME NUM_OF_SNAPSHOTS"
+  echo ""
+  echo "Options:"
+  echo "    DISTROBOX_NAME: Which container is affected"
+  echo "    NUM_OF_SNAPSHOTS: How many snapshots should remain"
+  exit 1
+}
+
+function print_rollback_usage_and_exit() {
+  echo "Usage: distro-snapper rollback DISTROBOX_NAME TARGET_SNAPSHOT"
+  echo ""
+  echo "Options:"
+  echo "    DISTROBOX_NAME: Which container to restore"
+  echo "    TARGET_SNAPSHOT: To which snapshot to restore"
+  exit 1
+}
+
+function print_update_usage_and_exit() {
+  echo "Usage: distro-snapper update DISTROBOX_NAME NUM_OF_SNAPSHOTS"
+  echo ""
+  echo "Convenience function, which creates a snapshot, runs \`distrobox update\` and then prunes the remaining snapshots"
+  echo "Options:"
+  echo "    DISTROBOX_NAME: Which container to update"
+  echo "    NUM_OF_SNAPSHOTS: How many snapshots should remain"
+  exit 1
+}
+
+function print_export_usage_and_exit() {
+  echo "Usage: distro-snapper export DISTROBOX_NAME TARGET_SNAPSHOT TARGET_DIR"
+  echo ""
+  echo "Options:"
+  echo "    DISTROBOX_NAME: Which container is affected"
+  echo "    TARGET_SNAPSHOT: Which snapshot to export"
+  echo "    TARGET_DIR: Where to export the snapshot to"
+  exit 1
+}
+
+function print_import_usage_and_exit() {
+  echo "Usage: distro-snapper import TARBALL"
+  echo ""
+  echo "Options:"
+  echo "    TARBALL: Path to tarball of an exported snapshot that should be imported"
+  exit 1
+}
+
+function print_main_usage_and_exit() {
+  echo "distro-snapper version: $VERSION"
+  echo ""
+  echo "Choose one of the following commands:"
+  echo "    current"
+  echo "    list | ls"
+  echo "    create"
+  echo "    remove | rm"
+  echo "    prune"
+  echo "    rollback"
+  echo "    update"
+  echo "    export"
+  echo "    import"
+  echo "    help"
+  exit 1
+}
+
+main "$@"

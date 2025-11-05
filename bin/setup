@@ -1,12 +1,10 @@
 #!/bin/bash
 
-setup::install() {
-    # paru -S --needed --noconfirm "$@"
-    sudo dnf install "$@"
-}
+# Use same toolsdir inside distrobox with its own home dir
+TOOLSDIR=~/git/tools
 
 setup::project() {
-    cd ~/git/tools/
+    cd $TOOLSDIR
     repo=$1
     name=${repo##*/}
     if ! [ -d "$name" ]; then
@@ -15,130 +13,164 @@ setup::project() {
         cd "$name"
         git pull
     fi
-    cd "$HOME/git/tools/$name"
+    cd "$TOOLSDIR/$name"
 }
 
-mkdir -p ~/git/tools/
+setup::fedora() {
+    # Add terra repository (https://terra.fyralabs.com/)
+    sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
 
-# Add terra repository (https://terra.fyralabs.com/)
-sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
+    packages=(
+        zsh
+        zoxide
+        diff-so-fancy
+        bat
+        ripgrep
+        fd-find
+        git-revise
+        git-autofixup
+        qalculate
+        bc
+        editorconfig
+        tig
+        fzf
+        atuin
+        eza
+        eza-zsh-completion
+        # GUI tools/utilities
+        ghostty-shell-integration
+        jetbrainsmono-nerd-fonts
+        waybar
+        rofi
+        wofi
+        dunstify
+        udiskie
+        mako
+        network-manager-applet
+        # GUI Applications
+        ghostty
+        zathura
+        zathura-pdf-mupdf
+        zathura-zsh-completion
+        # imv
+        nautilus
+        python3-nautilus-open-any-terminal
+        openssl-devel
+        kakoune
+        just
+    )
 
-packages=(
-    zsh
-    zoxide
-    diff-so-fancy
-    bat
-    ripgrep
-    fd-find
-    git-revise
-    git-autofixup
-    qalculate
-    bc
-    editorconfig
-    tig
-    fzf
-    atuin
-    eza
-    eza-zsh-completion
-    # GUI tools/utilities
-    ghostty-shell-integration
-    jetbrainsmono-nerd-fonts
-    waybar
-    rofi
-    wofi
-    dunstify
-    udiskie
-    mako
-    network-manager-applet
-    # GUI Applications
-    ghostty
-    # zathura
-    # zathura-pdf-mupdf
-    # zathura-zsh-completion
-    # imv
-    nautilus
-    python3-nautilus-open-any-terminal
-    openssl-devel
-)
+    sudo dnf install ${packages[@]}
 
-sudo dnf install ${packages[@]}
+    # NIRI
+    sudo dnf copr enable yalter/niri-git
+    echo "priority=1" | sudo tee -a /etc/yum.repos.d/_copr:copr.fedorainfracloud.org:yalter:niri-git.repo
+    sudo dnf install niri
 
-# setup::install git zsh jq tmux zoxide exa forgit jujutsu
-# setup::install diff-so-fancy bat ripgrep fd git-revise git-autofixup libqalculate bc
-# setup::install editorconfig-core-c tig fzf
+    systemctl --user add-wants niri.service battery-notifyd.service
+    systemctl --user add-wants niri.service hypridle.service
+    systemctl --user add-wants niri.service swaybg.service
+    systemctl --user add-wants niri.service udiskie.service
+    systemctl --user add-wants niri.service waybar.service
+    systemctl --user add-wants niri.service xsettingsd.service
 
-# setup::install waybar wofi dunst udiskie
-# setup::install hyprland hyprpaper hyprlock xdg-desktop-portal-hyprland hyprcursor hypridle wl-clipboard hyprpolkitagent uwsm
-# (
-#     systemctl --user enable hyprpaper.service
-#     systemctl --user enable hyprpolkitagent.service
-#     systemctl --user enable hypridle.service
-#     systemctl --user enable waybar.service
-# )
+    # RUST
 
-# setup::install ghostty
-# setup::install ttf-jetbrains-mono-nerd
-# setup::install breeze breeze5 papirus-icon-theme
-# setup::install zathura zathura-pdf-mupdf imv nautilus nautilus-open-any-terminal
+    sudo dnf install rustup
+    which rustup &> /dev/null || rustup-init
 
-gsettings set org.cinnamon.desktop.default-applications.terminal exec "$(which tmux-term)"
-gsettings set org.cinnamon.desktop.default-applications.terminal exec-arg ""
-gsettings set org.gnome.desktop.default-applications.terminal exec "$(which tmux-term)"
-gsettings set org.gnome.desktop.default-applications.terminal exec-arg ""
-gsettings set com.github.stunkymonkey.nautilus-open-any-terminal terminal "ghostty"
-# gsettings set com.github.stunkymonkey.nautilus-open-any-terminal custom-local-command "$(which tmux-term)"
-gsettings set com.github.stunkymonkey.nautilus-open-any-terminal keybindings '<Ctrl><Alt>t'
+    cargo install cargo-binstall
+    cargo binstall cargo-update
+    cargo install-update -a
 
-# NIRI
-sudo dnf copr enable yalter/niri-git
-echo "priority=1" | sudo tee -a /etc/yum.repos.d/_copr:copr.fedorainfracloud.org:yalter:niri-git.repo
-sudo dnf install niri
+    # jj
+    cargo binstall --strategies crate-meta-data jj-cli
 
-# RUST
+    sudo dnf install yazi
+}
 
-sudo dnf install rustup
-which rustup &> /dev/null || rustup-init
+setup::gui() {
+    gsettings set org.cinnamon.desktop.default-applications.terminal exec "$(which tmux-term)"
+    gsettings set org.cinnamon.desktop.default-applications.terminal exec-arg ""
+    gsettings set org.gnome.desktop.default-applications.terminal exec "$(which tmux-term)"
+    gsettings set org.gnome.desktop.default-applications.terminal exec-arg ""
+    gsettings set com.github.stunkymonkey.nautilus-open-any-terminal terminal "ghostty"
+    # gsettings set com.github.stunkymonkey.nautilus-open-any-terminal custom-local-command "$(which tmux-term)"
+    gsettings set com.github.stunkymonkey.nautilus-open-any-terminal keybindings '<Ctrl><Alt>t'
+}
 
-cargo install cargo-binstall cargo-update
-cargo install-update -a
+setup::arch() {
+    paru -S --needed git zsh jq zoxide eza jujutsu kakoune
+    paru -S --needed diff-so-fancy bat ripgrep fd git-revise git-autofixup libqalculate bc
+    paru -S --needed editorconfig-core-c tig fzf yazi
 
-# jj
-cargo binstall --strategies crate-meta-data jj-cli
+    # setup::install waybar wofi dunst udiskie
+    # setup::install hyprland hyprpaper hyprlock xdg-desktop-portal-hyprland hyprcursor hypridle wl-clipboard hyprpolkitagent uwsm
+    # (
+    #     systemctl --user enable hyprpaper.service
+    #     systemctl --user enable hyprpolkitagent.service
+    #     systemctl --user enable hypridle.service
+    #     systemctl --user enable waybar.service
+    # )
 
-# Kakoune and tools
-setup::project https://github.com/topisani/kakoune && (
-    make
-    sudo make install
-)
+    # setup::install ghostty
+    # setup::install ttf-jetbrains-mono-nerd
+    # setup::install breeze breeze5 papirus-icon-theme
+    # setup::install zathura zathura-pdf-mupdf imv nautilus nautilus-open-any-terminal
+}
 
-setup::project https://github.com/topisani/kakoune-remote-control && (
-    make install
-)
+setup::tools() {
+    mkdir -p $TOOLSDIR
 
-setup::project https://github.com/topisani/kak-lsp && (
-    cargo install --path . --locked
-)
+    # Kakoune and tools
+    # setup::project https://github.com/topisani/kakoune && (
+    #     make
+    #     sudo make install
+    # )
 
-setup::project https://github.com/topisani/kak-tree-sitter && (
-    # git remote add upstream git@git.sr.ht:~hadronized/kak-tree-sitter
-    # git fetch upstream
-    # git reset --hard upstream/master
-    cargo install --locked --path kak-tree-sitter
-    cargo install --locked --path ktsctl
-    # ktsctl sync -a 
-)
+    setup::project https://github.com/topisani/kakoune-remote-control && (
+        make install
+    )
 
-setup::project https://github.com/topisani/sidetree && (
-    cargo install --path . --locked
-)
+    # setup::project https://github.com/topisani/kak-lsp && (
+    #     cargo install --path . --locked
+    # )
+    cargo install kak-lsp
+    # cargo install sidetree
 
-setup::project https://github.com/topisani/tmux && (
-    ./autogen.sh
-    ./configure --enable-sixel
-    make
-    sudo make install
-)
+    setup::project https://github.com/topisani/kak-tree-sitter && (
+        # git remote add upstream git@git.sr.ht:~hadronized/kak-tree-sitter
+        # git fetch upstream
+        # git reset --hard upstream/master
+        cargo install --locked --path kak-tree-sitter
+        cargo install --locked --path ktsctl
+        ktsctl sync -a 
+    )
 
-setup::install yazi && (
-    ya pack -i
-)
+    setup::project https://github.com/topisani/sidetree && (
+        cargo install --path . --locked
+    )
+
+    setup::project https://github.com/topisani/tmux && (
+        ./autogen.sh
+        ./configure --enable-sixel
+        make
+        sudo make install
+    )
+
+    ya pkg install
+}
+
+setup::all() {
+    if distro -j | jq -e '.id == "fedora"' &> /dev/null; then
+        setup::fedora
+        setup::gui
+    elif distro -j | jq -e '.id == "arch"' &> /dev/null; then
+        setup::arch
+    fi
+    setup::tools
+}
+
+[[ $# < 1 ]] && set -- all
+
+setup::"$@"

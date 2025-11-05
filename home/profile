@@ -20,8 +20,6 @@ PATH="$PATH:$HOME/dev/flutter/.pub-cache/bin"
 PATH="$HOME/.ghcup/bin:$PATH"
 export PATH="$HOME/.bin:$HOME/.local/bin:/usr/local/bin:$PATH"
 
-[ -e "~/.rye/env" ] && source "~/.rye/env"
-
 # Global cache for cmake projects using CPM
 export CPM_SOURCE_CACHE=$HOME/.cache/CPM
 
@@ -69,12 +67,12 @@ export FORGIT_FZF_DEFAULT_OPTS="--reverse"
 
 export POETRY_VIRTUALENVS_IN_PROJECT=true
 
-export SSH_AUTH_SOCK=/tmp/ssh-agent.$HOST.sock
+# export SSH_AUTH_SOCK=/tmp/ssh-agent.$HOST.sock
 
-ssh-add -l 2>/dev/null >/dev/null
-if [ $? -ge 2 ]; then
-  ssh-agent -a "$SSH_AUTH_SOCK" >/dev/null
-fi
+# ssh-add -l 2>/dev/null >/dev/null
+# if [ $? -ge 2 ]; then
+#   ssh-agent -a "$SSH_AUTH_SOCK" >/dev/null
+# fi
 
 # use docker buildkit
 export DOCKER_BUILDKIT=1
@@ -91,4 +89,3 @@ if [ -n "$BASH_VERSION" ]; then
 	. "$HOME/.bashrc"
     fi
 fi
-. "$HOME/.cargo/env"

@@ -224,7 +224,7 @@ update_gtk() {
 }
 
 toggle_gtk_dark() {
-    gtk_theme="adw-gtk3"
+    gtk_theme="adw-gtk3-dark"
     icon_theme="Adwaita"
     color_scheme="prefer-dark"
     if gsettings get org.gnome.desktop.interface color-scheme | grep -qi dark; then
@@ -243,7 +243,8 @@ toggle_gtk_dark() {
     echo "Net/IconThemeName \"$icon_theme\"" >> $HOME/.config/xsettingsd/xsettingsd.conf
 
     # Reload xsettingsd config
-    killall -SIGHUP xsettingsd
+    # killall -SIGHUP xsettingsd
+    systemctl --user restart xsettingsd
 }
 
 getCurrentColorscheme() {

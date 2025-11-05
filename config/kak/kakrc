@@ -2,13 +2,14 @@ evaluate-commands %sh{
   # 
   krc kak-defs
   # We're assuming the default bundle_path here...
-  plugins="$kak_config/bundle"
+  plugins="$HOME/.local/share/kak/bundle"
   mkdir -p "$plugins"
   [ ! -e "$plugins/kak-bundle" ] && \
-    git clone -q https://github.com/jdugan6240/kak-bundle "$plugins/kak-bundle"
+    git clone https://codeberg.org/jdugan6240/kak-bundle "$plugins/kak-bundle"
   printf "%s\n" "source '$plugins/kak-bundle/rc/kak-bundle.kak'"
+  printf "%s\n" "set global bundle_path '$plugins'"
 }
-bundle-noload kak-bundle https://github.com/jdugan6240/kak-bundle
+bundle-noload kak-bundle https://codeberg.org/jdugan6240/kak-bundle
 
 def load-conf -params 1 %{
   echo -debug "[load-conf] Loading %arg{1}..."
@@ -347,6 +348,7 @@ filetype-assign .*\.scad openscad
 filetype-assign .*\.bean beancount
 filetype-assign .*\.corn corn
 filetype-assign .*\.slint slint
+# filetype-assign (.*/)?Containerfile(\..*)? dockerfile
 
 filetype-hook jj-describe %{
   # set window comment_line 'JJ:'

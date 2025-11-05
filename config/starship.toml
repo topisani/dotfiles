@@ -1,6 +1,9 @@
 add_newline = true
 format = '$username$hostname$shlvl$directory$git_branch$git_commit$git_status$git_state$hg_branch$docker_context$custom$time$python$line_break$cmd_duration$jobs$battery$status$shell$character'
 
+[hostname]
+ssh_only=false
+
 [directory]
 truncation_length = 3
 truncate_to_repo = false

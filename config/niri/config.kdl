@@ -256,9 +256,10 @@ layout {
     }
 }
 
-// enable rounded corners for all windows.
+// enable rounded corners for floating windows
 window-rule {
-    geometry-corner-radius 0
+    match is-floating=true
+    geometry-corner-radius 8
     clip-to-geometry true
 }
 
@@ -364,7 +365,8 @@ binds {
     // Mod+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
 
-    Mod+Return { spawn "tmux-term"; }
+    Mod+Return { spawn "ghostty" "--command=distrobox enter arch -- arch-term"; }
+    Mod+Shift+Return { spawn-sh "ghostty --working-directory=$HOME"; }
     Mod+Space { spawn "wofi"; }
     Mod+P { spawn "killall" "-SIGUSR1" "waybar"; }
     // You can also use a shell. Do this if you need pipes, multiple commands, etc.
@@ -377,7 +379,7 @@ binds {
     XF86AudioLowerVolume allow-when-locked=true { spawn "volume" "-n" "volume" "down"; }
     XF86AudioMute        allow-when-locked=true { spawn "volume" "-n" "mute" "toggle"; }
     XF86MonBrightnessUp   allow-when-locked=true { spawn "brightness" "-n" "+5"; }
-    XF86MonBrightnessDown allow-when-locked=true { spawn "brightness" "-n" "+5"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "brightness" "-n" "-5"; }
  // XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
 
     // Open/close the Overview: a zoomed-out view of workspaces and windows.
@@ -605,3 +607,6 @@ binds {
 
     Mod+Ctrl+Shift+F { toggle-windowed-fullscreen; }
 }
+
+// To run in cosmic session:
+// spawn-at-startup "cosmic-ext-alternative-startup"

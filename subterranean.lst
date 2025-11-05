@@ -14,7 +14,6 @@
 ~/.xinitrc;home/xinitrc
 ~/.config/zathura;config/zathura
 ~/.config/picom.conf;config/picom.conf
-~/.config/kak-lsp;config/kak-lsp
 ~/.config/gtk-3.0/gtk.css;config/gtk-3.0/gtk.css
 ~/.config/kitty;config/kitty
 ~/.config/tmux;config/tmux
@@ -51,7 +50,6 @@
 ~/.zshrc;home/zshrc
 ~/.p10k.zsh;home/p10k.zsh
 ~/.config/aerc;config/aerc
-~/.config/ags;config/ags
 ~/.config/zellij;config/zellij
 ~/.config/jj;config/jj
 ~/.config/yazi;config/yazi
@@ -67,9 +65,7 @@
 ~/.config/systemd/user/nm-applet.service;config/systemd/user/nm-applet.service
 ~/.config/systemd/user/udiskie.service;config/systemd/user/udiskie.service
 ~/.config/systemd/user/xsettingsd.service;config/systemd/user/xsettingsd.service
-~/.config/systemd/user/graphical-session.target.wants/nm-applet.service;config/systemd/user/graphical-session.target.wants/nm-applet.service
-~/.config/systemd/user/graphical-session.target.wants/udiskie.service;config/systemd/user/graphical-session.target.wants/udiskie.service
-~/.config/systemd/user/graphical-session.target.wants/xsettingsd.service;config/systemd/user/graphical-session.target.wants/xsettingsd.service
 ~/.config/nix;config/nix
 ~/.config/systemd/user/battery-notifyd.service;config/systemd/user/battery-notifyd.service
 ~/.config/systemd/user/swaybg.service;config/systemd/user/swaybg.service
+/run/host/home/topisani/distrobox;home/distrobox

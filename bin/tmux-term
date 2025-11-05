@@ -1,9 +1,9 @@
 #!/bin/sh
 
 setup_term() {
-    export TERM=tmux-256color
+    # export TERM=tmux-256color
     CMD=${1:-$SHELL}
-    exec tmux new-session "$CMD" \; set destroy-unattached on \; set status off \; attach
+    exec tmux new-session \; set destroy-unattached on \; attach #\; set status off \; attach
 }
 
 if [ "$1" = "--setup" ]; then

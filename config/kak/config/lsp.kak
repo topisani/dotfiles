@@ -1,6 +1,6 @@
 # Setup kak-lsp
 
-eval %sh{ kak-lsp --kakoune }
+eval %sh{ kak-lsp }
 
 declare-option -hidden str lsp_auto_hover_selection
 

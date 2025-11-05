@@ -10,7 +10,10 @@ autoload -Uz antidote
 
 zsh_plugins=$HOME/.zsh_plugins
 if [[ ! ${zsh_plugins}.zsh -nt ${zsh_plugins}.txt ]]; then
-    antidote bundle <${zsh_plugins}.txt >${zsh_plugins}.zsh
+    if ! antidote -v &> /dev/null; then
+        git clone --depth=1 https://github.com/mattmc3/antidote.git ~/.local/share/zsh-antidote
+    fi
+    antidote bundle <${zsh_plugins}.txt >${zsh_plugins}.zsh || rm ${zsh_plugins}.zsh
 fi
 source ${zsh_plugins}.zsh
 

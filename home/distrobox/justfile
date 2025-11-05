@@ -1,0 +1,39 @@
+set positional-arguments
+
+[private]
+@list:
+    just --list
+
+build:
+    podman build -t arch-dev .
+
+create *args: build
+    distrobox create \
+        --image arch-dev \
+        --name arch \
+        --unshare-netns \
+        --home ~/.distrobox/arch/home \
+        "$@"
+
+    distrobox enter arch -- just internal-init
+
+# Called from withing the container on first setup
+internal-init:
+    #!/bin/bash
+    ln -sf /home/topisani/.dotfiles ~/
+    rm ~/.bashrc
+    ~/.dotfiles/bin/subterranean install
+    rustup default stable
+    setup
+
+    mkdir -p /var/tmp/run
+    cat > ~/.local/bin/kak <<'EOF'
+        #!/bin/sh
+        export XDG_RUNTIME_DIR=/var/tmp/run
+        exec /usr/bin/kak "$@"
+    EOF
+    chmod +x ~/.local/bin/kak
+
+
+enter:
+    distrobox enter arch

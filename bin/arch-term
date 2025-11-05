@@ -1,0 +1,4 @@
+#!/bin/sh
+
+export TERM=tmux-256color
+exec tmux new-session \; set destroy-unattached on \; attach #\; set status off \; attach

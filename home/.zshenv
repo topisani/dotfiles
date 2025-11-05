@@ -1,4 +1,8 @@
 #!/bin/zsh
 
-# export ZDOTDIR=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
-. "$HOME/.cargo/env"
+if [ -n "$ZDOTDIR" ] && [ ! -d "$ZDOTDIR" ]; then
+    # If ZDOTDIR doesn't exist, try the host path
+    if [ -d "/run/host${ZDOTDIR}" ]; then
+        export ZDOTDIR="/run/host${ZDOTDIR}"
+    fi
+fi

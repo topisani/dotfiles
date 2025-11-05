@@ -15,10 +15,10 @@ stty -ixon -ixoff
 if [[ $(ps --no-header --pid=$PPID --format=comm) != "zsh" && -z ${BASH_EXECUTION_STRING} && ${SHLVL} ]]
 then
 	shopt -q login_shell && LOGIN_OPTION='--login' || LOGIN_OPTION=''
-	exec zsh $LOGIN_OPTION
-	exit $?
-else
-	echo $(ps --no-header --pid=$PPID --format=comm)
+	if which zsh &> /dev/null; then
+		exec zsh $LOGIN_OPTION
+		exit $?
+	fi
 fi
 
 complete -cf sudo
