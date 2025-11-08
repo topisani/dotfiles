@@ -69,9 +69,9 @@ def toggle-modeline -override %{
 # Window-based settings
 hook global WinCreate .* %{
   addhl window/matching show-matching
-  addhl -override window/whitespace show-whitespaces -indent '' -spc '' -face Whitespace
-  addhl -override window/trailing-whitespace show-whitespaces -lf '' -only-trailing -face WhitespaceTrailing
-  addhl -override window/indent-guides show-whitespaces -lf '' -spc '' -tab '' -nbsp '' -face WhitespaceIndent
+  # addhl -override window/whitespace show-whitespaces -indent '' -spc '' -face Whitespace
+  # addhl -override window/trailing-whitespace show-whitespaces -lf '' -only-trailing -face WhitespaceTrailing
+  # addhl -override window/indent-guides show-whitespaces -lf '' -spc '' -tab '' -nbsp '' -face WhitespaceIndent
   toggle-numbers
 }
 

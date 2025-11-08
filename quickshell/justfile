@@ -1,0 +1,20 @@
+#!/usr/bin/env -S just --justfile
+set positional-arguments
+
+build:
+    git submodule update --init qml-niri
+    cd qml-niri && just build
+
+debug *args: build
+    QS_ICON_THEME=breeze-dark \
+    QT_LOGGING_RULES="qml.debug=true" \
+    QML_IMPORT_PATH="$PWD/qml-niri/build:${QML_IMPORT_PATH:-}" \
+    quickshell --path shell "$@"
+
+run *args:
+    QS_ICON_THEME=breeze-dark \
+    QML_IMPORT_PATH="$PWD/qml-niri/build:${QML_IMPORT_PATH:-}" \
+    quickshell --path shell "$@"
+
+ipc *args:
+    quickshell --path shell ipc "$@"

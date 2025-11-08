@@ -69,3 +69,5 @@
 ~/.config/systemd/user/battery-notifyd.service;config/systemd/user/battery-notifyd.service
 ~/.config/systemd/user/swaybg.service;config/systemd/user/swaybg.service
 /run/host/home/topisani/distrobox;home/distrobox
+/run/host/home/topisani/.config/systemd/user/quickshell.service;config/systemd/user/quickshell.service
+/run/host/home/topisani/.config/systemd/user/polkit-mate-authentication-agent.service;config/systemd/user/polkit-mate-authentication-agent.service

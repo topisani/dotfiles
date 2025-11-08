@@ -359,6 +359,7 @@ hook -group lsp-qml global BufSetOption filetype=qml %{
       [qmlls]
       root_globs = [".qmlls.ini", ".git"]
       command = "qmlls6"
+      args = ["-E"]
   }
 }
 

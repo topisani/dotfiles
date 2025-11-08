@@ -275,7 +275,7 @@ environment {
     QT_QPA_PLATFORM "wayland;xcb"
     QT_AUTO_SCREEN_SCALE_FACTOR "1"
     // QT_WAYLAND_DISABLE_WINDOWDECORATION "1"
-    QT_QPA_PLATFORMTHEME "qt5ct"
+    QT_QPA_PLATFORMTHEME "gtk3"
     ELECTRON_OZONE_PLATFORM_HINT "wayland"
 
 }
@@ -345,6 +345,21 @@ window-rule {
     // block-out-from "screencast"
 }
 
+layer-rule {
+    match namespace="^quickshell-backdrop$"
+    place-within-backdrop true
+}
+
+gestures {
+    hot-corners {
+        off
+    }
+}
+
+overview {
+    backdrop-color "#101014"
+}
+
 binds {
     // Keys consist of modifiers separated by + signs, followed by an XKB key name
     // in the end. To find an XKB name for a particular key, you may use a program
@@ -368,19 +383,15 @@ binds {
     Mod+Return { spawn "ghostty" "--command=distrobox enter arch -- arch-term"; }
     Mod+Shift+Return { spawn-sh "ghostty --working-directory=$HOME"; }
     Mod+Space { spawn "wofi"; }
-    Mod+P { spawn "killall" "-SIGUSR1" "waybar"; }
-    // You can also use a shell. Do this if you need pipes, multiple commands, etc.
-    // Note: the entire command goes as a single argument in the end.
-    // Mod+T { spawn "bash" "-c" "notify-send hello && exec alacritty"; }
+    Mod+P { spawn "~/.dotfiles/quickshell/justfile" "ipc" "call" "shell" "toggleBar"; }
+    // Mod+P { spawn "killall" "-SIGUSR1" "waybar"; }
 
-    // Example volume keys mappings for PipeWire & WirePlumber.
-    // The allow-when-locked=true property makes them work even when the session is locked.
-    XF86AudioRaiseVolume allow-when-locked=true { spawn "volume" "-n" "volume" "up"; }
-    XF86AudioLowerVolume allow-when-locked=true { spawn "volume" "-n" "volume" "down"; }
-    XF86AudioMute        allow-when-locked=true { spawn "volume" "-n" "mute" "toggle"; }
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "volume" "volume" "up"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "volume" "volume" "down"; }
+    XF86AudioMute        allow-when-locked=true { spawn "volume" "mute" "toggle"; }
     XF86MonBrightnessUp   allow-when-locked=true { spawn "brightness" "-n" "+5"; }
     XF86MonBrightnessDown allow-when-locked=true { spawn "brightness" "-n" "-5"; }
- // XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
+    // XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
 
     // Open/close the Overview: a zoomed-out view of workspaces and windows.
     // You can also move the mouse into the top-left hot corner,

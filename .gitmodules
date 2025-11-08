@@ -1,0 +1,3 @@
+[submodule "quickshell/qml-niri"]
+	path = quickshell/qml-niri
+	url = https://github.com/topisani/qml-niri.git

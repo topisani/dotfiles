@@ -9,6 +9,9 @@ hook global WinSetOption filetype=qml %{
     require-module qml
 
     set-option window static_words %opt{qml_static_words}
+    set-option window comment_line "//"
+    set-option window comment_block_begin "/*"
+    set-option window comment_block_end "*/"
 
     # cleanup trailing whitespaces when exiting insert mode
     hook window ModeChange pop:insert:.* -group qml-trim-indent %{ try %{ execute-keys -draft <a-x>s^\h+$<ret>d } }
