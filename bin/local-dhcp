@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -e
+
+# Find the first ethernet interface (excluding lo and wlan)
+ETH_IFACE=$(ip link show | grep -E "^[0-9]+:" | grep -v "lo:" | grep -v "wlan" | head -1 | cut -d: -f2 | xargs)
+
+if [ -z "$ETH_IFACE" ]; then
+    echo "Error: No ethernet interface found"
+    exit 1
+fi
+
+echo "Using interface: $ETH_IFACE"
+
+IP_ADDR="10.55.55.1/24"
+DHCP_RANGE="10.55.55.2,10.55.55.254,12h"
+
+# Cleanup function to remove IP when script exits
+cleanup() {
+    echo ""
+    echo "Cleaning up..."
+    sudo ip addr del "$IP_ADDR" dev "$ETH_IFACE" 2>/dev/null || true
+    echo "IP address removed from $ETH_IFACE"
+}
+
+# Set trap to run cleanup on exit
+trap cleanup EXIT
+
+# Add IP address
+echo "Adding IP $IP_ADDR to $ETH_IFACE..."
+sudo ip addr add "$IP_ADDR" dev "$ETH_IFACE"
+
+# Start dnsmasq in foreground mode with DHCP only
+echo "Starting DHCP server (press Ctrl+C to stop)..."
+sudo dnsmasq --interface="$ETH_IFACE" --dhcp-range="$DHCP_RANGE" --port=0 -d

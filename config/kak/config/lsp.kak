@@ -277,9 +277,9 @@ hook -group lsp-filetype-rust global BufSetOption filetype=rust %{
       cargo.runBuildScripts = true
       cargo.features = "all"
       # default settings gives "can't find crate test" for no_std targets
-      checkOnSave.allTargets = true
-      checkOnSave.extraArgs = ["--bins"]
-      checkOnSave.command = "clippy"
+      # checkOnSave.allTargets = true
+      # checkOnSave.extraArgs = ["--bins"]
+      # checkOnSave.command = "clippy"
       check.allTargets = true
       check.extraArgs = ["--bins"]
       # See https://github.com/rust-analyzer/rust-analyzer/issues/6448

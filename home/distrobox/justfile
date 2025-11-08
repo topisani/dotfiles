@@ -33,6 +33,7 @@ internal-init:
         exec /usr/bin/kak "$@"
     EOF
     chmod +x ~/.local/bin/kak
+    rm -rf ~/.ssh
     ln -sf /home/topisani/.ssh ~/
 
 

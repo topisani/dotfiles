@@ -102,7 +102,7 @@ output "eDP-1" {
 }
 
 output "Dell Inc. DELL S2721QS CH3CM43" {
-    scale 1.25
+    scale 1
 }
 
 // Settings that influence how windows are positioned and sized.

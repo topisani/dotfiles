@@ -6,8 +6,11 @@ export GDK_BACKEND='wayland,x11,*'
 export SDL_VIDEODRIVER=wayland
 export CLUTTER_BACKEND=wayland
 export QT_QPA_PLATFORM="wayland;xcb"
-# export QT_AUTO_SCREEN_SCALE_FACTOR=1
+export QT_AUTO_SCREEN_SCALE_FACTOR=1
 export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 # export QT_QPA_PLATFORMTHEME=qt5ct
+# export QT_ENABLE_HIGHDPI_SCALING=0
+# export QT_SCALE_FACTOR=0.8  # Adjust this value (0.67 for 1.5x, 0.8 for 1.25x)
+# export QT_FONT_DPI=96
 export ELECTRON_OZONE_PLATFORM_HINT=wayland
 

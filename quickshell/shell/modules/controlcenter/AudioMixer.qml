@@ -78,6 +78,7 @@ ColumnLayout {
                         verticalAlignment: Text.AlignVCenter
                         text: item.modelData.nickname || item.modelData.description
                         color: Config.theme.color.textMuted
+                        font: Config.cc.font
                     }
                 }
 

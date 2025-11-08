@@ -163,6 +163,7 @@ Item {
             }
 
             Battery {
+                visible: Services.Battery.available
                 size: root.size
             }
 

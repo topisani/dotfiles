@@ -37,13 +37,13 @@ Singleton {
     }
 
     readonly property var bar: QtObject {
-        readonly property int size: 20
+        readonly property int size: 24
         readonly property int spacing: 15
         readonly property var font: QtObject {
             readonly property string family: "Monospace"
             // Size in pixels of all fonts. The actual size of fonts in
             // individual components will be proportial to this value.
-            readonly property real pointSize: 10.5
+            readonly property real pointSize: 11
             readonly property int weight: 500
         }
     }
@@ -61,7 +61,7 @@ Singleton {
             readonly property string family: "Monospace"
             // Size in pixels of all fonts. The actual size of fonts in
             // individual components will be proportial to this value.
-            readonly property real pointSize: 10
+            readonly property real pointSize: 11
         }
     }
 

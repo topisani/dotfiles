@@ -14,7 +14,7 @@ debug *args: build
 run *args:
     QS_ICON_THEME=breeze-dark \
     QML_IMPORT_PATH="$PWD/qml-niri/build:${QML_IMPORT_PATH:-}" \
-    quickshell --path shell "$@"
+    quickshell --path $PWD/shell "$@"
 
 ipc *args:
-    quickshell --path shell ipc "$@"
+    quickshell --path $PWD/shell ipc --any-display "$@"
