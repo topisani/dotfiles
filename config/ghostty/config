@@ -37,7 +37,7 @@ clipboard-read=ask
 clipboard-write=allow
 shell-integration=zsh
 
-mouse-shift-capture=true
+#mouse-shift-capture=true
 
 # theme=dark:flatblue-dark,light:flatblue-light
 theme = flatblue-dark
@@ -50,6 +50,7 @@ keybind = ctrl+zero=reset_font_size
 keybind = ctrl+minus=decrease_font_size:1
 keybind = ctrl+equal=increase_font_size:1
 keybind = ctrl+plus=increase_font_size:1
+keybind = performable:ctrl+shift+c=copy_to_clipboard
 
 # unbind default keybinds:
 
@@ -157,4 +158,3 @@ keybind = ctrl+shift+i=unbind
 keybind = alt+six=unbind
 #goto_tab:7
 keybind = alt+seven=unbind
-

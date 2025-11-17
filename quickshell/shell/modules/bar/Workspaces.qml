@@ -24,16 +24,19 @@ Rectangle {
             Repeater {
                 model: Niri.workspaces
 
-                Rectangle {
-                    visible: index < 11
-                    width: Config.workspaces.icon.scale * Config.theme.widget.size
-                    height: Config.workspaces.icon.scale * Config.theme.widget.size
-                    radius: Config.workspaces.icon.scale * Config.theme.widget.size * Config.workspaces.icon.radius
-                    color: model.isActive ? Config.theme.color.active : Config.workspaces.inactiveColor
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: Niri.focusWorkspaceById(model.id)
+                MouseArea {
+                    implicitWidth: Config.workspaces.icon.scale * Config.theme.widget.size
+                    implicitHeight: Config.workspaces.icon.scale * Config.theme.widget.size
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: Niri.focusWorkspaceById(model.id)
+                    Rectangle {
+                        anchors.centerIn: parent
+                        property bool hasWindows: model.activeWindowId != 0
+                        visible: hasWindows || index < 11
+                        width: Config.workspaces.icon.scale * Config.theme.widget.size * (hasWindows ? 1 : 0.5)
+                        height: width
+                        radius: Config.workspaces.icon.scale * Config.theme.widget.size * Config.workspaces.icon.radius
+                        color: model.isActive ? Config.theme.color.active : Config.workspaces.inactiveColor
                     }
                 }
             }

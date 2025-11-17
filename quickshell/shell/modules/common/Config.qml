@@ -37,7 +37,7 @@ Singleton {
     }
 
     readonly property var bar: QtObject {
-        readonly property int size: 24
+        readonly property int size: 20
         readonly property int spacing: 15
         readonly property var font: QtObject {
             readonly property string family: "Monospace"

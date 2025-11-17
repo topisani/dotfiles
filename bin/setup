@@ -90,10 +90,10 @@ setup::fedora() {
 }
 
 setup::gui() {
-    gsettings set org.cinnamon.desktop.default-applications.terminal exec "$(which tmux-term)"
-    gsettings set org.cinnamon.desktop.default-applications.terminal exec-arg ""
-    gsettings set org.gnome.desktop.default-applications.terminal exec "$(which tmux-term)"
-    gsettings set org.gnome.desktop.default-applications.terminal exec-arg ""
+    gsettings set org.cinnamon.desktop.default-applications.terminal exec "ghostty"
+    gsettings set org.cinnamon.desktop.default-applications.terminal exec-arg "-e"
+    gsettings set org.gnome.desktop.default-applications.terminal exec "ghostty"
+    gsettings set org.gnome.desktop.default-applications.terminal exec-arg "-e"
     gsettings set com.github.stunkymonkey.nautilus-open-any-terminal terminal "ghostty"
     # gsettings set com.github.stunkymonkey.nautilus-open-any-terminal custom-local-command "$(which tmux-term)"
     gsettings set com.github.stunkymonkey.nautilus-open-any-terminal keybindings '<Ctrl><Alt>t'

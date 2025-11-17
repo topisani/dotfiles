@@ -13,6 +13,8 @@ alias np='nano -w PKGBUILD'
 alias more=less
 export LESS="$LESS --mouse"
 
+alias o="xdg-open"
+
 alias l='eza --group-directories-first -F'
 alias ll='l -lh --git'
 alias la='ll -a'

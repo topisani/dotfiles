@@ -1,0 +1,8 @@
+[Unit]
+After=graphical-session.target
+
+[Service]
+Type=exec
+ExecStart=%h/.config/scripts/jotta-systray.py
+Slice=app-graphical.slice
+Restart=on-failure

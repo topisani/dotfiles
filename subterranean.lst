@@ -71,3 +71,6 @@
 /run/host/home/topisani/distrobox;home/distrobox
 /run/host/home/topisani/.config/systemd/user/quickshell.service;config/systemd/user/quickshell.service
 /run/host/home/topisani/.config/systemd/user/polkit-mate-authentication-agent.service;config/systemd/user/polkit-mate-authentication-agent.service
+~/.config/scripts;config/scripts
+~/.config/systemd/user/jotta-systray.service;config/systemd/user/jotta-systray.service
+~/.config/systemd/user/wl-sunset-systray.service;config/systemd/user/wl-sunset-systray.service

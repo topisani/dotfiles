@@ -102,7 +102,11 @@ output "eDP-1" {
 }
 
 output "Dell Inc. DELL S2721QS CH3CM43" {
-    scale 1
+    scale 1.25
+}
+
+output "HEADLESS-1" {
+    off
 }
 
 // Settings that influence how windows are positioned and sized.
@@ -360,6 +364,46 @@ overview {
     backdrop-color "#101014"
 }
 
+// workspace "W1"
+// workspace "W2"
+// workspace "W3"
+// workspace "W4"
+// workspace "W5"
+// workspace "W6"
+// workspace "W7"
+// workspace "W8"
+// workspace "W9"
+// workspace "W0"
+
+recent-windows {
+    // off
+    open-delay-ms 150
+
+    highlight {
+        active-color "#999999ff"
+        urgent-color "#ff9999ff"
+        padding 30
+        corner-radius 0
+    }
+
+    previews {
+        max-height 480
+        max-scale 0.5
+    }
+
+    binds {
+        Alt+Tab         { next-window; }
+        Alt+Shift+Tab   { previous-window; }
+        Alt+grave       { next-window     filter="app-id"; }
+        Alt+Shift+grave { previous-window filter="app-id"; }
+
+        // Mod+Tab         { next-window; }
+        // Mod+Shift+Tab   { previous-window; }
+        // Mod+grave       { next-window     filter="app-id"; }
+        // Mod+Shift+grave { previous-window filter="app-id"; }
+    }
+}
+
 binds {
     // Keys consist of modifiers separated by + signs, followed by an XKB key name
     // in the end. To find an XKB name for a particular key, you may use a program
@@ -380,18 +424,18 @@ binds {
     // Mod+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
 
-    Mod+Return { spawn "ghostty" "--command=distrobox enter arch -- arch-term"; }
-    Mod+Shift+Return { spawn-sh "ghostty --working-directory=$HOME"; }
+    Mod+Shift+Return { spawn "ghostty" "--command=distrobox enter arch -- arch-term"; }
+    Mod+Return { spawn-sh "ghostty --working-directory=$HOME"; }
     Mod+Space { spawn "wofi"; }
     Mod+P { spawn "~/.dotfiles/quickshell/justfile" "ipc" "call" "shell" "toggleBar"; }
     // Mod+P { spawn "killall" "-SIGUSR1" "waybar"; }
 
-    XF86AudioRaiseVolume allow-when-locked=true { spawn "volume" "volume" "up"; }
-    XF86AudioLowerVolume allow-when-locked=true { spawn "volume" "volume" "down"; }
-    XF86AudioMute        allow-when-locked=true { spawn "volume" "mute" "toggle"; }
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "10%+"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "10%-"; }
+    XF86AudioMute        allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
     XF86MonBrightnessUp   allow-when-locked=true { spawn "brightness" "-n" "+5"; }
     XF86MonBrightnessDown allow-when-locked=true { spawn "brightness" "-n" "-5"; }
-    // XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
 
     // Open/close the Overview: a zoomed-out view of workspaces and windows.
     // You can also move the mouse into the top-left hot corner,

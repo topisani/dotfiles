@@ -12,6 +12,8 @@ alias free='free -m'                      # show sizes in MB
 alias np='nano -w PKGBUILD'
 alias more=less
 
+alias o="xdg-open"
+
 alias l='exa --group-directories-first -F'
 alias ll='l -lh --git'
 alias la='ll -a'
