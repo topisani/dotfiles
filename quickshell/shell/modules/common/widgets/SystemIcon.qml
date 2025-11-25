@@ -10,19 +10,34 @@ Item {
     implicitHeight: size
     implicitWidth: size
 
-    readonly property string sourcePath: (() => {
-            if (!source)
+    function sourcePath(source) {
+            if (source === "")
                 return "";
+            source = source.replace(/^image:\/\/icon\//, "")
+            switch (source) {
+                case "blueman-active": 
+                    source = "bluetooth-activated"
+                break;
+                case "blueman-tray": 
+                    source = "bluetooth"
+                break;
+                case "blueman-disabled": 
+                    source = "bluetooth-inactive"
+                break;
+            }
+            if (source.startsWith("bluetooth")) {
+                source = "network-" + source
+            }
             if (source.indexOf("/") >= 0) {
                 return source;
             }
-            return Quickshell.iconPath(source);
-        })()
+            return Quickshell.iconPath(source, true);
+        }
 
     IconImage {
         id: image
-        source: root.sourcePath
-        visible: root.sourcePath != ""
+        source: root.sourcePath(root.source)
+        visible: source != "" && status == Image.Ready
         width: root.size
         height: root.size
     }

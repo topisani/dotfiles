@@ -25,18 +25,24 @@ ShellRoot {
             }
         }
     }
+    
+    Variants {
+        model: Quickshell.screens
+        
+        LazyLoader {
+            active: true
+            required property var modelData;
+            Bar {
+                id: bar
+                size: Config.bar.size
+                color: Config.theme.color.background
+                hidden: root.barHidden
+                screen: modelData
 
-    LazyLoader {
-        active: true
-        Bar {
-            id: bar
-            size: Config.bar.size
-            color: Config.theme.color.background
-            hidden: root.barHidden
-
-            onShowPopup: (anchor, widget, properties) => {
-                barPopupLoader.active = true
-                root.showPopup(anchor, widget, properties);
+                onShowPopup: (anchor, widget, properties) => {
+                    barPopupLoader.active = true
+                    root.showPopup(anchor, widget, properties);
+                }
             }
         }
     }

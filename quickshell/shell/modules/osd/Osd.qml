@@ -5,6 +5,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Pipewire
 import Quickshell.Widgets
+import Quickshell.Wayland
 import qs.modules.common
 import qs.modules.common.widgets
 
@@ -35,6 +36,13 @@ Scope {
     readonly property string iconSource: Config.audioIcon(volume, muted)
 
     property bool shouldShowOsd: false
+    property real panelOpacity: root.shouldShowOsd ? 1.0 : 0
+
+    Behavior on panelOpacity {
+        NumberAnimation {
+            duration: 100
+        }
+    }
 
     Timer {
         id: hideTimer
@@ -46,7 +54,7 @@ Scope {
     // PanelWindow.visible could be set instead of using a loader, but using
     // a loader will reduce the memory overhead when the window isn't open.
     LazyLoader {
-        active: root.shouldShowOsd || panel.opacity > 0
+        active: root.shouldShowOsd || root.panelOpacity > 0
 
         PanelWindow {
             // Since the panel's screen is unset, it will be picked by the compositor
@@ -56,6 +64,7 @@ Scope {
             anchors.bottom: true
             margins.bottom: 0
             exclusiveZone: 0
+            WlrLayershell.layer: WlrLayer.Overlay
 
             implicitHeight: panel.height + 100
             implicitWidth: panel.width + 100
@@ -72,14 +81,8 @@ Scope {
                 color: "transparent"
                 width: 400
                 implicitHeight: 50
+                opacity: root.panelOpacity
 
-                opacity: root.shouldShowOsd ? 1.0 : 0
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: 100
-                    }
-                }
                 layer.enabled: true
                 layer.effect: MultiEffect {
                     shadowEnabled: true
@@ -120,7 +123,7 @@ Scope {
                             Layout.horizontalStretchFactor: 2
                             Layout.fillWidth: true
                             verticalAlignment: Text.AlignVCenter
-                            text: Pipewire.defaultAudioSink.nickname
+                            text: Pipewire.defaultAudioSink.nickname || Pipewire.defaultAudioSink.description
                             color: Config.osd.textColor
                             font: Config.osd.font
                         }

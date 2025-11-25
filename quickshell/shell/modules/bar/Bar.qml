@@ -22,11 +22,13 @@ Item {
     property bool showTopLayer: !hidden || Services.Niri.overviewOpen
     property bool reserveSpace: showTopLayer
     property bool topLayerShadow: Services.Niri.overviewOpen
+    required property var screen
 
     PanelWindow {
         id: bottomLayerWindow
         WlrLayershell.layer: WlrLayer.Bottom
         exclusionMode: ExclusionMode.Ignore
+        screen: root.screen
         anchors {
             top: true
             left: true
@@ -64,6 +66,7 @@ Item {
 
         implicitHeight:root.size + (50 * root.topLayerShadow)
         // visible: !root.hidden; // || barContent.opacity > 0
+        screen: root.screen
 
         exclusiveZone: root.reserveSpace ? root.size : 0
         Behavior on exclusiveZone {
@@ -169,7 +172,9 @@ Item {
 
             DateTime {}
 
-            SystemTrayWidget {}
+            SystemTrayWidget {
+                onShowPopup: (anchor, comp, props) => root.showPopup(anchor, comp, props)
+            }
         }
     }
 }

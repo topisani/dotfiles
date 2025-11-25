@@ -1,5 +1,6 @@
 import Quickshell
 import QtQuick
+import qs.modules.common
 
 Item {
     id: tooltip
@@ -12,19 +13,20 @@ Item {
     PopupWindow {
         id: internal
 
-        implicitWidth: tooltipText.width + 16
-        implicitHeight: tooltipText.height + 16
+        implicitWidth: tooltipText.width + 32
+        implicitHeight: tooltipText.height + 32
         color: "transparent"
 
         Rectangle {
             anchors.fill: parent
-            color: "#333333"
+            color: Config.theme.color.background2
             radius: 4
 
             Text {
                 id: tooltipText
                 text: tooltip.text
-                color: "white"
+                color: Config.theme.color.text
+                font: Config.bar.font
                 anchors.centerIn: parent
             }
         }

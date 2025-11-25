@@ -98,11 +98,12 @@ output "eDP-1" {
     // so to put another output directly adjacent to it on the right, set its x to 1920.
     // If the position is unset or results in an overlap, the output is instead placed
     // automatically.
-    // position x=1280 y=0
+    position x=680 y=1728
 }
 
 output "Dell Inc. DELL S2721QS CH3CM43" {
     scale 1.25
+    position x=0 y=0
 }
 
 output "HEADLESS-1" {
@@ -210,6 +211,19 @@ layout {
         // inactive-gradient from="#505050" to="#808080" angle=45 relative-to="workspace-view"
     }
 
+    tab-indicator {
+        // off
+        on
+        hide-when-single-tab
+        place-within-column
+        gap 0
+        width 8
+        length total-proportion=1.0
+        // position "right"
+        gaps-between-tabs 0
+        corner-radius 0
+    }
+
     // You can enable drop shadows for windows.
     shadow {
         // Uncomment the next line to enable shadows.
@@ -267,7 +281,6 @@ window-rule {
     clip-to-geometry true
 }
 
-
 environment {
     XCURSOR_SIZE "24"
     XCURSOR_THEME "xcursor-breeze"
@@ -277,7 +290,7 @@ environment {
     SDL_VIDEODRIVER "wayland"
     CLUTTER_BACKEND "wayland"
     QT_QPA_PLATFORM "wayland;xcb"
-    QT_AUTO_SCREEN_SCALE_FACTOR "1"
+    // QT_AUTO_SCREEN_SCALE_FACTOR "1"
     // QT_WAYLAND_DISABLE_WINDOWDECORATION "1"
     QT_QPA_PLATFORMTHEME "gtk3"
     ELECTRON_OZONE_PLATFORM_HINT "wayland"
@@ -354,6 +367,25 @@ layer-rule {
     place-within-backdrop true
 }
 
+
+
+layer-rule {
+    match namespace="wofi"
+
+    shadow {
+        on
+        // off
+        softness 40
+        spread 5
+        offset x=0 y=5
+        draw-behind-window true
+        color "#00000064"
+        // inactive-color "#00000064"
+    }
+
+    geometry-corner-radius 12
+}
+
 gestures {
     hot-corners {
         off
@@ -426,7 +458,7 @@ binds {
 
     Mod+Shift+Return { spawn "ghostty" "--command=distrobox enter arch -- arch-term"; }
     Mod+Return { spawn-sh "ghostty --working-directory=$HOME"; }
-    Mod+Space { spawn "wofi"; }
+    Mod+Space { spawn-sh  "(which anyrun &2>&1 > /dev/null && anyrun) || wofi"; }
     Mod+P { spawn "~/.dotfiles/quickshell/justfile" "ipc" "call" "shell" "toggleBar"; }
     // Mod+P { spawn "killall" "-SIGUSR1" "waybar"; }
 
@@ -436,11 +468,12 @@ binds {
     XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
     XF86MonBrightnessUp   allow-when-locked=true { spawn "brightness" "-n" "+5"; }
     XF86MonBrightnessDown allow-when-locked=true { spawn "brightness" "-n" "-5"; }
+    XF86AudioPlay { spawn "playerctl" "play"; }
+    XF86AudioPause { spawn "playerctl" "pause"; }
 
     // Open/close the Overview: a zoomed-out view of workspaces and windows.
     // You can also move the mouse into the top-left hot corner,
     // or do a four-finger swipe up on a touchpad.
-    Mod+O repeat=false { toggle-overview; }
     Mod+Tab repeat=false { toggle-overview; }
 
     Mod+Q repeat=false { close-window; }
@@ -501,9 +534,9 @@ binds {
     Mod+BracketRight { consume-or-expel-window-right; }
 
     // Consume one window from the right to the bottom of the focused column.
-    Mod+Comma  { consume-window-into-column; }
+    Mod+Comma  { consume-or-expel-window-left; }
     // Expel the bottom window from the focused column to the right.
-    Mod+Period { expel-window-from-column; }
+    Mod+Period { consume-or-expel-window-right; }
 
     Mod+Page_Down      { focus-workspace-down; }
     Mod+Page_Up        { focus-workspace-up; }
@@ -613,6 +646,9 @@ binds {
 
     // Switches focus between the current and the previous workspace.
     // Mod+Tab { focus-workspace-previous; }
+
+    Mod+O { focus-monitor-next; }
+    Mod+Shift+O { move-workspace-to-monitor-next; }
 
     Mod+R { switch-preset-column-width; }
     Mod+Shift+R { switch-preset-window-height; }

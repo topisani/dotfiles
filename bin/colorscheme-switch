@@ -233,6 +233,7 @@ toggle_gtk_dark() {
         color_scheme="prefer-light"
     fi
 
+    niri msg action do-screen-transition --delay-ms=500
     # gsettings works in wayland
     gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme"
     gsettings set org.gnome.desktop.interface icon-theme "$icon_theme"

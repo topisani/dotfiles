@@ -1,24 +1,26 @@
 pragma ComponentBehavior: Bound
 import Quickshell
-import Quickshell.Widgets
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls
 import Quickshell.Services.SystemTray
 import qs.modules.common.widgets
+import qs.modules.controlcenter
 
 RowLayout {
     id: root
     spacing: 10
     property real size: 20
 
+    signal showPopup(Item anchor, var popupContent, var properties)
+
     Repeater {
         model: SystemTray.items
 
         MouseArea {
             id: trayItem
-            width: root.size
-            height: root.size
+            // implicitWidth: root.size
+            implicitWidth: row.width
+            implicitHeight: root.size
             hoverEnabled: true
             acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
             scrollGestureEnabled: true
@@ -28,29 +30,43 @@ RowLayout {
 
             visible: item.status != Status.Passive
 
-            // Tray icon
-            IconImage {
-                anchors.centerIn: parent
-                width: root.size
-                height: root.size
-                source: trayItem.item.icon
-                smooth: true
+            RowLayout {
+                id: row
+                // Tray icon
+                SystemIcon {
+                    // anchors.centerIn: parent
+                    size: root.size
+                    source: trayItem.item.icon
+                }
+                // Text {
+                //     text: trayItem.item.tooltipTitle
+                //     color: Config.theme.color.text
+                //     font: Config.bar.font
+                // }
             }
 
             // Tooltip
             PopupToolTip {
+                id: tooltip
                 anchor.item: trayItem
                 anchor.edges: Edges.Bottom | Edges.Right
                 visible: trayItem.containsMouse
                 text: (trayItem.item.tooltipTitle || trayItem.item.title || "") + (trayItem.item.tooltipDescription ? "\n" + trayItem.item.tooltipDescription : "")
                 delay: 500
             }
+            Component {
+                id: menuContents
+                SystrayMenu {
+                    menu: trayItem.item.menu
+                    Layout.fillWidth: true
+                }
+            }
 
             // Handle clicks
             onClicked: function (mouse) {
-                console.debug(item.title);
                 if (mouse.button === Qt.RightButton || trayItem.item.onlyMenu) {
-                    menuAnchor.open();
+                    // menuAnchor.open();
+                    root.showPopup(root, menuContents, {});
                 } else if (mouse.button === Qt.LeftButton) {
                     trayItem.item.activate();
                 }
@@ -62,12 +78,12 @@ RowLayout {
                 }
             }
 
-            QsMenuAnchor {
-                id: menuAnchor
-                anchor.item: trayItem
-                anchor.edges: Edges.Bottom | Edges.Right
-                menu: trayItem.item.menu
-            }
+            // QsMenuAnchor {
+            //     id: menuAnchor
+            //     anchor.item: trayItem
+            //     anchor.edges: Edges.Bottom | Edges.Right
+            //     menu: trayItem.item.menu
+            // }
 
             // Visual feedback on hover
             Rectangle {

@@ -2,7 +2,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.modules.common
 import qs.modules.common.widgets
-import qs.modules.icons
 import qs.services
 import QtQuick.Layouts
 

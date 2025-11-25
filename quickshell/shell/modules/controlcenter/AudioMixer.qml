@@ -44,13 +44,17 @@ ColumnLayout {
         spacing: 4
 
         Repeater {
-            model: Pipewire.nodes.values.filter(n => n.audio && !n.isStream && n.isSink).sort((a, b) => a.description < b.description)
+            model: Pipewire.nodes.values.filter(n => n.audio && !n.isStream && n.isSink && (n.audio.isAvailable ?? true)).sort((a, b) => a.description < b.description)
 
             Item {
                 id: item
 
                 required property PwNode modelData
-                property bool isActive: modelData.id == Pipewire.preferredDefaultAudioSink?.id
+                property bool isSelected: modelData.id == (Pipewire.preferredDefaultAudioSink ?? Pipewire.defaultAudioSink)?.id
+                // Preferred and actual default are not quite the same. This will only move the blue dot indicator if the device
+                // is actually enabled. AFAICT there is no way to hide/disable the ones that are not enabled, such as audio over HDMI
+                // on my laptop when no HDMI is plugged in.
+                property bool isActive: modelData.id == (Pipewire.defaultAudioSink)?.id
                 Layout.fillWidth: true
 
                 Layout.preferredHeight: Config.cc.iconSize
@@ -92,7 +96,7 @@ ColumnLayout {
 
                 states: [
                     State {
-                        when: item.isActive
+                        when: item.isSelected
                         PropertyChanges {
                             text.color: Config.theme.color.text
                         }

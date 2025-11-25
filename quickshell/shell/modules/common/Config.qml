@@ -64,6 +64,22 @@ Singleton {
             readonly property real pointSize: 11
         }
     }
+    
+    readonly property var menu: QtObject {
+        readonly property int iconSize: 18
+        readonly property color hoverBackground: "#222222"
+        readonly property color disabledColor: root.theme.color.textMuted
+        readonly property color separatorColor: "#555555"
+        readonly property int spacing: 0
+        readonly property int colSpacing: 10
+        readonly property int padding: 5
+        readonly property var font: QtObject {
+            readonly property string family: "Monospace"
+            // Size in pixels of all fonts. The actual size of fonts in
+            // individual components will be proportial to this value.
+            readonly property real pointSize: 11
+        }
+    }
 
     readonly property var osd: QtObject {
         readonly property color backgroundColor: root.theme.color.background2
@@ -144,5 +160,25 @@ Singleton {
             return "audio-volume-high"
         }
         return "audio-volume-overamplified"
+    }
+    
+    function checkboxIcon(state) {
+        if (state == Qt.Checked || state === true) {
+            return "checkbox"
+        }
+        if (state == Qt.PartiallyChecked) {
+            return "checkbox-partially-checked"
+        }
+        return "box"
+    }
+    
+    function radioButtonIcon(state) {
+        if (state == Qt.Checked || state === true) {
+            return "checkbox"
+        }
+        if (state == Qt.PartiallyChecked) {
+            return "checkbox-partially-checked"
+        }
+        return "box-symbolic"
     }
 }
