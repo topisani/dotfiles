@@ -40,7 +40,7 @@ ShellRoot {
                 screen: modelData
 
                 onShowPopup: (anchor, widget, properties) => {
-                    barPopupLoader.active = true
+                    barPopupLoader.active = widget != null
                     root.showPopup(anchor, widget, properties);
                 }
             }

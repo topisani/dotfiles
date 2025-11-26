@@ -11,6 +11,7 @@ Item {
     implicitWidth: size
 
     function sourcePath(source) {
+            console.error("Requested icon", source)
             if (source === "")
                 return "";
             source = source.replace(/^image:\/\/icon\//, "")

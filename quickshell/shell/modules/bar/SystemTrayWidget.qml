@@ -64,11 +64,11 @@ RowLayout {
 
             // Handle clicks
             onClicked: function (mouse) {
-                if (mouse.button === Qt.RightButton || trayItem.item.onlyMenu) {
+                if (mouse.button === Qt.RightButton || !trayItem.item.hasMenu) {
+                    trayItem.item.activate();
+                } else if (mouse.button === Qt.LeftButton) {
                     // menuAnchor.open();
                     root.showPopup(root, menuContents, {});
-                } else if (mouse.button === Qt.LeftButton) {
-                    trayItem.item.activate();
                 }
             }
 
