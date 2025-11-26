@@ -24,26 +24,26 @@ Singleton {
             readonly property string family: "Monospace"
             // Size in pixels of all fonts. The actual size of fonts in
             // individual components will be proportial to this value.
-            readonly property real size: 14
+            readonly property real size: 10
             readonly property int weight: 600
         }
         readonly property var widget: QtObject {
             // Size in pixels of all widgets. The actual size of
             // individual widgets will be proportial to this value.
-            readonly property real size: 20
+            readonly property real size: 18
         }
         
         readonly property real animationDuration: 100
     }
 
     readonly property var bar: QtObject {
-        readonly property int size: 20
+        readonly property int size: 18
         readonly property int spacing: 15
         readonly property var font: QtObject {
             readonly property string family: "Monospace"
             // Size in pixels of all fonts. The actual size of fonts in
             // individual components will be proportial to this value.
-            readonly property real pointSize: 11
+            readonly property real pointSize: 10
             readonly property int weight: 500
         }
     }
@@ -72,12 +72,12 @@ Singleton {
         readonly property color separatorColor: "#555555"
         readonly property int spacing: 0
         readonly property int colSpacing: 10
-        readonly property int padding: 5
+        readonly property int padding: 4
         readonly property var font: QtObject {
             readonly property string family: "Monospace"
             // Size in pixels of all fonts. The actual size of fonts in
             // individual components will be proportial to this value.
-            readonly property real pointSize: 11
+            readonly property real pointSize: 10
         }
     }
 

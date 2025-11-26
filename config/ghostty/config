@@ -22,7 +22,7 @@
 # # separated by equals signs.
 font-family = ""
 font-family = "JetBrainsMono Nerd Font"
-font-size = 11
+font-size = 9
 # disable ligatures:
 font-feature = -calt
 adjust-cell-height=-1
@@ -67,13 +67,13 @@ keybind = super+ctrl+shift+plus=unbind
 #adjust_selection:up
 keybind = shift+up=unbind
 #goto_tab:5
-keybind = alt+five=unbind
+keybind = alt+5=unbind
 #goto_split:next
 keybind = super+ctrl+right_bracket=unbind
 #new_split:right
 keybind = ctrl+shift+o=unbind
 #copy_to_clipboard
-keybind = ctrl+shift+c=unbind
+# keybind = ctrl+shift+c=unbind
 #quit
 keybind = ctrl+shift+q=unbind
 #new_window
@@ -85,7 +85,7 @@ keybind = shift+left=unbind
 #resize_split:up,10
 keybind = super+ctrl+shift+up=unbind
 #goto_tab:8
-keybind = alt+eight=unbind
+keybind = alt+8=unbind
 #scroll_page_up
 keybind = shift+page_up=unbind
 #write_screen_file:open
@@ -97,7 +97,7 @@ keybind = ctrl+shift+w=unbind
 #scroll_to_bottom
 keybind = shift+end=unbind
 #goto_tab:3
-keybind = alt+three=unbind
+keybind = alt+3=unbind
 #write_screen_file:paste
 keybind = ctrl+shift+j=unbind
 #toggle_fullscreen
@@ -127,7 +127,7 @@ keybind = super+ctrl+shift+left=unbind
 #previous_tab
 keybind = ctrl+shift+tab=unbind
 #goto_tab:2
-keybind = alt+two=unbind
+keybind = alt+2=unbind
 #goto_split:down
 keybind = ctrl+alt+down=unbind
 #resize_split:down,10
@@ -135,7 +135,7 @@ keybind = super+ctrl+shift+down=unbind
 #resize_split:right,10
 keybind = super+ctrl+shift+right=unbind
 #goto_tab:4
-keybind = alt+four=unbind
+keybind = alt+4=unbind
 #copy_to_clipboard
 keybind = ctrl+insert=unbind
 #new_split:down
@@ -145,7 +145,7 @@ keybind = ctrl+alt+right=unbind
 #close_window
 keybind = alt+f4=unbind
 #goto_tab:1
-keybind = alt+one=unbind
+keybind = alt+1=unbind
 #toggle_split_zoom
 keybind = ctrl+shift+enter=unbind
 #scroll_to_top
@@ -155,6 +155,216 @@ keybind = super+ctrl+left_bracket=unbind
 #inspector:toggle
 keybind = ctrl+shift+i=unbind
 #goto_tab:6
-keybind = alt+six=unbind
+keybind = alt+6=unbind
 #goto_tab:7
-keybind = alt+seven=unbind
+keybind = alt+7=unbind
+
+# Ghostty Configuration - Ctrl+Space Prefix (tmux-style)
+# All keybinds moved behind Ctrl+Space prefix
+
+# ============================================================================
+# UNBIND ALL DEFAULT KEYBINDS
+# ============================================================================
+# This removes all default Ghostty keybinds so they can be remapped behind prefix
+
+# Font size controls
+# keybind = ctrl+plus=unbind
+# keybind = ctrl+minus=unbind
+# keybind = ctrl+zero=unbind
+# keybind = ctrl+equal=unbind
+
+# Copy/Paste
+# keybind = ctrl+shift+c=unbind
+# keybind = ctrl+shift+v=unbind
+# keybind = shift+insert=unbind
+
+# Selection
+keybind = ctrl+shift+a=unbind
+
+# Scrolling
+keybind = ctrl+shift+home=unbind
+keybind = ctrl+shift+end=unbind
+keybind = shift+page_up=unbind
+keybind = shift+page_down=unbind
+
+# Window/Tab management
+keybind = ctrl+shift+n=unbind
+keybind = ctrl+shift+t=unbind
+keybind = ctrl+shift+w=unbind
+keybind = ctrl+tab=unbind
+keybind = ctrl+shift+tab=unbind
+keybind = ctrl+page_down=unbind
+keybind = ctrl+page_up=unbind
+
+# Split management
+keybind = ctrl+shift+enter=unbind
+
+# Config
+keybind = ctrl+shift+comma=unbind
+keybind = ctrl+comma=unbind
+
+# Fullscreen
+keybind = ctrl+shift+f=unbind
+
+# Inspector
+keybind = ctrl+shift+i=unbind
+
+# Close
+keybind = ctrl+shift+q=unbind
+
+# # ============================================================================
+# # SPLIT MANAGEMENT (v=vertical/right, s=horizontal/down)
+# # ============================================================================
+# keybind = ctrl+space>v=new_split:right
+# keybind = ctrl+space>s=new_split:down
+# keybind = ctrl+space>enter=new_split:auto
+# keybind = ctrl+space>w=toggle_tab_overview
+# keybind = ctrl+space>o=toggle_tab_overview
+
+# # ============================================================================
+# # NAVIGATION - HJKL and Arrow Keys
+# # ============================================================================
+# # Pane navigation with HJKL
+# keybind = ctrl+space>h=goto_split:left
+# keybind = ctrl+space>j=goto_split:down
+# keybind = ctrl+space>k=goto_split:up
+# keybind = ctrl+space>l=goto_split:right
+
+# # Pane navigation with arrow keys
+# keybind = ctrl+space>left=goto_split:left
+# keybind = ctrl+space>down=goto_split:down
+# keybind = ctrl+space>up=goto_split:up
+# keybind = ctrl+space>right=goto_split:right
+
+# keybind = ctrl+space>alt+up=jump_to_prompt:-1
+# keybind = ctrl+space>alt+down=jump_to_prompt:1
+# keybind = ctrl+alt+space>alt+up=jump_to_prompt:-1
+# keybind = ctrl+alt+space>alt+down=jump_to_prompt:1
+
+# # ============================================================================
+# # RESIZE PANES
+# # ============================================================================
+# # Resize with Ctrl+HJKL (10 pixels)
+# keybind = ctrl+space>ctrl+h=resize_split:left,10
+# keybind = ctrl+space>ctrl+j=resize_split:down,10
+# keybind = ctrl+space>ctrl+k=resize_split:up,10
+# keybind = ctrl+space>ctrl+l=resize_split:right,10
+
+# # Resize with Ctrl+Arrow Keys (30 pixels)
+# keybind = ctrl+space>ctrl+left=resize_split:left,30
+# keybind = ctrl+space>ctrl+down=resize_split:down,30
+# keybind = ctrl+space>ctrl+up=resize_split:up,30
+# keybind = ctrl+space>ctrl+right=resize_split:right,30
+
+# # Equalize splits
+# keybind = ctrl+space>e=equalize_splits
+
+# # ============================================================================
+# # WINDOW/TAB MANAGEMENT
+# # ============================================================================
+# # New tab (mimics new-window)
+# keybind = ctrl+space>c=new_tab
+
+# # Select windows/tabs by number
+# keybind = ctrl+space>1=goto_tab:1
+# keybind = ctrl+space>2=goto_tab:2
+# keybind = ctrl+space>3=goto_tab:3
+# keybind = ctrl+space>4=goto_tab:4
+# keybind = ctrl+space>5=goto_tab:5
+# keybind = ctrl+space>6=goto_tab:6
+# keybind = ctrl+space>7=goto_tab:7
+# keybind = ctrl+space>8=goto_tab:8
+# keybind = ctrl+space>9=goto_tab:9
+# keybind = ctrl+space>0=goto_tab:10
+
+# # Next/Previous tab
+# keybind = ctrl+space>n=next_tab
+# keybind = ctrl+space>shift+n=previous_tab
+
+# # ============================================================================
+# # ZOOM/FULLSCREEN
+# # ============================================================================
+# keybind = ctrl+space>z=toggle_split_zoom
+# keybind = ctrl+space>f=toggle_fullscreen
+
+# # ============================================================================
+# # RELOAD CONFIG (mimics tmux reload)
+# # ============================================================================
+# keybind = ctrl+space>r=reload_config
+
+# # ============================================================================
+# # TOGGLE STATUS/UI ELEMENTS
+# # ============================================================================
+# keybind = ctrl+space>p=toggle_window_decorations
+
+# # ============================================================================
+# # COPY/PASTE
+# # ============================================================================
+# keybind = ctrl+shift+c=copy_to_clipboard
+# keybind = ctrl+shift+v=paste_from_clipboard
+
+# # ============================================================================
+# # SCROLLING
+# # ============================================================================
+# keybind = ctrl+space>page_up=scroll_page_up
+# keybind = ctrl+space>page_down=scroll_page_down
+# keybind = ctrl+space>shift+h=scroll_to_top
+# keybind = ctrl+space>shift+l=scroll_to_bottom
+
+# # ============================================================================
+# # SEARCH & SELECTION
+# # ============================================================================
+# keybind = ctrl+space>/=toggle_command_palette
+# keybind = ctrl+space>space=toggle_command_palette
+# keybind = ctrl+space>a=select_all
+
+# # ============================================================================
+# # FONT SIZE
+# # ============================================================================
+# keybind = ctrl+space>plus=increase_font_size:1
+# keybind = ctrl+space>equal=increase_font_size:1
+# keybind = ctrl+space>minus=decrease_font_size:1
+# keybind = ctrl+space>shift+zero=reset_font_size
+
+# # ============================================================================
+# # CLOSE/QUIT
+# # ============================================================================
+# keybind = ctrl+space>x=close_surface
+# keybind = ctrl+space>d=close_surface
+# keybind = ctrl+space>shift+x=close_tab
+# keybind = ctrl+space>q=close_window
+# keybind = ctrl+space>shift+q=quit
+
+# # ============================================================================
+# # INSPECTOR & CONFIG
+# # ============================================================================
+# keybind = ctrl+space>i=inspector:toggle
+# keybind = ctrl+space>comma=open_config
+
+# # ============================================================================
+# # SCREEN MANAGEMENT
+# # ============================================================================
+# keybind = ctrl+space>shift+c=clear_screen
+
+# # ============================================================================
+# # WINDOW OPERATIONS
+# # ============================================================================
+# keybind = ctrl+space>shift+m=toggle_maximize
+# keybind = ctrl+space>shift+f=toggle_fullscreen
+
+# # ============================================================================
+# # UNDO/REDO (macOS only)
+# # ============================================================================
+# keybind = ctrl+space>u=undo
+# keybind = ctrl+space>shift+u=redo
+
+# # ============================================================================
+# # NOTES
+# # ============================================================================
+# # - Ghostty doesn't have a direct equivalent to tmux's "join-pane" or "break-pane"
+# #   These would require moving splits between tabs, which isn't currently supported
+# # - The "p=set status" binding is mapped to toggle_window_decorations
+# # - New splits don't inherit the current directory by default in Ghostty
+# #   This is a limitation compared to tmux's -c "#{pane_current_path}"
+# # - Tab overview can be toggled with: ctrl+space>o (if you want to add it)
+# #   keybind = ctrl+space>o=toggle_tab_overview

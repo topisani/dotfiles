@@ -1,11 +1,3 @@
-// This config is in the KDL format: https://kdl.dev
-// "/-" comments out the following node.
-// Check the wiki for a full description of the configuration:
-// https://github.com/YaLTeR/niri/wiki/Configuration:-Introduction
-
-// Input device configuration.
-// Find the full list of options on the wiki:
-// https://github.com/YaLTeR/niri/wiki/Configuration:-Input
 input {
     keyboard {
         xkb {
@@ -64,40 +56,11 @@ input {
     focus-follows-mouse max-scroll-amount="0%"
 }
 
-// You can configure outputs by their name, which you can find
-// by running `niri msg outputs` while inside a niri instance.
-// The built-in laptop monitor is usually called "eDP-1".
-// Find more information on the wiki:
-// https://github.com/YaLTeR/niri/wiki/Configuration:-Outputs
-// Remember to uncomment the node by removing "/-"!
 output "eDP-1" {
-    // Uncomment this line to disable this output.
-    // off
-
-    // Resolution and, optionally, refresh rate of the output.
-    // The format is "<width>x<height>" or "<width>x<height>@<refresh rate>".
-    // If the refresh rate is omitted, niri will pick the highest refresh rate
-    // for the resolution.
-    // If the mode is omitted altogether or is invalid, niri will pick one automatically.
-    // Run `niri msg outputs` while inside a niri instance to list all outputs and their modes.
-    // mode "1920x1080@120.030"
-
-    // You can use integer or fractional scale, for example use 1.5 for 150% scale.
     scale 1.25
 
-    // Transform allows to rotate the output counter-clockwise, valid values are:
     // normal, 90, 180, 270, flipped, flipped-90, flipped-180 and flipped-270.
     transform "normal"
-
-    // Position of the output in the global coordinate space.
-    // This affects directional monitor actions like "focus-monitor-left", and cursor movement.
-    // The cursor can only move between directly adjacent outputs.
-    // Output scale and rotation has to be taken into account for positioning:
-    // outputs are sized in logical, or scaled, pixels.
-    // For example, a 3840×2160 output with scale 2.0 will have a logical size of 1920×1080,
-    // so to put another output directly adjacent to it on the right, set its x to 1920.
-    // If the position is unset or results in an overlap, the output is instead placed
-    // automatically.
     position x=680 y=1728
 }
 
@@ -106,8 +69,17 @@ output "Dell Inc. DELL S2721QS CH3CM43" {
     position x=0 y=0
 }
 
-output "HEADLESS-1" {
-    off
+output "PNP(AOC) AG346UCD 2OQQ9JA000874" {
+    mode "3440x1440@175.001"
+    variable-refresh-rate
+    layout {
+        struts {
+            left 16
+            right 16
+            top 0
+            bottom 0
+        }
+    }
 }
 
 // Settings that influence how windows are positioned and sized.
@@ -141,7 +113,7 @@ layout {
     }
 
     // You can also customize the heights that "switch-preset-window-height" (Mod+Shift+R) toggles between.
-    // preset-window-heights { }
+    // preset-window-heights {  }
 
     // You can change the default width of the new windows.
     default-column-width { proportion 0.5; }
@@ -200,9 +172,9 @@ layout {
         // If you enable the border, you probably want to disable the focus ring.
         on
 
-        width 2
+        width 1
         active-color "#178ca6"
-        inactive-color "#000000"
+        inactive-color "#505050"
 
         // Color of the border around windows that request your attention.
         urgent-color "#9b0000"
@@ -266,12 +238,14 @@ layout {
     // Left and right struts will cause the next window to the side to always be visible.
     // Top and bottom struts will simply add outer gaps in addition to the area occupied by
     // layer-shell panels and regular gaps.
-    /-struts {
+    /- struts {
         left 16
         right 16
         top 0
         bottom 0
     }
+
+    background-color "#101014"
 }
 
 // enable rounded corners for floating windows
@@ -287,18 +261,23 @@ environment {
 
     // Fix various UI systems
     GDK_BACKEND "wayland"
-    SDL_VIDEODRIVER "wayland"
+    SDL_VIDEODRIVER "wayland,x11"
     CLUTTER_BACKEND "wayland"
     QT_QPA_PLATFORM "wayland;xcb"
     // QT_AUTO_SCREEN_SCALE_FACTOR "1"
     // QT_WAYLAND_DISABLE_WINDOWDECORATION "1"
     QT_QPA_PLATFORMTHEME "gtk3"
-    ELECTRON_OZONE_PLATFORM_HINT "wayland"
-
+    ELECTRON_OZONE_PLATFORM_HINT "auto"
+    GTK_IM_MODULE "simple"
+    _JAVA_AWT_WM_NONREPARENTING "1"
 }
 
 clipboard {
     disable-primary
+}
+
+hotkey-overlay {
+    skip-at-startup
 }
 
 // Uncomment this line to ask the clients to omit their client-side decorations if possible.
@@ -361,12 +340,22 @@ window-rule {
     // Use this instead if you want them visible on third-party screenshot tools.
     // block-out-from "screencast"
 }
+window-rule {
+    // match app-id=r#"firefox$"#
+    clip-to-geometry true
+}
+
+window-rule {
+    match app-id="qalculate-gtk"
+    match app-id="qalculate-qt"
+
+    open-floating true
+}
 
 layer-rule {
     match namespace="^quickshell-backdrop$"
     place-within-backdrop true
 }
-
 
 
 layer-rule {
@@ -384,6 +373,11 @@ layer-rule {
     }
 
     geometry-corner-radius 12
+}
+
+layer-rule {
+    match namespace="^wallpaper$"
+    place-within-backdrop true
 }
 
 gestures {
@@ -461,6 +455,7 @@ binds {
     Mod+Space { spawn-sh  "(which anyrun &2>&1 > /dev/null && anyrun) || wofi"; }
     Mod+P { spawn "~/.dotfiles/quickshell/justfile" "ipc" "call" "shell" "toggleBar"; }
     // Mod+P { spawn "killall" "-SIGUSR1" "waybar"; }
+    Mod+C { spawn "qalculate-gtk"; }
 
     XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "10%+"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "10%-"; }
@@ -497,12 +492,12 @@ binds {
     Mod+Ctrl+Shift+L     { consume-or-expel-window-right; }
 
     Mod+Shift+Left  { move-column-left; }
-    Mod+Shift+Down  { move-column-to-workspace-down; }
-    Mod+Shift+Up    { move-column-to-workspace-up; }
+    Mod+Shift+Down  { move-window-down; }
+    Mod+Shift+Up    { move-window-up; }
     Mod+Shift+Right { move-column-right; }
     Mod+Shift+H     { move-column-left; }
-    Mod+Shift+J     { move-column-to-workspace-down; }
-    Mod+Shift+K     { move-column-to-workspace-up; }
+    Mod+Shift+J     { move-window-down; }
+    Mod+Shift+K     { move-window-up; }
     Mod+Shift+L     { move-column-right; }
 
     // Resize windows
@@ -532,10 +527,7 @@ binds {
     // If the window is already in a column, they will expel it out.
     Mod+BracketLeft  { consume-or-expel-window-left; }
     Mod+BracketRight { consume-or-expel-window-right; }
-
-    // Consume one window from the right to the bottom of the focused column.
     Mod+Comma  { consume-or-expel-window-left; }
-    // Expel the bottom window from the focused column to the right.
     Mod+Period { consume-or-expel-window-right; }
 
     Mod+Page_Down      { focus-workspace-down; }
@@ -654,7 +646,7 @@ binds {
     Mod+Shift+R { switch-preset-window-height; }
     Mod+Ctrl+R { reset-window-height; }
     Mod+M { maximize-window-to-edges; }
-    // Mod+F { fullscreen-window; }
+    Mod+Ctrl+F { fullscreen-window; }
 
     // Expand the focused column to space not taken up by other fully visible columns.
     // Makes the column "fill the rest of the space".

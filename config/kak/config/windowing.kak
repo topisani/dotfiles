@@ -1,6 +1,6 @@
 load-conf tmux
 
-set global windowing_modules 'tmux' 'screen' 'zellij' 'wezterm' 'kitty' 'sway' 'wayland'
+set global windowing_modules 'tmux' 'screen' 'zellij' 'wezterm' 'kitty' 'sway' 'niri' 'wayland'
 
 hook global ModuleLoaded wezterm %{
     define-command wezterm-terminal-popup -params 1.. %{
@@ -154,4 +154,18 @@ hook global ModuleLoaded zellij %{
     complete-command zellij-terminal-bottom-panel shell
 
     alias global zellij-terminal-auto zellij-terminal-window
+}
+
+hook global ModuleLoaded wayland %{
+    alias global wayland-terminal-auto wayland-terminal-window
+    alias global wayland-terminal-popup wayland-terminal-window
+    alias global wayland-terminal-panel wayland-terminal-window
+    alias global wayland-terminal-bottom-panel wayland-terminal-window
+}
+
+hook global ModuleLoaded niri %{
+    alias global niri-terminal-auto wayland-terminal-window
+    alias global niri-terminal-popup niri-terminal-consume
+    alias global niri-terminal-panel wayland-terminal-window
+    alias global niri-terminal-bottom-panel niri-terminal-consume
 }

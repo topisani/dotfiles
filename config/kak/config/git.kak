@@ -15,7 +15,7 @@ define-command git-blame-current-line %{
   }
 
   info -markup -style above -anchor "%val{cursor_line}.%val{cursor_column}" -- %sh{
-    git blame -l$kak_cursor_line,$kak_cursor_line $kak_bufname --incremental | awk '\
+    git blame -L$kak_cursor_line,$kak_cursor_line $kak_bufname --incremental | awk '\
 begin {
   ref = ""
   author = ""
