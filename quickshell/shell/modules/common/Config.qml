@@ -9,12 +9,12 @@ Singleton {
     readonly property var theme: QtObject {
         readonly property var color: QtObject {
             readonly property color active: "#178ca6"
-            readonly property color inactive: "#112126"
-            readonly property color text: "#FFFFFF"
+            readonly property color inactive: "#021c2d" // #112126"
+            readonly property color text: "#FEFBFC"
             readonly property color textMuted: "#999999"
             readonly property color foreground: "#FFFFFF"
             readonly property color background: "#000000"
-            readonly property color background2: "#0a0b0d"
+            readonly property color background2: "#090a0f"
             readonly property color ok: "#1A7F39"
             readonly property color error: "#E5002E"
             readonly property color warning: "#E5BF00"
@@ -37,8 +37,8 @@ Singleton {
     }
 
     readonly property var bar: QtObject {
-        readonly property int size: 18
-        readonly property int spacing: 15
+        readonly property int size: 20
+        readonly property int spacing: 10
         readonly property var font: QtObject {
             readonly property string family: "Monospace"
             // Size in pixels of all fonts. The actual size of fonts in
@@ -54,9 +54,14 @@ Singleton {
     
     readonly property var cc: QtObject {
         readonly property color backgroundColor: root.theme.color.background2
+        readonly property color menuBackground: "#0d1016" // "#0b1112"
+        readonly property color overlayColor: "#20000000"
         readonly property color buttonColor: root.theme.color.inactive
-        readonly property int iconSize: 30
-        readonly property int padding: 10
+        readonly property real iconSize: 24
+        readonly property real padding: 10
+        readonly property real spacing: 10
+        readonly property real width: 600
+        readonly property real radius: 4
         readonly property var font: QtObject {
             readonly property string family: "Monospace"
             // Size in pixels of all fonts. The actual size of fonts in
@@ -67,9 +72,9 @@ Singleton {
     
     readonly property var menu: QtObject {
         readonly property int iconSize: 18
-        readonly property color hoverBackground: "#222222"
+        readonly property color hoverBackground: "#12161e"
         readonly property color disabledColor: root.theme.color.textMuted
-        readonly property color separatorColor: "#555555"
+        readonly property color separatorColor: "#15161e"
         readonly property int spacing: 0
         readonly property int colSpacing: 10
         readonly property int padding: 4

@@ -10,7 +10,7 @@ import math
 import signal
 from PySide6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
 from PySide6.QtGui import QIcon, QAction
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QTimer, Qt
 from PySide6.QtSvg import QSvgRenderer
 from PySide6.QtGui import QPixmap, QPainter
 
@@ -24,8 +24,8 @@ def icon_svg(color):
 def svg_to_qicon(svg_string):
     """Convert SVG string to QIcon"""
     renderer = QSvgRenderer(svg_string.encode())
-    pixmap = QPixmap(64, 64)
-    pixmap.fill(0x00000000)  # Transparent background
+    pixmap = QPixmap(256, 256)
+    pixmap.fill(Qt.transparent)  # Transparent background
     painter = QPainter(pixmap)
     renderer.render(painter)
     painter.end()

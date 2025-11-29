@@ -14,14 +14,14 @@ from pathlib import Path
 
 from PySide6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
 from PySide6.QtGui import QIcon, QAction
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QTimer, Qt
 from PySide6.QtSvg import QSvgRenderer
 from PySide6.QtGui import QPixmap, QPainter
 
 # Embedded SVG icons
 def icon_svg(color):
     return f'''<?xml version="1.0" encoding="UTF-8"?>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 2 36 36">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 5 30 30">
         <path fill="{color}" d="M25.699 7v17.334a8.72 8.72 0 0 1-2.51 6.128A8.52 8.52 0 0 1 17.133 33h-3.427V15.667a8.72 8.72 0 0 1 2.51-6.129A8.52 8.52 0 0 1 22.271 7zM0 20.867h3.427c2.272 0 4.45.913 6.058 2.538a8.72 8.72 0 0 1 2.509 6.128V33H8.567a8.52 8.52 0 0 1-6.058-2.538A8.72 8.72 0 0 1 0 24.334z"></path>
         </svg>'''
 
@@ -110,12 +110,25 @@ class JottaIndicator:
     def svg_to_qicon(self, svg_string):
         """Convert SVG string to QIcon"""
         renderer = QSvgRenderer(svg_string.encode())
-        pixmap = QPixmap(64, 64)
-        pixmap.fill(0x00000000)  # Transparent background
+        pixmap = QPixmap(256, 256)
+        pixmap.fill(Qt.transparent)  # Transparent background
         painter = QPainter(pixmap)
         renderer.render(painter)
         painter.end()
         return QIcon(pixmap)
+
+    # def svg_to_qicon(self, svg_string):
+    #     """Convert SVG string to QIcon"""
+    #     from PySide6.QtCore import QByteArray
+    #     from PySide6.QtGui import QIcon, QPixmap
+        
+    #     byte_array = QByteArray(svg_string.encode())
+    #     pixmap = QPixmap()
+    #     pixmap.loadFromData(byte_array, "SVG")
+        
+    #     icon = QIcon()
+    #     icon.addPixmap(pixmap)
+    #     return icon
 
     def get_sync_status(self):
         """Get sync status from jotta-cli status --json"""

@@ -6,12 +6,14 @@ import Quickshell
 import Quickshell.Io
 import qs.modules.bar
 import qs.modules.osd
+import qs.modules.controlcenter
 import qs.modules.common
 
 ShellRoot {
     id: root
     signal showPopup(anchor: Item, widget: var, props: var)
     property bool barHidden: false
+    property alias ccOpen: cc.shouldShow
 
     LazyLoader {
         id: barPopupLoader
@@ -19,9 +21,9 @@ ShellRoot {
             id: barPopup
             Connections {
                 target: root
-                function onShowPopup(anchor, widget, props) {
-                    barPopup.showPopup(anchor, widget, props);
-                }
+                // function onShowPopup(anchor, widget, props) {
+                //     barPopup.showPopup(anchor, widget, props);
+                // }
             }
         }
     }
@@ -38,11 +40,26 @@ ShellRoot {
                 color: Config.theme.color.background
                 hidden: root.barHidden
                 screen: modelData
+                ccOpen: root.ccOpen
 
                 onShowPopup: (anchor, widget, properties) => {
                     barPopupLoader.active = widget != null
                     root.showPopup(anchor, widget, properties);
                 }
+                
+                onSetCcOpen: (open) => {
+                    root.ccOpen = open
+                }
+            }
+        }
+    }
+    
+    ControlCenter {
+        id: cc
+        Connections {
+            target: root
+            function onShowPopup(anchor, widget, props) {
+                cc.openPopup(widget, props);
             }
         }
     }

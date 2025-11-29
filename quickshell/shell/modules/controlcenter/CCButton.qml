@@ -13,7 +13,7 @@ WrapperMouseArea {
     acceptedButtons: Qt.LeftButton
 
     WrapperRectangle {
-        radius: 10
+        radius: Config.cc.radius
         margin: Config.cc.padding
         color: root.state ? Config.theme.color.active : Config.theme.color.inactive
 
@@ -26,6 +26,7 @@ WrapperMouseArea {
         RowLayout {
             id: row
             SystemIcon {
+                Layout.alignment: Layout.Center
                 visible: root.icon != ""
                 source: root.icon
                 size: Config.cc.iconSize

@@ -10,7 +10,7 @@ ClippingRectangle {
     property string icon: ""
     property string text: ""
 
-    radius: 10
+    radius: Config.cc.radius
     height: Config.cc.iconSize + 2 * Config.cc.padding
     implicitWidth: row.implicitWidth
     color: "transparent"
@@ -23,6 +23,7 @@ ClippingRectangle {
         anchors.fill: parent
         trackColor: Config.theme.color.inactive
         highlightColor: Config.theme.color.active
+        radius: 0
     }
 
     RowLayout {
@@ -32,11 +33,12 @@ ClippingRectangle {
         SystemIcon {
             source: root.icon
             size: Config.cc.iconSize
+            visible: root.icon
         }
         Text {
             color: Config.theme.color.text
             font: Config.cc.font
             text: root.text
         }
-    }}
-
+    }
+}

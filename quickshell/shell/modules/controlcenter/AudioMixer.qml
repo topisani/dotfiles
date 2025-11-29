@@ -32,82 +32,102 @@ ColumnLayout {
         CCSlider {
             Layout.fillWidth: true
 
-            value: root.volume
+            text: Pipewire.defaultAudioSink.nickname || Pipewire.defaultAudioSink.description
+
+            value: root.volume 
             onValueChanged: {
                 Pipewire.defaultAudioSink.audio.volume = value;
             }
         }
+
+        CCButton {
+            icon: mixerContainer.visible ? "arrow-down" : "arrow-right"
+            state: mixerContainer.visible
+            onClicked: {
+                mixerContainer.visible = !mixerContainer.visible
+            }            
+        }
     }
 
-    ColumnLayout {
-        id: column
-        spacing: 4
+    WrapperRectangle {
+        id: mixerContainer
+        visible: false
+        Layout.fillWidth: true
+    
+        margin: Config.cc.padding
+        color: Config.cc.menuBackground        
+        radius: Config.cc.radius
+        
+        ColumnLayout {
+            id: column
+            spacing: 4
 
-        Repeater {
-            model: Pipewire.nodes.values.filter(n => n.audio && !n.isStream && n.isSink && (n.audio.isAvailable ?? true)).sort((a, b) => a.description < b.description)
+            Repeater {
+                model: Pipewire.nodes.values.filter(n => n.audio && !n.isStream && n.isSink && (n.audio.isAvailable ?? true)).sort((a, b) => a.description < b.description)
 
-            Item {
-                id: item
+                Item {
+                    id: item
 
-                required property PwNode modelData
-                property bool isSelected: modelData.id == (Pipewire.preferredDefaultAudioSink ?? Pipewire.defaultAudioSink)?.id
-                // Preferred and actual default are not quite the same. This will only move the blue dot indicator if the device
-                // is actually enabled. AFAICT there is no way to hide/disable the ones that are not enabled, such as audio over HDMI
-                // on my laptop when no HDMI is plugged in.
-                property bool isActive: modelData.id == (Pipewire.defaultAudioSink)?.id
-                Layout.fillWidth: true
+                    required property PwNode modelData
+                    property bool isSelected: modelData.id == (Pipewire.preferredDefaultAudioSink ?? Pipewire.defaultAudioSink)?.id
+                    // Preferred and actual default are not quite the same. This will only move the blue dot indicator if the device
+                    // is actually enabled. AFAICT there is no way to hide/disable the ones that are not enabled, such as audio over HDMI
+                    // on my laptop when no HDMI is plugged in.
+                    property bool isActive: modelData.id == (Pipewire.defaultAudioSink)?.id
+                    Layout.fillWidth: true
 
-                Layout.preferredHeight: Config.cc.iconSize
+                    Layout.preferredHeight: Config.cc.iconSize
 
-                RowLayout {
-                    Item {
-                        implicitHeight: Config.cc.iconSize
-                        implicitWidth: Config.cc.iconSize
+                    RowLayout {
+                        Item {
+                            implicitHeight: Config.cc.iconSize
+                            implicitWidth: Config.cc.iconSize
 
-                        Rectangle {
-                            anchors.centerIn: parent
-                            radius: Config.cc.iconSize
-                            width: Config.cc.iconSize / 4
-                            height: width
-                            color: item.isActive ? Config.theme.color.active : Config.theme.color.inactive
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Config.theme.animationDuration
+                            Rectangle {
+                                anchors.centerIn: parent
+                                radius: Config.cc.iconSize
+                                width: Config.cc.iconSize / 4
+                                height: width
+                                color: item.isActive ? Config.theme.color.active : Config.theme.color.inactive
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: Config.theme.animationDuration
+                                    }
                                 }
                             }
                         }
-                    }
-                    Text {
-                        id: text
-                        verticalAlignment: Text.AlignVCenter
-                        text: item.modelData.nickname || item.modelData.description
-                        color: Config.theme.color.textMuted
-                        font: Config.cc.font
-                    }
-                }
-
-                MouseArea {
-                    id: ma
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    acceptedButtons: Qt.LeftButton
-                    onClicked: Pipewire.preferredDefaultAudioSink = parent.modelData
-                }
-
-                states: [
-                    State {
-                        when: item.isSelected
-                        PropertyChanges {
-                            text.color: Config.theme.color.text
-                        }
-                    },
-                    State {
-                        when: ma.containsMouse
-                        PropertyChanges {
-                            text.color: ColorUtils.mix(Config.theme.color.text, Config.theme.color.textMuted, 0.5)
+                        Text {
+                            id: text
+                            verticalAlignment: Text.AlignVCenter
+                            text: item.modelData.nickname || item.modelData.description
+                            color: Config.theme.color.textMuted
+                            font: Config.menu.font
                         }
                     }
-                ]
+
+                    MouseArea {
+                        id: ma
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        acceptedButtons: Qt.LeftButton
+                        onClicked: Pipewire.preferredDefaultAudioSink = parent.modelData
+                    }
+
+                    states: [
+                        State {
+                            when: item.isSelected
+                            PropertyChanges {
+                                text.color: Config.theme.color.text
+                            }
+                        },
+                        State {
+                            when: ma.containsMouse
+                            PropertyChanges {
+                                text.color: ColorUtils.mix(Config.theme.color.text, Config.theme.color.textMuted, 0.5)
+                            }
+                        }
+                    ]
+                }
             }
         }
     }

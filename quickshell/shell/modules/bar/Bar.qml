@@ -7,6 +7,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import qs.modules.common
+import qs.modules.common.widgets
 import qs.modules.controlcenter
 import qs.services as Services
 
@@ -18,11 +19,13 @@ Item {
     property bool hidden: false
 
     signal showPopup(Item anchor, var popupContent, var properties)
+    signal setCcOpen(bool open)
     
     property bool showTopLayer: !hidden || Services.Niri.overviewOpen
     property bool reserveSpace: showTopLayer
     property bool topLayerShadow: Services.Niri.overviewOpen
     required property var screen
+    required property bool ccOpen
 
     PanelWindow {
         id: bottomLayerWindow
@@ -150,7 +153,6 @@ Item {
             anchors {
                 verticalCenter: parent.verticalCenter
                 right: parent.right
-                rightMargin: 5
             }
 
             PipewireWidget {
@@ -172,8 +174,21 @@ Item {
 
             DateTime {}
 
-            SystemTrayWidget {
-                onShowPopup: (anchor, comp, props) => root.showPopup(anchor, comp, props)
+            // SystemTrayWidget {
+            //     onShowPopup: (anchor, comp, props) => root.showPopup(anchor, comp, props)
+            // }
+            
+            BarButton {
+                implicitWidth: root.size
+                implicitHeight: root.size
+                SystemIcon {
+                    source: "overflow-menu-symbolic"
+                    size: root.size
+                }
+                
+                onClicked: {
+                    root.setCcOpen(!root.ccOpen)
+                }
             }
         }
     }

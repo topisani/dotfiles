@@ -12,7 +12,6 @@ Rectangle {
     implicitWidth: size + 4
     implicitHeight: size
     color: hover.hovered ? Config.theme.color.inactive : "transparent"
-    radius: 4
 
     Behavior on color {
         ColorAnimation {
