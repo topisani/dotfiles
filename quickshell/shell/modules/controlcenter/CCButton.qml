@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
 import qs.modules.common
+import qs.modules.common.utils
 import qs.modules.common.widgets
 
 WrapperMouseArea {
@@ -10,12 +11,17 @@ WrapperMouseArea {
     property string icon: ""
     property string text: ""
     property bool state: false
+    property var font: Config.cc.font
+    property real radius: Config.cc.radius
+    property real iconSize: Config.cc.iconSize
+    property real padding: Config.cc.padding
     acceptedButtons: Qt.LeftButton
+    hoverEnabled: true
 
     WrapperRectangle {
-        radius: Config.cc.radius
-        margin: Config.cc.padding
-        color: root.state ? Config.theme.color.active : Config.theme.color.inactive
+        radius: root.radius
+        margin: root.padding
+        color: ColorUtils.mix(Config.theme.color.inactive, Config.theme.color.active, root.state ? (1 - 0.25 * root.containsMouse) : 0.25 * root.containsMouse)
 
         Behavior on color {
             ColorAnimation {
@@ -27,14 +33,14 @@ WrapperMouseArea {
             id: row
             SystemIcon {
                 Layout.alignment: Layout.Center
-                visible: root.icon != ""
+                visible: isValid
                 source: root.icon
-                size: Config.cc.iconSize
+                size: root.iconSize
             }
             Text {
                 visible: root.text != ""
                 color: Config.theme.color.text
-                font: Config.cc.font
+                font: root.font
                 text: root.text
             }
         }

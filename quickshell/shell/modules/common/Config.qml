@@ -16,7 +16,8 @@ Singleton {
             readonly property color background: "#000000"
             readonly property color background2: "#090a0f"
             readonly property color ok: "#1A7F39"
-            readonly property color error: "#E5002E"
+            readonly property color error: "#F24130"
+            readonly property color errorMuted: "#3A1E1B" // "#9E453C"
             readonly property color warning: "#E5BF00"
             readonly property color shadow: "#D0000000"
         }
@@ -57,17 +58,26 @@ Singleton {
         readonly property color menuBackground: "#0d1016" // "#0b1112"
         readonly property color overlayColor: "#20000000"
         readonly property color buttonColor: root.theme.color.inactive
+        readonly property color borderColor: root.theme.color.inactive
+        readonly property color borderColorUrgent: root.theme.color.error
         readonly property real iconSize: 24
         readonly property real padding: 10
         readonly property real spacing: 10
         readonly property real width: 600
         readonly property real radius: 4
+        readonly property real borderWidth: 1
         readonly property var font: QtObject {
             readonly property string family: "Monospace"
-            // Size in pixels of all fonts. The actual size of fonts in
-            // individual components will be proportial to this value.
             readonly property real pointSize: 11
         }
+        readonly property var fontSmall: QtObject {
+            readonly property string family: "Monospace"
+            readonly property real pointSize: 10
+        }
+    }
+    
+    readonly property var notifications: QtObject {
+        readonly property real popupExpireSeconds: 20
     }
     
     readonly property var menu: QtObject {
@@ -120,7 +130,6 @@ Singleton {
         readonly property int suspend: 5
         readonly property bool automaticSuspend: true
         readonly property bool showPercentage: false
-        readonly property string orientation: Types.orientationToString(Types.Orientation.Horizontal)
     }
 
     readonly property var datetime: QtObject {

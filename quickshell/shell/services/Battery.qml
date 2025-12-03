@@ -27,32 +27,32 @@ Singleton {
     property real timeToEmpty: UPower.displayDevice.timeToEmpty
     property real timeToFull: UPower.displayDevice.timeToFull
 
-    onIsLowAndNotChargingChanged: {
-        if (available && isLowAndNotCharging) Quickshell.execDetached([
-            "notify-send",
-            "Low battery",
-            "Consider plugging in your device",
-            "-u", "critical",
-            "-a", "Shell"
-        ])
-    }
+    // onIsLowAndNotChargingChanged: {
+    //     if (available && isLowAndNotCharging) Quickshell.execDetached([
+    //         "notify-send",
+    //         "Low battery",
+    //         "Consider plugging in your device",
+    //         "-u", "critical",
+    //         "-a", "Shell"
+    //     ])
+    // }
 
-    onIsCriticalAndNotChargingChanged: {
-        if (available && isCriticalAndNotCharging) Quickshell.execDetached([
-            "notify-send",
-            "Critically low battery",
-            "Please charge!\nAutomatic suspend triggers at %1".arg(Config.battery.suspend),
-            "-u", "critical",
-            "-a", "Shell"
-        ]);
+    // onIsCriticalAndNotChargingChanged: {
+    //     if (available && isCriticalAndNotCharging) Quickshell.execDetached([
+    //         "notify-send",
+    //         "Critically low battery",
+    //         "Please charge!\nAutomatic suspend triggers at %1".arg(Config.battery.suspend),
+    //         "-u", "critical",
+    //         "-a", "Shell"
+    //     ]);
 
-    }
+    // }
 
-    onIsSuspendingAndNotChargingChanged: {
-        if (available && isSuspendingAndNotCharging) {
-            Quickshell.execDetached(["sh", "-c", `systemctl suspend || loginctl suspend`]);
-        }
-    }
+    // onIsSuspendingAndNotChargingChanged: {
+    //     if (available && isSuspendingAndNotCharging) {
+    //         Quickshell.execDetached(["sh", "-c", `systemctl suspend || loginctl suspend`]);
+    //     }
+    // }
     
     readonly property string iconSource: (() =>{
                             

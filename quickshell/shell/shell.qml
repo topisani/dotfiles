@@ -8,6 +8,8 @@ import qs.modules.bar
 import qs.modules.osd
 import qs.modules.controlcenter
 import qs.modules.common
+import qs.modules.notifications
+import qs.services
 
 ShellRoot {
     id: root
@@ -15,18 +17,18 @@ ShellRoot {
     property bool barHidden: false
     property alias ccOpen: cc.shouldShow
 
-    LazyLoader {
-        id: barPopupLoader
-        BarPopupWindow {
-            id: barPopup
-            Connections {
-                target: root
-                // function onShowPopup(anchor, widget, props) {
-                //     barPopup.showPopup(anchor, widget, props);
-                // }
-            }
-        }
-    }
+    // LazyLoader {
+    //     id: barPopupLoader
+    //     BarPopupWindow {
+    //         id: barPopup
+    //         Connections {
+    //             target: root
+    //             // function onShowPopup(anchor, widget, props) {
+    //             //     barPopup.showPopup(anchor, widget, props);
+    //             // }
+    //         }
+    //     }
+    // }
     
     Variants {
         model: Quickshell.screens
@@ -43,7 +45,7 @@ ShellRoot {
                 ccOpen: root.ccOpen
 
                 onShowPopup: (anchor, widget, properties) => {
-                    barPopupLoader.active = widget != null
+                    // barPopupLoader.active = widget != null
                     root.showPopup(anchor, widget, properties);
                 }
                 
@@ -62,15 +64,27 @@ ShellRoot {
                 cc.openPopup(widget, props);
             }
         }
+        
+        onShouldShowChanged: {
+            Notifications.showPopups = !cc.shouldShow
+        }
     }
 
     Osd {}
+    
+    NotificationPopup {
+        id: notificationPopup
+    }
 
     IpcHandler {
         target: "shell"
 
         function toggleBar() {
             root.barHidden = !root.barHidden
+        }
+        
+        function toggleCC() {
+            root.ccOpen = !root.ccOpen
         }
     }
 }

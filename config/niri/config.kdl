@@ -454,6 +454,7 @@ binds {
     Mod+Return { spawn-sh "ghostty --working-directory=$HOME"; }
     Mod+Space { spawn-sh  "(which anyrun &2>&1 > /dev/null && anyrun) || wofi"; }
     Mod+P { spawn "~/.dotfiles/quickshell/justfile" "ipc" "call" "shell" "toggleBar"; }
+    Mod+Semicolon { spawn "~/.dotfiles/quickshell/justfile" "ipc" "call" "shell" "toggleCC"; }
     // Mod+P { spawn "killall" "-SIGUSR1" "waybar"; }
     Mod+C { spawn "qalculate-gtk"; }
 

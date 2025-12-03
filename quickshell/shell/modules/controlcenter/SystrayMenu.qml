@@ -38,8 +38,13 @@ Item {
                 active: true
                 sourceComponent: modelData.isSeparator ? separatorItem : menuItem
                 Layout.fillWidth: true
+                Layout.fillHeight: false
                 Layout.alignment: Qt.AlignTop
             }
+        }
+        
+        Item {
+            Layout.fillHeight: true
         }
     }
 

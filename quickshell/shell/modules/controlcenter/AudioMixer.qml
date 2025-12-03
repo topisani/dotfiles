@@ -18,6 +18,7 @@ ColumnLayout {
 
     readonly property real volume: Pipewire.defaultAudioSink?.audio.volume || 0.0
     readonly property bool muted: Pipewire.defaultAudioSink?.audio.muted || false
+    property alias expanded: mixerContainer.visible
 
     RowLayout {
         spacing: Config.cc.padding
@@ -49,14 +50,10 @@ ColumnLayout {
         }
     }
 
-    WrapperRectangle {
+    CCCard  {
         id: mixerContainer
         visible: false
         Layout.fillWidth: true
-    
-        margin: Config.cc.padding
-        color: Config.cc.menuBackground        
-        radius: Config.cc.radius
         
         ColumnLayout {
             id: column

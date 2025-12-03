@@ -24,7 +24,7 @@ Item {
 
     function openPopup(comp, props) {
         root.open();
-        _openPopup(comp, props);
+        // _openPopup(comp, props);
     }
 
     signal _openPopup(comp: var, props: var)
@@ -68,6 +68,8 @@ Item {
                 color: Config.cc.backgroundColor
                 layer.enabled: true
                 opacity: root.panelOpacity
+                // border.color: Config.cc.borderColor
+                // border.width: Config.cc.borderWidth
 
                 layer.effect: MultiEffect {
                     shadowEnabled: true
@@ -85,6 +87,7 @@ Item {
                     spacing: Config.cc.spacing
                     
                     AudioMixer {
+                        id: audioMixer
                     }
 
                     SystrayIconGrid {
@@ -92,12 +95,27 @@ Item {
                         Layout.fillWidth: true
 
                         onShowPopup: (anchor, comp, props) => {
-                            root.openPopup(comp, props);
+                            root._openPopup(comp, props);
                         }
                     }
 
-                    WrapperWidget {
-                        visible: popupLoader.active
+                    CCCard {
+                        visible: popupLoader.active || animatedHeight > 0
+                        border.color: Config.theme.color.active
+                        border.width: Config.cc.borderWidth
+                        color: Config.theme.color.inactive
+                        
+                        implicitHeight: animatedHeight + 2 * margin
+
+                        property real animatedHeight: popupLoader.active ? popupLoader.implicitHeight : 0
+                        clip: true
+
+                        Behavior on animatedHeight {
+                            NumberAnimation {
+                                duration: Config.theme.animationDuration
+                            }
+                        }
+                        
                         Loader {
                             id: popupLoader
                             active: false
@@ -107,6 +125,11 @@ Item {
 
                                 function on_OpenPopup(comp, props) {
                                     systrayIconGrid.openId = "";
+                                    audioMixer.expanded = false
+                                    if (comp == null) {
+                                        popupLoader.active = false
+                                        return
+                                    }
                                     popupLoader.sourceComponent = comp;
                                     popupLoader.active = true;
                                     if (props) {
@@ -118,24 +141,31 @@ Item {
                             }
                         }
                     }
-
-                    Item {
-                        id: filler
+                    
+                    Text {
+                        Layout.topMargin: 10
+                        text: "Notifications"
+                        font: Config.cc.font
+                        color: Config.theme.color.text
+                    }
+                    
+                    NotificationCenter {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                     }
 
-                    WrapperWidget {
-                        Layout.fillWidth: false
-                        Layout.alignment: Qt.AlignRight
-                        CalendarWidget {}
-                    }
-                }
-            }
+                    // Item {
+                    //     id: filler
+                    //     Layout.fillWidth: true
+                    //     Layout.fillHeight: true
+                    // }
 
-            Rectangle {
-                anchors.fill: systrayIconGrid
-                color: "red"
+                    // CCCard {
+                    //     Layout.fillWidth: false
+                    //     Layout.alignment: Qt.AlignRight
+                    //     CalendarWidget {}
+                    // }
+                }
             }
 
             MouseArea {
@@ -147,13 +177,5 @@ Item {
                 onClicked: root.close()
             }
         }
-    }
-
-    component WrapperWidget: WrapperRectangle {
-        Layout.fillWidth: true
-
-        color: Config.cc.menuBackground
-        margin: Config.cc.padding
-        radius: Config.cc.radius
     }
 }

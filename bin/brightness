@@ -14,14 +14,14 @@ query() {
 icon() {
     if (( $1 == 0 )); then
         icon=off
-    elif (( $1 < 34 )); then
+    elif (( $1 < 51 )); then
         icon=low
-    elif (( $1 < 67 )); then
-        icon=medium
+    # elif (( $1 < 67 )); then
+    #     icon=medium
     else
         icon=high
     fi
-    echo display-brightness-$icon-symbolic
+    echo brightness-$icon-symbolic
     #echo /usr/share/icons/Yaru/scalable/status/display-brightness-symbolic.svg
 }
 

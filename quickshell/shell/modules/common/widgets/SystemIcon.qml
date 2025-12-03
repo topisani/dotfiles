@@ -6,39 +6,41 @@ Item {
     id: root
     required property real size
     required property string source
+    readonly property bool isValid: sourcePath != ""
 
     implicitHeight: size
     implicitWidth: size
 
-    function sourcePath(source) {
-            console.error("Requested icon", source)
-            if (source === "")
-                return "";
-            source = source.replace(/^image:\/\/icon\//, "")
-            switch (source) {
-                case "blueman-active": 
-                    source = "bluetooth-activated"
-                break;
-                case "blueman-tray": 
-                    source = "bluetooth"
-                break;
-                case "blueman-disabled": 
-                    source = "bluetooth-inactive"
-                break;
-            }
-            if (source.startsWith("bluetooth")) {
-                source = "network-" + source
-            }
-            if (source.indexOf("/") >= 0) {
-                return source;
-            }
-            return Quickshell.iconPath(source, true);
+    readonly property string sourcePath: {
+        let res = source
+        // console.error("Requested icon", res)
+        if (res === "")
+            return "";
+        res = res.replace(/^image:\/\/icon\//, "")
+        switch (res) {
+            case "blueman-active": 
+                res = "bluetooth-activated"
+            break;
+            case "blueman-tray": 
+                res = "bluetooth"
+            break;
+            case "blueman-disabled": 
+                res = "bluetooth-inactive"
+            break;
         }
+        if (res.startsWith("bluetooth")) {
+            res = "network-" + res
+        }
+        if (res.indexOf("/") >= 0) {
+            return res;
+        }
+        return Quickshell.iconPath(res, true);
+    }
 
     IconImage {
         id: image
-        source: root.sourcePath(root.source)
-        visible: source != "" && status == Image.Ready
+        source: root.sourcePath
+        visible: root.isValid
         width: root.size
         height: root.size
     }

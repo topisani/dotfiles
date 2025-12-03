@@ -35,8 +35,8 @@ Rectangle {
         spacing: Config.bar.spacing
         SystemIcon {
             visible: root.icon
-            anchors.centerIn: parent
-            anchors.margins: 3
+            Layout.alignment: Qt.AlignVCenter
+            Layout.margins: 3
             size: root.size - 6
             source: root.icon
         }

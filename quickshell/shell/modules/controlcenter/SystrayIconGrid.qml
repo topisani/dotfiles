@@ -47,20 +47,22 @@ GridLayout {
                     //     trayItem.item.activate();
                     // }
                     if (trayItem.item.hasMenu) {
-                        root.showPopup(root, menuContents, {});
-                        root.openId = trayItem.item.id;
+                        if (root.openId == trayItem.item.id) {
+                            root.showPopup(null, null, {});
+                            root.openId = "";
+                        } else {
+                            root.showPopup(root, menuContents, {});
+                            root.openId = trayItem.item.id;
+                        }
                     }
                 }
-                
+
                 onDoubleClicked: {
                     trayItem.item.activate();
                     if (trayItem.item.hasMenu) {
                         root.showPopup(root, menuContents, {});
                         root.openId = trayItem.item.id;
                     }
-                }
-                
-                TapHandler {
                 }
 
                 WheelHandler {
@@ -94,6 +96,11 @@ GridLayout {
                     SystrayMenu {
                         menu: trayItem.item.menu
                         Layout.fillWidth: true
+                    }
+
+                    // Fixes alignment during animation
+                    Item {
+                        Layout.fillHeight: true
                     }
                 }
             }
