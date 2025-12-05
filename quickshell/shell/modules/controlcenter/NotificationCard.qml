@@ -137,6 +137,7 @@ ClippingRectangle {
             Layout.fillWidth: true
             visible: root.notification.actions
             spacing: Config.cc.borderWidth
+            uniformCellSizes: true
 
             Repeater {
                 model: root.notification.actions

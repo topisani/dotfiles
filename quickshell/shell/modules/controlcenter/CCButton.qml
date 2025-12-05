@@ -22,7 +22,7 @@ WrapperMouseArea {
         radius: root.radius
         margin: root.padding
         color: ColorUtils.mix(Config.theme.color.inactive, Config.theme.color.active, root.state ? (1 - 0.25 * root.containsMouse) : 0.25 * root.containsMouse)
-
+        
         Behavior on color {
             ColorAnimation {
                 duration: Config.theme.animationDuration
