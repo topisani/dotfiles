@@ -136,6 +136,14 @@ Singleton {
             function onHintsChanged() {
                 nroot._notificationUpdated()
             }
+            
+            function onBodyChanged() {
+                nroot._notificationUpdated()
+            }
+            
+            function onSummaryChanged() {
+                nroot._notificationUpdated()
+            }
 
             function onClosed() {
                 nroot.closed();
