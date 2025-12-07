@@ -1,31 +1,32 @@
 #!/bin/bash
 
-_get_display_id_from_desc() {
-  hyprctl monitors -j | jq -r ".[] | select(.description | contains(\"$1\")) | .name"
-}
+# _get_display_id_from_desc() {
+#   hyprctl monitors -j | jq -r ".[] | select(.description | contains(\"$1\")) | .name"
+# }
 
-_wallpapers() {
- cat ~/.config/hypr/hyprpaper.conf | grep "^wallpaper" | cut -d= -f2 |
-   while read line; do
-     IFS=',' read -r -a args <<< "$line"
-     output=${args[0]}
-     wallpaper="${args[1]}"
-     if [[ -z "$output" ]]; then
-       echo -n "-i $wallpaper "
-     else
-       output=${output##desc:}
-       output=$(_get_display_id_from_desc "$output")
-       [[ -n "$output" ]] && echo -n "-i $output:$wallpaper "
-     fi
-   done
-}
+# _wallpapers() {
+#  cat ~/.config/hypr/hyprpaper.conf | grep "^wallpaper" | cut -d= -f2 |
+#    while read line; do
+#      IFS=',' read -r -a args <<< "$line"
+#      output=${args[0]}
+#      wallpaper="${args[1]}"
+#      if [[ -z "$output" ]]; then
+#        echo -n "-i $wallpaper "
+#      else
+#        output=${output##desc:}
+#        output=$(_get_display_id_from_desc "$output")
+#        [[ -n "$output" ]] && echo -n "-i $output:$wallpaper "
+#      fi
+#    done
+# }
 
-_wallpapers
+# _wallpapers
 
 
 # _get_display_id_from_desc 5NRBS83
 cmd="
-swaylock -fe $(_wallpapers) 
+swaylock -fe
+-i $HOME/.config/wallpapers/whale.png
 --indicator-radius 100
 --line-uses-inside
 --inside-color 00000060
