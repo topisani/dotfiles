@@ -67,6 +67,14 @@ output "eDP-1" {
 output "Dell Inc. DELL S2721QS CH3CM43" {
     scale 1.25
     position x=0 y=0
+    layout {
+        struts {
+            left 8
+            right 8
+            top 0
+            bottom 0
+        }
+    }
 }
 
 output "PNP(AOC) AG346UCD 2OQQ9JA000874" {
@@ -451,7 +459,7 @@ binds {
     // Allow when locked means this is how to recover from a crashed lockscreen
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" allow-when-locked=true { spawn "lockscreen"; }
 
-    Mod+Shift+Return { spawn "ghostty" "--command=distrobox enter arch -- arch-term"; }
+    Mod+Shift+Return { spawn "ghostty" "--command=distrobox enter arch"; }
     Mod+Return { spawn-sh "ghostty --working-directory=$HOME"; }
     Mod+Space { spawn-sh  "(which anyrun &2>&1 > /dev/null && anyrun) || wofi"; }
     Mod+P { spawn "~/.dotfiles/quickshell/justfile" "ipc" "call" "shell" "toggleBar"; }
@@ -572,6 +580,9 @@ binds {
     Mod+Shift+WheelScrollUp        { focus-column-left; }
     Mod+Ctrl+Shift+WheelScrollDown { move-column-right; }
     Mod+Ctrl+Shift+WheelScrollUp   { move-column-left; }
+
+    Mod+MouseForward         { focus-column-right; }
+    Mod+MouseBack   { focus-column-left; }
 
     // Similarly, you can bind touchpad scroll "ticks".
     // Touchpad scrolling is continuous, so for these binds it is split into

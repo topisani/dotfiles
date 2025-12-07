@@ -1,5 +1,10 @@
 #!/bin/sh
 
+if [ -z "$TMUX" ]; then
+    export TERM=tmux-256color
+    exec tmux new-session kak "$@" \; set destroy-unattached on \; attach #\; set status off \; attach
+fi
+
 if [ -n "$KAKOUNE_SESSION" ]; then
     exec krc attach "$@"
 else
