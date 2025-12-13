@@ -40,13 +40,13 @@ hook global -group bufname-abbrev WinResize .* update-bufname-abbrev
 hook global -group bufname-abbrev EnterDirectory .* update-bufname-abbrev
 hook global -group bufname-abbrev EnterDirectory .* update-bufname-abbrev
 
-declare-option str myml_git
+# declare-option str myml_git
 
-rmhooks global myml
-# Main hook (git branch update, gutters)
-hook global -group myml NormalIdle .* %{
-  set-option window myml_git %sh{ $(git rev-parse --is-inside-work-tree 2> /dev/null) && echo " $(git rev-parse --abbrev-ref HEAD) "}
-}
+# rmhooks global myml
+# # Main hook (git branch update, gutters)
+# hook global -group myml NormalIdle .* %{
+#   set-option window myml_git %sh{ $(git rev-parse --is-inside-work-tree 2> /dev/null) && echo " $(git rev-parse --abbrev-ref HEAD) "}
+# }
 
 declare-option str myml_mode_str "NORMAL"
 
@@ -88,12 +88,12 @@ def -hidden set-my-modelinefmt %{
 {cyan+i}%opt{bufname_abbrev}{annotation}:{bright-blue+d}%val{cursor_line}{annotation}:{bright-blue+d}%val{cursor_char_column}{annotation}+{bright-blue+d}%val{selection_length}
 {{context_info}} 
 {+da@comment}%opt{filetype} 
-{yellow}%opt{myml_git}
 {magenta}%val{client}{magenta+d} {magenta}%val{session}{magenta+d}%opt{modeline_client_flags} 
 {cyan}U+%sh{printf '%04X' "$kak_cursor_char_value"}{default} 
 {+r@StatusLineMode} %opt{myml_mode_str} 
 EOF
   }
+# {yellow}%opt{myml_git}
 }
 
 set-my-modelinefmt

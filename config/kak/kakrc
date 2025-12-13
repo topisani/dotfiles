@@ -170,7 +170,7 @@ bundle-install-hook reasymotion %{
 
 bundle parinfer-rust https://github.com/eraserhd/parinfer-rust %{
     hook global WinSetOption filetype=(clojure|lisp|picolisp|racket|scheme|janet) %{
-        parinfer-enable-window -smart
+        parinfer-enable-window -indent
     }
 }
 bundle-install-hook parinfer-rust %{

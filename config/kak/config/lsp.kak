@@ -297,7 +297,7 @@ hook -group lsp-filetype-rust global BufSetOption filetype=rust %{
 rmhooks global lsp-filetype-janet
 hook -group lsp-filetype-janet global BufSetOption filetype=janet %{
   set-option buffer lsp_servers %exp{
-      [ginko]
+      [janet]
       root_globs = [".git", "project.janet"]
       command = "janet-lsp"
       args = ["--stdio"]
@@ -371,7 +371,16 @@ hook -group lsp-slint global BufSetOption filetype=slint %{
   }
 }
 
-filetype-hook (rust|css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml|zig|go|templ|devicetree|kconfig|conf|janet|openscad|qml|slint) %{
+rmhooks global lsp-cmake
+hook -group lsp-cmake global BufSetOption filetype=cmake %{
+  set-option buffer lsp_servers %exp{
+      [neocmakelsp]
+      root_globs = [".git"]
+      args = ["stdio"]
+  }
+}
+
+filetype-hook (rust|css|scss|typescript|javascript|php|python|java|dart|haskell|ocaml|latex|markdown|toml|zig|go|templ|devicetree|kconfig|conf|janet|openscad|qml|slint|cmake) %{
   lsp-setup
   lsp-enable-semantic-tokens
 }
