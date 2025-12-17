@@ -84,9 +84,18 @@ _confirm() {
 _add() {
   local src="$1"; shift
   local reldst="$1"; shift
-  local dst="$DOTFILES_FOLDER/$reldst"
   src=$(realpath -s "$src")
   relsrc=${src/#$HOME/\~}
+  if [[ -z "$reldst" ]]; then
+    _submsg "$relsrc"
+    if [[ "$relsrc" =~ ^~/\.config/ ]]; then
+      reldst=${relsrc/#\~\/.config/config}
+      _confirm "Destination: $reldst" || _fail "Aborted, pass destination manually"
+    else
+      _fail "No destination given and could not determine one automatically"
+    fi
+  fi
+  local dst="$DOTFILES_FOLDER/$reldst"
   if ! [[ -e "$src" ]]; then
     _fail "$src not found"
   fi

@@ -15,7 +15,7 @@ fi
 
 echo "$PWD" >&2
 
-if poetry env info -q; then
+if poetry env info -q 2>&1 > /dev/null; then
     exec poetry run "$@"
 fi
 

@@ -264,9 +264,6 @@ window-rule {
 }
 
 environment {
-    XCURSOR_SIZE "24"
-    XCURSOR_THEME "xcursor-breeze"
-
     // Fix various UI systems
     GDK_BACKEND "wayland"
     SDL_VIDEODRIVER "wayland,x11"
@@ -278,6 +275,11 @@ environment {
     ELECTRON_OZONE_PLATFORM_HINT "auto"
     GTK_IM_MODULE "simple"
     _JAVA_AWT_WM_NONREPARENTING "1"
+}
+
+cursor {
+    xcursor-theme "breeze_cursors"
+    xcursor-size 24
 }
 
 clipboard {
@@ -467,8 +469,8 @@ binds {
     // Mod+P { spawn "killall" "-SIGUSR1" "waybar"; }
     Mod+C { spawn "qalculate-gtk"; }
 
-    XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "10%+"; }
-    XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "10%-"; }
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+" "-l" "1.0"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-" "-l" "1.0"; }
     XF86AudioMute        allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
     XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
     XF86MonBrightnessUp   allow-when-locked=true { spawn "brightness" "-n" "+5"; }
@@ -479,7 +481,7 @@ binds {
     // Open/close the Overview: a zoomed-out view of workspaces and windows.
     // You can also move the mouse into the top-left hot corner,
     // or do a four-finger swipe up on a touchpad.
-    Mod+Tab repeat=false { toggle-overview; }
+    Mod+Tab { toggle-overview; }
 
     Mod+Q repeat=false { close-window; }
 
@@ -581,8 +583,8 @@ binds {
     Mod+Ctrl+Shift+WheelScrollDown { move-column-right; }
     Mod+Ctrl+Shift+WheelScrollUp   { move-column-left; }
 
-    Mod+MouseForward         { focus-column-right; }
-    Mod+MouseBack   { focus-column-left; }
+    Mod+MouseForward         { toggle-overview; }
+    // Mod+MouseBack   { focus-column-left; }
 
     // Similarly, you can bind touchpad scroll "ticks".
     // Touchpad scrolling is continuous, so for these binds it is split into
