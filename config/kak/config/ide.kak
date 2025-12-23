@@ -17,7 +17,7 @@
 #   echo '}'
 # }}
 
-hook -once global WinDisplay .* ide-setup
+# hook -once global WinDisplay .* ide-setup
 
 declare-option -hidden str toolsclient_tmux_pane
 

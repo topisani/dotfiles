@@ -146,7 +146,7 @@ bundle-customload kakoune-boost https://github.com/krobelus/kakoune-boost %{
   # source "%opt{bundle_path}/kakoune-boost/jj.kak"
   source "%opt{bundle_path}/kakoune-boost/doc.kak"
   load-conf git
-  load-conf ide
+  # load-conf ide
 }
 
 bundle kakoune-phantom-selection https://github.com/occivink/kakoune-phantom-selection %{
@@ -157,7 +157,6 @@ bundle kakoune-phantom-selection https://github.com/occivink/kakoune-phantom-sel
 }
 
 bundle reasymotion https://github.com/astaugaard/reasymotion %{
-  evaluate-commands %sh{ rkak_easymotion start }
   set global reasymotion_keys "thnesirayfoluckpdg,m.w/xjbvq"
   # map global normal <a-t> ':reasymotion-selection<ret>'
   map global normal t ':reasymotion-word<ret>'

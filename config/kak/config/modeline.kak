@@ -26,12 +26,14 @@ set-face global StatusLineGit "red"
 declare-option str bufname_abbrev
 
 define-command -hidden -override update-bufname-abbrev %{
-  set-option window bufname_abbrev %sh{
-    if [ ${#kak_bufname} -gt $((${kak_window_width:-10000} / 3)) ]; then
-      echo $kak_bufname | sed "s:\([^/]\)[^/]*/:\1/:g"
-    else
-      echo $kak_bufname
-    fi
+  try %{
+    set-option window bufname_abbrev %sh{
+      if [ ${#kak_bufname} -gt $((${kak_window_width:-10000} / 3)) ]; then
+        echo $kak_bufname | sed "s:\([^/]\)[^/]*/:\1/:g"
+      else
+        echo $kak_bufname
+      fi
+    }
   }
 }
 

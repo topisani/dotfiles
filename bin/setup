@@ -56,7 +56,6 @@ setup::fedora() {
         nautilus
         python3-nautilus-open-any-terminal
         openssl-devel
-        kakoune
         just
     )
 
@@ -68,7 +67,7 @@ setup::fedora() {
     sudo dnf install niri
 
     systemctl --user add-wants niri.service battery-notifyd.service
-    systemctl --user add-wants niri.service hypridle.service
+    systemctl --user add-wants niri.service swayidle.service
     systemctl --user add-wants niri.service swaybg.service
     systemctl --user add-wants niri.service udiskie.service
     systemctl --user add-wants niri.service waybar.service
@@ -87,6 +86,9 @@ setup::fedora() {
     cargo binstall --strategies crate-meta-data jj-cli
 
     sudo dnf install yazi
+
+    sudo dnf builddep tmux
+    sudo dnf builddep kakoune
 }
 
 setup::gui() {
@@ -100,33 +102,19 @@ setup::gui() {
 }
 
 setup::arch() {
-    paru -S --needed git zsh jq zoxide eza jujutsu kakoune
+    paru -S --needed git zsh jq zoxide eza jujutsu
     paru -S --needed diff-so-fancy bat ripgrep fd git-revise git-autofixup libqalculate bc
     paru -S --needed editorconfig-core-c tig fzf yazi
-
-    # setup::install waybar wofi dunst udiskie
-    # setup::install hyprland hyprpaper hyprlock xdg-desktop-portal-hyprland hyprcursor hypridle wl-clipboard hyprpolkitagent uwsm
-    # (
-    #     systemctl --user enable hyprpaper.service
-    #     systemctl --user enable hyprpolkitagent.service
-    #     systemctl --user enable hypridle.service
-    #     systemctl --user enable waybar.service
-    # )
-
-    # setup::install ghostty
-    # setup::install ttf-jetbrains-mono-nerd
-    # setup::install breeze breeze5 papirus-icon-theme
-    # setup::install zathura zathura-pdf-mupdf imv nautilus nautilus-open-any-terminal
 }
 
 setup::tools() {
     mkdir -p $TOOLSDIR
 
     # Kakoune and tools
-    # setup::project https://github.com/topisani/kakoune && (
-    #     make
-    #     sudo make install
-    # )
+    setup::project https://github.com/topisani/kakoune && (
+        make
+        sudo make install
+    )
 
     setup::project https://github.com/topisani/kakoune-remote-control && (
         make install

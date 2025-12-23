@@ -14,7 +14,7 @@ def source-local-config -override -params ..1 %{
               upsearch "$1"
           fi
       }
-      startdir=${1:-$(dirname $kak_buffile)}
+      startdir=${1:-$(dirname "$kak_buffile")}
       [ -d "$startdir" ] && cd $startdir
       upsearch ".local.kak"
   }
