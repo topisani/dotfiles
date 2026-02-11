@@ -12,76 +12,85 @@ import qs.modules.common.utils
 import qs.modules.controlcenter
 import qs.services as Services
 
-GridLayout {
-    columns: 2
-    Layout.fillWidth: false
-    Layout.fillHeight: false
+ColumnLayout {
 
     SystemClock {
         id: clock
-        precision: SystemClock.Hours
+        precision: SystemClock.Seconds
     }
 
-    DayOfWeekRow {
-        locale: grid.locale
-
-        Layout.column: 1
+    Text {
         Layout.fillWidth: true
-
-        delegate: Text {
-            text: shortName
-            font: Config.cc.font
-            color: Config.theme.color.textMuted
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-
-            required property string shortName
-        }
+        Layout.bottomMargin: Config.cc.padding
+        text: Qt.formatDateTime(clock.date, "dddd, MMMM d, yyyy  hh:mm:ss")
+        font: Config.cc.font
+        color: Config.theme.color.text
+        horizontalAlignment: Text.AlignHCenter
     }
 
-    WeekNumberColumn {
-        month: grid.month
-        year: grid.year
-        locale: grid.locale
+    GridLayout {
+        columns: 2
 
-        Layout.fillHeight: true
+        DayOfWeekRow {
+            locale: grid.locale
 
-        delegate: Text {
-            text: weekNumber
-            font: Config.cc.font
-            color: Config.theme.color.textMuted
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
+            Layout.column: 1
+            Layout.fillWidth: true
 
-            required property int weekNumber
-        }
-    }
-
-    MonthGrid {
-        id: grid
-        month: clock.date.getMonth()
-        year: clock.date.getFullYear()
-
-        Layout.fillWidth: true
-        Layout.fillHeight: false
-        delegate: Rectangle {
-            id: monthBg
-            required property var model
-            implicitWidth: monthText.implicitWidth + 2 * Config.cc.padding
-            implicitHeight: monthText.implicitHeight + 2
-            color: (model.date.getMonth() == clock.date.getMonth() && model.date.getDate() == clock.date.getDate()) ? Config.theme.color.active : "transparent"
-            radius: Config.cc.radius
-            Text {
-                id: monthText
-                anchors.fill: parent
+            delegate: Text {
+                text: shortName
+                font: Config.cc.font
+                color: Config.theme.color.textMuted
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                opacity: monthBg.model.month === clock.date.getMonth() ? 1 : 0.5
-                text: monthBg.model.day
+
+                required property string shortName
+            }
+        }
+
+        WeekNumberColumn {
+            month: grid.month
+            year: grid.year
+            locale: grid.locale
+
+            Layout.fillHeight: true
+
+            delegate: Text {
+                text: weekNumber
                 font: Config.cc.font
-                color: Config.theme.color.text
+                color: Config.theme.color.textMuted
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+
+                required property int weekNumber
+            }
+        }
+
+        MonthGrid {
+            id: grid
+            month: clock.date.getMonth()
+            year: clock.date.getFullYear()
+
+            Layout.fillWidth: true
+            Layout.fillHeight: false
+            delegate: Rectangle {
+                id: monthBg
+                required property var model
+                implicitWidth: monthText.implicitWidth + 2 * Config.cc.padding
+                implicitHeight: monthText.implicitHeight + 2
+                color: (model.date.getMonth() == clock.date.getMonth() && model.date.getDate() == clock.date.getDate()) ? Config.theme.color.active : "transparent"
+                radius: Config.cc.radius
+                Text {
+                    id: monthText
+                    anchors.fill: parent
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    opacity: monthBg.model.month === clock.date.getMonth() ? 1 : 0.5
+                    text: monthBg.model.day
+                    font: Config.cc.font
+                    color: Config.theme.color.text
+                }
             }
         }
     }
 }
-

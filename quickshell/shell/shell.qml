@@ -17,19 +17,16 @@ ShellRoot {
     property bool barHidden: false
     property alias ccOpen: cc.shouldShow
 
-    // LazyLoader {
-    //     id: barPopupLoader
-    //     BarPopupWindow {
-    //         id: barPopup
-    //         Connections {
-    //             target: root
-    //             // function onShowPopup(anchor, widget, props) {
-    //             //     barPopup.showPopup(anchor, widget, props);
-    //             // }
-    //         }
-    //     }
-    // }
-    
+    BarPopupWindow {
+        id: barPopup
+        Connections {
+            target: root
+            function onShowPopup(anchor, widget, props) {
+                barPopup.showPopup(anchor, widget, props);
+            }
+        }
+    }
+
     Variants {
         model: Quickshell.screens
         
@@ -58,13 +55,6 @@ ShellRoot {
     
     ControlCenter {
         id: cc
-        Connections {
-            target: root
-            function onShowPopup(anchor, widget, props) {
-                cc.openPopup(widget, props);
-            }
-        }
-        
         onShouldShowChanged: {
             Notifications.showPopups = !cc.shouldShow
         }

@@ -142,11 +142,40 @@ Item {
                         }
                     }
                     
-                    Text {
-                        Layout.topMargin: 10
-                        text: "Notifications"
-                        font: Config.cc.font
-                        color: Config.theme.color.text
+                    
+                    RowLayout {
+                        Text {
+                            Layout.topMargin: 10
+                            text: "Notifications"
+                            font: Config.cc.font
+                            color: Config.theme.color.text
+                        }
+
+                        Item { Layout.fillWidth: true }
+
+                        Text {
+                            visible: Services.Notifications.notifications.count > 0
+                            Layout.topMargin: 10
+                            text: "Clear All"
+                            font: Config.cc.fontSmall
+                            color: mouseArea.containsMouse ? Config.theme.color.active : Config.theme.color.text
+                            opacity: mouseArea.containsMouse ? 1.0 : 0.6
+
+                            Behavior on color {
+                                ColorAnimation { duration: Config.theme.animationDuration }
+                            }
+                            Behavior on opacity {
+                                NumberAnimation { duration: Config.theme.animationDuration }
+                            }
+
+                            MouseArea {
+                                id: mouseArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: Services.Notifications.dismissAll()
+                            }
+                        }
                     }
                     
                     NotificationCenter {

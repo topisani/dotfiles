@@ -172,7 +172,24 @@ Item {
                 size: root.size
             }
 
-            DateTime {}
+            DateTime {
+                id: dateTime
+                Component {
+                    id: calendarWidget
+                    CalendarWidget {}
+                }
+                TapHandler {
+                    onTapped: root.showPopup(dateTime, calendarWidget, {})
+                }
+                TapHandler {
+                    acceptedButtons: Qt.RightButton
+                    onTapped: {
+                        const iso = Qt.formatDateTime(new Date(), "yyyy-MM-dd");
+                        Quickshell.execDetached(["sh", "-c", "echo -n '" + iso + "' | wl-copy"]);
+                        Quickshell.execDetached(["notify-send", "--transient", "-a", "Shell", "Copied date", iso]);
+                    }
+                }
+            }
 
             // SystemTrayWidget {
             //     onShowPopup: (anchor, comp, props) => root.showPopup(anchor, comp, props)

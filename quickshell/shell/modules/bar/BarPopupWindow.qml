@@ -38,6 +38,7 @@ Item {
         popupType: Popup.Window
         focus: true
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+        onClosed: popupLoader.active = false
 
         readonly property real shadowSize: 50
         contentWidth: popupPanel.implicitWidth

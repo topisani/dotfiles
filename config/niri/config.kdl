@@ -57,7 +57,7 @@ input {
 }
 
 output "eDP-1" {
-    scale 1.25
+    scale 1.5
 
     // normal, 90, 180, 270, flipped, flipped-90, flipped-180 and flipped-270.
     transform "normal"

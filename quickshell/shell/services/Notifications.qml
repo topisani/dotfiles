@@ -38,6 +38,12 @@ Singleton {
         }
         return n.appIcon;
     }
+    
+    function dismissAll() {
+        for (let i = notifications.count - 1; i >= 0; i--) {
+            notifications.get(i).modelData.dismiss();
+        }
+    }
 
     Component {
         id: notificationWrapper
