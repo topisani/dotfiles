@@ -1,9 +1,11 @@
 [Unit]
 PartOf=graphical-session.target
 After=graphical-session.target
+Requisite=graphical-session.target
 
 [Service]
 ExecStart=/usr/libexec/polkit-mate-authentication-agent-1
 Slice=background.slice
 TimeoutStopSec=5sec
 Restart=on-failure
+RestartSec=1

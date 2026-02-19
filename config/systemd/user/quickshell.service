@@ -1,9 +1,10 @@
 [Unit]
 After=graphical-session.target
+PartOf=graphical-session.target
+Requisite=graphical-session.target
 
 [Service]
 Type=exec
 ExecStart=%h/.dotfiles/quickshell/justfile run
-Slice=app-graphical.slice
 Restart=on-failure
-
+RestartSec=1

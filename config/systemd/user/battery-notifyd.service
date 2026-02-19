@@ -6,4 +6,4 @@ Requisite=graphical-session.target
 [Service]
 ExecStart=%h/.bin/battery_notifyd
 Restart=on-failure
-
+RestartSec=5

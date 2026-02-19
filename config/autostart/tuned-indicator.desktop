@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Exec=/usr/bin/python3 /home/topisani/.config/scripts/tuned_indicator.py
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=TuneD Indicator
+Name=TuneD Indicator
+Comment[en_US]=TuneD profile switcher indicator
+Comment=TuneD profile switcher indicator

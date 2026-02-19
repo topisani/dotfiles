@@ -7,4 +7,4 @@ Requisite=graphical-session.target
 Type=exec
 ExecStart=%h/.config/scripts/wlsunset-systray.py
 Restart=on-failure
-RestartSec=10
+RestartSec=5

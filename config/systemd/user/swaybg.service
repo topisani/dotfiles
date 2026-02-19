@@ -6,3 +6,4 @@ Requisite=graphical-session.target
 [Service]
 ExecStart=/usr/bin/swaybg -m fill -i "%h/.config/wallpapers/whale-blur.png"
 Restart=on-failure
+RestartSec=1

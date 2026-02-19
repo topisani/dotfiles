@@ -74,3 +74,4 @@
 ~/.config/scripts;config/scripts
 ~/.config/systemd/user/jotta-systray.service;config/systemd/user/jotta-systray.service
 ~/.config/systemd/user/wl-sunset-systray.service;config/systemd/user/wl-sunset-systray.service
+~/.config/autostart/tuned-indicator.desktop;config/autostart/tuned-indicator.desktop

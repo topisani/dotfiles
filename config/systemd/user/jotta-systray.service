@@ -1,8 +1,13 @@
 [Unit]
+PartOf=graphical-session.target
 After=graphical-session.target
+Requisite=graphical-session.target
 
 [Service]
 Type=exec
 ExecStart=%h/.config/scripts/jotta-systray.py
-Slice=app-graphical.slice
 Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target
