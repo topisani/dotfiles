@@ -265,7 +265,7 @@ window-rule {
 
 environment {
     // Fix various UI systems
-    GDK_BACKEND "wayland"
+    // GDK_BACKEND "wayland"
     SDL_VIDEODRIVER "wayland,x11"
     CLUTTER_BACKEND "wayland"
     QT_QPA_PLATFORM "wayland;xcb"
