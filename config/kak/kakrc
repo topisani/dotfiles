@@ -19,6 +19,7 @@ def load-conf -params 1 %{
     echo -debug "[load-conf] Error loading %arg{1}: %val{error}"
   }
 }
+
 def filetype-hook -params 2 %{ 
   hook global WinSetOption "filetype=%arg{1}" %arg{2}
 }
@@ -69,10 +70,10 @@ def toggle-modeline -override %{
 # Window-based settings
 hook global WinCreate .* %{
   addhl window/matching show-matching
-  addhl -override window/whitespace show-whitespaces -indent '▏'
-  # addhl -override window/whitespace show-whitespaces -indent '' -spc '' -face Whitespace
-  # addhl -override window/trailing-whitespace show-whitespaces -lf '' -only-trailing -face WhitespaceTrailing
-  # addhl -override window/indent-guides show-whitespaces -lf '' -spc '' -tab '' -nbsp '' -face WhitespaceIndent
+  # addhl -override window/whitespace show-whitespaces -indent '▏' -
+  addhl -override window/whitespace show-whitespaces -indent '' -spc '' -face Whitespace
+  addhl -override window/trailing-whitespace show-whitespaces -lf '' -only-trailing -face WhitespaceTrailing
+  addhl -override window/indent-guides show-whitespaces -lf '' -spc '' -tab '' -nbsp '' -face WhitespaceIndent
   toggle-numbers
 }
 
@@ -302,7 +303,8 @@ set-option global grepcmd 'rg -Hn --no-heading --vimgrep'
 
 # load-conf git
 load-conf tree-sitter
-load-conf lsp
+# load-conf lsp
+source "%val{config}/config/lsp.kak" # For some reason load-conf fails in distrobox here...
 load-conf c++
 load-conf rust
 

@@ -9,5 +9,5 @@ define-command kts-map-ft-lang -params 2 %{
 kts-map-ft-lang git-diff diff
 kts-map-ft-lang justfile just
 kts-map-ft-lang typescript tsx
-kts-map-ft-lang c cpp
+# kts-map-ft-lang c cpp
 kts-map-ft-lang hare ''

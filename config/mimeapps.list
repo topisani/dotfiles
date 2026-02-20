@@ -3,6 +3,8 @@ image/gif=sxiv.desktop;gimp.desktop;
 application/pdf=org.pwmt.zathura.desktop;
 x-scheme-handler/mailto=userapp-Thunderbird-0XNXN1.desktop;
 x-scheme-handler/mid=userapp-Thunderbird-0XNXN1.desktop;
+model/stl=orcaslicer.desktop;
+image/png=org.gnome.Loupe.desktop;
 
 [Default Applications]
 application/pdf=org.pwmt.zathura.desktop;
@@ -15,3 +17,6 @@ x-scheme-handler/mailto=min.desktop
 x-scheme-handler/mid=userapp-Thunderbird-0XNXN1.desktop
 x-scheme-handler/unknown=min.desktop
 TerminalEmulator=alacritty.desktop
+model/3mf=orcaslicer.desktop
+model/stl=orcaslicer.desktop
+image/png=org.gnome.Loupe.desktop

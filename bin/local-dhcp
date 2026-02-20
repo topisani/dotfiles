@@ -21,10 +21,14 @@ cleanup() {
     echo "Cleaning up..."
     sudo ip addr del "$IP_ADDR" dev "$ETH_IFACE" 2>/dev/null || true
     echo "IP address removed from $ETH_IFACE"
+    sudo nmcli device set "$ETH_IFACE" managed yes
 }
 
 # Set trap to run cleanup on exit
 trap cleanup EXIT
+
+echo "Configuring NetworkManager to ignore $ETH_IFACE..."
+sudo nmcli device set "$ETH_IFACE" managed no
 
 # Add IP address
 echo "Adding IP $IP_ADDR to $ETH_IFACE..."
@@ -32,4 +36,4 @@ sudo ip addr add "$IP_ADDR" dev "$ETH_IFACE"
 
 # Start dnsmasq in foreground mode with DHCP only
 echo "Starting DHCP server (press Ctrl+C to stop)..."
-sudo dnsmasq --interface="$ETH_IFACE" --dhcp-range="$DHCP_RANGE" --port=0 -d
+sudo dnsmasq --interface="$ETH_IFACE" --dhcp-range="$DHCP_RANGE" --port=0 -d --log-debug

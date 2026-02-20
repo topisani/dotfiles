@@ -17,6 +17,10 @@ Item {
         if (!widget) {
             return root.close();
         }
+        // Toggle: clicking the same anchor while open closes the popup
+        if (parentWindow === anchor && popup.visible) {
+            return root.close();
+        }
         parentWindow = anchor;
         popupLoader.sourceComponent = widget;
         popupLoader.active = true;
@@ -25,7 +29,7 @@ Item {
                 popupLoader.item[key] = properties[key];
             }
         }
-        if (!popup.visible) popup.open();
+        popup.open();
     }
 
     function close() {
@@ -44,7 +48,9 @@ Item {
         contentWidth: popupPanel.implicitWidth
         // contentHeight: popupPanel.implicitHeight
         contentHeight: Math.max(1000, popupPanel.implicitHeight);
-        padding: shadowSize
+        // padding: shadowSize
+        // padding: 0
+        topPadding: 0
         y: parent.height
 
         background: MouseArea {
@@ -74,16 +80,20 @@ Item {
         ClippingWrapperRectangle {
             id: popupPanel
 
-            x: popup.shadowSize
-            y: -popup.shadowSize
+            // x: popup.shadowSize
+            // y: -popup.shadowSize
 
             radius: 10
             color: Config.cc.backgroundColor
             margin: 20
             implicitHeight: popupLoader.implicitHeight + margin * 2
             implicitWidth: Math.max(popupLoader.implicitWidth + margin * 2, 400)
+            border {
+                width: 1
+                color: Config.theme.color.inactive
+            }
             // implicitHeight: 500
-            layer.enabled: true
+            layer.enabled: false
             layer.effect: MultiEffect {
                 shadowEnabled: true
                 // The vertical offset makes the shadow slightly more prominent

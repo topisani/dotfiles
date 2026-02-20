@@ -8,11 +8,12 @@ build:
     podman build -t arch-dev .
 
 create *args: build
+    # the --userns flag: https://github.com/89luca89/distrobox/issues/1961
     distrobox create \
         --image arch-dev \
         --name arch \
-        --unshare-netns \
         --home ~/.distrobox/arch/home \
+        --additional-flags "--userns=keep-id:size=65534" \
         "$@"
 
     distrobox enter arch -- just internal-init

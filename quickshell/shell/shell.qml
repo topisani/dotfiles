@@ -29,7 +29,7 @@ ShellRoot {
 
     Variants {
         model: Quickshell.screens
-        
+
         LazyLoader {
             active: true
             required property var modelData;
@@ -45,14 +45,14 @@ ShellRoot {
                     // barPopupLoader.active = widget != null
                     root.showPopup(anchor, widget, properties);
                 }
-                
+
                 onSetCcOpen: (open) => {
                     root.ccOpen = open
                 }
             }
         }
     }
-    
+
     ControlCenter {
         id: cc
         onShouldShowChanged: {
@@ -61,7 +61,7 @@ ShellRoot {
     }
 
     Osd {}
-    
+
     NotificationPopup {
         id: notificationPopup
     }
@@ -72,7 +72,7 @@ ShellRoot {
         function toggleBar() {
             root.barHidden = !root.barHidden
         }
-        
+
         function toggleCC() {
             root.ccOpen = !root.ccOpen
         }

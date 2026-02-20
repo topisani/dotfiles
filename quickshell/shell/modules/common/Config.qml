@@ -33,7 +33,7 @@ Singleton {
             // individual widgets will be proportial to this value.
             readonly property real size: 18
         }
-        
+
         readonly property real animationDuration: 100
     }
 
@@ -48,11 +48,11 @@ Singleton {
             readonly property int weight: 500
         }
     }
-    
+
     readonly property var popup: QtObject {
         readonly property color backdropColor: "transparent"
     }
-    
+
     readonly property var cc: QtObject {
         readonly property color backgroundColor: root.theme.color.background2
         readonly property color menuBackground: "#0d1016" // "#0b1112"
@@ -75,11 +75,11 @@ Singleton {
             readonly property real pointSize: 10
         }
     }
-    
+
     readonly property var notifications: QtObject {
         readonly property real popupExpireSeconds: 20
     }
-    
+
     readonly property var menu: QtObject {
         readonly property int iconSize: 18
         readonly property color hoverBackground: "#12161e"
@@ -152,7 +152,7 @@ Singleton {
             readonly property real scale: 0.7
             readonly property real radius: 1
         }
-        
+
         readonly property color inactiveColor: "#333333"
     }
 
@@ -175,7 +175,7 @@ Singleton {
         }
         return "audio-volume-overamplified"
     }
-    
+
     function checkboxIcon(state) {
         if (state == Qt.Checked || state === true) {
             return "checkbox"
@@ -185,7 +185,7 @@ Singleton {
         }
         return "box"
     }
-    
+
     function radioButtonIcon(state) {
         if (state == Qt.Checked || state === true) {
             return "checkbox"
