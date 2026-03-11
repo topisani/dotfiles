@@ -2,6 +2,7 @@ pragma Singleton
 import Quickshell
 import QtQuick
 import qs.modules.common
+import qs.modules.common.utils
 
 Singleton {
     id: root
@@ -10,6 +11,7 @@ Singleton {
         readonly property var color: QtObject {
             readonly property color active: "#178ca6"
             readonly property color inactive: "#021c2d" // #112126"
+            readonly property color hover: ColorUtils.mix(Config.theme.color.inactive, Config.theme.color.active, 0.25)
             readonly property color text: "#FEFBFC"
             readonly property color textMuted: "#999999"
             readonly property color foreground: "#FFFFFF"

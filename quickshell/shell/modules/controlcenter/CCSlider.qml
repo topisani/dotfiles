@@ -9,11 +9,13 @@ ClippingRectangle {
     id: root
     property string icon: ""
     property string text: ""
+    property string rightText: ""
 
     radius: Config.cc.radius
     height: Config.cc.iconSize + 2 * Config.cc.padding
     implicitWidth: row.implicitWidth
     color: "transparent"
+    property bool disabled: false
 
     property alias value: slider.value
     // margin: 15
@@ -22,7 +24,7 @@ ClippingRectangle {
         id: slider
         anchors.fill: parent
         trackColor: Config.theme.color.inactive
-        highlightColor: Config.theme.color.active
+        highlightColor: root.disabled ? Config.theme.color.hover : Config.theme.color.active 
         radius: 0
     }
 
@@ -39,6 +41,12 @@ ClippingRectangle {
             color: Config.theme.color.text
             font: Config.cc.font
             text: root.text
+            Layout.horizontalStretchFactor: 2
+        }
+        Text {
+            color: Config.theme.color.text
+            font: Config.cc.font
+            text: root.rightText
         }
     }
 }

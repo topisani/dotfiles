@@ -160,7 +160,9 @@ Item {
                 size: root.size
                 Component {
                     id: audioMixer
-                    AudioMixer {}
+                    AudioMixer {
+                        alwaysShowOutputSelector: true
+                    }
                 }
                 TapHandler {
                     onTapped: root.showPopup(pipewire, audioMixer, {})

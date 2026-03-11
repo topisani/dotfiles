@@ -61,7 +61,7 @@ output "eDP-1" {
 
     // normal, 90, 180, 270, flipped, flipped-90, flipped-180 and flipped-270.
     transform "normal"
-    position x=680 y=1728
+    // position x=0 y=0
 }
 
 output "Dell Inc. DELL S2721QS CH3CM43" {
@@ -269,7 +269,7 @@ environment {
     SDL_VIDEODRIVER "wayland,x11"
     CLUTTER_BACKEND "wayland"
     QT_QPA_PLATFORM "wayland;xcb"
-    // QT_AUTO_SCREEN_SCALE_FACTOR "1"
+    QT_AUTO_SCREEN_SCALE_FACTOR "1"
     // QT_WAYLAND_DISABLE_WINDOWDECORATION "1"
     QT_QPA_PLATFORMTHEME "gtk3"
     ELECTRON_OZONE_PLATFORM_HINT "auto"

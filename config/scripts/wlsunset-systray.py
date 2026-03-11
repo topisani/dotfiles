@@ -183,10 +183,10 @@ def main():
     # Ensure the app doesn't quit when the last window is closed
     app.setQuitOnLastWindowClosed(False)
 
-    # Check if system tray is available
-    if not QSystemTrayIcon.isSystemTrayAvailable():
-        print("System tray is not available on this system.")
-        sys.exit(1)
+    # # Check if system tray is available
+    # if not QSystemTrayIcon.isSystemTrayAvailable():
+    #     print("System tray is not available on this system.")
+    #     sys.exit(1)
 
     # Create and show tray icon
     tray = ColorTempTray()

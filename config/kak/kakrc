@@ -350,6 +350,7 @@ filetype-assign .*\.scad openscad
 filetype-assign .*\.bean beancount
 filetype-assign .*\.corn corn
 filetype-assign .*\.slint slint
+filetype-assign .*\.eta html
 # filetype-assign (.*/)?Containerfile(\..*)? dockerfile
 
 filetype-hook jj-describe %{

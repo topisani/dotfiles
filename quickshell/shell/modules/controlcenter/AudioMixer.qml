@@ -19,6 +19,7 @@ ColumnLayout {
     readonly property real volume: Pipewire.defaultAudioSink?.audio.volume || 0.0
     readonly property bool muted: Pipewire.defaultAudioSink?.audio.muted || false
     property alias expanded: mixerContainer.visible
+    property bool alwaysShowOutputSelector:  false
 
     RowLayout {
         spacing: Config.cc.padding
@@ -32,8 +33,10 @@ ColumnLayout {
 
         CCSlider {
             Layout.fillWidth: true
+            disabled: root.muted
 
             text: Pipewire.defaultAudioSink.nickname || Pipewire.defaultAudioSink.description
+            rightText: root.muted ? "Muted" : `${Math.round(root.volume * 100)}%`
 
             value: root.volume 
             onValueChanged: {
@@ -42,6 +45,7 @@ ColumnLayout {
         }
 
         CCButton {
+            visible: !root.alwaysShowOutputSelector
             icon: mixerContainer.visible ? "arrow-down" : "arrow-right"
             state: mixerContainer.visible
             onClicked: {
@@ -52,7 +56,7 @@ ColumnLayout {
 
     CCCard  {
         id: mixerContainer
-        visible: false
+        visible: root.alwaysShowOutputSelector
         Layout.fillWidth: true
         
         ColumnLayout {

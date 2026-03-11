@@ -290,3 +290,17 @@ link_flags = ["-O3"]
 [language.corn.queries]
 source = { git = { url = "https://github.com/corn-config/tree-sitter-corn", pin = "464654742cbfd3a3de560aba120998f1d5dfa844" }}
 path = "queries"
+
+[language.ejs.grammar]
+source = { git = { url = "https://github.com/tree-sitter/tree-sitter-embedded-template", pin = "3499d85f0a0d937c507a4a65368f2f63772786e1" }}
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "-o", "ejs.so"]
+link_flags = ["-O3"]
+
+[language.ejs.queries]
+source = { git = { url = "https://github.com/tree-sitter/tree-sitter-embedded-template", pin = "3499d85f0a0d937c507a4a65368f2f63772786e1" }}
+path = "queries"
