@@ -4,6 +4,9 @@ After=graphical-session.target
 Requisite=graphical-session.target
 
 [Service]
-ExecStart=%h/.bin/battery_notifyd
+ExecStart=%h/.config/scripts/battery-monitor.py
 Restart=on-failure
 RestartSec=5
+
+[Install]
+WantedBy=niri.service

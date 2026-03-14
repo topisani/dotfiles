@@ -3,8 +3,6 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Effects
-import QtQuick.Layouts
-import Quickshell
 import Quickshell.Widgets
 import qs.modules.common
 
@@ -44,6 +42,7 @@ Item {
         focus: true
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
         onClosed: popupLoader.active = false
+        onOpened: if (popupLoader.item) popupLoader.item.forceActiveFocus()
 
         readonly property real shadowSize: 50
         contentWidth: popupPanel.implicitWidth
@@ -85,7 +84,7 @@ Item {
             // y: -popup.shadowSize
 
             radius: 5
-            color: Config.cc.backgroundColor
+            color: Config.cc.menuBackground // Config.cc.backgroundColor
             margin: 10
             implicitHeight: popupLoader.implicitHeight + margin * 2
             implicitWidth: Math.max(popupLoader.implicitWidth + margin * 2, 400)
@@ -108,6 +107,14 @@ Item {
 
             Loader {
                 id: popupLoader
+            }
+
+            Connections {
+                target: popupLoader.item
+                ignoreUnknownSignals: true
+                function onItemTriggered() {
+                    popup.close();
+                }
             }
         }
     }

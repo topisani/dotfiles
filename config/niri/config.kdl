@@ -467,7 +467,7 @@ binds {
     Mod+P { spawn "~/.dotfiles/quickshell/justfile" "ipc" "call" "shell" "toggleBar"; }
     Mod+Semicolon { spawn "~/.dotfiles/quickshell/justfile" "ipc" "call" "shell" "toggleCC"; }
     // Mod+P { spawn "killall" "-SIGUSR1" "waybar"; }
-    Mod+C { spawn "qalculate-gtk"; }
+    Mod+C { spawn "qalculate-qt"; }
 
     XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+" "-l" "1.0"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-" "-l" "1.0"; }

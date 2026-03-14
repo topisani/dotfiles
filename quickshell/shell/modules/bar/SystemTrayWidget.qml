@@ -29,7 +29,7 @@ RowLayout {
             required property var modelData
             property var item: modelData
 
-            visible: item.status != Status.Passive
+            visible: item.status != Status.Passive && !Config.state.isSystrayItemHiddenInBar(item.id)
 
             // Tray icon
             SystemIcon {
@@ -40,12 +40,8 @@ RowLayout {
 
             // Tooltip
             PopupToolTip {
-                id: tooltip
-                anchor.item: trayItem
-                anchor.edges: Edges.Bottom | Edges.Right
-                visible: trayItem.containsMouse
+                parent: trayItem
                 text: (trayItem.item.tooltipTitle || trayItem.item.title || "") + (trayItem.item.tooltipDescription ? "\n" + trayItem.item.tooltipDescription : "")
-                delay: 500
             }
             Component {
                 id: menuContents

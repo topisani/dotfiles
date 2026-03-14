@@ -31,6 +31,7 @@ Item {
     PanelWindow {
         id: bottomLayerWindow
         WlrLayershell.layer: WlrLayer.Bottom
+        WlrLayershell.focusable: true
         exclusionMode: ExclusionMode.Ignore
         screen: root.screen
         anchors {
@@ -67,6 +68,7 @@ Item {
         id: topLayerWindow
         color: "transparent"
         WlrLayershell.layer: WlrLayer.Top
+        // WlrLayershell.focusable: true
 
         implicitHeight:root.size + (50 * root.topLayerShadow)
         // visible: !root.hidden; // || barContent.opacity > 0
@@ -122,6 +124,7 @@ Item {
         color: "transparent"
         WlrLayershell.layer: WlrLayer.Overlay
         exclusionMode: ExclusionMode.Ignore
+        WlrLayershell.focusable: true
 
         implicitHeight: root.size
         screen: root.screen
@@ -229,15 +232,26 @@ Item {
             }
             
             BarButton {
+                id: overflowButton
                 implicitWidth: root.size
                 implicitHeight: root.size
                 SystemIcon {
                     source: "overflow-menu-symbolic"
                     size: root.size
                 }
-                
+
+                Component {
+                    id: systrayFilterMenu
+                    SystrayFilterMenu {}
+                }
+
                 onClicked: {
                     root.setCcOpen(!root.ccOpen)
+                }
+
+                TapHandler {
+                    acceptedButtons: Qt.RightButton
+                    onTapped: { root.popupOpen = true; root.showPopup(overflowButton, systrayFilterMenu, {}); }
                 }
             }
         }

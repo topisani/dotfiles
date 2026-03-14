@@ -1,51 +1,48 @@
-import Quickshell
 import QtQuick
+import QtQuick.Controls
 import qs.modules.common
 
-Item {
+ToolTip {
     id: tooltip
+    popupType: Popup.Window
+    delay: 500
+    timeout: -1
+    
+    y: Math.round(parent.height)
 
-    property string text: ""
-    property int delay: 500
-    property alias anchor: internal.anchor
-
-    // Internal actual visibility state
-    PopupWindow {
-        id: internal
-
-        implicitWidth: tooltipText.width + 32
-        implicitHeight: tooltipText.height + 32
-        color: "transparent"
-
-        Rectangle {
-            anchors.fill: parent
-            color: Config.theme.color.background2
-            radius: 4
-
-            Text {
-                id: tooltipText
-                text: tooltip.text
-                color: Config.theme.color.text
-                font: Config.bar.font
-                anchors.centerIn: parent
-            }
+    property bool _hovered: parentHover.hovered || tooltipHover.hovered
+    on_HoveredChanged: {
+        if (_hovered) {
+            hideTimer.stop();
+            visible = true;
+        } else {
+            hideTimer.start();
         }
     }
 
     Timer {
-        id: showTimer
-        interval: tooltip.delay
-        onTriggered: function () {
-            internal.visible = true;
-        }
+        id: hideTimer
+        interval: 100
+        onTriggered: tooltip.visible = false
     }
-    // Watch the public visible property
-    onVisibleChanged: {
-        if (visible) {
-            showTimer.start();
-        } else {
-            showTimer.stop();
-            internal.visible = false;
-        }
+
+    HoverHandler {
+        id: parentHover
+        parent: tooltip.parent
+    }
+
+    HoverHandler {
+        id: tooltipHover
+    }
+
+    background: Rectangle {
+        color: Config.theme.color.background2
+        radius: 4
+    }
+
+    contentItem: Text {
+        text: tooltip.text
+        color: Config.theme.color.text
+        font: Config.bar.font
     }
 }

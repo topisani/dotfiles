@@ -66,7 +66,6 @@
 ~/.config/systemd/user/udiskie.service;config/systemd/user/udiskie.service
 ~/.config/systemd/user/xsettingsd.service;config/systemd/user/xsettingsd.service
 ~/.config/nix;config/nix
-~/.config/systemd/user/battery-notifyd.service;config/systemd/user/battery-notifyd.service
 ~/.config/systemd/user/swaybg.service;config/systemd/user/swaybg.service
 ~/distrobox;home/distrobox
 ~/.config/systemd/user/quickshell.service;config/systemd/user/quickshell.service
@@ -76,3 +75,4 @@
 ~/.config/systemd/user/wl-sunset-systray.service;config/systemd/user/wl-sunset-systray.service
 ~/.config/autostart/tuned-indicator.desktop;config/autostart/tuned-indicator.desktop
 ~/.config/environment.d/ssh_auth_socket.conf;config/environment.d/ssh_auth_socket.conf
+~/.config/systemd/user/battery-monitor.service;config/systemd/user/battery-monitor.service

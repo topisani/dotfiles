@@ -41,7 +41,7 @@ ClippingRectangle {
             color: Config.theme.color.text
             font: Config.cc.font
             text: root.text
-            Layout.horizontalStretchFactor: 2
+            Layout.fillWidth: true
         }
         Text {
             color: Config.theme.color.text

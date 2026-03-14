@@ -1,5 +1,6 @@
 pragma Singleton
 import Quickshell
+import Quickshell.Io
 import QtQuick
 import qs.modules.common
 import qs.modules.common.utils
@@ -87,7 +88,7 @@ Singleton {
 
     readonly property var menu: QtObject {
         readonly property int iconSize: 18
-        readonly property color hoverBackground: "#12161e"
+        readonly property color hoverBackground: root.theme.color.hover // "#12161e"
         readonly property color disabledColor: root.theme.color.textMuted
         readonly property color separatorColor: "#15161e"
         readonly property int spacing: 0
@@ -163,6 +164,42 @@ Singleton {
 
     readonly property var systray: QtObject {
         readonly property bool enabled: true
+    }
+
+    FileView {
+        id: stateFile
+        path: Quickshell.statePath("state.json")
+        preload: true
+        blockLoading: true
+        atomicWrites: true
+        watchChanges: true
+
+        adapter: JsonAdapter {
+            id: stateAdapter
+            property var hiddenBarSystrayIds: []
+        }
+
+        onAdapterUpdated: writeAdapter()
+        onFileChanged: reload()
+    }
+
+    readonly property var state: QtObject {
+        readonly property var hiddenBarSystrayIds: stateAdapter.hiddenBarSystrayIds
+
+        function isSystrayItemHiddenInBar(id: string): bool {
+            return hiddenBarSystrayIds.indexOf(id) >= 0;
+        }
+
+        function toggleSystrayItemInBar(id: string) {
+            let ids = hiddenBarSystrayIds.slice();
+            const idx = ids.indexOf(id);
+            if (idx >= 0) {
+                ids.splice(idx, 1);
+            } else {
+                ids.push(id);
+            }
+            stateAdapter.hiddenBarSystrayIds = ids;
+        }
     }
 
     function audioIcon(volume, muted) {

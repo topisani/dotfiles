@@ -5,6 +5,9 @@ Requisite=graphical-session.target
 
 [Service]
 Type=exec
-ExecStart=%h/.dotfiles/quickshell/justfile run
+ExecStart=%h/.dotfiles/quickshell/run.sh
 Restart=on-failure
 RestartSec=1
+
+[Install]
+WantedBy=niri.service
