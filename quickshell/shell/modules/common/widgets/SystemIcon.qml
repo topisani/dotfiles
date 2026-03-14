@@ -39,6 +39,7 @@ Item {
 
     IconImage {
         id: image
+        anchors.centerIn: parent
         source: root.sourcePath
         visible: root.isValid
         width: root.size

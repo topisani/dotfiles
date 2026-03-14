@@ -5,11 +5,12 @@ import QtQuick.Layouts
 import Quickshell.Services.SystemTray
 import qs.modules.common.widgets
 import qs.modules.controlcenter
+import qs.modules.common
 
 RowLayout {
     id: root
-    spacing: 10
-    property real size: 20
+    spacing: 5
+    property real size: Config.bar.size;
 
     signal showPopup(Item anchor, var popupContent, var properties)
 
@@ -19,7 +20,7 @@ RowLayout {
         MouseArea {
             id: trayItem
             // implicitWidth: root.size
-            implicitWidth: row.width
+            implicitWidth: root.size
             implicitHeight: root.size
             hoverEnabled: true
             acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
@@ -30,19 +31,11 @@ RowLayout {
 
             visible: item.status != Status.Passive
 
-            RowLayout {
-                id: row
-                // Tray icon
-                SystemIcon {
-                    // anchors.centerIn: parent
-                    size: root.size
-                    source: trayItem.item.icon
-                }
-                // Text {
-                //     text: trayItem.item.tooltipTitle
-                //     color: Config.theme.color.text
-                //     font: Config.bar.font
-                // }
+            // Tray icon
+            SystemIcon {
+                Layout.alignment: Qt.AlignVCenter
+                size: Config.bar.iconSize
+                source: trayItem.item.icon
             }
 
             // Tooltip
@@ -68,7 +61,7 @@ RowLayout {
                     trayItem.item.activate();
                 } else if (mouse.button === Qt.LeftButton) {
                     // menuAnchor.open();
-                    root.showPopup(root, menuContents, {});
+                    root.showPopup(trayItem, menuContents, {});
                 }
             }
 

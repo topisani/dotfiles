@@ -14,11 +14,15 @@ import qs.services
 ShellRoot {
     id: root
     signal showPopup(anchor: Item, widget: var, props: var)
+    signal popupClosed()
     property bool barHidden: false
     property alias ccOpen: cc.shouldShow
 
     BarPopupWindow {
         id: barPopup
+        onPopupOpenChanged: {
+            if (!popupOpen) root.popupClosed();
+        }
         Connections {
             target: root
             function onShowPopup(anchor, widget, props) {
@@ -40,14 +44,19 @@ ShellRoot {
                 hidden: root.barHidden
                 screen: modelData
                 ccOpen: root.ccOpen
-
                 onShowPopup: (anchor, widget, properties) => {
-                    // barPopupLoader.active = widget != null
                     root.showPopup(anchor, widget, properties);
                 }
 
                 onSetCcOpen: (open) => {
                     root.ccOpen = open
+                }
+
+                Connections {
+                    target: root
+                    function onPopupClosed() {
+                        bar.popupOpen = false;
+                    }
                 }
             }
         }

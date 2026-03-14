@@ -42,6 +42,7 @@ Singleton {
     readonly property var bar: QtObject {
         readonly property int size: 20
         readonly property int spacing: 10
+        readonly property real iconSize: 18
         readonly property var font: QtObject {
             readonly property string family: "Monospace"
             // Size in pixels of all fonts. The actual size of fonts in
@@ -49,6 +50,8 @@ Singleton {
             readonly property real pointSize: 10
             readonly property int weight: 500
         }
+        
+        readonly property var systrayItems: []
     }
 
     readonly property var popup: QtObject {

@@ -55,7 +55,8 @@ Singleton {
     // }
     
     readonly property string iconSource: (() =>{
+        return UPower.displayDevice.iconName
                             
-        return `battery-0${Math.round(percentage * 10)}0-${isCharging ? "-charging" : ""}`
+        // return `battery-0${Math.round(percentage * 10)}0-${isCharging ? "-charging" : ""}`
     })()
 }

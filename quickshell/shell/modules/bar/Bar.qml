@@ -26,6 +26,7 @@ Item {
     property bool topLayerShadow: Services.Niri.overviewOpen
     required property var screen
     required property bool ccOpen
+    property bool popupOpen: false
 
     PanelWindow {
         id: bottomLayerWindow
@@ -114,9 +115,39 @@ Item {
         }
     }
 
+    property bool showOverlay: (root.ccOpen || root.popupOpen) && root.showTopLayer
+
+    PanelWindow {
+        id: overlayLayerWindow
+        color: "transparent"
+        WlrLayershell.layer: WlrLayer.Overlay
+        exclusionMode: ExclusionMode.Ignore
+
+        implicitHeight: root.size
+        screen: root.screen
+
+        mask: Region {
+            item: overlayLayerContainer
+        }
+
+        anchors {
+            top: true
+            left: true
+            right: true
+        }
+
+        Rectangle {
+            id: overlayLayerContainer
+            anchors.top: parent.top
+            width: parent.width
+            color: "transparent"
+            height: root.showOverlay ? root.size : 0
+        }
+    }
+
     Rectangle {
         id: barContent
-        parent: root.showTopLayer ? topLayerContainer : bottomLayerContainer
+        parent: root.showOverlay ? overlayLayerContainer : (root.showTopLayer ? topLayerContainer : bottomLayerContainer)
         anchors.fill: parent
         color: root.color
 
@@ -165,7 +196,7 @@ Item {
                     }
                 }
                 TapHandler {
-                    onTapped: root.showPopup(pipewire, audioMixer, {})
+                    onTapped: { root.popupOpen = true; root.showPopup(pipewire, audioMixer, {}); }
                 }
             }
 
@@ -181,7 +212,7 @@ Item {
                     CalendarWidget {}
                 }
                 TapHandler {
-                    onTapped: root.showPopup(dateTime, calendarWidget, {})
+                    onTapped: { root.popupOpen = true; root.showPopup(dateTime, calendarWidget, {}); }
                 }
                 TapHandler {
                     acceptedButtons: Qt.RightButton
@@ -193,9 +224,9 @@ Item {
                 }
             }
 
-            // SystemTrayWidget {
-            //     onShowPopup: (anchor, comp, props) => root.showPopup(anchor, comp, props)
-            // }
+            SystemTrayWidget {
+                onShowPopup: (anchor, comp, props) => { root.popupOpen = true; root.showPopup(anchor, comp, props); }
+            }
             
             BarButton {
                 implicitWidth: root.size

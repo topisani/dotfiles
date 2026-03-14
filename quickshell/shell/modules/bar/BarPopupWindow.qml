@@ -12,6 +12,7 @@ Item {
     id: root
 
     property var parentWindow
+    readonly property bool popupOpen: popup.visible
 
     function showPopup(anchor: Item, widget = null, properties = {}) {
         if (!widget) {
@@ -83,9 +84,9 @@ Item {
             // x: popup.shadowSize
             // y: -popup.shadowSize
 
-            radius: 10
+            radius: 5
             color: Config.cc.backgroundColor
-            margin: 20
+            margin: 10
             implicitHeight: popupLoader.implicitHeight + margin * 2
             implicitWidth: Math.max(popupLoader.implicitWidth + margin * 2, 400)
             border {
