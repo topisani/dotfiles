@@ -224,12 +224,12 @@ update_gtk() {
 }
 
 toggle_gtk_dark() {
-    gtk_theme="adw-gtk3-dark"
-    icon_theme="Adwaita"
+    gtk_theme="Breeze-Dark"
+    icon_theme="breeze-dark"
     color_scheme="prefer-dark"
     if gsettings get org.gnome.desktop.interface color-scheme | grep -qi dark; then
-        gtk_theme="adw-gtk3"
-        icon_theme="Adwaita"
+        gtk_theme="Breeze"
+        icon_theme="breeze"
         color_scheme="prefer-light"
     fi
 

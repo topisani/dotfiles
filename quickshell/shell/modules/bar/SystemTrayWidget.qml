@@ -53,9 +53,13 @@ RowLayout {
 
             // Handle clicks
             onClicked: function (mouse) {
-                if (mouse.button === Qt.RightButton || !trayItem.item.hasMenu) {
+                if (trayItem.item.menuOnly || trayItem.item.id == "nm-applet" || trayItem.item.id == "udiskie") {
+                    root.showPopup(trayItem, menuContents, {});
+                    return
+                }
+                if (mouse.button === Qt.LeftButton) {
                     trayItem.item.activate();
-                } else if (mouse.button === Qt.LeftButton) {
+                } else {
                     // menuAnchor.open();
                     root.showPopup(trayItem, menuContents, {});
                 }

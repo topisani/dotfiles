@@ -77,3 +77,4 @@
 ~/.config/environment.d/ssh_auth_socket.conf;config/environment.d/ssh_auth_socket.conf
 ~/.config/systemd/user/battery-monitor.service;config/systemd/user/battery-monitor.service
 ~/.config/systemd/user/swayidle.service;config/systemd/user/swayidle.service
+~/.config/systemd/user/idle-inhibitor-systray.service;config/systemd/user/idle-inhibitor-systray.service

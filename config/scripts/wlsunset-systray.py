@@ -99,7 +99,7 @@ def update_menu():
     icon.menu = [
         MenuItem(
             "Night Light",
-            toggle_type="checkbox",
+            toggle_type="checkmark",
             toggle_state=1 if enabled else 0,
             on_click=toggle,
         ),

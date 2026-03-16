@@ -146,7 +146,7 @@ class MenuItem:
         self.on_click = on_click
         self.enabled = enabled
         self.icon_name = icon_name
-        self.toggle_type = toggle_type  # "", "checkbox", "radio"
+        self.toggle_type = toggle_type  # "", "checkmark", "radio"
         self.toggle_state = toggle_state  # 0=off, 1=on, -1=indeterminate
         self.children = children or []
         self._id = 0
