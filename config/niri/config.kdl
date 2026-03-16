@@ -397,6 +397,7 @@ gestures {
 }
 
 overview {
+    // zoom 0.8
     backdrop-color "#101014"
 }
 
