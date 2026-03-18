@@ -69,7 +69,7 @@ ColumnLayout {
             required property var modelData
             required property int index
             property var item: modelData
-            visible: item.status != Status.Passive
+            // visible: item.status != Status.Passive
 
             Layout.fillWidth: true
             implicitHeight: rowLayout.implicitHeight + 4

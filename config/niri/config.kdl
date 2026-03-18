@@ -706,6 +706,3 @@ binds {
 
     Mod+Ctrl+Shift+F { toggle-windowed-fullscreen; }
 }
-
-// To run in cosmic session:
-// spawn-at-startup "cosmic-ext-alternative-startup"

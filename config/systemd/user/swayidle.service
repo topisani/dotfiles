@@ -4,5 +4,5 @@ After=graphical-session.target
 Requisite=graphical-session.target
 
 [Service]
-ExecStart=/usr/bin/swayidle -w timeout 601 'niri msg action power-off-monitors' timeout 300 '/home/topisani/.bin/lockscreen' before-sleep '/home/topisani/.bin/lockscreen' timeout 1800 'systemctl suspend'
+ExecStart=%h/.config/scripts/swayidle.sh
 Restart=on-failure

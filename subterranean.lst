@@ -78,3 +78,5 @@
 ~/.config/systemd/user/battery-monitor.service;config/systemd/user/battery-monitor.service
 ~/.config/systemd/user/swayidle.service;config/systemd/user/swayidle.service
 ~/.config/systemd/user/idle-inhibitor-systray.service;config/systemd/user/idle-inhibitor-systray.service
+~/.local/share/applications/kak.desktop;home/local/share/applications/kak.desktop
+~/.config/anyrun;config/anyrun
