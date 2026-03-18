@@ -1,7 +1,11 @@
 #!/bin/bash
-COPY_PROVIDERS="osc52 wl-copy"
 PASTE_PROVIDERS="wl-copy tmux"
 TTY=$( (tty || tty </proc/$PPID/fd/0) 2>/dev/null | grep /dev/)
+if [[ -n "$TTY" ]]; then
+	COPY_PROVIDERS="osc52"
+else
+	COPY_PROVIDERS="wl-copy"
+fi
 
 action=copy
 [ "$1" == paste ] && action=paste && shift
@@ -13,9 +17,13 @@ main() {
 
 	case $action in
 	copy)
-		stdin=$(cat /dev/stdin; echo .)
-		stdin=${stdin%.}
-		buffer=$(echo "$stdin" | base64); 
+		if [[ $# -gt 0 ]]; then
+			stdin=$*
+		else
+			stdin=$(cat /dev/stdin; echo .)
+			stdin=${stdin%.}
+		fi
+		buffer=$(printf %s "$stdin" | base64)
 		for p in $COPY_PROVIDERS; do
 			$p-provider copy && status=0
 		done

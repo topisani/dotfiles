@@ -1,5 +1,13 @@
 # Util functions
 
+define-command -override copy-file-line -docstring "Copy file:line to system clipboard" %{
+  nop %sh{
+    text=$(printf '%s:%s' "$kak_bufname" "$kak_cursor_line")
+    exec clip -- "$text"
+  }
+  echo -markup "{Information}copied %val{bufname}:%val{cursor_line}"
+}
+
 define-command my-file-delete -docstring "Delete current file" -override %{
    prompt "Delete file [Y/n]? " '%sh{ ([ "$kak_text" = "y" ] || [ "$kak_text" = "Y" ])   && rm $kak_buffile && echo "delete-buffer" }'
 }
@@ -96,9 +104,10 @@ map global files c ":my-fzf-config-popup<ret>"                                  
 map global files C ":my-fzf-bundle-popup<ret>"                                       -docstring 'Open plugin dir'
 map global files d ':my-file-delete<ret>'                                            -docstring 'Delete current file'
 map global files r ':my-file-rename<ret>'                                            -docstring 'Rename current file'
-map global files y ':winplace window connect terminal yazi %reg[%]<ret>'             -docstring 'Yazi'
+map global files b ':winplace window connect terminal yazi %reg[%]<ret>'             -docstring 'Yazi'
 map global files h ':winplace popup connect yazi<ret>'                      -docstring 'Yazi'
 map global files g ':winplace popup connect terminal krc-fzf grep<ret>'                       -docstring 'Grep...'
+map global files y ':copy-file-line<ret>' -docstring 'Copy file:line'
 
 map global buffers b ':winplace popup connect terminal krc-fzf buffers<ret>'           -docstring "List Buffers"
 map global buffers n ':buffer-next<ret>'                                               -docstring "Next Buffer"
