@@ -4,19 +4,20 @@ email = "mail@topisani.dev"
 
 [ui]
 default-command = "log"
-pager = ["sh", "-c", "diff-so-fancy | less -RFX"]
+# pager = ["sh", "-c", "diff-so-fancy | less -RFX"]
 
 [templates]
-draft_commit_description = '''
-concat(
-  description,
-  surround(
-    "\nJJ: This commit contains the following changes:\n", "\n",
-    indent("JJ:     ", diff.stat(72)),
-  ),
-  indent("JJ: ", diff.git())
-)
-'''
+# draft_commit_description = '''
+# concat(
+#   description,
+#   surround(
+#     "\nJJ: This commit contains the following changes:\n", "\n",
+#     indent("JJ:     ", diff.stat(72)),
+#   ),
+#   indent("JJ: ", diff.git())
+# )
+# '''
+draft_commit_description = 'builtin_draft_commit_description_with_diff'
 
 [template-aliases]
 'format_short_signature(signature)' = 'signature'
@@ -28,7 +29,7 @@ concat(
 
 [git]
 # Prevent pushing work in progress or anything explicitly labeled "private"
-# private-commits = "description(glob:'wip:*') | description(glob:'private:*')"
+private-commits = "description(glob:'private:*')"
 
 [snapshot]
-auto-track = 'none()'
+# auto-track = 'none()'

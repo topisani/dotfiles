@@ -106,200 +106,120 @@ groups = [
 ]
 
 # devicetree
-[language.devicetree.grammar]
+[grammar.devicetree]
 source = { git = { url = "https://github.com/joelspadin/tree-sitter-devicetree", pin = "877adbfa0174d25894c40fa75ad52d4515a36368" }}
-path = "src"
-compile = "cc"
 compile_args = ["-c", "-fpic", "../parser.c", "-I", ".."]
-compile_flags = ["-O3"]
-link = "cc"
 link_args = ["-shared", "-fpic", "parser.o", "-o", "devicetree.so"]
-link_flags = ["-O3"]
 
 [language.devicetree.queries]
 source = { git = { url = "https://github.com/helix-editor/helix", pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7" }}
 path = "runtime/queries/devicetree"
 
 # just
-[language.just.grammar]
-name = "just"
+[grammar.just]
 source = { git = { url = "https://github.com/IndianBoy42/tree-sitter-just", pin = "4f5d53b52a65771f9695df3f1a294d5c80b916fb" }}
-path = "src"
-compile = "cc"
 compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "../scanner.c", "-I", ".."]
-compile_flags = ["-O3"]
-link = "cc"
 link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "scanner.o", "-o", "just.so"]
-link_flags = ["-O3"]
 
 [language.just.queries]
 source = { git = { url = "https://github.com/IndianBoy42/tree-sitter-just", pin = "4f5d53b52a65771f9695df3f1a294d5c80b916fb" }}
 path = "queries/just"
 
 # kconfig
-# [language.kconfig.grammar]
-# name = "kconfig"
+# [grammar.kconfig]
 # source = { git = { url = "https://github.com/tree-sitter-grammars/tree-sitter-kconfig", pin = "486fea71f61ad9f3fd4072a118402e97fe88d26c" }}
-# path = "src"
-# compile = "cc"
 # compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "../scanner.c", "-I", ".."]
-# compile_flags = ["-O3"]
-# link = "cc"
 # link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "scanner.o", "-o", "kconfig.so"]
-# link_flags = ["-O3"]
 
 # [language.kconfig.queries]
 # source = { git = { url = "https://github.com/tree-sitter-grammars/tree-sitter-kconfig", pin = "486fea71f61ad9f3fd4072a118402e97fe88d26c" }}
 # path = "queries"
 
-# [language.hare.grammar]
-# name = "hare"
+# [grammar.hare]
 # source = { git = { url = "https://github.com/tree-sitter-grammars/tree-sitter-hare", pin = "4af5d82cf9ec39f67cb1db5b7a9269d337406592" }}
-# path = "src"
-# compile = "cc"
 # compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "-I", ".."]
-# compile_flags = ["-O3"]
-# link = "cc"
 # link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "-o", "hare.so"]
-# link_flags = ["-O3"]
 
 # [language.hare.queries]
 # source = { git = { url = "https://github.com/tree-sitter-grammars/tree-sitter-hare", pin = "4af5d82cf9ec39f67cb1db5b7a9269d337406592" }}
 # path = "queries"
 
-[language.templ.grammar]
+[grammar.templ]
 source = { git = { url = "https://github.com/vrischmann/tree-sitter-templ", pin = "58aed18580c476d7bc211f187e7b07a6cd12bb1f" }}
-path = "src"
-compile = "cc"
 compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "../scanner.c", "-I", ".."]
-compile_flags = ["-O3"]
-link = "cc"
 link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "scanner.o", "-o", "templ.so"]
-link_flags = ["-O3"]
 
 [language.templ.queries]
 source = { git = { url = "https://github.com/helix-editor/helix", pin = "b90ec5c77985bd444e7043fe738bb51b396ed496" }}
 path = "runtime/queries/templ"
 
-
-
-[language.kdl.grammar]
+[grammar.kdl]
 source = { git = { url = "https://github.com/amaanq/tree-sitter-kdl", pin = "3ca569b9f9af43593c24f9e7a21f02f43a13bb88" }}
-path = "src"
-compile = "cc"
 compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "../scanner.c", "-I", ".."]
-compile_flags = ["-O3"]
-link = "cc"
 link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "scanner.o", "-o", "kdl.so"]
-link_flags = ["-O3"]
 
 [language.kdl.queries]
 source = { git = { url = "https://github.com/helix-editor/helix", pin = "b90ec5c77985bd444e7043fe738bb51b396ed496" }}
 path = "runtime/queries/kdl"
 
-
-
-[language.surrealdb.grammar]
+[grammar.surrealdb]
 source = { git = { url = "https://github.com/DariusCorvus/tree-sitter-surrealdb", pin = "17a7ed4481bdaaa35a1372f3a94bc851d634a19e" }}
-path = "src"
-compile = "cc"
 compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "-I", ".."]
-compile_flags = ["-O3"]
-link = "cc"
 link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "-o", "surrealdb.so"]
-link_flags = ["-O3"]
 
 [language.surrealdb.queries]
 source = { git = { url = "https://github.com/DariusCorvus/tree-sitter-surrealdb", pin = "17a7ed4481bdaaa35a1372f3a94bc851d634a19e" }}
 path = "queries"
 
-
-
-[language.typst.grammar]
+[grammar.typst]
 source = { git = { url = "https://github.com/uben0/tree-sitter-typst", pin = "46cf4ded12ee974a70bf8457263b67ad7ee0379d" }}
-path = "src"
-compile = "cc"
 compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "../scanner.c", "-I", ".."]
-compile_flags = ["-O3"]
-link = "cc"
 link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "scanner.o", "-o", "typst.so"]
-link_flags = ["-O3"]
 
 [language.typst.queries]
 source = { git = { url = "https://github.com/uben0/tree-sitter-typst", pin = "46cf4ded12ee974a70bf8457263b67ad7ee0379d" }}
 path = "queries/typst"
 
-
-
-[language.openscad.grammar]
+[grammar.openscad]
 source = { git = { url = "https://github.com/openscad/tree-sitter-openscad", pin = "5771b531d5b5f8042b983f7ac31e757831035b1e" }}
-path = "src"
-compile = "cc"
 compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "-I", ".."]
-compile_flags = ["-O3"]
-link = "cc"
 link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "-o", "openscad.so"]
-link_flags = ["-O3"]
 
 [language.openscad.queries]
 source = { git = { url = "https://github.com/openscad/tree-sitter-openscad", pin = "5771b531d5b5f8042b983f7ac31e757831035b1e" }}
 path = "queries"
 
-
-
-[language.beancount.grammar]
+[grammar.beancount]
 source = { git = { url = "https://github.com/polarmutex/tree-sitter-beancount", pin = "b7a2557e6c8cf1dc70a52cece1861522ad3903fc" }}
-path = "src"
-compile = "cc"
 compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "../scanner.c", "-I", ".."]
-compile_flags = ["-O3"]
-link = "cc"
 link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "scanner.o", "-o", "beancount.so"]
-link_flags = ["-O3"]
 
 [language.beancount.queries]
 source = { git = { url = "https://github.com/helix-editor/helix", pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7" }}
 path = "runtime/queries/beancount"
 
-
-[language.slint.grammar]
+[grammar.slint]
 source = { git = { url = "https://github.com/slint-ui/tree-sitter-slint", pin = "927f3e2f0213d0eea7f12c978c81067c3dc4289d" }}
-path = "src"
-compile = "cc"
 compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "-I", ".."]
-compile_flags = ["-O3"]
-link = "cc"
 link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "-o", "slint.so"]
-link_flags = ["-O3"]
 
 [language.slint.queries]
 source = { git = { url = "https://github.com/helix-editor/helix", pin = "e22bbf5489ba95b643b9751038046d736aa92ad1" }}
 path = "runtime/queries/slint"
 
-
-[language.corn.grammar]
+[grammar.corn]
 source = { git = { url = "https://github.com/corn-config/tree-sitter-corn", pin = "464654742cbfd3a3de560aba120998f1d5dfa844" }}
-path = "src"
-compile = "cc"
 compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "-I", ".."]
-compile_flags = ["-O3"]
-link = "cc"
 link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "-o", "corn.so"]
-link_flags = ["-O3"]
 
 [language.corn.queries]
 source = { git = { url = "https://github.com/corn-config/tree-sitter-corn", pin = "464654742cbfd3a3de560aba120998f1d5dfa844" }}
 path = "queries"
 
-[language.ejs.grammar]
+[grammar.ejs]
 source = { git = { url = "https://github.com/tree-sitter/tree-sitter-embedded-template", pin = "3499d85f0a0d937c507a4a65368f2f63772786e1" }}
-path = "src"
-compile = "cc"
 compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "-I", ".."]
-compile_flags = ["-O3"]
-link = "cc"
 link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "-o", "ejs.so"]
-link_flags = ["-O3"]
 
 [language.ejs.queries]
 source = { git = { url = "https://github.com/tree-sitter/tree-sitter-embedded-template", pin = "3499d85f0a0d937c507a4a65368f2f63772786e1" }}

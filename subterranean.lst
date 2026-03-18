@@ -14,7 +14,6 @@
 ~/.xinitrc;home/xinitrc
 ~/.config/zathura;config/zathura
 ~/.config/picom.conf;config/picom.conf
-~/.config/gtk-3.0/gtk.css;config/gtk-3.0/gtk.css
 ~/.config/kitty;config/kitty
 ~/.config/tmux;config/tmux
 ~/.config/colorschemes;config/colorschemes
