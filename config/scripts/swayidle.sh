@@ -5,5 +5,5 @@ swayidle -w \
     timeout 600 'loginctl lock-session' \
     timeout 660 'niri msg action power-off-monitors' \
     timeout 1800 'systemctl suspend' \
-    before-sleep 'loginctl lock-session' \
+    before-sleep '$HOME/.bin/lockscreen' \
     lock "$HOME/.bin/lockscreen" \

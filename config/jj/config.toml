@@ -1,3 +1,5 @@
+"$schema" = 'https://jj-vcs.github.io/jj/prerelease/config-schema.json'
+
 [user]
 name = "Tobias Pisani"
 email = "mail@topisani.dev"
@@ -5,6 +7,10 @@ email = "mail@topisani.dev"
 [ui]
 default-command = "log"
 # pager = ["sh", "-c", "diff-so-fancy | less -RFX"]
+
+[merge-tools.difft]
+program = "difft"
+diff-args = ["--color=always", "$left", "$right"]
 
 [templates]
 # draft_commit_description = '''
@@ -18,9 +24,19 @@ default-command = "log"
 # )
 # '''
 draft_commit_description = 'builtin_draft_commit_description_with_diff'
+log_node = '''
+if(self && !current_working_copy && !immutable && !conflict && in_branch(self),
+  "◇",
+  builtin_log_node
+)
+'''
 
 [template-aliases]
 'format_short_signature(signature)' = 'signature'
+"in_branch(commit)" = 'commit.contained_in("immutable_heads()..bookmarks()")'
+
+[revsets]
+bookmark-advance-to = "@-"
 
 [colors]
 # Highlight hunks with background
@@ -30,6 +46,24 @@ draft_commit_description = 'builtin_draft_commit_description_with_diff'
 [git]
 # Prevent pushing work in progress or anything explicitly labeled "private"
 private-commits = "description(glob:'private:*')"
+track-default-bookmark-on-clone = false
+
+[remotes.origin]
+auto-track-bookmarks = "*"
+auto-track-created-bookmarks = "*"
+
+[remotes.upstream]
+auto-track-bookmarks = "main"
 
 [snapshot]
-# auto-track = 'none()'
+auto-track = 'none()'
+
+[aliases]
+l = ["log", "-r", "ancestors(reachable(@, mutable()), 5)"]
+delta = [
+  '--config=ui.pager=["delta", "--line-numbers", "--navigate", "--side-by-side"]',
+  'diff',
+  '--git',
+]
+
+difft = ["diff", "--tool=difft"]

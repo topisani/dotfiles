@@ -1,18 +1,7 @@
 AddKeysToAgent yes
 SendEnv LANG LC_*
- 
-Host ssh.dev.azure.com
-  IdentitiesOnly yes
-  User git
-  HostkeyAlgorithms +ssh-rsa
-  PubkeyAcceptedAlgorithms +ssh-rsa
-  
-Host umag-as-move
-  Hostname ssh.dev.azure.com
-  IdentitiesOnly yes
-  User git
-  HostkeyAlgorithms +ssh-rsa
-  PubkeyAcceptedAlgorithms +ssh-rsa
+
+Include ~/.ssh/config.d/*
 
 Host gitlab-as-topisani
   HostName gitlab.com
@@ -25,12 +14,3 @@ Host gitlab-as-move
   Hostname gitlab.com
   IdentitiesOnly true
   IdentityFile ~/.ssh/id_rsa.topisani-move
-
-Host git.topisani.com
-  IdentityFile ~/.ssh/id_rsa
-  ProxyCommand cloudflared access ssh --hostname %h
-
-Host pisani-move.move
-  HostName 10.0.5.52
-  IdentitiesOnly true
-  IdentityFile ~/.ssh/id_rsa

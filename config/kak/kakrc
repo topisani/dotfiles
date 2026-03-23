@@ -355,7 +355,7 @@ filetype-assign .*\.eta html
 
 filetype-hook jj-describe %{
   # set window comment_line 'JJ:'
-  # addhl window/comment regex 'JJ:[^\n]*' 0:comment
+  addhl window/comment regex 'JJ:[^\n]*' 0:comment
   set buffer autowrap_column 72
 }
 
