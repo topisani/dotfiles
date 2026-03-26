@@ -21,3 +21,4 @@ model/3mf=orcaslicer.desktop
 model/stl=orcaslicer.desktop
 image/png=org.gnome.Loupe.desktop
 x-scheme-handler/preflight=preFlightURLProtocol.desktop
+x-scheme-handler/claude-cli=claude-code-url-handler.desktop

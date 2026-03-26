@@ -6,6 +6,7 @@ email = "mail@topisani.dev"
 
 [ui]
 default-command = "log"
+diff-editor = ":builtin"
 # pager = ["sh", "-c", "diff-so-fancy | less -RFX"]
 
 [merge-tools.difft]
