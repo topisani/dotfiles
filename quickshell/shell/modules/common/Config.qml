@@ -177,6 +177,7 @@ Singleton {
         adapter: JsonAdapter {
             id: stateAdapter
             property var hiddenBarSystrayIds: []
+            property var systrayBarOrder: [""]
         }
 
         onAdapterUpdated: writeAdapter()
@@ -185,9 +186,13 @@ Singleton {
 
     readonly property var state: QtObject {
         readonly property var hiddenBarSystrayIds: stateAdapter.hiddenBarSystrayIds
+        readonly property var systrayBarOrder: stateAdapter.systrayBarOrder
 
         function isSystrayItemHiddenInBar(id: string): bool {
-            return hiddenBarSystrayIds.indexOf(id) >= 0;
+            if (hiddenBarSystrayIds.indexOf(id) >= 0) return true;
+            // Unknown items inherit "" (Others) visibility
+            if (systrayBarOrder.indexOf(id) < 0 && hiddenBarSystrayIds.indexOf("") >= 0) return true;
+            return false;
         }
 
         function toggleSystrayItemInBar(id: string) {
@@ -199,6 +204,10 @@ Singleton {
                 ids.push(id);
             }
             stateAdapter.hiddenBarSystrayIds = ids;
+        }
+
+        function setSystrayBarOrder(order) {
+            stateAdapter.systrayBarOrder = order;
         }
     }
 
@@ -233,8 +242,8 @@ Singleton {
             return "checkbox"
         }
         if (state == Qt.PartiallyChecked) {
-            return "checkbox-partially-checked"
+            return "draw-half-circle-symbolic"
         }
-        return "box-symbolic"
+        return "draw-circle-symbolic"
     }
 }

@@ -29,7 +29,7 @@ setup::fedora() {
         fd-find
         git-revise
         git-autofixup
-        qalculate
+        qalculate-qt
         bc
         editorconfig
         tig
@@ -37,22 +37,21 @@ setup::fedora() {
         atuin
         eza
         eza-zsh-completion
+        jujutsu
         # GUI tools/utilities
         ghostty-shell-integration
         jetbrainsmono-nerd-fonts
-        waybar
         rofi
         wofi
         dunstify
         udiskie
-        mako
         network-manager-applet
         # GUI Applications
         ghostty
         zathura
         zathura-pdf-mupdf
         zathura-zsh-completion
-        # imv
+        qimgv
         nautilus
         python3-nautilus-open-any-terminal
         openssl-devel
@@ -66,11 +65,10 @@ setup::fedora() {
     echo "priority=1" | sudo tee -a /etc/yum.repos.d/_copr:copr.fedorainfracloud.org:yalter:niri-git.repo
     sudo dnf install niri
 
-    systemctl --user add-wants niri.service battery-notifyd.service
+    systemctl --user add-wants niri.service battery-monitor.service
     systemctl --user add-wants niri.service swayidle.service
     systemctl --user add-wants niri.service swaybg.service
     systemctl --user add-wants niri.service udiskie.service
-    systemctl --user add-wants niri.service waybar.service
     systemctl --user add-wants niri.service xsettingsd.service
 
     # RUST
@@ -81,9 +79,6 @@ setup::fedora() {
     cargo install cargo-binstall
     cargo binstall cargo-update
     cargo install-update -a
-
-    # jj
-    cargo binstall --strategies crate-meta-data jj-cli
 
     sudo dnf install yazi
 
@@ -102,9 +97,9 @@ setup::gui() {
 }
 
 setup::arch() {
-    paru -S --needed git zsh jq zoxide eza jujutsu
-    paru -S --needed diff-so-fancy bat ripgrep fd git-revise git-autofixup libqalculate bc
-    paru -S --needed editorconfig-core-c tig fzf yazi
+    yay -S --needed git zsh jq zoxide eza jujutsu
+    yay -S --needed diff-so-fancy bat ripgrep fd git-revise git-autofixup libqalculate bc
+    yay -S --needed editorconfig-core-c tig fzf yazi
 }
 
 setup::tools() {

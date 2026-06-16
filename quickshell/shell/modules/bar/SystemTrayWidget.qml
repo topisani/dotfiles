@@ -14,12 +14,49 @@ RowLayout {
 
     signal showPopup(Item anchor, var popupContent, var properties)
 
+    // Hidden repeater to access SystemTray items
     Repeater {
+        id: itemRepeater
         model: SystemTray.items
+        Item {
+            required property var modelData
+            property var itemData: modelData
+            visible: false
+        }
+    }
+
+    // Sorted + filtered list of systray item objects
+    property var sortedItems: {
+        void(Config.state.systrayBarOrder);
+        void(Config.state.hiddenBarSystrayIds);
+        void(itemRepeater.count);
+        let order = Config.state.systrayBarOrder;
+        let othersIdx = order.indexOf("");
+        let items = [];
+        for (let i = 0; i < itemRepeater.count; i++) {
+            let d = itemRepeater.itemAt(i);
+            if (!d) continue;
+            let item = d.itemData;
+            if (item.status === Status.Passive) continue;
+            if (Config.state.isSystrayItemHiddenInBar(item.id)) continue;
+            items.push({ obj: item, mi: i });
+        }
+        items.sort((a, b) => {
+            let ai = order.indexOf(a.obj.id);
+            let bi = order.indexOf(b.obj.id);
+            if (ai < 0) ai = othersIdx >= 0 ? othersIdx + 0.5 : 9999;
+            if (bi < 0) bi = othersIdx >= 0 ? othersIdx + 0.5 : 9999;
+            if (ai !== bi) return ai - bi;
+            return a.mi - b.mi;
+        });
+        return items.map(x => x.obj);
+    }
+
+    Repeater {
+        model: root.sortedItems
 
         MouseArea {
             id: trayItem
-            // implicitWidth: root.size
             implicitWidth: root.size
             implicitHeight: root.size
             hoverEnabled: true
@@ -29,11 +66,11 @@ RowLayout {
             required property var modelData
             property var item: modelData
 
-            visible: item.status != Status.Passive && !Config.state.isSystrayItemHiddenInBar(item.id)
+            // visible: item.status != Status.Passive && !Config.state.isSystrayItemHiddenInBar(item.id)
 
             // Tray icon
             SystemIcon {
-                Layout.alignment: Qt.AlignVCenter
+                anchors.centerIn: parent
                 size: Config.bar.iconSize
                 source: trayItem.item.icon
             }
@@ -70,13 +107,6 @@ RowLayout {
                     trayItem.item.scroll(wheel.y, false);
                 }
             }
-
-            // QsMenuAnchor {
-            //     id: menuAnchor
-            //     anchor.item: trayItem
-            //     anchor.edges: Edges.Bottom | Edges.Right
-            //     menu: trayItem.item.menu
-            // }
 
             // Visual feedback on hover
             Rectangle {

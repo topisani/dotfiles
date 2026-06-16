@@ -1,0 +1,58 @@
+#!/bin/sh
+
+usage() {
+	echo "usage: git exclude [-r|-rf] <file>..." >&2
+	exit 1
+}
+
+[ $# -eq 0 ] && usage
+
+remove=0
+force=0
+
+case "$1" in
+	-rf|-fr)
+		remove=1; force=1; shift ;;
+	-r)
+		remove=1; shift ;;
+esac
+
+[ $# -eq 0 ] && usage
+
+if [ "$remove" -eq 1 ]; then
+	for file in "$@"; do
+		result="$(git check-ignore -v "$file" 2>/dev/null)"
+		if [ -z "$result" ]; then
+			echo "git exclude: '$file' is not ignored" >&2
+			continue
+		fi
+
+		# Format: source:linenum:pattern<TAB>pathname
+		info="$(echo "$result" | cut -f1)"
+		source="$(echo "$info" | cut -d: -f1)"
+		linenum="$(echo "$info" | cut -d: -f2)"
+		pattern="$(echo "$info" | cut -d: -f3-)"
+
+		if [ "$force" -eq 0 ]; then
+			printf "Remove '%s' (line %s of %s)? [y/N] " "$pattern" "$linenum" "$source"
+			read -r answer
+			case "$answer" in
+				[yY]*) ;;
+				*) continue ;;
+			esac
+		fi
+
+		sed -i "${linenum}d" "$source"
+		echo "Removed '$pattern' from $source"
+	done
+else
+	exclude_file="$(git rev-parse --git-dir)/info/exclude"
+	toplevel="$(git rev-parse --show-toplevel)"
+
+	mkdir -p "$(dirname "$exclude_file")"
+
+	for file in "$@"; do
+		rel="$(realpath --relative-to="$toplevel" "$file")"
+		echo "/$rel" >> "$exclude_file"
+	done
+fi

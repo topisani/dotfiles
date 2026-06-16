@@ -57,7 +57,7 @@ auto-track-created-bookmarks = "*"
 auto-track-bookmarks = "main"
 
 [snapshot]
-auto-track = 'none()'
+# auto-track = 'none()'
 
 [aliases]
 l = ["log", "-r", "ancestors(reachable(@, mutable()), 5)"]
@@ -68,3 +68,11 @@ delta = [
 ]
 
 difft = ["diff", "--tool=difft"]
+
+notrack = [
+  'util', 'exec', '--', 'bash', '-c',
+  'jj config set --repo snapshot.auto-track "$(jj config get snapshot.auto-track) & ~$0" && jj file untrack $0'
+]
+exclude = [
+  'util', 'exec', '--', 'sh', '-c', 'git-exclude "$0" && jj file untrack "$0"'
+]

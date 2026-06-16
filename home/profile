@@ -67,7 +67,7 @@ export FORGIT_FZF_DEFAULT_OPTS="--reverse"
 
 export POETRY_VIRTUALENVS_IN_PROJECT=true
 
-# export SSH_AUTH_SOCK=/tmp/ssh-agent.$HOST.sock
+export SSH_AUTH_SOCK=${SSH_AUTH_SOCK:-$XDG_RUNTIME_DIR/ssh-agent.socket}
 
 # ssh-add -l 2>/dev/null >/dev/null
 # if [ $? -ge 2 ]; then
@@ -89,3 +89,5 @@ if [ -n "$BASH_VERSION" ]; then
 	. "$HOME/.bashrc"
     fi
 fi
+
+export STM32CubeMX_PATH=/home/topisani/STM32CubeMX

@@ -44,6 +44,11 @@ async def main():
     proxy = system_bus.get_proxy_object(UPOWER_BUS, DISPLAY_DEVICE_PATH, introspection)
     props = proxy.get_interface(PROPS_IFACE)
 
+    # Check if the display device is a battery; if not, exit silently
+    device_type = (await props.call_get(DEVICE_IFACE, "Type")).value
+    if device_type != TYPE_BATTERY:
+        return
+
     # Notifications
     notify_introspection = await session_bus.introspect(NOTIFY_BUS, NOTIFY_PATH)
     notify_proxy = session_bus.get_proxy_object(NOTIFY_BUS, NOTIFY_PATH, notify_introspection)
