@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+# jjsync — drive a remote jj "worker" repo from a thin local client over a
+# metered link. Project-agnostic: operates on the jj repo of the current dir.
+#
+# Topology: the heavy work (e.g. a Claude session) runs on a REMOTE machine that
+# holds a full colocated jj repo. This machine is a thin build/test client. All
+# traffic is locally initiated (the remote may be unable to reach you). jj moves
+# only object deltas, so each sync is tiny.
+#
+# Usage:
+#   jjsync                 interactive: [Enter]=sync  p=push  w=watch  s=status  q=quit
+#   jjsync pull            one-shot: pull the remote's live snapshot, check it out
+#   jjsync push            one-shot: send this client's local change to the remote
+#   jjsync status          show divergence between local @ and the remote tip
+#   jjsync connect [sess]  mosh + attach/create tmux session (default: claude)
+#
+# Config — env vars, or a KEY=VALUE file at "<repo root>/.jjsync" (git-ignore it):
+#   REMOTE_SSH   ssh target of the remote, e.g. user@host           (required)
+#   REMOTE_REPO  absolute path to the repo on the remote            (required)
+#   REMOTE_NAME  jj git remote name for it          (default: derived from host)
+#   INTERVAL     watch-mode pull interval, seconds                  (default: 30)
+#
+# One-time setup on this client (inside the repo):
+#   jj git remote add <REMOTE_NAME> ssh://<host>/<abs path>/.git
+set -uo pipefail
+
+# --- locate the local repo and load per-project config -----------------------
+REPO_ROOT="$(jj root 2>/dev/null)" || { echo "jjsync: not inside a jj repo"; exit 1; }
+[ -f "$REPO_ROOT/.jjsync" ] && . "$REPO_ROOT/.jjsync"
+: "${REMOTE_SSH:?set REMOTE_SSH=user@host (env or $REPO_ROOT/.jjsync)}"
+: "${REMOTE_REPO:?set REMOTE_REPO=/abs/path/to/repo (env or $REPO_ROOT/.jjsync)}"
+REMOTE_NAME="${REMOTE_NAME:-${REMOTE_SSH##*@}}"; REMOTE_NAME="${REMOTE_NAME%%.*}"
+INTERVAL="${INTERVAL:-30}"
+MIRROR="jjsync-build-mirror (auto)"
+cd "$REPO_ROOT" || exit 1
+
+c_dim=$'\e[2m'; c_grn=$'\e[32m'; c_yel=$'\e[33m'; c_red=$'\e[31m'; c_rst=$'\e[0m'
+say()  { printf '%s\n' "$*"; }
+ts()   { date +%H:%M:%S; }
+empty_at() { [ "$(jj log --no-graph -r @ -T 'if(empty, "1", "0")' 2>/dev/null)" = "1" ]; }
+cid()  { jj log --no-graph -r "$1" -T 'change_id.shortest(8)' 2>/dev/null; }
+desc() { jj log --no-graph -r "$1" -T 'description.first_line()' 2>/dev/null; }
+
+# --- remote prepare: snapshot the remote's live work into the `sync` bookmark,
+#     and refresh the jj-tasks anchor if one exists (best-effort) --------------
+remote_prepare() {
+  ssh "$REMOTE_SSH" "REPO='$REMOTE_REPO' bash -s" <<'REMOTE'
+set -uo pipefail
+cd "$REPO" || { echo "remote: repo not found: $REPO" >&2; exit 1; }
+# Any jj command auto-snapshots the working copy first; this captures live edits.
+jj bookmark set sync -r @ -B >/dev/null 2>&1
+ids=$(jj log --no-graph -r 'open_tasks()' -T 'change_id ++ "\n"' 2>/dev/null | awk 'NF')
+if [ -n "$ids" ] && jj bookmark list 2>/dev/null | grep -q '^tasks:'; then
+  # shellcheck disable=SC2086
+  jj rebase -r tasks $(printf -- '-d %s ' $ids) >/dev/null 2>&1 || true
+fi
+printf 'remote: sync=%s\n' "$(jj log --no-graph -r sync -T 'change_id.shortest(8)' 2>/dev/null)"
+REMOTE
+}
+
+pull() {
+  printf '%s[%s] pulling…%s\n' "$c_dim" "$(ts)" "$c_rst"
+  remote_prepare || { say "${c_red}pull: remote prepare failed${c_rst}"; return 1; }
+  jj git fetch --remote "$REMOTE_NAME" >/dev/null 2>&1 \
+    || { say "${c_red}pull: fetch failed (check the '$REMOTE_NAME' remote / connection)${c_rst}"; return 1; }
+  if ! empty_at; then
+    say "${c_yel}local uncommitted work in @ — fetched 'sync' but did NOT switch the checkout.${c_rst}"
+    say "  push it with ${c_grn}p${c_rst}, or build against the remote with: ${c_dim}jj new sync@$REMOTE_NAME${c_rst}"
+    return 0
+  fi
+  jj new "sync@$REMOTE_NAME" -m "$MIRROR" >/dev/null 2>&1 \
+    || { say "${c_red}pull: could not check out sync@$REMOTE_NAME${c_rst}"; return 1; }
+  jj abandon -r "description(exact:\"$MIRROR\") & empty() & ~@" >/dev/null 2>&1 || true
+  say "${c_grn}[$(ts)] synced${c_rst} — building against ${c_dim}$(cid @-) $(desc @-)${c_rst}"
+}
+
+push() {
+  if empty_at; then
+    say "${c_yel}working copy is empty — nothing local to push.${c_rst}"
+    return 0
+  fi
+  jj bookmark set lap -r @ -B >/dev/null 2>&1
+  if ! jj git push --remote "$REMOTE_NAME" --bookmark lap --allow-new >/dev/null 2>&1; then
+    jj git push --remote "$REMOTE_NAME" --bookmark lap --allow-new --allow-private >/dev/null 2>&1 \
+      || { say "${c_red}push failed${c_rst}"; return 1; }
+  fi
+  ssh "$REMOTE_SSH" "cd '$REMOTE_REPO' && jj git import" >/dev/null 2>&1 || true
+  local k; k="$(cid @)"
+  say "${c_grn}pushed${c_rst} local @ (${k}) → remote bookmark 'lap'."
+  say "  on the remote, integrate with: ${c_dim}jj rebase -r $k -d @${c_rst}  (or jj edit $k)"
+}
+
+status() {
+  remote_prepare >/dev/null 2>&1 || true
+  jj git fetch --remote "$REMOTE_NAME" >/dev/null 2>&1 || true
+  say "local @    : $(cid @) $(desc @)"
+  say "remote sync: $(cid "sync@$REMOTE_NAME") $(desc "sync@$REMOTE_NAME")"
+  if jj log --no-graph -r "sync@$REMOTE_NAME ~ ::@" -T '"x"' 2>/dev/null | grep -q x; then
+    say "${c_yel}remote has work you haven't built yet — press Enter / jjsync pull.${c_rst}"
+  else
+    say "${c_grn}up to date.${c_rst}"
+  fi
+}
+
+connect() { exec mosh "$REMOTE_SSH" -- tmux new-session -A -s "${1:-claude}"; }
+
+interactive() {
+  local watch=0
+  say "${c_grn}jjsync${c_rst} → ${REMOTE_SSH}:${REMOTE_REPO}  (remote '${REMOTE_NAME}', watch ${INTERVAL}s)"
+  say "${c_dim}[Enter]=sync  p=push  w=watch  s=status  q=quit${c_rst}"
+  while :; do
+    if [ "$watch" = 1 ]; then
+      pull
+      read -rsn1 -t "$INTERVAL" key && {
+        case "$key" in
+          w|W) watch=0; say "${c_dim}watch off${c_rst}" ;;
+          p|P) push ;; s|S) status ;; q|Q) say bye; exit 0 ;;
+        esac; }
+    else
+      read -rsn1 key && case "$key" in
+        "")  pull ;;
+        p|P) push ;;
+        w|W) watch=1; say "${c_grn}watch on (${INTERVAL}s)${c_rst}" ;;
+        s|S) status ;;
+        q|Q) say bye; exit 0 ;;
+        *)   say "${c_dim}keys: [Enter]=sync  p=push  w=watch  s=status  q=quit${c_rst}" ;;
+      esac
+    fi
+  done
+}
+
+case "${1:-}" in
+  ""|menu)   interactive ;;
+  pull)      pull ;;
+  push)      push ;;
+  status)    status ;;
+  connect)   connect "${2:-}" ;;
+  *)         say "usage: jjsync [pull|push|status|connect [session]]"; exit 2 ;;
+esac

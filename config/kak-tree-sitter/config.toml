@@ -171,14 +171,14 @@ link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "-o", "surrealdb.so"]
 source = { git = { url = "https://github.com/DariusCorvus/tree-sitter-surrealdb", pin = "17a7ed4481bdaaa35a1372f3a94bc851d634a19e" }}
 path = "queries"
 
-[grammar.typst]
-source = { git = { url = "https://github.com/uben0/tree-sitter-typst", pin = "46cf4ded12ee974a70bf8457263b67ad7ee0379d" }}
-compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "../scanner.c", "-I", ".."]
-link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "scanner.o", "-o", "typst.so"]
+# [grammar.typst]
+# source = { git = { url = "https://github.com/uben0/tree-sitter-typst", pin = "46cf4ded12ee974a70bf8457263b67ad7ee0379d" }}
+# compile_args = ["-c", "-fpic", "-flto=auto", "../parser.c", "../scanner.c", "-I", ".."]
+# link_args = ["-shared", "-fpic", "-flto=auto", "parser.o", "scanner.o", "-o", "typst.so"]
 
-[language.typst.queries]
-source = { git = { url = "https://github.com/uben0/tree-sitter-typst", pin = "46cf4ded12ee974a70bf8457263b67ad7ee0379d" }}
-path = "queries/typst"
+# [language.typst.queries]
+# source = { git = { url = "https://github.com/uben0/tree-sitter-typst", pin = "46cf4ded12ee974a70bf8457263b67ad7ee0379d" }}
+# path = "queries/typst"
 
 [grammar.openscad]
 source = { git = { url = "https://github.com/openscad/tree-sitter-openscad", pin = "5771b531d5b5f8042b983f7ac31e757831035b1e" }}

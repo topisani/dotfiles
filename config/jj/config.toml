@@ -36,17 +36,119 @@ if(self && !current_working_copy && !immutable && !conflict && in_branch(self),
 'format_short_signature(signature)' = 'signature'
 "in_branch(commit)" = 'commit.contained_in("immutable_heads()..bookmarks()")'
 
+# --- jj-tasks: a change-based task tracker (see ~/.claude/skills/jj) ---
+# A "task" is any commit carrying a `Task-Status:` trailer. `task_field` reads a
+# trailer value; `task_log` is the one-line board format used by `jj tasks`.
+'task_field(key)' = 'trailers.filter(|t| t.key() == key).map(|t| t.value()).join("")'
+# Per-status color for the `[status]` tag on the board: todo=blue, blocked=red,
+# done=green, epic=purple, everything else (doing/investigating/ready/…)=yellow.
+'task_status_label' = '''
+label(
+  if(description.contains("Task-Status: done"), "task_done",
+    if(description.contains("Task-Status: blocked"), "task_blocked",
+      if(description.contains("Task-Status: todo"), "task_todo",
+        if(description.contains("Task-Status: epic"), "task_epic", "task_doing")))),
+  "[" ++ task_field("Task-Status") ++ "]")
+'''
+# `task_log` — the one-line board format used by `jj tasks`: change id · status ·
+# (priority) · summary · `(needs <id…>)`. The `(needs)` suffix names this task's
+# blockers — its task-parents (parents carrying a Task-Status trailer) — by change
+# id; dependencies are shown textually rather than via nesting. Colored by jj from
+# the [colors] scheme; the change-id prefix highlight is jj's default.
+'task_log' = '''
+separate(" ",
+  format_short_change_id(change_id),
+  task_status_label,
+  if(trailers.contains_key("Priority"), label("task_priority", "(" ++ task_field("Priority") ++ ")")),
+  if(description.contains("Task-Status: done"),
+    label("task_done_dim", description.first_line()),
+    description.first_line()),
+  if(parents.any(|p| p.trailers().contains_key("Task-Status")),
+    label("task_needs",
+      "(needs " ++ parents.filter(|p| p.trailers().contains_key("Task-Status")).map(|p| p.change_id().shortest(8)).join(" ") ++ ")"))
+) ++ "\n"
+'''
+# Editor buffer for `jj todo` (no summary). JJ: lines are stripped on save;
+# uncommenting one (drop the "JJ: ") turns it into an active trailer.
+'task_draft' = '''
+concat(
+  "\n\n",
+  "Task-Status: todo\n",
+  "\n",
+  "JJ: New task — the FIRST line above is the summary shown by `jj tasks`.\n",
+  "JJ: Keep `Task-Status:` — it is the trailer that marks this commit as a task.\n",
+  "JJ:   status: todo | ready | doing | investigating | blocked | done\n",
+  "JJ: Uncomment (remove the \"JJ: \") to set optional fields:\n",
+  "JJ: Priority: P2\n",
+  "JJ: Scope: path/one.ts, path/two.ts\n",
+  "JJ:\n",
+  "JJ: Lines starting with \"JJ:\" are removed; save an empty summary to abort.\n"
+)
+'''
+# `jj taskevo` — emits one machine-parseable RECORD per evolution step for the
+# `taskevo` command alias (the bash wrapper) to format. Four \x1f-separated fields,
+# each record terminated by \x1e:
+#   1 change-id (jj-colored)   2 timestamp   3 "(empty)" or ""   4 full description
+#     (last field, may be multi-line — no \x1f/\x1e in prose, so the wrapper splits
+#     the 3 leading fields and takes the remainder as the description).
+# The wrapper renders the DESCRIPTION trail (one row per checkpoint = distinct
+# consecutive description) and ends with the task's single final diff-stat. It does
+# NOT compute per-checkpoint code diffs: on a heavily-rebased or tangled evolog (two
+# stacked changes interleaved) no per-step method is reliable — interdiff between
+# divergent-parent states shows whole features, cumulative/ summed inter_diffs count
+# transient or split-out edits. The description trail is the dependable signal; the
+# real code change is shown once via `jj diff -r <task>`.
+'taskevo' = '''
+format_short_commit_id(commit.commit_id()) ++ "\x1f" ++
+commit.committer().timestamp().local().format("%Y-%m-%d %H:%M") ++ "\x1f" ++
+if(commit.empty(), "(empty)", "") ++ "\x1f" ++
+commit.description() ++ "\x1e"
+'''
+
+[revset-aliases]
+# jj-tasks: tasks are commits with a `Task-Status:` trailer. Kept off the default
+# log and out of normal pushes (see [revsets].log and [git].private-commits).
+'tasks()' = 'description(substring:"Task-Status:")'
+# Board view: real tasks only (exclude the transport anchor) so the board never
+# shows the octopus-merge sync commit.
+'task_board()' = 'tasks() ~ description(substring:"Task-Status: anchor")'
+# Open tasks = board minus done (so it also excludes the anchor, via task_board()).
+'open_tasks()' = 'task_board() ~ description(substring:"Task-Status: done")'
+
 [revsets]
 bookmark-advance-to = "@-"
+# Hide EMPTY task placeholders from the default `jj log` (todo stubs, the
+# transport anchor — they live off to the side; view with `jj tasks`). Once you
+# `jj edit` a task and write real code, it's non-empty and shows in the log like
+# any other change, even though it still carries a `Task-Status:` trailer. (Using
+# bare `tasks()` here hid every finished/worked task too — including `@`.)
+log = "(present(@) | ancestors(immutable_heads().., 2) | trunk()) ~ (tasks() & empty())"
 
 [colors]
 # Highlight hunks with background
 "diff removed token" = { bg = "#221111", underline = false }
 "diff added token" = { bg = "#002200", underline = false }
+# jj-tasks board status tags (see task_status_label / task_log).
+"task_todo" = "blue"
+"task_blocked" = "bright red"
+"task_doing" = "yellow"
+"task_done" = "green"
+"task_epic" = { fg = "#a371f7", bold = true }
+# Priority (P1/P2/…) tag — distinct from the status label text.
+"task_priority" = "bright black"
+# done tasks: dim/gray the summary text.
+"task_done_dim" = "bright black"
+# `(needs <id…>)` blocker suffix — gray, unobtrusive.
+"task_needs" = "bright black"
 
 [git]
-# Prevent pushing work in progress or anything explicitly labeled "private"
-private-commits = "description(glob:'private:*')"
+# Prevent pushing anything labeled "private", or EMPTY task placeholders (todo
+# stubs + the transport anchor). A finished task that holds real code is non-empty
+# and stays pushable so you can land it onto main. The empty anchor syncs to
+# another machine only via an explicit `--allow-private` push of the `tasks`
+# bookmark (see ~/.claude/skills/jj). (Bare `tasks()` here blocked every finished
+# task from pushing, since it keeps its `Task-Status:` trailer.)
+private-commits = "description(glob:'private:*') | (tasks() & empty())"
 track-default-bookmark-on-clone = false
 
 [remotes.origin]
@@ -61,6 +163,77 @@ auto-track-bookmarks = "main"
 
 [aliases]
 l = ["log", "-r", "ancestors(reachable(@, mutable()), 5)"]
+# jj-tasks board — a flat, reversed (oldest-first) list of tasks, one `task_log`
+# line each. Dependencies are shown textually via task_log's `(needs <id…>)`
+# suffix, not by nesting. Transport anchor excluded (task_board()). Args forward,
+# e.g. `jj tasks -r 'open_tasks()'`.
+tasks = ["log", "-r", "task_board()", "-T", "task_log", "--no-graph", "--reversed"]
+# Create a task: `jj todo "summary"` (off @, Task-Status: todo), or `jj todo`
+# with no summary to open your editor for the description. Refine later with
+# `jj describe <id>` to add Priority:/Scope:.
+todo = ["util", "exec", "--", "bash", "-c", '''
+if [ -n "$1" ]; then
+  jj new --no-edit @ -m "$1" -m "Task-Status: todo"
+else
+  id=$(jj new --no-edit @ -m "Task-Status: todo" 2>&1 | grep -m1 -oE "Created new commit [a-z]+" | awk '{print $4}')
+  if [ -n "$id" ]; then
+    jj describe "$id" --config templates.draft_commit_description=task_draft
+    # abort: no summary was written → discard the empty task
+    jj log -r "$id" --no-graph --no-pager -T 'description.first_line()' 2>/dev/null | grep -qE '^(Task-Status:|$)' \
+      && jj abandon "$id" >/dev/null 2>&1 && echo "jj todo: no summary, task discarded"
+  fi
+fi
+''', "jj-todo"]
+# Inspect a task's evolution / decision trail: `jj taskevo <id>` (defaults to @).
+# Reads one \x1f/\x1e RECORD per step from the `taskevo` template (oldest-first) and
+# renders the DESCRIPTION trail in chronological (evolog) order: one row per
+# checkpoint = a distinct CONSECUTIVE description (trailing whitespace ignored so
+# rebase artifacts merge). Per row: the full description on the first checkpoint,
+# else a `delta` word-diff of the description vs the previous checkpoint. It ends
+# with the task's single real code change — `jj diff -r <task> --stat`. Deliberately
+# NO per-checkpoint code diffs (see the template comment: unreliable on tangled/
+# rebased evologs). `--color=always` keeps jj coloring; `--ignore-working-copy` skips
+# the snapshot; `--no-graph` so records aren't wrapped. NB: trim with
+# `${desc##*[![:space:]]}` — NOT extglob `${x%%*(…)}` (backtracks ~0.5s on big descs).
+taskevo = ["util", "exec", "--", "bash", "-c", '''
+set -u
+id="${1:-@}"
+US=$(printf '\037'); RS=$(printf '\036')
+raw=$(jj --ignore-working-copy evolog -r "$id" --reversed --no-graph --color=always -T taskevo "${@:2}")
+prevdesc=""; first=1
+g_have=0; g_disp=""; g_ts=""; g_empty=""; g_desc=""; g_dkey=""
+flush() {
+  [ "$g_have" = 0 ] && return
+  hdr="$g_disp $g_ts"; [ -n "$g_empty" ] && hdr="$hdr $g_empty"
+  printf '%s\n' "$hdr"
+  if [ "$first" = 1 ]; then
+    printf '%s\n' "$g_desc" | sed 's/^/    /'
+  else
+    git diff --no-index <(printf '%s\n' "$prevdesc") <(printf '%s\n' "$g_desc") 2>/dev/null \
+      | delta --paging=never --file-style=omit --hunk-header-style=omit 2>/dev/null | sed 's/^/    /'
+  fi
+  printf '\n'; prevdesc="$g_desc"; first=0
+}
+while IFS= read -r -d "$RS" rec; do
+  [ -z "$rec" ] && continue
+  disp="${rec%%$US*}";  rec="${rec#*$US}"
+  ts="${rec%%$US*}";    rec="${rec#*$US}"
+  empty="${rec%%$US*}"; desc="${rec#*$US}"
+  tw="${desc##*[![:space:]]}"; dkey="${desc%"$tw"}"
+  if [ "$g_have" = 1 ] && [ "$dkey" = "$g_dkey" ]; then
+    g_disp="$disp"; g_ts="$ts"; g_empty="$empty"; g_desc="$desc"
+  else
+    flush
+    g_have=1; g_disp="$disp"; g_ts="$ts"; g_empty="$empty"; g_desc="$desc"; g_dkey="$dkey"
+  fi
+done <<< "$raw$RS"
+flush
+fstat=$(jj --ignore-working-copy diff -r "$id" --stat --color=always 2>/dev/null)
+fclean=$(printf '%s' "$fstat" | sed -E 's/\x1b\[[0-9;]*m//g')
+case "$fclean" in ""|"0 files changed"*) : ;; *)
+  printf '\033[1m── task diff ──\033[0m\n'; printf '%s\n' "$fstat" ;;
+esac
+''', "jj-taskevo"]
 delta = [
   '--config=ui.pager=["delta", "--line-numbers", "--navigate", "--side-by-side"]',
   'diff',
