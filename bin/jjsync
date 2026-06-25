@@ -7,31 +7,56 @@
 # traffic is locally initiated (the remote may be unable to reach you). jj moves
 # only object deltas, so each sync is tiny.
 #
+# What gets pulled: the remote's WORKTREE revision (its live `@`) plus all tasks.
+# `@` isn't a fetchable ref, so a `sync` bookmark is pointed at it. On a manual
+# `pull`/`status`, remote_publish snapshots the working copy first (captures the
+# latest disk edits — Claude Code edits files without running jj, so the recorded
+# `@` otherwise lags real work and you miss changes). A standard `jj git fetch`
+# then pulls `sync` + the jj-tasks anchor in one shot.
+#
+# Watch mode is event-driven, not polling-the-network: a long-running ssh runs a
+# loop ON the remote that reads `@ | tasks()` via `jj --ignore-working-copy`
+# (cheap, no snapshot — so watch only fires when the remote itself snapshots;
+# press w then Enter to force a fresh snapshotting pull), republishes `sync` via
+# git update-ref (a pure ref write — no jj operation/lock, so it never races the
+# work running on the remote), and prints only when something moves. The laptop
+# fetches only on that signal.
+#
 # Usage:
 #   jjsync                 interactive: [Enter]=sync  p=push  w=watch  s=status  q=quit
-#   jjsync pull            one-shot: pull the remote's live snapshot, check it out
+#   jjsync pull            one-shot: publish + fetch + check out the worktree to build
 #   jjsync push            one-shot: send this client's local change to the remote
-#   jjsync status          show divergence between local @ and the remote tip
+#   jjsync status          show whether the remote worktree is ahead of local @
 #   jjsync connect [sess]  mosh + attach/create tmux session (default: claude)
 #
 # Config — env vars, or a KEY=VALUE file at "<repo root>/.jjsync" (git-ignore it):
-#   REMOTE_SSH   ssh target of the remote, e.g. user@host           (required)
-#   REMOTE_REPO  absolute path to the repo on the remote            (required)
-#   REMOTE_NAME  jj git remote name for it          (default: derived from host)
-#   INTERVAL     watch-mode pull interval, seconds                  (default: 30)
+#   REMOTE_SSH    ssh target of the remote, e.g. user@host          (required)
+#   REMOTE_REPO   repo path AS SEEN where jj runs (inside REMOTE_ENTER) (required)
+#   REMOTE_NAME   jj git remote name for it        (default: derived from host)
+#   REMOTE_ENTER  prefix to run remote jj/tmux in a sandbox,        (default: none)
+#                 e.g. "distrobox enter arch --"
+#   REMOTE_BOOKMARK  bookmark republished at the remote worktree    (default: sync)
+#   WATCH_REVSET  revset whose movement triggers a sync         (default: "@ | tasks()")
+#   POLL          remote-side poll interval, seconds                (default: 3)
+#   INTERVAL      fallback watch interval if streaming fails        (default: 30)
 #
-# One-time setup on this client (inside the repo):
-#   jj git remote add <REMOTE_NAME> ssh://<host>/<abs path>/.git
+# One-time setup on this client (inside the repo). The git remote URL is the
+# host-side path served by the host's git (may differ from REMOTE_REPO when
+# REMOTE_ENTER points jj at a container view of the same files):
+#   jj git remote add <REMOTE_NAME> ssh://<host>/<host-side abs path>/.git
 set -uo pipefail
 
 # --- locate the local repo and load per-project config -----------------------
 REPO_ROOT="$(jj root 2>/dev/null)" || { echo "jjsync: not inside a jj repo"; exit 1; }
 [ -f "$REPO_ROOT/.jjsync" ] && . "$REPO_ROOT/.jjsync"
 : "${REMOTE_SSH:?set REMOTE_SSH=user@host (env or $REPO_ROOT/.jjsync)}"
-: "${REMOTE_REPO:?set REMOTE_REPO=/abs/path/to/repo (env or $REPO_ROOT/.jjsync)}"
+: "${REMOTE_REPO:?set REMOTE_REPO=/abs/path (as seen inside REMOTE_ENTER)}"
 REMOTE_NAME="${REMOTE_NAME:-${REMOTE_SSH##*@}}"; REMOTE_NAME="${REMOTE_NAME%%.*}"
+REMOTE_ENTER="${REMOTE_ENTER:-}"
+REMOTE_BOOKMARK="${REMOTE_BOOKMARK:-sync}"
+WATCH_REVSET="${WATCH_REVSET:-@ | tasks()}"
+POLL="${POLL:-3}"
 INTERVAL="${INTERVAL:-30}"
-MIRROR="jjsync-build-mirror (auto)"
 cd "$REPO_ROOT" || exit 1
 
 c_dim=$'\e[2m'; c_grn=$'\e[32m'; c_yel=$'\e[33m'; c_red=$'\e[31m'; c_rst=$'\e[0m'
@@ -40,38 +65,33 @@ ts()   { date +%H:%M:%S; }
 empty_at() { [ "$(jj log --no-graph -r @ -T 'if(empty, "1", "0")' 2>/dev/null)" = "1" ]; }
 cid()  { jj log --no-graph -r "$1" -T 'change_id.shortest(8)' 2>/dev/null; }
 desc() { jj log --no-graph -r "$1" -T 'description.first_line()' 2>/dev/null; }
+ref()  { echo "${REMOTE_BOOKMARK}@${REMOTE_NAME}"; }
+fetch() { jj git fetch --remote "$REMOTE_NAME" --branch "glob:$REMOTE_BOOKMARK" --branch 'glob:tasks' >/dev/null 2>&1; }   # only the worktree bookmark + tasks anchor
 
-# --- remote prepare: snapshot the remote's live work into the `sync` bookmark,
-#     and refresh the jj-tasks anchor if one exists (best-effort) --------------
-remote_prepare() {
-  ssh "$REMOTE_SSH" "REPO='$REMOTE_REPO' bash -s" <<'REMOTE'
-set -uo pipefail
-cd "$REPO" || { echo "remote: repo not found: $REPO" >&2; exit 1; }
-# Any jj command auto-snapshots the working copy first; this captures live edits.
-jj bookmark set sync -r @ -B >/dev/null 2>&1
-ids=$(jj log --no-graph -r 'open_tasks()' -T 'change_id ++ "\n"' 2>/dev/null | awk 'NF')
-if [ -n "$ids" ] && jj bookmark list 2>/dev/null | grep -q '^tasks:'; then
-  # shellcheck disable=SC2086
-  jj rebase -r tasks $(printf -- '-d %s ' $ids) >/dev/null 2>&1 || true
-fi
-printf 'remote: sync=%s\n' "$(jj log --no-graph -r sync -T 'change_id.shortest(8)' 2>/dev/null)"
-REMOTE
-}
+# run a jj command in the remote repo, inside REMOTE_ENTER (e.g. distrobox)
+remote_jj() { ssh "$REMOTE_SSH" "$REMOTE_ENTER sh -c 'cd \"$REMOTE_REPO\" && $1'"; }
+# publish the remote worktree to the bookmark, snapshotting the working copy
+# first (NO --ignore-working-copy) so completed-but-unsnapshotted disk edits get
+# captured — otherwise `sync` lags real work and the laptop misses changes.
+remote_publish() { remote_jj "jj bookmark set $REMOTE_BOOKMARK -r @ -B" >/dev/null 2>&1; }
 
-pull() {
-  printf '%s[%s] pulling…%s\n' "$c_dim" "$(ts)" "$c_rst"
-  remote_prepare || { say "${c_red}pull: remote prepare failed${c_rst}"; return 1; }
-  jj git fetch --remote "$REMOTE_NAME" >/dev/null 2>&1 \
-    || { say "${c_red}pull: fetch failed (check the '$REMOTE_NAME' remote / connection)${c_rst}"; return 1; }
+# fetch + check out the published worktree (assumes the bookmark is current)
+sync_local() {
+  fetch || { say "${c_red}fetch failed (check the '$REMOTE_NAME' remote / connection)${c_rst}"; return 1; }
   if ! empty_at; then
-    say "${c_yel}local uncommitted work in @ — fetched 'sync' but did NOT switch the checkout.${c_rst}"
-    say "  push it with ${c_grn}p${c_rst}, or build against the remote with: ${c_dim}jj new sync@$REMOTE_NAME${c_rst}"
+    say "${c_yel}local work in @ — fetched but did NOT switch the checkout.${c_rst}"
+    say "  push it with ${c_grn}p${c_rst}, or build the remote with: ${c_dim}jj new $(ref)${c_rst}"
     return 0
   fi
-  jj new "sync@$REMOTE_NAME" -m "$MIRROR" >/dev/null 2>&1 \
-    || { say "${c_red}pull: could not check out sync@$REMOTE_NAME${c_rst}"; return 1; }
-  jj abandon -r "description(exact:\"$MIRROR\") & empty() & ~@" >/dev/null 2>&1 || true
+  # an empty, undescribed working copy is auto-abandoned by jj when we move off it
+  jj new "$(ref)" >/dev/null 2>&1 || { say "${c_red}pull: could not check out $(ref)${c_rst}"; return 1; }
   say "${c_grn}[$(ts)] synced${c_rst} — building against ${c_dim}$(cid @-) $(desc @-)${c_rst}"
+}
+
+pull() {   # manual: publish first (no watcher running to do it), then sync
+  printf '%s[%s] pulling…%s\n' "$c_dim" "$(ts)" "$c_rst"
+  remote_publish || { say "${c_red}pull: could not reach the remote${c_rst}"; return 1; }
+  sync_local
 }
 
 push() {
@@ -80,54 +100,118 @@ push() {
     return 0
   fi
   jj bookmark set lap -r @ -B >/dev/null 2>&1
-  if ! jj git push --remote "$REMOTE_NAME" --bookmark lap --allow-new >/dev/null 2>&1; then
-    jj git push --remote "$REMOTE_NAME" --bookmark lap --allow-new --allow-private >/dev/null 2>&1 \
-      || { say "${c_red}push failed${c_rst}"; return 1; }
+  local out
+  if ! out="$(jj git push --remote "$REMOTE_NAME" --bookmark lap --allow-private --allow-empty-description 2>&1)"; then
+    say "${c_red}push failed:${c_rst}"; say "$out"; return 1
   fi
-  ssh "$REMOTE_SSH" "cd '$REMOTE_REPO' && jj git import" >/dev/null 2>&1 || true
   local k; k="$(cid @)"
   say "${c_grn}pushed${c_rst} local @ (${k}) → remote bookmark 'lap'."
-  say "  on the remote, integrate with: ${c_dim}jj rebase -r $k -d @${c_rst}  (or jj edit $k)"
+  say "  on the desktop: ${c_dim}jj rebase -r lap -d @${c_rst}  (jj auto-imports the ref on its next command)"
 }
 
 status() {
-  remote_prepare >/dev/null 2>&1 || true
-  jj git fetch --remote "$REMOTE_NAME" >/dev/null 2>&1 || true
-  say "local @    : $(cid @) $(desc @)"
-  say "remote sync: $(cid "sync@$REMOTE_NAME") $(desc "sync@$REMOTE_NAME")"
-  if jj log --no-graph -r "sync@$REMOTE_NAME ~ ::@" -T '"x"' 2>/dev/null | grep -q x; then
-    say "${c_yel}remote has work you haven't built yet — press Enter / jjsync pull.${c_rst}"
+  remote_publish || true
+  fetch || true
+  say "local @     : $(cid @) $(desc @)"
+  say "remote work : $(cid "$(ref)") $(desc "$(ref)")"
+  if jj log --no-graph -r "$(ref) ~ ::@" -T '"x"' 2>/dev/null | grep -q x; then
+    say "${c_yel}remote is ahead — press Enter / jjsync pull.${c_rst}"
   else
     say "${c_grn}up to date.${c_rst}"
   fi
 }
 
-connect() { exec mosh "$REMOTE_SSH" -- tmux new-session -A -s "${1:-claude}"; }
-
-interactive() {
-  local watch=0
-  say "${c_grn}jjsync${c_rst} → ${REMOTE_SSH}:${REMOTE_REPO}  (remote '${REMOTE_NAME}', watch ${INTERVAL}s)"
-  say "${c_dim}[Enter]=sync  p=push  w=watch  s=status  q=quit${c_rst}"
+# Event-driven watch: a remote loop reads WATCH_REVSET via --ignore-working-copy
+# (no snapshot, read-only), republishes the worktree ref with git update-ref (no
+# jj operation/lock — see the heredoc), and prints CHANGE on any move. The laptop
+# fetches only on CHANGE. Returns to the menu on w; caller handles q.
+watch_loop() {
+  local line
+  coproc WATCH { ssh "$REMOTE_SSH" "$REMOTE_ENTER sh -s -- '$REMOTE_REPO' '$POLL' '$WATCH_REVSET' '$REMOTE_BOOKMARK'" <<'RWATCH' 2>/dev/null
+cd "$1" || exit 1
+# Exit the instant a write to the pipe fails: that pipe is our only liveness
+# signal. When local ssh dies (w/q/quit/dropped link) this loop is otherwise
+# orphaned (esp. under REMOTE_ENTER's container indirection) and polls forever.
+# The periodic PING below thus doubles as a dead-pipe detector — the watcher
+# self-terminates within ~5*POLL seconds of the client going away.
+last=""; i=0
+while :; do
+  cur=$(jj --ignore-working-copy log --no-graph -r "$3" -T 'commit_id ++ "\n"' 2>/dev/null)
+  if [ "$cur" != "$last" ]; then
+    # Publish @ with plain git, NOT `jj bookmark set`: git update-ref touches
+    # only the ref store, so it records no jj operation, takes no jj op-heads
+    # lock, and doesn't move @ — it can't race / lock-fight / concurrent-op the
+    # work happening on this repo, and can't self-retrigger this loop. (Colocated
+    # repo: the laptop's `jj git fetch glob:sync` reads this same ref. Like the
+    # old --ignore-working-copy publish, this ships the last snapshot, not fresh
+    # disk edits; press w then Enter for a snapshotting pull.)
+    at=$(jj --ignore-working-copy log --no-graph -r @ -T 'commit_id' 2>/dev/null)
+    [ -n "$at" ] && git update-ref "refs/heads/$4" "$at" 2>/dev/null
+    printf 'CHANGE\n' || exit 0; last=$cur
+  fi
+  i=$((i+1)); [ $((i % 5)) -eq 0 ] && { printf 'PING\n' || exit 0; }
+  sleep "$2"
+done
+RWATCH
+  }
+  if [ -z "${WATCH_PID:-}" ]; then
+    say "${c_yel}watch: couldn't start remote stream — using ${INTERVAL}s polling.${c_rst}"; watch_interval; return
+  fi
+  say "${c_grn}watch on${c_rst} ${c_dim}(remote-polled; syncs only when ${WATCH_REVSET} moves — w=stop p=push s=status q=quit)${c_rst}"
+  local wpid="$WATCH_PID"
   while :; do
-    if [ "$watch" = 1 ]; then
-      pull
-      read -rsn1 -t "$INTERVAL" key && {
-        case "$key" in
-          w|W) watch=0; say "${c_dim}watch off${c_rst}" ;;
-          p|P) push ;; s|S) status ;; q|Q) say bye; exit 0 ;;
-        esac; }
-    else
-      read -rsn1 key && case "$key" in
-        "")  pull ;;
+    if read -t 0.4 -u "${WATCH[0]}" line 2>/dev/null; then
+      [ "$line" = CHANGE ] && sync_local      # PING ignored; bookmark already published remotely
+    elif ! kill -0 "$wpid" 2>/dev/null; then
+      say "${c_yel}watch: remote stream closed.${c_rst}"; break
+    fi
+    if read -rsn1 -t 0.4 key 2>/dev/null; then
+      case "$key" in
+        w|W) break ;;
+        q|Q) kill "$wpid" 2>/dev/null; say bye; exit 0 ;;
         p|P) push ;;
-        w|W) watch=1; say "${c_grn}watch on (${INTERVAL}s)${c_rst}" ;;
         s|S) status ;;
-        q|Q) say bye; exit 0 ;;
-        *)   say "${c_dim}keys: [Enter]=sync  p=push  w=watch  s=status  q=quit${c_rst}" ;;
       esac
     fi
   done
+  kill "$wpid" 2>/dev/null
+  say "${c_dim}watch off${c_rst}"
 }
+
+# fallback: plain interval polling (publish + full fetch each tick)
+watch_interval() {
+  say "${c_grn}watch on${c_rst} ${c_dim}(${INTERVAL}s interval — w=stop p=push s=status q=quit)${c_rst}"
+  while :; do
+    pull
+    read -rsn1 -t "$INTERVAL" key && case "$key" in
+      w|W) break ;;
+      q|Q) say bye; exit 0 ;;
+      p|P) push ;;
+      s|S) status ;;
+    esac
+  done
+  say "${c_dim}watch off${c_rst}"
+}
+
+connect() { exec mosh "$REMOTE_SSH" -- $REMOTE_ENTER tmux new-session -A -s "${1:-claude}"; }
+
+interactive() {
+  say "${c_grn}jjsync${c_rst} → ${REMOTE_SSH} (${REMOTE_NAME}, worktree→${REMOTE_BOOKMARK})"
+  say "${c_dim}[Enter]=sync  p=push  w=watch  s=status  q=quit${c_rst}"
+  while :; do
+    read -rsn1 key && case "$key" in
+      "")  pull ;;
+      p|P) push ;;
+      w|W) watch_loop ;;
+      s|S) status ;;
+      q|Q) say bye; exit 0 ;;
+      *)   say "${c_dim}keys: [Enter]=sync  p=push  w=watch  s=status  q=quit${c_rst}" ;;
+    esac
+  done
+}
+
+cleanup() { [ -n "${WATCH_PID:-}" ] && kill "$WATCH_PID" 2>/dev/null; }
+trap cleanup EXIT INT TERM
 
 case "${1:-}" in
   ""|menu)   interactive ;;

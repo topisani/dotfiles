@@ -74,7 +74,6 @@ separate(" ",
 concat(
   "\n\n",
   "Task-Status: todo\n",
-  "\n",
   "JJ: New task — the FIRST line above is the summary shown by `jj tasks`.\n",
   "JJ: Keep `Task-Status:` — it is the trailer that marks this commit as a task.\n",
   "JJ:   status: todo | ready | doing | investigating | blocked | done\n",

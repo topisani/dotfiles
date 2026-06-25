@@ -153,6 +153,8 @@ Task-Status: todo        # todo | ready | doing | investigating | blocked | done
 Priority: P2             # optional
 Scope: path/a, path/b    # optional pointer for whoever picks it up
 ```
+NB: trailers cannot have empty lines between them.
+
 The **change id is the task id** — stable across rewrites and portable across
 machines (written into the git commit header). Don't invent a separate numbering
 (`#42`) — there's nothing to cross-reference; the change id *is* the handle.

@@ -1,0 +1,6 @@
+[ui.colors]
+selected = { fg = "bright white", bg = "233" }
+"revisions details selected" = { bg = "233" }
+"revisions details selected dimmed" = { fg = "bright cyan" }
+"picker selected" = { fg = "bright white", bg = "233" }
+"revset completion selected" = { bg = "233" }

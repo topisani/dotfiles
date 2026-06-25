@@ -359,6 +359,10 @@ filetype-hook jj-describe %{
   set buffer autowrap_column 72
 }
 
+filetype-hook markdown %{
+  add-highlighter window/ wrap -word -width 100
+}
+
 filetype-hook typst %{
   set window comment_line '//'
   set window comment_block_begin '/*'

@@ -78,6 +78,16 @@ map global git <ret> %{:git blame-jump<ret>} -docstring "jump"
 map global git-blame b %{:git-blame-current-line<ret>} -docstring "blame popup"
 map global git-blame <ret> %{:git blame-jump<ret>} -docstring "jump"
 
+set-face global jjChangeId magenta+b
+set-face global jjCommitId blue+b
+
+define-command -hidden -override jj-describe-show %{
+  evaluate-commands -draft %{
+    execute-keys '<a-i>w'
+    jj show %val{selection}
+  }
+}
+
 filetype-hook jj-describe %{
   add-highlighter window/jj-describe regions
   add-highlighter window/jj-describe/diff region "^diff --git [^\n]*"  "^\n" group
@@ -90,6 +100,15 @@ filetype-hook jj-describe %{
   add-highlighter window/jj-describe/diff/ regex "^\+[^\n]*?(\h+)\n" 1:default,red
 
   add-highlighter window/jj-describe/comment region "^JJ: " "$" fill comment
+
+  # Highlight change ids (reverse-hex k-z) and commit hashes (hex) on top of the regions
+  add-highlighter window/jj-change-id regex "\b[k-z]{8,}\b" 0:jjChangeId
+  add-highlighter window/jj-commit-id regex "\b[0-9a-f]{8,40}\b" 0:jjCommitId
+
+  add-highlighter window/ wrap -word -width 100
+
+  # Press <ret> on a change id / commit hash to jj show it
+  map buffer normal <ret> ': jj-describe-show<ret>'
 }
 
 declare-user-mode jj
