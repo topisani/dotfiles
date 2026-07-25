@@ -1,0 +1,910 @@
+#!/usr/bin/env bash
+# jt — a task tracker built on jj changes.
+#
+# A task is any change whose description ends with a trailer block containing
+# `Task-Status:`. The change id is the task id. Blockers are parent edges.
+#
+# Unlike a pure-revset board, status is parsed from the *trailer block* (the
+# last paragraph of key: value lines) rather than substring-matched against the
+# whole description — so a task that merely mentions "Task-Status: done" in its
+# body is not silently misfiled. The revset is only a coarse prefilter.
+
+set -euo pipefail
+
+TASKS='description(substring:"Task-Status:")'
+STATUSES="todo ready doing investigating blocked done"
+
+if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
+  c_id=$'\e[33m'; c_todo=$'\e[34m'; c_doing=$'\e[32m'; c_blocked=$'\e[31m'
+  c_done=$'\e[90m'; c_inv=$'\e[35m'; c_prio=$'\e[35m'; c_needs=$'\e[36m'; c_off=$'\e[0m'
+else
+  c_id=; c_todo=; c_doing=; c_blocked=; c_done=; c_inv=; c_prio=; c_needs=; c_off=
+fi
+
+die() { printf 'jt: %s\n' "$*" >&2; exit 1; }
+
+# ---------------------------------------------------------------- awk library
+
+read -r -d '' AWKLIB <<'AWKEOF' || true
+# Decode a JSON string literal (including surrounding quotes). jj's json() does
+# not escape non-ASCII, so \uXXXX handling is a fallback we rarely hit.
+function unesc(s,   out, i, c, n, L) {
+  s = substr(s, 2, length(s) - 2)
+  L = length(s); out = ""
+  for (i = 1; i <= L; i++) {
+    c = substr(s, i, 1)
+    if (c != "\\") { out = out c; continue }
+    i++; n = substr(s, i, 1)
+    if (n == "n") out = out "\n"
+    else if (n == "t") out = out "\t"
+    else if (n == "r") out = out "\r"
+    else if (n == "b") out = out "\b"
+    else if (n == "f") out = out "\f"
+    else if (n == "u") { out = out "?"; i += 4 }
+    else out = out n
+  }
+  return out
+}
+
+function jesc(s,   out) {
+  out = s
+  gsub(/\\/, "\\\\", out); gsub(/"/, "\\\"", out)
+  gsub(/\n/, "\\n", out);  gsub(/\t/, "\\t", out)
+  gsub(/\r/, "\\r", out)
+  return out
+}
+
+# Split desc into L[1..n]; find the trailer block; fill T[lowerkey]=value and
+# ORDER[1..oc] with original key names. Returns the 1-based index of the first
+# trailer line, or 0 if the description has no trailer block.
+function parse(desc, L, T, ORDER,   n, i, start, ok, p, k, v, oc) {
+  n = split(desc, L, "\n")
+  while (n > 0 && L[n] ~ /^[ \t]*$/) n--
+  if (n == 0) return 0
+  start = n
+  while (start > 1 && L[start - 1] !~ /^[ \t]*$/) start--
+  for (i = start; i <= n; i++)
+    if (L[i] !~ /^[A-Za-z][A-Za-z0-9-]*:[ \t]/) return 0
+  oc = 0
+  for (i = start; i <= n; i++) {
+    p = index(L[i], ":")
+    k = substr(L[i], 1, p - 1)
+    v = substr(L[i], p + 1)
+    sub(/^[ \t]+/, "", v); sub(/[ \t]+$/, "", v)
+    T[tolower(k)] = v
+    ORDER[++oc] = k
+  }
+  ORDER[0] = oc
+  return start
+}
+
+# Body = everything before the trailer block, trailing blanks trimmed.
+function body_of(L, start,   i, out, last) {
+  last = start - 1
+  while (last > 0 && L[last] ~ /^[ \t]*$/) last--
+  out = ""
+  for (i = 1; i <= last; i++) out = out (i > 1 ? "\n" : "") L[i]
+  return out
+}
+AWKEOF
+
+# ------------------------------------------------------------------ jj access
+
+# Emit one record per task: id \t parents \t empty \t json(description)
+raw() {
+  local rev="${1:-$TASKS}"
+  jj log -r "$rev" --no-graph --reversed --ignore-working-copy -T \
+    'change_id.shortest(8) ++ "\t" ++ parents.map(|p| p.change_id().shortest(8)).join(" ") ++ "\t" ++ if(empty,"1","0") ++ "\t" ++ json(description) ++ "\n"'
+}
+
+worktip() {
+  jj log -r "heads(::@ ~ ($TASKS))" --no-graph --ignore-working-copy \
+    -T 'change_id.shortest(8)' | head -n1
+}
+
+# Resolve a user-supplied id or search term to exactly one task id.
+resolve() {
+  local q="$1" hits
+  hits=$(raw | awk -F'\t' -v AWKQ="$q" "$AWKLIB"'
+    { id = $1; d = unesc(substr($0, index($0, "\"")))
+      split(d, L, "\n")
+      if (id ~ "^" AWKQ || tolower(L[1]) ~ tolower(AWKQ)) print id }')
+  [[ -z "$hits" ]] && die "no task matches '$q'"
+  [[ $(wc -l <<<"$hits") -gt 1 ]] && die "'$q' is ambiguous:"$'\n'"$hits"
+  printf '%s' "$hits"
+}
+
+desc_of() { jj log -r "$1" --no-graph --ignore-working-copy -T 'description'; }
+
+# ------------------------------------------------------------------- commands
+
+cmd_list() {
+  local all=0
+  [[ "${1:-}" == "-a" || "${1:-}" == "--all" ]] && all=1
+  raw | awk -F'\t' -v all="$all" -v c_id="$c_id" -v c_todo="$c_todo" -v c_doing="$c_doing" \
+            -v c_blocked="$c_blocked" -v c_done="$c_done" -v c_inv="$c_inv" \
+            -v c_prio="$c_prio" -v c_needs="$c_needs" -v c_off="$c_off" \
+    "$AWKLIB"'
+    {
+      id = $1; par = $2
+      d = unesc(substr($0, index($0, "\"")))
+      delete L; delete T; delete O
+      if (parse(d, L, T, O) == 0) next          # has the substring but no trailer block
+      if (!("task-status" in T)) next
+      n++; ID[n] = id; PAR[n] = par
+      ST[id] = T["task-status"]; PR[id] = T["priority"]; SUM[id] = L[1]
+    }
+    END {
+      # Priority order, preserving graph order within a priority. Graph order
+      # alone is unstable: rewriting a task bumps its commit time.
+      for (i = 1; i <= n; i++) { p = PR[ID[i]]; PSET[(p == "" ? "~" : p)] = 1 }
+      m = asorti(PSET, PKEY)
+      for (k = 1; k <= m; k++) for (i = 1; i <= n; i++) {
+        id = ID[i]
+        p = PR[id]; if (p == "") p = "~"
+        if (p != PKEY[k]) continue
+        if (!all && ST[id] == "done") continue
+        needs = ""
+        split(PAR[i], ps, " ")
+        for (j in ps) if (ps[j] in ST && ST[ps[j]] != "done")
+          needs = needs (needs ? " " : "") ps[j]
+        col = ST[id] == "doing" ? c_doing : ST[id] == "blocked" ? c_blocked : \
+              ST[id] == "done" ? c_done : ST[id] == "investigating" ? c_inv : c_todo
+        line = c_id id c_off " " col "[" ST[id] "]" c_off
+        if (PR[id]) line = line " " c_prio "(" PR[id] ")" c_off
+        line = line " " (ST[id] == "done" ? c_done SUM[id] c_off : SUM[id])
+        if (needs) line = line " " c_needs "(needs " needs ")" c_off
+        print line; shown++
+      }
+      if (!shown) print "no open tasks"
+    }'
+}
+
+cmd_json() {
+  local all=0
+  [[ "${1:-}" == "-a" || "${1:-}" == "--all" ]] && all=1
+  raw | awk -F'\t' -v all="$all" "$AWKLIB"'
+    {
+      id = $1; par = $2; empty = $3
+      d = unesc(substr($0, index($0, "\"")))
+      delete L; delete T; delete O
+      start = parse(d, L, T, O)
+      if (start == 0 || !("task-status" in T)) next
+      n++; ID[n] = id; PAR[n] = par; EM[id] = empty
+      ST[id] = T["task-status"]; PR[id] = T["priority"]
+      SC[id] = T["scope"]; SUM[id] = L[1]
+      last = start - 1
+      while (last > 0 && L[last] ~ /^[ \t]*$/) last--
+      s = 2; while (s <= last && L[s] ~ /^[ \t]*$/) s++
+      b = ""
+      for (i = s; i <= last; i++) b = b (i > s ? "\n" : "") L[i]
+      BODY[id] = b
+    }
+    END {
+      for (i = 1; i <= n; i++) {
+        id = ID[i]
+        if (!all && ST[id] == "done") continue
+        needs = ""
+        split(PAR[i], ps, " ")
+        for (j in ps) if (ps[j] in ST && ST[ps[j]] != "done")
+          needs = needs (needs ? " " : "") ps[j]
+        ready = (needs == "" && (ST[id] == "todo" || ST[id] == "ready")) ? "true" : "false"
+        printf "{\"id\":\"%s\",\"status\":\"%s\",\"priority\":\"%s\",\"scope\":\"%s\"," \
+               "\"summary\":\"%s\",\"needs\":\"%s\",\"ready\":%s,\"empty\":%s,\"body\":\"%s\"}\n", \
+               id, jesc(ST[id]), jesc(PR[id]), jesc(SC[id]), jesc(SUM[id]), needs, \
+               ready, (EM[id] == "1" ? "true" : "false"), jesc(BODY[id])
+      }
+    }'
+}
+
+cmd_show() {
+  local id; id=$(resolve "${1:?usage: jt show <id>}")
+  printf '%s%s%s\n\n' "$c_id" "$id" "$c_off"
+  desc_of "$id"
+}
+
+# Rewrite the trailer block. Args: id key=val...
+cmd_set() {
+  local id; id=$(resolve "${1:?usage: jt set <id> key=val...}"); shift
+  [[ $# -eq 0 ]] && die "nothing to set"
+  local kvs=()
+  for kv in "$@"; do
+    [[ "$kv" != *=* ]] && die "expected key=value, got '$kv'"
+    local k="${kv%%=*}" v="${kv#*=}"
+    case "${k,,}" in
+      status|task-status) k="Task-Status"
+        [[ " $STATUSES " == *" $v "* ]] || die "status must be one of: $STATUSES" ;;
+      priority|prio) k="Priority" ;;
+      scope) k="Scope" ;;
+    esac
+    kvs+=("$k=$v")
+  done
+  desc_of "$id" | awk -v kvspec="$(printf '%s\n' "${kvs[@]}")" "$AWKLIB"'
+    { d = d (NR > 1 ? "\n" : "") $0 }
+    END {
+      start = parse(d, L, T, O)
+      if (start == 0) { body = d; O[0] = 0 } else body = body_of(L, start)
+      nk = split(kvspec, KV, "\n")
+      for (i = 1; i <= nk; i++) {
+        if (KV[i] == "") continue
+        p = index(KV[i], "="); k = substr(KV[i], 1, p-1); v = substr(KV[i], p+1)
+        if (!(tolower(k) in T)) { O[0]++; O[O[0]] = k }
+        T[tolower(k)] = v
+        CASE[tolower(k)] = k
+      }
+      printf "%s\n\n", body
+      seen["task-status"] = seen["priority"] = seen["scope"] = 0
+      for (i = 1; i <= O[0]; i++) {
+        lk = tolower(O[i]); if (done_[lk]++) continue
+        if (T[lk] == "") continue
+        k = (lk in CASE) ? CASE[lk] : O[i]
+        printf "%s: %s\n", k, T[lk]
+      }
+    }' | jj describe "$id" --stdin --quiet
+  printf 'jt: %s updated\n' "$id"
+}
+
+cmd_new() {
+  local summary="" prio="" scope="" parents=() body=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -p|--priority) prio="$2"; shift 2 ;;
+      -s|--scope)    scope="$2"; shift 2 ;;
+      -b|--blocked-by) parents+=("$(resolve "$2")"); shift 2 ;;
+      --parent)      parents+=("$2"); shift 2 ;;
+      --body)        body="$2"; shift 2 ;;
+      -*) die "unknown flag $1" ;;
+      *) summary="${summary:+$summary }$1"; shift ;;
+    esac
+  done
+  [[ -z "$summary" ]] && die "usage: jt new <summary> [-p P1] [-s scope] [-b blocker]"
+  [[ ${#parents[@]} -eq 0 ]] && parents=("$(worktip)")
+  local trailers="Task-Status: todo"
+  [[ -n "$prio"  ]] && trailers="$trailers"$'\n'"Priority: $prio"
+  [[ -n "$scope" ]] && trailers="$trailers"$'\n'"Scope: $scope"
+  local args=(new "${parents[@]}" --no-edit -m "$summary")
+  [[ -n "$body" ]] && args+=(-m "$body")
+  args+=(-m "$trailers")
+  local out id
+  out=$(jj "${args[@]}" 2>&1)
+  id=$(grep -oE 'Created new commit [a-z]+' <<<"$out" | head -n1 | awk '{print $4}')
+  [[ -z "$id" ]] && { printf '%s\n' "$out" >&2; die "could not determine new task id"; }
+  printf '%s%s%s %s\n' "$c_id" "$id" "$c_off" "$summary"
+}
+
+cmd_start() {
+  local id; id=$(resolve "${1:?usage: jt start <id>}")
+  local tip; tip=$(worktip)
+  local cur; cur=$(jj log -r "$id-" --no-graph --ignore-working-copy -T 'change_id.shortest(8)' | head -n1)
+  if [[ "$cur" != "$tip" && "$id" != "$tip" ]]; then
+    if jj rebase -r "$id" -d "$tip" --quiet 2>/dev/null; then
+      printf 'jt: rebased %s onto %s\n' "$id" "$tip"
+    else
+      printf 'jt: could not rebase onto %s — working it where it sits\n' "$tip" >&2
+    fi
+  fi
+  cmd_set "$id" status=doing >/dev/null
+  jj edit "$id" --quiet
+  printf 'jt: %s is now @ (status doing)\n' "$id"
+}
+
+cmd_done() {
+  local id; id=$(resolve "${1:?usage: jt done <id>}")
+  local empty; empty=$(jj log -r "$id" --no-graph --ignore-working-copy -T 'if(empty,"1","0")')
+  [[ "$empty" == "1" ]] && printf 'jt: warning — %s is empty (no code changes)\n' "$id" >&2
+  desc_of "$id" | awk "$AWKLIB"'
+    { d = d (NR > 1 ? "\n" : "") $0 }
+    END {
+      start = parse(d, L, T, O)
+      if (start == 0) { printf "%s\n", d; exit }
+      body = body_of(L, start)
+      keep = ""
+      for (i = 1; i <= O[0]; i++) {
+        lk = tolower(O[i])
+        if (lk == "task-status" || lk == "priority" || lk == "scope") continue
+        if (done_[lk]++) continue
+        keep = keep sprintf("%s: %s\n", O[i], T[lk])
+      }
+      printf "%s\n", body
+      if (keep != "") printf "\n%s", keep
+    }' | jj describe "$id" --stdin --quiet
+  printf 'jt: %s done — trailers stripped, off the board\n' "$id"
+}
+
+cmd_block() {
+  local id; id=$(resolve "${1:?usage: jt block <id> [reason]}"); shift
+  local reason="${*:-}"
+  if [[ -n "$reason" ]]; then
+    desc_of "$id" | awk -v r="$reason" "$AWKLIB"'
+      { d = d (NR > 1 ? "\n" : "") $0 }
+      END {
+        start = parse(d, L, T, O)
+        body = (start == 0) ? d : body_of(L, start)
+        printf "%s\n\nBLOCKED: %s\n", body, r
+        if (start != 0) { printf "\n"
+          for (i = 1; i <= O[0]; i++) { lk = tolower(O[i])
+            if (done_[lk]++) continue
+            printf "%s: %s\n", O[i], (lk == "task-status" ? "blocked" : T[lk]) } }
+      }' | jj describe "$id" --stdin --quiet
+    printf 'jt: %s blocked\n' "$id"
+  else
+    cmd_set "$id" status=blocked
+  fi
+}
+
+cmd_tip() { worktip; echo; }
+
+# A task's evolution trail. The old template-based version could only word-diff
+# the raw description; parsing outside jj lets this report what actually
+# changed — status transitions, priority, checklist progress — and needs no
+# external diff tool.
+cmd_evo() {
+  local q="${1:?usage: jt evo <id>}" id
+  id=$(resolve "$q" 2>/dev/null) || id="$q"
+  jj log -r "$id" --no-graph --ignore-working-copy -T '""' >/dev/null 2>&1 \
+    || die "no such revision '$q'"
+  printf '%s%s%s %s\n\n' "$c_id" "$(jj log -r "$id" --no-graph --ignore-working-copy \
+    -T 'change_id.shortest(8)')" "$c_off" \
+    "$(jj log -r "$id" --no-graph --ignore-working-copy -T 'description.first_line()')"
+
+  jj evolog -r "$id" --reversed --no-graph --ignore-working-copy -T \
+    'commit.commit_id().short(8) ++ "\t" ++ commit.committer().timestamp().local().format("%Y-%m-%d %H:%M") ++ "\t" ++ if(commit.empty(),"1","0") ++ "\t" ++ json(commit.description()) ++ "\n"' \
+  | awk -F'\t' -v c_id="$c_id" -v c_off="$c_off" -v c_add="$c_doing" -v c_del="$c_blocked" \
+        -v c_meta="$c_prio" -v c_dim="$c_done" "$AWKLIB"'
+    function ckdone(s,   n, t) { t = s; n = gsub(/- \[[xX]\]/, "", t); return n }
+    function cktodo(s,   n, t) { t = s; n = gsub(/- \[ \]/, "", t); return n }
+    {
+      cid = $1; ts = $2; em = $3
+      d = unesc(substr($0, index($0, "\"")))
+      key = d; sub(/[ \t\n]+$/, "", key)
+      if (n > 0 && key == PKEY) { CID[n] = cid; TS[n] = ts; EM[n] = em; next }
+      n++; CID[n] = cid; TS[n] = ts; EM[n] = em; D[n] = d; PKEY = key
+    }
+    END {
+      for (i = 1; i <= n; i++) {
+        delete L; delete T; delete O
+        start = parse(D[i], L, T, O)
+        body = (start == 0) ? D[i] : body_of(L, start)
+        printf "  %s%s%s  %s%s\n", c_dim, TS[i], c_off, CID[i], \
+               (EM[i] == "1" ? "  " c_dim "(empty)" c_off : "")
+        delete CASE
+        for (j = 1; j <= O[0]; j++) CASE[tolower(O[j])] = O[j]
+        if (i == 1) {
+          nl = split(D[i], FL, "\n")
+          for (j = 1; j <= nl; j++) {
+            if (j == nl && FL[j] == "") continue
+            printf "      %s\n", FL[j]
+          }
+          printf "\n"; PB = body; delete PT; delete PCASE
+          for (k in T) PT[k] = T[k]
+          for (k in CASE) PCASE[k] = CASE[k]
+          continue
+        }
+        # trailer transitions — the signal the old word-diff buried in prose
+        for (k in T) if (!(k in PT)) printf "      %s+ %s: %s%s\n", c_meta, CASE[k], T[k], c_off
+          else if (T[k] != PT[k]) printf "      %s%s: %s → %s%s\n", c_meta, CASE[k], PT[k], T[k], c_off
+        for (k in PT) if (!(k in T)) printf "      %s- %s (dropped)%s\n", c_meta, PCASE[k], c_off
+        pd = ckdone(PB); pt = cktodo(PB); cd = ckdone(body); ct = cktodo(body)
+        if (pd + pt > 0 || cd + ct > 0) if (pd != cd || pt != ct)
+          printf "      %schecklist: %d/%d → %d/%d%s\n", c_meta, pd, pd+pt, cd, cd+ct, c_off
+        # body line delta
+        delete PC; delete CC
+        np = split(PB, PL, "\n"); nc = split(body, CL, "\n")
+        for (j = 1; j <= np; j++) PC[PL[j]]++
+        for (j = 1; j <= nc; j++) CC[CL[j]]++
+        for (j = 1; j <= np; j++) if (PL[j] != "" && CC[PL[j]] < PC[PL[j]]) {
+          printf "      %s- %s%s\n", c_del, PL[j], c_off; PC[PL[j]]-- }
+        for (j = 1; j <= nc; j++) if (CL[j] != "" && PC[CL[j]] <= 0) {
+          printf "      %s+ %s%s\n", c_add, CL[j], c_off } else if (CL[j] != "") PC[CL[j]]--
+        printf "\n"
+        PB = body; delete PT; delete PCASE
+        for (k in T) PT[k] = T[k]
+        for (k in CASE) PCASE[k] = CASE[k]
+      }
+    }'
+  local stat
+  stat=$(jj diff -r "$id" --stat --ignore-working-copy 2>/dev/null || true)
+  if [[ -n "$stat" && "$stat" != "0 files changed"* ]]; then
+    printf '  %s── task diff ──%s\n' "$c_prio" "$c_off"
+    sed 's/^/  /' <<<"$stat"
+  fi
+}
+
+# ------------------------------------------------- Claude Code slash commands
+# Embedded so the script is the single source of truth: `jt install` writes them
+# to ~/.claude/commands/jt/, giving /jt:file /jt:board /jt:start /jt:burst
+# /jt:decide. They drive jt rather than raw jj revsets, so they don't break when
+# the revset wiring changes.
+
+md_file() { cat <<'JTMD'
+---
+description: File a feature request or bug report as a jj task
+argument-hint: [what's broken / what you want]
+allowed-tools: Bash(jt:*), AskUserQuestion
+---
+
+## Open board
+
+!`jt list`
+
+## Request
+
+$ARGUMENTS
+
+## Your task
+
+File the request above as **one** task. Do not write code, do not start the
+work, do not investigate beyond a quick look to scope it.
+
+1. **Dedupe.** If it's already on the board, say which task and stop. If it
+   refines an existing task, update that one (`jt show <id>`, then `jt set`)
+   rather than filing a near-duplicate.
+
+2. **Create it:**
+   ```
+   jt new "<one-line summary>" -p P2 -s "path/a, path/b" --body "<detail>"
+   ```
+   `jt new` parents the task on the current work tip, so its provenance pins the
+   code state it was filed against. You don't need to pick a parent.
+
+   - `-p` — P0..P3. Calibrate against the priorities already on the board.
+   - `-s` — files you'd expect to touch. This is what stops a later burst run
+     colliding with in-flight work. Approximate is fine; omit only if you
+     genuinely can't guess.
+   - `--body` — for a bug: reproduction, observed vs expected. For a feature:
+     what and why, not how.
+
+3. **Blocked by something?** `jt new "…" -b <blocker-id>` makes it a real
+   dependency edge — it shows as `(needs <id>)` and won't count as ready.
+
+4. **Ask at most one question**, via `AskUserQuestion`, and only if you can't
+   assign priority or scope without it. A vague task filed now beats an
+   interrogation.
+
+Report the change id and summary. Nothing else.
+JTMD
+}
+
+md_board() { cat <<'JTMD'
+---
+description: Show the task board and lane state
+argument-hint: [optional filter, e.g. "P1" or "auth"]
+allowed-tools: Bash(jt:*), Bash(jj workspace:*)
+---
+
+## Board
+
+!`jt list`
+
+## Structured
+
+!`jt json`
+
+## Workspaces
+
+!`jj workspace list`
+
+## Your task
+
+Read-only. Change nothing.
+
+Summarise the board at a glance:
+
+- **Ready** — `"ready":true` in the JSON (no unfinished blockers, status todo or
+  ready). Highest priority first.
+- **In flight** — status `doing`. Another session owns these; name each and its
+  scope.
+- **Collisions** — any ready task whose `scope` overlaps something `doing`.
+  Those must wait; picking one up means a merge conflict later.
+- **Blocked** — phrase each as the actual question waiting on me, not the title.
+
+Filter to `$ARGUMENTS` if given. Be terse — this is a glance, not a report. End
+with the one task you'd pick up next, and why.
+JTMD
+}
+
+md_start() { cat <<'JTMD'
+---
+description: Work one task with me in the loop on the design
+argument-hint: [task id, or words matching one]
+allowed-tools: Bash(jt:*), Bash(jj:*), AskUserQuestion
+---
+
+## Board
+
+!`jt list`
+
+## Which task
+
+$ARGUMENTS
+
+## Your task
+
+Work **one** task, with me involved in the design. This is the attended mode —
+the point is that I see and can redirect the approach before code exists. If I
+wanted it done unsupervised I'd have said `/jt:burst`.
+
+### Set up
+
+`jt start <id>` — takes a change-id prefix or words matching a summary. It
+claims the task as `doing`, rebases it onto the current work tip so you build on
+current code rather than the state it was filed against, and makes it the
+working copy. If it reports that it couldn't rebase, tell me before continuing.
+
+### Then stop
+
+Investigate the code and come back to me with:
+
+- what you found, and whether the task's premise still holds
+- the approach you'd take, in a few sentences
+- **any fork worth my input** — the options and your recommendation
+- anything in the task description that turned out to be wrong
+
+**Write no code until I've responded.** If the description already settles the
+design and you genuinely have nothing to ask, say so in a line and start — but
+the default is to check.
+
+Use `AskUserQuestion` for a real fork with discrete options; plain prose when
+you just want a sanity check.
+
+### Then work it
+
+- Keep a `- [ ]` / `- [x]` checklist in the task description, ticking items off
+  as you go. `jt evo <id>` then shows the checklist filling in over time.
+- Update the description at **checkpoints** — a decision taken, a blocker hit.
+  Terse and high-level; not a transcript.
+- New files: `jj file track <path>`. Auto-track is off, so an untracked file
+  silently isn't in the commit.
+- Notice something unrelated? `jt new "…"` and carry on. Don't scope-creep.
+- Turns out much bigger than it looked? Say so and let me decide whether to
+  split it, rather than quietly working for an hour.
+
+### Finish
+
+1. **Verify** — the project's verify command from `CLAUDE.md`. Exit 0 is the
+   only thing that counts; ignore stale LSP diagnostics.
+2. **`jj describe <id>`** — trim the description to a clean implementation
+   summary explaining the change and the key reasoning.
+3. **`jt done <id>`** — strips the trailers so the task leaves the board as a
+   clean commit. It warns if the change is still empty; that warning means
+   something went wrong, so stop and say so.
+4. Report the change id, what you did, and anything you left for later.
+
+Don't squash, rebase other changes, or move bookmarks — that's mine.
+JTMD
+}
+
+md_burst() { cat <<'JTMD'
+---
+description: Knock out a run of small ready tasks, unattended
+argument-hint: [optional focus, e.g. "the UI bugs" or a change id]
+allowed-tools: Bash(jt:*), Bash(jj:*)
+---
+
+## Board
+
+!`jt list`
+
+## Structured
+
+!`jt json`
+
+## Focus
+
+$ARGUMENTS
+
+## Your task
+
+Work a run of **small** ready tasks back to back, without checking in. This is
+the unattended counterpart to `/jt:start` — don't ask me things, park them.
+
+### Picking
+
+Take tasks with `"ready":true`, priority order, narrowed to `$ARGUMENTS` if
+given. Skip anything whose `scope` overlaps a task marked `doing` — another
+session owns those files.
+
+**Only small tasks.** If one needs real design or a wide diff, stop, write what
+you learned into its description, leave it `todo`, and move on. Big work wants
+`/jt:start` or an orchestrate run, not this.
+
+### Per task
+
+1. **`jt start <id>`** — claims it, rebases onto the current work tip, makes it
+   the working copy. For the second and later tasks in the run, the tip is the
+   one you just finished, so the run accumulates as a clean line.
+2. Do the work inline. Don't delegate — spin-up costs more than the fix at this
+   size.
+3. **`jj file track <path>`** for new files.
+4. **Verify** — the project's command from `CLAUDE.md`. Exit 0 or it isn't done.
+5. **`jj describe <id>`** to a clean summary, then **`jt done <id>`**.
+
+### Along the way
+
+- **Design fork?** `jt block <id> "<the question, with options and your
+  recommendation>"` and move to the next task. Never guess, never stall the run
+  — I'll drain them with `/jt:decide`.
+- **Spot something new?** `jt new "…"` and keep going. Don't scope-creep.
+- **Broken tree** is top priority — fix it before starting anything else.
+- Keep descriptions terse: the decision and why, not a play-by-play.
+
+Don't squash, merge, or move bookmarks — history cleanup is mine.
+
+Stop when nothing is ready, everything left is too big, or I interrupt. Report
+one line per task (change id + what you did), anything blocked or skipped, and
+the final tip.
+JTMD
+}
+
+md_decide() { cat <<'JTMD'
+---
+description: Drain blocked tasks — answer the design forks waiting on me
+argument-hint: [optional task id to decide just one]
+allowed-tools: Bash(jt:*), AskUserQuestion
+---
+
+## Blocked tasks, in full
+
+!`jt json | grep '"status":"blocked"'`
+
+## Board for context
+
+!`jt list`
+
+## Scope
+
+$ARGUMENTS
+
+## Your task
+
+These are the design forks that workers parked rather than guessing at. Walk me
+through them and record what I decide. **That is the only thing you're doing** —
+no code, no starting tasks.
+
+For each blocked task (or just the one named in `$ARGUMENTS`):
+
+1. **Put the fork to me with `AskUserQuestion`.** Use the options the task
+   already lists in its `body`. Lead with the worker's recommendation if it made
+   one, marked `(Recommended)`. Make option descriptions concrete about the
+   trade-off — I should be able to decide from the question alone.
+
+   If the task is vague about what's actually being asked, say so and ask the
+   real question rather than a reconstructed one.
+
+2. **Record the decision** — `jj describe <id>`: state what was decided, why,
+   and the date, and **replace the open question** rather than leaving both. A
+   future reader should see the resolution, not the debate. `jt evo <id>` keeps
+   the original either way.
+
+3. **Unblock it** — `jt set <id> status=todo`. If my answer makes the task moot,
+   `jt done <id>` to take it off the board, and say you've done that.
+
+4. **Cascade.** If the decision settles a question another blocked task was also
+   waiting on, resolve that one too and tell me — don't ask me twice.
+
+Batch related forks into a single `AskUserQuestion` where they're genuinely one
+decision; ask separately when they're not.
+
+If nothing is blocked, say so in one line and stop.
+JTMD
+}
+
+# ------------------------------------------------------- shell completions
+# Task ids are completed dynamically from `jt json -a`, with the summary as the
+# description. Outside a jj repo that fails silently and you just get subcommands.
+
+comp_zsh() { cat <<'JTEOF'
+#compdef jt
+
+_jt_ids() {
+  local -a ids
+  ids=(${(f)"$(jt json -a 2>/dev/null | sed -n 's/.*"id":"\([^"]*\)".*"summary":"\([^"]*\)".*/\1:\2/p')"})
+  (( ${#ids} )) && _describe -t tasks 'task' ids
+}
+
+_jt() {
+  local -a cmds
+  cmds=(
+    'list:board of open tasks'
+    'board:board of open tasks'
+    'json:board as JSONL'
+    'new:file a task'
+    'show:full description'
+    'set:update trailers'
+    'start:claim, rebase onto work tip, edit'
+    'done:strip trailers, leaves the board'
+    'block:mark blocked, with a reason'
+    'evo:evolution trail'
+    'tip:current work tip'
+    'install:write Claude commands + completions'
+    'help:usage'
+  )
+  if (( CURRENT == 2 )); then
+    _describe 'command' cmds
+    return
+  fi
+  case "${words[2]}" in
+    show|start|done|evo)
+      (( CURRENT == 3 )) && _jt_ids ;;
+    block)
+      (( CURRENT == 3 )) && _jt_ids ;;
+    set)
+      if (( CURRENT == 3 )); then _jt_ids; else
+        _values -S = 'field' \
+          'status[task status]:status:(todo ready doing investigating blocked done)' \
+          'priority[priority]:priority:(P0 P1 P2 P3)' \
+          'scope[files it touches]:scope:'
+      fi ;;
+    list|board|json)
+      _arguments '(-a --all)'{-a,--all}'[include done tasks]' ;;
+    new)
+      _arguments \
+        '(-p --priority)'{-p,--priority}'[priority]:priority:(P0 P1 P2 P3)' \
+        '(-s --scope)'{-s,--scope}'[files it touches]:scope:' \
+        '(-b --blocked-by)'{-b,--blocked-by}'[blocked by task]:task:_jt_ids' \
+        '--parent[parent revision]:rev:' \
+        '--body[body text]:text:' ;;
+    install)
+      _arguments '--dir[Claude commands dir]:dir:_files -/' \
+                 '(-n --dry-run)'{-n,--dry-run}'[show what would be written]' ;;
+  esac
+}
+
+_jt "$@"
+JTEOF
+}
+
+comp_fish() { cat <<'JTEOF'
+function __jt_ids
+    jt json -a 2>/dev/null | string replace -rf '.*"id":"([^"]*)".*"summary":"([^"]*)".*' '$1\t$2'
+end
+
+complete -c jt -f
+complete -c jt -n __fish_use_subcommand -a list    -d 'board of open tasks'
+complete -c jt -n __fish_use_subcommand -a json    -d 'board as JSONL'
+complete -c jt -n __fish_use_subcommand -a new     -d 'file a task'
+complete -c jt -n __fish_use_subcommand -a show    -d 'full description'
+complete -c jt -n __fish_use_subcommand -a set     -d 'update trailers'
+complete -c jt -n __fish_use_subcommand -a start   -d 'claim, rebase onto work tip, edit'
+complete -c jt -n __fish_use_subcommand -a done    -d 'strip trailers, leaves the board'
+complete -c jt -n __fish_use_subcommand -a block   -d 'mark blocked, with a reason'
+complete -c jt -n __fish_use_subcommand -a evo     -d 'evolution trail'
+complete -c jt -n __fish_use_subcommand -a tip     -d 'current work tip'
+complete -c jt -n __fish_use_subcommand -a install -d 'write Claude commands + completions'
+
+complete -c jt -n '__fish_seen_subcommand_from show set start done block evo' -a '(__jt_ids)'
+complete -c jt -n '__fish_seen_subcommand_from list json' -s a -l all -d 'include done tasks'
+complete -c jt -n '__fish_seen_subcommand_from new' -s p -l priority -d 'priority' -x -a 'P0 P1 P2 P3'
+complete -c jt -n '__fish_seen_subcommand_from new' -s s -l scope -d 'files it touches' -x
+complete -c jt -n '__fish_seen_subcommand_from new' -s b -l blocked-by -d 'blocked by task' -x -a '(__jt_ids)'
+complete -c jt -n '__fish_seen_subcommand_from new' -l body -d 'body text' -x
+complete -c jt -n '__fish_seen_subcommand_from install' -l dir -d 'Claude commands dir' -x -a '(__fish_complete_directories)'
+complete -c jt -n '__fish_seen_subcommand_from install' -s n -l dry-run -d 'show what would be written'
+JTEOF
+}
+
+comp_bash() { cat <<'JTEOF'
+_jt() {
+  local cur prev cmds
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+  cmds="list board json new show set start done block evo tip install help"
+
+  if [[ $COMP_CWORD -eq 1 ]]; then
+    mapfile -t COMPREPLY < <(compgen -W "$cmds" -- "$cur")
+    return
+  fi
+
+  case "${COMP_WORDS[1]}" in
+    show|start|done|evo|block)
+      if [[ $COMP_CWORD -eq 2 ]]; then
+        mapfile -t COMPREPLY < <(compgen -W \
+          "$(jt json -a 2>/dev/null | sed -n 's/.*"id":"\([^"]*\)".*/\1/p')" -- "$cur")
+      fi ;;
+    set)
+      if [[ $COMP_CWORD -eq 2 ]]; then
+        mapfile -t COMPREPLY < <(compgen -W \
+          "$(jt json -a 2>/dev/null | sed -n 's/.*"id":"\([^"]*\)".*/\1/p')" -- "$cur")
+      elif [[ "$cur" == status=* ]]; then
+        mapfile -t COMPREPLY < <(compgen -W \
+          "status=todo status=ready status=doing status=investigating status=blocked status=done" -- "$cur")
+      elif [[ "$cur" == priority=* ]]; then
+        mapfile -t COMPREPLY < <(compgen -W "priority=P0 priority=P1 priority=P2 priority=P3" -- "$cur")
+      else
+        mapfile -t COMPREPLY < <(compgen -W "status= priority= scope=" -- "$cur")
+      fi ;;
+    list|board|json)
+      mapfile -t COMPREPLY < <(compgen -W "-a --all" -- "$cur") ;;
+    new)
+      case "$prev" in
+        -p|--priority) mapfile -t COMPREPLY < <(compgen -W "P0 P1 P2 P3" -- "$cur") ;;
+        -b|--blocked-by) mapfile -t COMPREPLY < <(compgen -W \
+          "$(jt json -a 2>/dev/null | sed -n 's/.*"id":"\([^"]*\)".*/\1/p')" -- "$cur") ;;
+        *) mapfile -t COMPREPLY < <(compgen -W "-p -s -b --parent --body" -- "$cur") ;;
+      esac ;;
+    install)
+      mapfile -t COMPREPLY < <(compgen -W "--dir -n --dry-run" -- "$cur") ;;
+  esac
+}
+complete -F _jt jt
+JTEOF
+}
+
+cmd_install() {
+  local dir="${JT_CLAUDE_DIR:-$HOME/.claude/commands/jt}" dry=0
+  local zdir="${JT_ZSH_DIR:-$HOME/.local/share/zsh/site-functions}"
+  local fdir="${JT_FISH_DIR:-$HOME/.config/fish/completions}"
+  local bdir="${JT_BASH_DIR:-$HOME/.local/share/bash-completion/completions}"
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --dir) dir="$2"; shift 2 ;;
+      -n|--dry-run) dry=1; shift ;;
+      *) die "usage: jt install [--dir <path>] [--dry-run]" ;;
+    esac
+  done
+  local n
+  if [[ $dry -eq 1 ]]; then
+    printf 'slash commands → %s\n' "$dir"
+    printf '  %s.md\n' file board start burst decide
+    printf 'completions:\n'
+    printf '  %s/_jt\n  %s/jt.fish\n  %s/jt\n' "$zdir" "$fdir" "$bdir"
+    return
+  fi
+  mkdir -p "$dir"
+  for n in file board start burst decide; do
+    "md_$n" > "$dir/$n.md"
+    printf 'wrote %s/%s.md  → /jt:%s\n' "$dir" "$n" "$n"
+  done
+  mkdir -p "$zdir" "$fdir" "$bdir"
+  comp_zsh  > "$zdir/_jt";     printf 'wrote %s/_jt\n' "$zdir"
+  comp_fish > "$fdir/jt.fish"; printf 'wrote %s/jt.fish\n' "$fdir"
+  comp_bash > "$bdir/jt";      printf 'wrote %s/jt\n' "$bdir"
+  printf '\nRestart Claude Code (or start a new session) to pick up the commands.\n'
+  case ":${FPATH:-}:" in
+    *":$zdir:"*) : ;;
+    *) printf 'For zsh completions, add to ~/.zshrc BEFORE compinit:\n  fpath=(%s $fpath)\n' "$zdir" ;;
+  esac
+}
+
+usage() {
+  cat <<'EOF'
+jt — task tracker on jj changes. A task is a change with a Task-Status: trailer.
+
+  jt [list] [-a]              board of open tasks (-a includes done)
+  jt json [-a]                same, as JSONL — for scripts and agents
+  jt new <summary> [flags]    file a task
+       -p P1  -s <scope>  -b <blocker-id>  --parent <rev>  --body <text>
+  jt show <id>                full description
+  jt set <id> key=val...      status= priority= scope=, or any Trailer-Key=
+  jt start <id>               rebase onto work tip, mark doing, jj edit it
+  jt done <id>                strip trailers — leaves the board, clean commit
+  jt block <id> [reason]      mark blocked, appending the reason
+  jt evo <id>                 evolution trail: status/priority/checklist changes
+  jt tip                      the current work tip
+  jt install [--dir P] [-n]   write the Claude Code /jt:* slash commands
+
+<id> may be a change-id prefix or words matching a summary.
+Statuses: todo ready doing investigating blocked done
+EOF
+}
+
+case "${1:-list}" in
+  -h|--help|help) usage; exit 0 ;;
+  install)        shift; cmd_install "$@"; exit 0 ;;
+esac
+jj root >/dev/null 2>&1 || die "not in a jj repo"
+
+case "${1:-list}" in
+  list|board|ls) shift || true; cmd_list "$@" ;;
+  json)          shift; cmd_json "$@" ;;
+  new|add|todo)  shift; cmd_new "$@" ;;
+  show|view)     shift; cmd_show "$@" ;;
+  set)           shift; cmd_set "$@" ;;
+  start)         shift; cmd_start "$@" ;;
+  done)          shift; cmd_done "$@" ;;
+  block)         shift; cmd_block "$@" ;;
+  evo|taskevo)   shift; cmd_evo "$@" ;;
+  tip)           cmd_tip ;;
+  -h|--help|help) usage ;;
+  *) die "unknown command '$1' (try: jt --help)" ;;
+esac

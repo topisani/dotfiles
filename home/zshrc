@@ -4,6 +4,8 @@ if [ -z "$_HOME_DOT_PROFILE_INCLUDED" ]; then
     source ~/.profile
 fi
 
+
+fpath=($HOME/.local/share/zsh/site-functions $fpath)
 fpath=($HOME/.local/share/zsh-antidote/functions $fpath)
 fpath=(/usr/share/zsh-antidote/functions $fpath)
 autoload -Uz antidote
