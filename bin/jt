@@ -334,6 +334,12 @@ cmd_block() {
 
 cmd_tip() { worktip; echo; }
 
+# Launch jjui showing only the task graph. Extra args forward to jjui.
+cmd_ui() {
+  command -v jjui >/dev/null 2>&1 || die "jjui is not installed"
+  exec jjui -r "($TASKS) | @" "$@"
+}
+
 # A task's evolution trail. The old template-based version could only word-diff
 # the raw description; parsing outside jj lets this report what actually
 # changed — status transitions, priority, checklist progress — and needs no
@@ -830,16 +836,141 @@ complete -F _jt jt
 JTEOF
 }
 
+# jjui integration. Schema per jjui 0.10.x: [[actions]] takes name/desc/lua and
+# may carry key/seq/scope directly. `t` is unbound in the top-level `revisions`
+# scope and the defaults ship no seq bindings, so a t-prefixed chord is free.
+comp_jjui() { cat <<'JTEOF'
+# >>> jt tasks — managed by `jt install --jjui`, edits here will be overwritten >>>
+[[actions]]
+name = "jt_status"
+desc = "task: set status"
+lua = '''
+local id = context.change_id()
+if not id then return end
+local s = choose({ options = {"todo","ready","doing","investigating","blocked","done"}, title = "Task-Status" })
+if s then
+  exec_shell("jt set " .. id .. " status=" .. s)
+  revisions.refresh({ keep_selections = true })
+  flash("status → " .. s)
+end
+'''
+seq = ["t", "s"]
+scope = "revisions"
+
+[[actions]]
+name = "jt_priority"
+desc = "task: set priority"
+lua = '''
+local id = context.change_id()
+if not id then return end
+local p = choose({ options = {"P0","P1","P2","P3"}, title = "Priority" })
+if p then
+  exec_shell("jt set " .. id .. " priority=" .. p)
+  revisions.refresh({ keep_selections = true })
+  flash("priority → " .. p)
+end
+'''
+seq = ["t", "p"]
+scope = "revisions"
+
+[[actions]]
+name = "jt_new"
+desc = "task: file a new one"
+lua = '''
+local s = input({ title = "New task", prompt = "summary: " })
+if s and s ~= "" then
+  exec_shell("jt new " .. string.format("%q", s))
+  revisions.refresh()
+  flash("filed: " .. s)
+end
+'''
+seq = ["t", "n"]
+scope = "revisions"
+
+[[actions]]
+name = "jt_block"
+desc = "task: block with a reason"
+lua = '''
+local id = context.change_id()
+if not id then return end
+local r = input({ title = "Block task", prompt = "reason: " })
+if r and r ~= "" then
+  exec_shell("jt block " .. id .. " " .. string.format("%q", r))
+  revisions.refresh({ keep_selections = true })
+  flash("blocked")
+end
+'''
+seq = ["t", "b"]
+scope = "revisions"
+
+[[actions]]
+name = "jt_done"
+desc = "task: done (strip trailers)"
+lua = '''
+local id = context.change_id()
+if not id then return end
+exec_shell("jt done " .. id)
+revisions.refresh()
+flash("done: " .. id)
+'''
+seq = ["t", "d"]
+scope = "revisions"
+
+[[actions]]
+name = "jt_start"
+desc = "task: start (rebase onto tip, edit)"
+lua = '''
+local id = context.change_id()
+if not id then return end
+exec_shell("jt start " .. id)
+revisions.refresh({ selected_revision = id })
+flash("started: " .. id)
+'''
+seq = ["t", "S"]
+scope = "revisions"
+
+[[actions]]
+name = "jt_evo"
+desc = "task: evolution trail"
+lua = '''
+local id = context.change_id()
+if not id then return end
+exec_shell("jt evo " .. id .. " | less -R")
+'''
+seq = ["t", "e"]
+scope = "revisions"
+# <<< jt tasks <<<
+JTEOF
+}
+
+install_jjui() {
+  local cfg="${JJUI_CONFIG_DIR:-$HOME/.config/jjui}/config.toml"
+  mkdir -p "$(dirname "$cfg")"
+  [[ -f "$cfg" ]] || : > "$cfg"
+  # idempotent: drop any previously managed block, then append the current one
+  if grep -q '^# >>> jt tasks' "$cfg"; then
+    sed -i '/^# >>> jt tasks/,/^# <<< jt tasks <<</d' "$cfg"
+    printf 'replaced existing jt block in %s\n' "$cfg"
+  fi
+  # trim trailing blank lines, then append
+  printf '%s\n\n' "$(cat "$cfg")" > "$cfg.tmp" && mv "$cfg.tmp" "$cfg"
+  comp_jjui >> "$cfg"
+  printf 'wrote jjui actions to %s\n' "$cfg"
+  printf '  t s  status    t p  priority   t n  new     t b  block\n'
+  printf '  t d  done      t S  start      t e  evo\n'
+}
+
 cmd_install() {
-  local dir="${JT_CLAUDE_DIR:-$HOME/.claude/commands/jt}" dry=0
+  local dir="${JT_CLAUDE_DIR:-$HOME/.claude/commands/jt}" dry=0 do_jjui=0
   local zdir="${JT_ZSH_DIR:-$HOME/.local/share/zsh/site-functions}"
   local fdir="${JT_FISH_DIR:-$HOME/.config/fish/completions}"
   local bdir="${JT_BASH_DIR:-$HOME/.local/share/bash-completion/completions}"
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --dir) dir="$2"; shift 2 ;;
+      --jjui) do_jjui=1; shift ;;
       -n|--dry-run) dry=1; shift ;;
-      *) die "usage: jt install [--dir <path>] [--dry-run]" ;;
+      *) die "usage: jt install [--dir <path>] [--jjui] [--dry-run]" ;;
     esac
   done
   local n
@@ -848,6 +979,8 @@ cmd_install() {
     printf '  %s.md\n' file board start burst decide
     printf 'completions:\n'
     printf '  %s/_jt\n  %s/jt.fish\n  %s/jt\n' "$zdir" "$fdir" "$bdir"
+    [[ $do_jjui -eq 1 ]] && printf 'jjui actions → %s/config.toml (appended, marked block)\n' \
+      "${JJUI_CONFIG_DIR:-$HOME/.config/jjui}"
     return
   fi
   mkdir -p "$dir"
@@ -859,6 +992,7 @@ cmd_install() {
   comp_zsh  > "$zdir/_jt";     printf 'wrote %s/_jt\n' "$zdir"
   comp_fish > "$fdir/jt.fish"; printf 'wrote %s/jt.fish\n' "$fdir"
   comp_bash > "$bdir/jt";      printf 'wrote %s/jt\n' "$bdir"
+  [[ $do_jjui -eq 1 ]] && install_jjui
   printf '\nRestart Claude Code (or start a new session) to pick up the commands.\n'
   case ":${FPATH:-}:" in
     *":$zdir:"*) : ;;
@@ -881,7 +1015,10 @@ jt — task tracker on jj changes. A task is a change with a Task-Status: traile
   jt block <id> [reason]      mark blocked, appending the reason
   jt evo <id>                 evolution trail: status/priority/checklist changes
   jt tip                      the current work tip
-  jt install [--dir P] [-n]   write the Claude Code /jt:* slash commands
+  jt ui [jjui args]           browse the task graph in jjui
+  jt install [--dir P] [-n] [--jjui]
+                              write the /jt:* slash commands, shell completions,
+                              and (with --jjui) jjui task actions
 
 <id> may be a change-id prefix or words matching a summary.
 Statuses: todo ready doing investigating blocked done
@@ -904,6 +1041,7 @@ case "${1:-list}" in
   done)          shift; cmd_done "$@" ;;
   block)         shift; cmd_block "$@" ;;
   evo|taskevo)   shift; cmd_evo "$@" ;;
+  ui|jjui)       shift; cmd_ui "$@" ;;
   tip)           cmd_tip ;;
   -h|--help|help) usage ;;
   *) die "unknown command '$1' (try: jt --help)" ;;
