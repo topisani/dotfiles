@@ -6,6 +6,26 @@ selected = { fg = "bright white", bg = "233" }
 "revset completion selected" = { bg = "233" }
 
 # >>> jt tasks — managed by `jt install --jjui`, edits here will be overwritten >>>
+# Task-aware log template. Uses jj's `trailers` keyword — real trailer parsing,
+# not the substring matching the old revset board relied on. Non-task commits
+# fall through to builtin_log_compact so the working copy still reads normally.
+[revisions]
+template = '''
+if(trailers.contains_key("Task-Status"),
+  separate(" ",
+    format_short_change_id(change_id),
+    label("task_" ++ trailers.filter(|t| t.key()=="Task-Status").map(|t| t.value()).join(""),
+      "[" ++ trailers.filter(|t| t.key()=="Task-Status").map(|t| t.value()).join("") ++ "]"),
+    if(trailers.contains_key("Priority"),
+      label("task_priority", "(" ++ trailers.filter(|t| t.key()=="Priority").map(|t| t.value()).join("") ++ ")")),
+    description.first_line(),
+    if(parents.any(|p| p.trailers().contains_key("Task-Status")),
+      label("task_needs", "(needs " ++ parents.filter(|p| p.trailers().contains_key("Task-Status")).map(|p| p.change_id().shortest(8)).join(" ") ++ ")")),
+  ) ++ "\n",
+  builtin_log_compact
+)
+'''
+
 [[actions]]
 name = "jt_status"
 desc = "task: set status"

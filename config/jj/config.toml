@@ -92,3 +92,22 @@ notrack = [
 exclude = [
   'util', 'exec', '--', 'sh', '-c', 'git-exclude "$0" && jj file untrack "$0"'
 ]
+
+# >>> jt tasks — managed by `jt install --jjui`, edits here will be overwritten >>>
+[colors.task_todo]
+fg = "blue"
+[colors.task_ready]
+fg = "bright blue"
+[colors.task_doing]
+fg = "yellow"
+[colors.task_investigating]
+fg = "magenta"
+[colors.task_blocked]
+fg = "bright red"
+[colors.task_done]
+fg = "bright black"
+[colors.task_priority]
+fg = "bright black"
+[colors.task_needs]
+fg = "bright black"
+# <<< jt tasks <<<

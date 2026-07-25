@@ -334,10 +334,13 @@ cmd_block() {
 
 cmd_tip() { worktip; echo; }
 
-# Launch jjui showing only the task graph. Extra args forward to jjui.
+# Launch jjui on the task graph. Including parents($TASKS) connects the tasks
+# into one component: jj draws a trailing "~" per *disconnected* component, so
+# without it you get one per task (6 vs 1 on a real board). It also shows what
+# the tasks are based on, and renders blocker edges properly.
 cmd_ui() {
   command -v jjui >/dev/null 2>&1 || die "jjui is not installed"
-  exec jjui -r "($TASKS) | @" "$@"
+  exec jjui -r "($TASKS) | @ | parents($TASKS)" "$@"
 }
 
 # A task's evolution trail. The old template-based version could only word-diff
@@ -841,6 +844,26 @@ JTEOF
 # scope and the defaults ship no seq bindings, so a t-prefixed chord is free.
 comp_jjui() { cat <<'JTEOF'
 # >>> jt tasks — managed by `jt install --jjui`, edits here will be overwritten >>>
+# Task-aware log template. Uses jj's `trailers` keyword — real trailer parsing,
+# not the substring matching the old revset board relied on. Non-task commits
+# fall through to builtin_log_compact so the working copy still reads normally.
+[revisions]
+template = '''
+if(trailers.contains_key("Task-Status"),
+  separate(" ",
+    format_short_change_id(change_id),
+    label("task_" ++ trailers.filter(|t| t.key()=="Task-Status").map(|t| t.value()).join(""),
+      "[" ++ trailers.filter(|t| t.key()=="Task-Status").map(|t| t.value()).join("") ++ "]"),
+    if(trailers.contains_key("Priority"),
+      label("task_priority", "(" ++ trailers.filter(|t| t.key()=="Priority").map(|t| t.value()).join("") ++ ")")),
+    description.first_line(),
+    if(parents.any(|p| p.trailers().contains_key("Task-Status")),
+      label("task_needs", "(needs " ++ parents.filter(|p| p.trailers().contains_key("Task-Status")).map(|p| p.change_id().shortest(8)).join(" ") ++ ")")),
+  ) ++ "\n",
+  builtin_log_compact
+)
+'''
+
 [[actions]]
 name = "jt_status"
 desc = "task: set status"
@@ -943,21 +966,57 @@ scope = "revisions"
 JTEOF
 }
 
+# The template above emits label()s; jj — not jjui — resolves those to colours,
+# so they belong in jj's config. Written as [colors.task_*] sub-tables because a
+# second bare [colors] header would be a TOML duplicate-key error.
+comp_jjcolors() { cat <<'JTEOF'
+# >>> jt tasks — managed by `jt install --jjui`, edits here will be overwritten >>>
+[colors.task_todo]
+fg = "blue"
+[colors.task_ready]
+fg = "bright blue"
+[colors.task_doing]
+fg = "yellow"
+[colors.task_investigating]
+fg = "magenta"
+[colors.task_blocked]
+fg = "bright red"
+[colors.task_done]
+fg = "bright black"
+[colors.task_priority]
+fg = "bright black"
+[colors.task_needs]
+fg = "bright black"
+# <<< jt tasks <<<
+JTEOF
+}
+
+# Append a marked block to $1, replacing any previous one. Idempotent.
+append_block() {
+  local f="$1" gen="$2"
+  mkdir -p "$(dirname "$f")"
+  [[ -f "$f" ]] || : > "$f"
+  if grep -q '^# >>> jt tasks' "$f"; then
+    sed -i '/^# >>> jt tasks/,/^# <<< jt tasks <<</d' "$f"
+  fi
+  printf '%s\n\n' "$(cat "$f")" > "$f.jt.tmp" && mv "$f.jt.tmp" "$f"
+  "$gen" >> "$f"
+}
+
+install_jj_colors() {
+  local cfg; cfg=$(jj config path --user 2>/dev/null) || cfg="$HOME/.config/jj/config.toml"
+  append_block "$cfg" comp_jjcolors
+  printf 'wrote task colours to %s\n' "$cfg"
+}
+
 install_jjui() {
   local cfg="${JJUI_CONFIG_DIR:-$HOME/.config/jjui}/config.toml"
-  mkdir -p "$(dirname "$cfg")"
-  [[ -f "$cfg" ]] || : > "$cfg"
-  # idempotent: drop any previously managed block, then append the current one
-  if grep -q '^# >>> jt tasks' "$cfg"; then
-    sed -i '/^# >>> jt tasks/,/^# <<< jt tasks <<</d' "$cfg"
-    printf 'replaced existing jt block in %s\n' "$cfg"
-  fi
-  # trim trailing blank lines, then append
-  printf '%s\n\n' "$(cat "$cfg")" > "$cfg.tmp" && mv "$cfg.tmp" "$cfg"
-  comp_jjui >> "$cfg"
-  printf 'wrote jjui actions to %s\n' "$cfg"
+  append_block "$cfg" comp_jjui
+  printf 'wrote jjui template + actions to %s\n' "$cfg"
+  install_jj_colors
   printf '  t s  status    t p  priority   t n  new     t b  block\n'
   printf '  t d  done      t S  start      t e  evo\n'
+  printf '  browse with: jt ui\n'
 }
 
 cmd_install() {
