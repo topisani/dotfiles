@@ -1,205 +1,300 @@
 ---
 name: orchestrate
 description: >-
-  Run an unattended, multi-task orchestration session. The main session stays
-  thin, sequences the jj task board, and delegates each task to a fresh worker
-  that commits its own work. Use when the user wants a real queue worked while
-  they're away — "work through the backlog", "run autonomously while I'm out".
-  NOT for attended work or a handful of small fixes: the /jt:* commands are
-  lighter and better for those.
+  Run a managed, optionally-autonomous task-orchestration session. The main
+  session keeps its own context thin, tracks the backlog as jt tasks (jj
+  changes), and delegates each task to a fresh subagent that commits its work
+  with jj/jt. Use when the user wants to kick off managed multi-task work,
+  "work through these tasks / the backlog", "run autonomously while I'm away",
+  "manage these as tasks and delegate", or keeps a rolling list of small
+  features/bugs to hand off. Not for one-off single edits.
 ---
 
 # Orchestrate
 
-You are the **orchestrator**. You do not write code. You keep the board true,
-sequence the work, delegate each task to a fresh worker, verify the result, and
-keep going. Workers edit and commit. You stay thin so you can run for hours.
+You are the **orchestrator**: keep the backlog true, dispatch each task to a
+fresh worker subagent, verify the result, land it, repeat until the backlog is
+empty or everything left is blocked on the user. Workers do the reading, the
+editing, and the committing — via `jt`, which wraps jj (general jj mechanics
+are in the `jj-workflow:jj-concepts` skill; `jt --help` for jt's own command
+surface). You stay thin so you can run for hours without losing the plot.
 
-## When NOT to use this
+**Never stop early.** While any unblocked task remains, keep dispatching.
 
-Orchestrate is the heavy option. It earns its cost only on an **unattended run
-over a real queue**. If the user is present, or there are only a few small
-fixes, the `/jt:*` commands are lighter and give the user more control:
+## Setup
 
-| | |
-|---|---|
-| `/jt:file` | chat → one task |
-| `/jt:board` | see the board and lane state |
-| `/jt:start` | one task, user in the loop on design |
-| `/jt:burst` | a run of small fixes, inline |
-| `/jt:decide` | drain blocked design forks |
+Requires a jj repo and `jt` on PATH (a task tracker built on jj changes — see
+`jt --help`). If `jt` is missing, say so and stop; don't reimplement its
+bookkeeping by hand with a markdown file.
 
-## The two cardinal sins
+No project file to create: a task *is* a jj change (a commit whose
+description ends in a `Task-Status:` trailer block), so the backlog lives in
+`jj log` itself — no committed-vs-ignored decision, nothing to add to
+`.gitignore`.
 
-**1. Stopping early.** While any unblocked task remains, keep dispatching.
-Finishing a batch is not a reason to stop. Only two things end the loop: the
-board is empty, or everything left is blocked on the user.
+Migrating an old `.orchestrate/BACKLOG.md`: file each surviving entry with
+`jt new` (carry over priority/scope/body), then delete the file — a one-time
+step, not a recurring one.
 
-**2. Investigating.** Your job is sequencing, not understanding the code. Every
-file you read lands in a long-lived context that is **re-sent on every turn** —
-and the worker will read it all again anyway. You pay twice, with the expensive
-copy in the worst place.
+## State
 
-> This is not hypothetical. A past run wrote 700 lines of spec across two
-> `specs-*.md` files, plus 220 lines of research, from the orchestrator — then
-> dispatched workers who investigated from scratch regardless. That run's cost
-> was dominated by the coordinator, which is exactly backwards.
+**Poll with `jt json -q`, never bare `jt json`.** `-q` drops the `body` field:
+on a ~30-task board that's 11KB instead of 99KB — measured, ~10x — and the
+board is re-read every loop iteration, so bare `jt json` spends most of your
+context on the bodies of tasks you are not running. You never need a body
+yourself: the worker reads its own with `jt show <id>` inside its own context.
+Reach for a body only when *you* are root-causing a failure (see Failure).
 
-Do **light scoping only**: name the entry-point file(s) and the goal. If you
-feel the urge to write a spec document, you are doing the worker's job. The
-correct move is to dispatch and let the worker report back.
+`jt json -q` is the source of truth — re-run it after any compaction instead of
+trusting memory. Each line is one task: `id` (the jj change id — same
+identifier throughout, nothing to keep in sync separately), `status` (`todo
+ready doing investigating blocked testing deferred done`), `priority`
+(`P0`..`P3`), `scope` (files it's expected to touch — collision detection is
+based on this, trust it over guessing from the title), `needs` (unfinished
+blockers), `ready` (no unfinished blockers and status `todo`/`ready`). Bare
+`jt json` adds `body`.
 
-## 1. The board
+Two statuses a worker leaves behind rather than the orchestrator setting:
+`testing` (worker finished but the change needs the user's own eyes —
+typically a UI change verify can't judge — so it set `status=testing` instead
+of calling `jt done`; treat that exactly like `done` for sequencing purposes,
+including as the new tip, but leave it alone — it's the user's to resolve, not
+yours to re-dispatch or nudge to `done`) and `deferred` (the user punted on a
+blocked question via `/jt:decide`; never dispatch it, never re-raise it —
+that's the whole point of the status).
 
-The backlog **is** the jj task graph. All mechanics live in the `jj` skill §8 —
-read it if you're not fluent. Do not create `BACKLOG.md`, `JOURNAL.md`, or
-`QUESTIONS.md`; the graph plus `jj evolog` replaces all three.
+No `BACKLOG.md`, no `JOURNAL.md`, no `QUESTIONS.md`: `jt evo <id>` is a
+task's history (status/priority/checklist changes over time), the landed
+commit is the permanent record, and a blocked task carries its open question
+inline — `jt block <id> "<question, with options and a recommendation>"`
+appends it to the description instead of it living in a separate file.
 
-- **Board:** `jj tasks -r 'open_tasks()'`
-- **Task id = change id.** No separate numbering.
-- **Ready** = no unfinished blockers (the board prints `(needs <id…>)`).
-- **Reprioritize:** `jj describe <id>` — metadata, not a rebase.
-- **Done:** strip the `Task-Status:`/`Priority:` trailers entirely, so the task
-  leaves the board and the commit is clean and pushable.
+**Compact proactively** at natural boundaries (task claimed, task landed)
+instead of waiting for the context ceiling — everything durable already lives
+in jj; nothing in context is unrecoverable from `jt json -q`.
 
-Defaults, no config file needed: workers commit their own task; workers
-self-verify. The verify command and project conventions live in the project's
-`CLAUDE.md`.
+**Your context is the scarce resource, not the workers'.** Each worker starts
+fresh and its transcript never reaches you; only what you read yourself and
+what workers report back accumulates. So the three inflows to police are: the
+board poll (use `-q`), worker return reports (bound them — see RETURN), and
+your own file reads (delegate them). Everything else is free.
 
-## 2. Staying thin
-
-Your context is disposable **by design** — the graph is the memory. The moment
-something is persisted, drop it from your head:
-
-- Task captured → forget the discussion that produced it.
-- Worker committed and verified → keep the change id and a one-line outcome.
-  The diff, the file reads, the worker's report can all go.
-- Decision recorded in a task description → the deliberation is no longer yours
-  to carry.
-
-**Compact at persistence boundaries, not at the context ceiling.** You cannot
-self-invoke `/compact` — remind the user at natural boundaries when it would
-genuinely help. When compaction runs, preserve only the **spine**: open task
-ids + one-line goals, the work tip, in-flight worker ids and what each is
-doing, unresolved user decisions. Re-derive everything else from `jj tasks`.
-
-## 3. The loop
+## Main loop
 
 ```
 loop:
-  reconcile the board (fold in new input, re-sequence by priority + blockers)
-  pick the highest-priority ready task whose Scope doesn't collide with in-flight work
+  jt json -q                                 # reconcile — reread, don't trust memory
+  fold in new input not yet on the board: jt new "<summary>" -p <P> \
+    -s "<scope>" --body "<detail>"
+  pick highest-priority ready:true task whose scope doesn't collide with a
+  status:doing task
+  several small ready tasks with related scope? dispatch them as ONE batch to
+  one worker (see Batching) instead of one worker each
   if none ready:
-      blocked tasks remain -> all waiting on the user -> stop, summarize
-      else                 -> board empty            -> stop, summarize
-  rebase it onto the work tip, then dispatch to a worker (§4)
-  set Task-Status: doing
-  verify (§5); on success strip the trailer, land it, it becomes the new work tip
-  on failure: §6
+    any status:blocked remains -> stop, summarize, point at /jt:decide
+    only testing/deferred/done remain -> stop, summarize (done) — testing
+      tasks are the user's to confirm, deferred ones are theirs to revive
+  dispatch to a worker (below)
+  verify the result
+  success -> sequential: jt done (or jt set status=testing, for a change that
+             needs the user's own eyes) already left the finished commit as
+             the new tip. parallel: rebase it onto the default workspace's
+             tip yourself, then dispatch a verify pass (below) — jt does not
+             do this for you.
+  failure -> root-cause it yourself before re-dispatching — don't blind-retry
   goto loop
 ```
 
-**Batch questions up front.** Before a long stretch, gather every design
-decision the upcoming tasks need and ask them in **one** `AskUserQuestion` with
-pre-baked options. Mid-run forks become `Task-Status: blocked` tasks — you keep
-working other tasks rather than halting.
+Land each verified change immediately — don't stockpile unmerged work for a
+big merge later. Batch design questions up front before a long autonomous
+stretch; mid-run questions go inline on the task (`jt block`) and don't block
+other work. New user input mid-run is filed with `jt new` and a priority — it
+doesn't preempt the current task unless flagged urgent (`-p P0`).
 
-**New user input mid-run** gets filed and sequenced. It does not preempt the
-current task unless flagged urgent.
+## Delegating to workers
 
-**Confirm scope, build the simplest correct thing.** Past runs churned on
-over-engineering. When a task is ambiguous, prefer the simplest design that
-satisfies the goal.
+**Delegate investigation, not transcription.** A task goes to a worker as a
+goal and an entry point, not a pre-spec'd diff — the worker reads the code,
+decides the approach, and implements it. If you investigate first and hand the
+worker a spec to transcribe into edits, you've done the expensive part
+yourself and defeated the reason to delegate. Only true one-liners stay with
+you.
 
-## 4. Workers
+Exception: a task that already failed once. Then investigate and root-cause it
+yourself before re-dispatching (see Failure below).
 
-**Delegate whole tasks, not pre-spec'd edits.** A fresh worker owns its task
-end to end: investigate, decide the approach, implement, verify, commit, report.
-That is what keeps your context thin — the expensive reading lives and dies
-inside the disposable worker.
+Worker prompt should cover:
+- **GOAL + SCOPE** — the outcome and an entry-point file, not the exact edits
+- **CONSTRAINTS** — API/patterns to follow, what not to touch
+- **DESIGN** — resolve a fork alone when the choice is discoverable (record
+  the choice + why in the commit message); block instead of guessing when
+  it's genuinely up to the user: `jt block <id> "<the question, options, your
+  recommendation>"` and return early. Blocked tasks accumulate for a single
+  `/jt:decide` pass rather than pausing the run.
+- **BUGS** — reproduce with a failing test first, then fix, keep the test
+- **VCS** — jj only, never `git commit`. `jt start` runs `jj edit`, seizing
+  the *invoking* workspace's `@` — so **every** worker, sequential or
+  parallel, is told which workspace to `cd` into before it does anything
+  else. Never let a worker inherit your own cwd — that's the default
+  workspace, and workers must never edit its `@` out from under you.
+  First action once in its workspace: `jt start <id>` — claims the task
+  (marks `doing`, rebases onto that workspace's own tip, `jj edit`s it). A
+  task filed from a different workspace can have a stale parent; that's
+  harmless, `jt start` rebases it. If it reports it couldn't rebase, that's a
+  stop-and-report, not something to push through. `jj file track` any new
+  file. Finish with the project's verify command (exit 0 only), `jj describe
+  <id>` to a clean implementation summary (a couple of short paragraphs, max —
+  the change and its motivation, not a log of the work), then `jt done <id>` —
+  marks it done and moves it off the default board. The trailers stay on the
+  commit until a later `/jt:cleanup` pass runs `jt strip`, so a `done` commit
+  is not yet the clean landed prose the trailers will eventually give way to
+  — that's a separate, later pass, not part of this worker's job. If the
+  change genuinely needs the user's own eyes (a UI change, anything verify
+  can't judge), `jt set <id> status=testing` instead and say so in the return
+  report — that still counts as finished for sequencing, but leave it for the
+  user to close out, not you.
+- **VERIFY** — the project's verify command; exit code is truth, ignore stale
+  LSP diagnostics
+- **RETURN** — **at most 3 lines, no diffs, no file contents, no play-by-play**
+  — the change id, done/testing/blocked, one line of what changed and why.
+  Everything longer belongs in the commit message, where it costs you nothing
+  and outlives the run. This is a hard cap, not a style note: a worker that
+  returns its reasoning spends your context on every remaining round of the
+  run. Data for the orchestrator, not a chat reply.
 
-**Model tiering.** Workers are the token-heavy component; run them on **sonnet**
-by default and reserve the strong model for genuinely architectural tasks. This
-is ~80% of the available saving. Read-only scouting can go cheaper still and
-**parallelizes freely** — fan out several investigators rather than reading
-serially yourself.
+Model: default to one strong enough to get it right on the first pass;
+downshift only for mechanical or read-only work; escalate on any repeat
+failure.
 
-**The granularity trap.** Every worker carries fixed overhead — system prompt,
-tool schemas, re-reading conventions — before it does anything. Delegating a
-one-liner costs *more* than doing it inline. Delegate **investigation**, not
-transcription. For a run of small fixes arriving one at a time, reuse one warm
-worker via `SendMessage` rather than spawning a fresh one each time.
+### Batching
 
-**Surface design decisions.** Pushing investigation into the worker must not
-bury the reasoning:
-- A genuine fork the user would want a say in → the worker **stops and reports
-  it**. You park it as a `blocked` task with the options written out, and keep
-  working. The user drains it with `/jt:decide`.
-- A fork the worker resolves itself → it reports the choice, the alternatives,
-  and why. That goes in the task description, which `jj evolog` preserves.
+One task per worker is the default, not a rule. A worker's first minutes are
+spent orienting in the repo, and that cost is paid again by every fresh
+worker — so when several *small* ready tasks sit in related scope, hand the
+lot to one worker and let it work them back to back, exactly as `/jt:burst`
+does inline (`jt start` each in turn; the run accumulates as a clean line
+because each claim rebases onto the tip the last one left). Cap a batch at
+about 8, and keep it to tasks whose scopes are related — one worker holding
+two unrelated areas in context is worse than two workers.
 
-**Worker prompt template:**
+Batch only *small* tasks. Anything needing real design or a wide diff goes
+alone: a batch that stalls on task 3 leaves tasks 4-8 unstarted and their
+claims to clean up.
 
-```
-GOAL: <one self-contained outcome>
-SCOPE: <entry-point file(s) + the goal — nothing more. Do NOT pre-spec the
-  edits; investigating it yourself is what clobbers the orchestrator.>
-CONSTRAINTS: <APIs to use, patterns to follow, what NOT to change>
-QUALITY: prefer sound design over the smallest diff; self-evaluate your choices.
-DESIGN: if you hit a fork the user would reasonably want to decide, STOP and
-  report it instead of guessing. For forks you resolve, report the choice, the
-  alternatives, and why.
-VCS: this repo uses jujutsu (jj), NOT git.
-  - `jj file track <path>` for any NEW file (repo has auto-track=none)
-  - commit with `jj commit -m "<concise message>"`
-  - do NOT rewrite history (no squash/rebase/bookmark) — that's the
-    orchestrator's job
-VERIFY before committing: <project verify command>. EXIT 0 is the only source of
-  truth — IGNORE stale LSP diagnostics.
-RETURN: a compact report — what changed (files + approach, 2-4 lines), the key
-  design decision(s) + why, any unresolved fork, and the jj **change id**
-  (`jj log -r @- --no-graph -T 'change_id.shortest(8)'`). Not the git hash — the
-  change id survives rebase. You are returning data, not chatting.
-```
+Read-only investigation/scouting is safe to parallelize freely — fan out
+several investigators at once rather than reading serially yourself. If live
+edits (a worker mid-task, your own WIP `@`) would confuse a scout's read of
+the tree, give it `isolation: "worktree"` — the jj plugin bridges this to a
+throwaway `jj workspace`, created and torn down automatically, no manual `jj
+workspace add`/`forget` needed. Fine for scouting since it needs no
+`node_modules`/verify; not a fit for write-workers (see below).
 
-## 5. Verification gate
+## jj specifics for this workflow
 
-A task is not done until it passes. The worker runs the project's verify command
-and commits only on **exit 0**; you spot-check.
+General jj mechanics (squash, absorb, bookmarks, rebase, conflicts) are in the
+`jj-workflow:jj-concepts` skill — don't re-derive them here. These are the
+orchestration-only rules:
 
-**Keep the spot-check light.** Read the worker's reported decisions and confirm
-the exit code. Pull the actual diff only when the report raises a flag or the
-design warrants your eyes — re-reading every touched file re-clobbers the
-context §4 just protected.
+- Trailers are jt's storage, not manual bookkeeping: `Task-Status`,
+  `Priority`, `Scope` live in the description from filing all the way through
+  `done` — `jt done` only flips the status trailer, it doesn't strip. `jt
+  strip` (normally run in a batch via `/jt:cleanup`, not part of this loop)
+  is what removes them and leaves clean prose only. Never hand-edit the
+  trailer block — go through `jt set`/`jt start`/`jt done`/`jt strip`/`jt
+  block`.
+- Default to **sequential** dispatch, working directly in the default
+  workspace — `jt done` leaves the finished commit as the new tip and there
+  is no separate landing step. Only run workers in parallel when their
+  `scope` fields are disjoint — overlapping scope must be serialized even
+  across workspaces.
+- A parallel write-worker needs a **persistent** workspace (`jj workspace
+  add`, deps installed once, reused) — `jt start` edits *that* workspace's
+  `@`, so each parallel worker needs its own. A throwaway one (including
+  `isolation: "worktree"`) has no `node_modules` and can't run verify.
+- **Parallel landing is on you, not jt.** Each workspace's `jt start`
+  rebases onto *that workspace's own* tip, so parallel workers build
+  divergent lines that never converge by themselves. Once a parallel task is
+  `done`, rebase it onto the default workspace's current tip yourself (`jj
+  rebase -r <id> -d <default-tip>` — one line of output, fine to run
+  directly) — jj's merge is textual, not semantic, so a clean rebase doesn't
+  guarantee the code still works. Don't run the verify command yourself to
+  check: dispatch a worker into the *same persistent workspace* the task was
+  built in (it already has `node_modules`/deps installed — `isolation:
+  "worktree"` doesn't) to run verify and report the exit code, same as any
+  other task dispatch. This is safe to do concurrently with other live
+  workers, as long as they're positioned on their own tip and you never touch
+  a workspace whose `@` is still mid-task. The one thing that still needs a
+  quiet window: rewriting a commit some *other live* workspace's `@` is
+  based on.
 
-Confirm from jj rather than trusting the worker's self-report: the change id it
-returned should exist and be non-empty. For complex or high-stakes tasks, offer
-the user an **independent reviewer** — a fresh subagent that reviews the diff
-before you mark done.
+## Verify gate
 
-## 6. Failure and blockers
+Default self-verify: the worker runs the verify command and only calls `jt
+done` (or `jt set status=testing`, when the change needs the user's own eyes)
+on exit 0 — a task still `doing` after a worker returns means verify didn't
+pass (or the worker forgot), not that it's fine. You spot-check two things
+against `jt json -q`, not the diff: the task is off the board or
+`status:testing` (`done` tasks are filtered out of the default board view —
+they still carry their trailers, so `jt json -q -a` or `jt evo <id>` still
+shows them until a later `jt strip`), and `"empty":false` — `jt done` warns on
+an empty change the same way `/jt:start` treats that warning as
+stop-and-report, and an empty-but-`done` task is the cheapest sign a worker
+misfired. Pull the full diff only when something looks off by these checks or
+the task is high-stakes. For complex/important tasks, offer an
+independent-reviewer pass instead (a fresh subagent runs the gate and reviews
+the diff before `jt done`).
 
-- Broken tree → **top priority**, get it compiling before anything else.
-- Worker failed → root-cause and re-delegate **once**, with the diagnosis added.
-- Still stuck → set `Task-Status: blocked` with the reason in the description
-  and **continue with other ready tasks**. One blocker never stalls the run.
+A task still `doing` after its worker returned is the one failure that hides:
+it isn't `ready:true` any more, so the next loop iteration skips it and the
+run can end declaring victory with work half-claimed. Check for `doing` tasks
+with no live worker every iteration. First time: reset it (`jt set <id>
+status=todo`, diagnosis appended) and let it be re-dispatched. Same task
+leaking twice: stop and look at it yourself — something is wrong that a third
+worker won't fix either.
 
-## 7. Landing
+## Failure & blockers
 
-Finishing is not integrating. Land each task as it completes so the run
-accumulates as one clean advancing line, and so the next task's pre-dispatch
-rebase has an unambiguous tip. If done tasks pile up unlanded they stay parallel
-siblings and you re-inherit the conflicts the rebase was meant to avoid.
+Don't blind-retry a failed worker. Read the code, find the actual cause, and
+re-dispatch with that diagnosis baked in (or fix a one-liner inline) — leave
+the task claimable again (`jt set <id> status=todo`) with the diagnosis added
+to its description first, so the next worker doesn't repeat the investigation.
+While you're the one root-causing it, `jt set <id> status=investigating`
+rather than leaving it `todo`/`ready` — otherwise it's still `ready:true` and
+a later loop iteration will happily hand it to a fresh worker out from under
+you. A repeat failure means escalate, not re-patch cheaply: a stronger model,
+a reproduction test, your own root-cause up front. Still stuck after that →
+`jt block <id> "<reason>"` and keep going on other ready tasks — `/jt:decide`
+drains these with the user later.
 
-**Squash small fixes into their feature — only when clean.** Use
-`jj squash --from <fix> --into <feature> --use-destination-message` (the bare
-form opens an editor and fails with no TTY). If it needs more than a trivial
-conflict resolution, leave it standalone. Avoid `jj absorb` when an intervening
-change rewrote the same file. If a squash goes wrong: `jj op restore <op before
-it>`.
+## Project notes
 
-## 8. Project-specific notes
+Per-project verify commands and footguns belong in that project's `CLAUDE.md`,
+not here — write discovered traps there so future runs and workers inherit
+them.
 
-Verify commands, footguns, and conventions belong in the project's `CLAUDE.md`,
-not here. When you discover a recurring trap, write it there so future runs and
-workers inherit it.
+## Cross-run habits
+
+- Squash a small fix into its feature when clean (`jj squash --from <fix>
+  --into <feature> --use-destination-message`); leave it as a standalone
+  fixup if it'd need real conflict resolution.
+- `/jt:cleanup` (tidy `done` commit messages, then `jt strip` them) is a
+  separate, user-invoked pass, not part of this loop — `done` tasks pile up
+  with their trailers still on, and that's expected. Don't run it yourself
+  unless asked; do mention it exists if `jt json -q -a` shows a pile of
+  `done` tasks at a natural stopping point.
+- You can't self-invoke `/compact` — proactively remind the user to run it at
+  natural boundaries. Which is the honest limit of this skill for a run
+  nobody is watching: an unattended session eventually compacts on its own
+  terms or hits the ceiling. For that case hand off to **`jt grind`** instead
+  — a shell loop that runs one fresh `claude -p "/jt:burst"` per batch, so
+  context resets between batches and no supervisor accumulates at all. It
+  stops on its own when nothing is ready, decides between rounds from `jt json
+  -q` at zero context cost, and logs each round's result and cost. Use this
+  skill when someone is in the loop, `jt grind -C <workspace> -r N` when
+  nobody is. (`jt grind --help`. It refuses to run in the default workspace —
+  `jt start` would seize the `@` the user works from.)
+- For a run of several small fixes, prefer reusing one warm worker (via
+  SendMessage) over a fresh spin-up each time — the same economy as Batching,
+  applied to tasks that arrive one at a time instead of all at once.
+- `jt evo <id>` is the fast way to sanity-check what actually happened to a
+  task across a long run, without re-reading the whole conversation.

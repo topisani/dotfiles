@@ -12,13 +12,15 @@
 set -euo pipefail
 
 TASKS='description(substring:"Task-Status:")'
-STATUSES="todo ready doing investigating blocked done"
+STATUSES="todo ready doing investigating blocked testing deferred done"
 
 if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
   c_id=$'\e[33m'; c_todo=$'\e[34m'; c_doing=$'\e[32m'; c_blocked=$'\e[31m'
   c_done=$'\e[90m'; c_inv=$'\e[35m'; c_prio=$'\e[35m'; c_needs=$'\e[36m'; c_off=$'\e[0m'
+  c_testing=$'\e[93m'; c_defer=$'\e[37m'
 else
   c_id=; c_todo=; c_doing=; c_blocked=; c_done=; c_inv=; c_prio=; c_needs=; c_off=
+  c_testing=; c_defer=
 fi
 
 die() { printf 'jt: %s\n' "$*" >&2; exit 1; }
@@ -97,9 +99,65 @@ raw() {
     'change_id.shortest(8) ++ "\t" ++ parents.map(|p| p.change_id().shortest(8)).join(" ") ++ "\t" ++ if(empty,"1","0") ++ "\t" ++ json(description) ++ "\n"'
 }
 
+# Revset for the graph views (jt list --tree, jt ui). Including parents($TASKS)
+# connects the tasks into one component: jj draws a trailing "~" per
+# *disconnected* component, so without it you get one per task.
+ui_revset() { printf '(%s) | @ | parents(%s)' "$TASKS" "$TASKS"; }
+
+# Task-aware log template, shared by `jt list --tree` and the jjui config block.
+# jj's `trailers` keyword does real git-trailer parsing — verified that it reads
+# only the trailer block, not a "Task-Status:" line planted in the body.
+# First line matches what a normal commit gets (format_short_commit_header,
+# same as builtin_log_compact) so tasks and regular commits read the same way
+# in a mixed graph; task metadata (status/priority/needs) rides on the second
+# line, alongside the description rather than replacing it.
+task_template() { cat <<'JTEOF'
+if(trailers.contains_key("Task-Status"),
+  label(
+    separate(" ",
+      if(current_working_copy, "working_copy"),
+      if(immutable, "immutable", "mutable"),
+      if(conflict, "conflicted"),
+    ),
+    concat(
+      format_short_commit_header(self) ++ "\n",
+      separate(" ",
+        label("task_" ++ trailers.filter(|t| t.key()=="Task-Status").map(|t| t.value()).join(""),
+          "[" ++ trailers.filter(|t| t.key()=="Task-Status").map(|t| t.value()).join("") ++ "]"),
+        if(trailers.contains_key("Priority"),
+          label("task_priority", "(" ++ trailers.filter(|t| t.key()=="Priority").map(|t| t.value()).join("") ++ ")")),
+        if(empty, empty_commit_marker),
+        if(description,
+          description.first_line(),
+          label(if(empty, "empty"), description_placeholder)),
+        if(parents.any(|p| p.trailers().contains_key("Task-Status")),
+          label("task_needs", "(needs " ++ parents.filter(|p| p.trailers().contains_key("Task-Status")).map(|p| p.change_id().shortest(8)).join(" ") ++ ")")),
+      ) ++ "\n",
+    ),
+  ),
+  builtin_log_compact
+)
+JTEOF
+}
+
+# A task's code is buildable-on the moment it's implemented, even before its
+# trailers are stripped — so a task merely awaiting the user's confirmation
+# (status testing) counts as a tip candidate like a done (trailer-stripped)
+# commit does, not like an in-progress one.
+#
+# An empty, undescribed commit is jj's scratch working copy, not work — it is
+# excluded too, so `jt new` doesn't parent a task on it and `jt start` doesn't
+# rebase onto it. Otherwise every task filed from a fresh `@` inherits a
+# pointless empty ancestor that outlives the run. Empty-*with*-a-description is
+# deliberate and still counts. If everything is excluded (fresh repo, @ on
+# root), fall back to @ so callers always get a revision.
 worktip() {
-  jj log -r "heads(::@ ~ ($TASKS))" --no-graph --ignore-working-copy \
-    -T 'change_id.shortest(8)' | head -n1
+  local tip
+  tip=$(jj log -r "heads(::@ ~ ($TASKS ~ description(substring:\"Task-Status: testing\")) \
+        ~ (empty() & description(exact:\"\")))" \
+    --no-graph --ignore-working-copy -T 'change_id.shortest(8)' | head -n1)
+  [[ -z "$tip" ]] && tip=$(jj log -r @ --no-graph --ignore-working-copy -T 'change_id.shortest(8)')
+  printf '%s' "$tip"
 }
 
 # Resolve a user-supplied id or search term to exactly one task id.
@@ -110,7 +168,17 @@ resolve() {
       split(d, L, "\n")
       if (id ~ "^" AWKQ || tolower(L[1]) ~ tolower(AWKQ)) print id }')
   [[ -z "$hits" ]] && die "no task matches '$q'"
-  [[ $(wc -l <<<"$hits") -gt 1 ]] && die "'$q' is ambiguous:"$'\n'"$hits"
+  if [[ $(wc -l <<<"$hits") -gt 1 ]]; then
+    # An exact id match beats an incidental substring hit in another task's
+    # summary (e.g. one task's text mentions another task's id verbatim).
+    local exact
+    exact=$(grep -x -F "$q" <<<"$hits")
+    if [[ $(wc -l <<<"$exact") -eq 1 ]]; then
+      hits="$exact"
+    else
+      die "'$q' is ambiguous:"$'\n'"$hits"
+    fi
+  fi
   printf '%s' "$hits"
 }
 
@@ -119,11 +187,25 @@ desc_of() { jj log -r "$1" --no-graph --ignore-working-copy -T 'description'; }
 # ------------------------------------------------------------------- commands
 
 cmd_list() {
-  local all=0
-  [[ "${1:-}" == "-a" || "${1:-}" == "--all" ]] && all=1
+  local all=0 tree=0
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -a|--all)  all=1; shift ;;
+      -t|--tree) tree=1; shift ;;
+      *) die "usage: jt list [-a] [-t]" ;;
+    esac
+  done
+  # Tree view: jj draws the graph, so ordering is structural (blockers below
+  # dependents) rather than by priority — that's the trade for seeing the DAG.
+  if [[ $tree -eq 1 ]]; then
+    jj log -r "$(ui_revset)" --ignore-working-copy \
+       --config ui.log-synthetic-elided-nodes=false -T "$(task_template)"
+    return
+  fi
   raw | awk -F'\t' -v all="$all" -v c_id="$c_id" -v c_todo="$c_todo" -v c_doing="$c_doing" \
             -v c_blocked="$c_blocked" -v c_done="$c_done" -v c_inv="$c_inv" \
             -v c_prio="$c_prio" -v c_needs="$c_needs" -v c_off="$c_off" \
+            -v c_testing="$c_testing" -v c_defer="$c_defer" \
     "$AWKLIB"'
     {
       id = $1; par = $2
@@ -146,10 +228,11 @@ cmd_list() {
         if (!all && ST[id] == "done") continue
         needs = ""
         split(PAR[i], ps, " ")
-        for (j in ps) if (ps[j] in ST && ST[ps[j]] != "done")
+        for (j in ps) if (ps[j] in ST && ST[ps[j]] != "done" && ST[ps[j]] != "testing")
           needs = needs (needs ? " " : "") ps[j]
         col = ST[id] == "doing" ? c_doing : ST[id] == "blocked" ? c_blocked : \
-              ST[id] == "done" ? c_done : ST[id] == "investigating" ? c_inv : c_todo
+              ST[id] == "done" ? c_done : ST[id] == "investigating" ? c_inv : \
+              ST[id] == "testing" ? c_testing : ST[id] == "deferred" ? c_defer : c_todo
         line = c_id id c_off " " col "[" ST[id] "]" c_off
         if (PR[id]) line = line " " c_prio "(" PR[id] ")" c_off
         line = line " " (ST[id] == "done" ? c_done SUM[id] c_off : SUM[id])
@@ -160,10 +243,20 @@ cmd_list() {
     }'
 }
 
+# -q drops `body`. Not cosmetic: on a ~30-task board the bodies are 90% of the
+# output (99KB vs 11KB measured), and an orchestrator that polls the board every
+# loop iteration pays that repeatedly, in context, for tasks it isn't running.
+# Poll with -q; read one task's body with `jt show <id>` when you dispatch it.
 cmd_json() {
-  local all=0
-  [[ "${1:-}" == "-a" || "${1:-}" == "--all" ]] && all=1
-  raw | awk -F'\t' -v all="$all" "$AWKLIB"'
+  local all=0 brief=0
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -a|--all)   all=1; shift ;;
+      -q|--brief) brief=1; shift ;;
+      *) die "usage: jt json [-a] [-q]" ;;
+    esac
+  done
+  raw | awk -F'\t' -v all="$all" -v brief="$brief" "$AWKLIB"'
     {
       id = $1; par = $2; empty = $3
       d = unesc(substr($0, index($0, "\"")))
@@ -186,13 +279,15 @@ cmd_json() {
         if (!all && ST[id] == "done") continue
         needs = ""
         split(PAR[i], ps, " ")
-        for (j in ps) if (ps[j] in ST && ST[ps[j]] != "done")
+        for (j in ps) if (ps[j] in ST && ST[ps[j]] != "done" && ST[ps[j]] != "testing")
           needs = needs (needs ? " " : "") ps[j]
         ready = (needs == "" && (ST[id] == "todo" || ST[id] == "ready")) ? "true" : "false"
         printf "{\"id\":\"%s\",\"status\":\"%s\",\"priority\":\"%s\",\"scope\":\"%s\"," \
-               "\"summary\":\"%s\",\"needs\":\"%s\",\"ready\":%s,\"empty\":%s,\"body\":\"%s\"}\n", \
+               "\"summary\":\"%s\",\"needs\":\"%s\",\"ready\":%s,\"empty\":%s", \
                id, jesc(ST[id]), jesc(PR[id]), jesc(SC[id]), jesc(SUM[id]), needs, \
-               ready, (EM[id] == "1" ? "true" : "false"), jesc(BODY[id])
+               ready, (EM[id] == "1" ? "true" : "false")
+        if (!brief) printf ",\"body\":\"%s\"", jesc(BODY[id])
+        printf "}\n"
       }
     }'
 }
@@ -207,7 +302,7 @@ cmd_show() {
 cmd_set() {
   local id; id=$(resolve "${1:?usage: jt set <id> key=val...}"); shift
   [[ $# -eq 0 ]] && die "nothing to set"
-  local kvs=()
+  local kvs=() have_body=0 newbody=""
   for kv in "$@"; do
     [[ "$kv" != *=* ]] && die "expected key=value, got '$kv'"
     local k="${kv%%=*}" v="${kv#*=}"
@@ -216,14 +311,24 @@ cmd_set() {
         [[ " $STATUSES " == *" $v "* ]] || die "status must be one of: $STATUSES" ;;
       priority|prio) k="Priority" ;;
       scope) k="Scope" ;;
+      # body= replaces the description body, not a trailer. It's handled
+      # out-of-band (via a dedicated awk -v) because the trailer path joins
+      # all key=value pairs with newlines before splitting on them — a
+      # multi-line body value would get sliced into bogus trailer lines and
+      # corrupt the real ones.
+      body) have_body=1
+        if [[ "$v" == "-" ]]; then newbody="$(cat)"; else newbody="$v"; fi
+        continue ;;
     esac
     kvs+=("$k=$v")
   done
-  desc_of "$id" | awk -v kvspec="$(printf '%s\n' "${kvs[@]}")" "$AWKLIB"'
+  desc_of "$id" | awk -v kvspec="$(printf '%s\n' "${kvs[@]}")" \
+      -v have_body="$have_body" -v newbody="$newbody" "$AWKLIB"'
     { d = d (NR > 1 ? "\n" : "") $0 }
     END {
       start = parse(d, L, T, O)
       if (start == 0) { body = d; O[0] = 0 } else body = body_of(L, start)
+      if (have_body == "1") body = newbody
       nk = split(kvspec, KV, "\n")
       for (i = 1; i <= nk; i++) {
         if (KV[i] == "") continue
@@ -292,6 +397,16 @@ cmd_done() {
   local id; id=$(resolve "${1:?usage: jt done <id>}")
   local empty; empty=$(jj log -r "$id" --no-graph --ignore-working-copy -T 'if(empty,"1","0")')
   [[ "$empty" == "1" ]] && printf 'jt: warning — %s is empty (no code changes)\n' "$id" >&2
+  cmd_set "$id" status=done >/dev/null
+  printf 'jt: %s marked done — off the default board; `jt strip` finishes it\n' "$id"
+}
+
+# The trailer-stripping half of the old `jt done`. Split out so a task can sit
+# at status=done (visible with -a, filterable, still on the graph) for as long
+# as it takes to clean up the commit message, rather than losing its trailers
+# the instant it's marked complete.
+cmd_strip() {
+  local id; id=$(resolve "${1:?usage: jt strip <id>}")
   desc_of "$id" | awk "$AWKLIB"'
     { d = d (NR > 1 ? "\n" : "") $0 }
     END {
@@ -308,7 +423,7 @@ cmd_done() {
       printf "%s\n", body
       if (keep != "") printf "\n%s", keep
     }' | jj describe "$id" --stdin --quiet
-  printf 'jt: %s done — trailers stripped, off the board\n' "$id"
+  printf 'jt: %s stripped — trailers gone, off the board for good\n' "$id"
 }
 
 cmd_block() {
@@ -332,6 +447,27 @@ cmd_block() {
   fi
 }
 
+cmd_defer() {
+  local id; id=$(resolve "${1:?usage: jt defer <id> [reason]}"); shift
+  local reason="${*:-}"
+  if [[ -n "$reason" ]]; then
+    desc_of "$id" | awk -v r="$reason" "$AWKLIB"'
+      { d = d (NR > 1 ? "\n" : "") $0 }
+      END {
+        start = parse(d, L, T, O)
+        body = (start == 0) ? d : body_of(L, start)
+        printf "%s\n\nDEFERRED: %s\n", body, r
+        if (start != 0) { printf "\n"
+          for (i = 1; i <= O[0]; i++) { lk = tolower(O[i])
+            if (done_[lk]++) continue
+            printf "%s: %s\n", O[i], (lk == "task-status" ? "deferred" : T[lk]) } }
+      }' | jj describe "$id" --stdin --quiet
+    printf 'jt: %s deferred\n' "$id"
+  else
+    cmd_set "$id" status=deferred
+  fi
+}
+
 cmd_tip() { worktip; echo; }
 
 # Launch jjui on the task graph. Including parents($TASKS) connects the tasks
@@ -340,7 +476,7 @@ cmd_tip() { worktip; echo; }
 # the tasks are based on, and renders blocker edges properly.
 cmd_ui() {
   command -v jjui >/dev/null 2>&1 || die "jjui is not installed"
-  exec jjui -r "($TASKS) | @ | parents($TASKS)" "$@"
+  exec jjui -r "$(ui_revset)" "$@"
 }
 
 # A task's evolution trail. The old template-based version could only word-diff
@@ -419,6 +555,148 @@ cmd_evo() {
   fi
 }
 
+# ------------------------------------------------------------------- grind
+# Run batches of tasks unattended, one fresh `claude -p` per batch.
+#
+# The point is the process boundary: a slash command cannot clear its own
+# context, so a long unattended run inside one session pays for every earlier
+# batch's transcript on every later turn. One process per batch starts each
+# batch at zero. /jt:burst already picks its batch up front and refuses to
+# re-query mid-run ("next run's problem") — that clause is exactly what makes
+# it composable under an outer loop.
+#
+# The loop is deliberately dumb: it decides only *whether* another batch should
+# run, from `jt json` — which costs no context at all.
+
+grind_ready() { jt json -q | jq -s '[.[] | select(.ready)] | length'; }
+grind_doing()  { jt json -q | jq -sr '.[] | select(.status == "doing") | .id'; }
+grind_hash()   { jt json -q -a | jq -sr '[.[] | .id + ":" + .status] | sort | join(",")' | cksum; }
+
+cmd_grind() {
+  local rounds=10 dir="" model="" budget="" focus="" logdir="" dry=0 here=0
+  local cmd="/jt:burst"
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -r|--rounds)  rounds="$2"; shift 2 ;;
+      -C|--dir)     dir="$2"; shift 2 ;;
+      --model)      model="$2"; shift 2 ;;
+      --budget)     budget="$2"; shift 2 ;;
+      --command)    cmd="$2"; shift 2 ;;
+      --log)        logdir="$2"; shift 2 ;;
+      --here)       here=1; shift ;;
+      -n|--dry-run) dry=1; shift ;;
+      -h|--help)    grind_usage; return 0 ;;
+      --)           shift; focus="$*"; break ;;
+      -*)           die "unknown flag '$1' (try: jt grind --help)" ;;
+      *)            focus="$*"; break ;;
+    esac
+  done
+  command -v claude >/dev/null 2>&1 || die "claude is not on PATH"
+  command -v jq >/dev/null 2>&1 || die "jq is not installed (jt grind needs it)"
+
+  [[ -n "$dir" ]] && { cd "$dir" || die "no such directory: $dir"; }
+  local root; root=$(jj workspace root 2>/dev/null) || die "not in a jj workspace"
+  cd "$root"
+  # A secondary workspace stores .jj/repo as a *file* pointing at the store;
+  # the default workspace has it as a directory. Grinding in the default
+  # workspace means `jt start`'s `jj edit` seizes the @ the user works from.
+  if [[ -d .jj/repo && $here -eq 0 ]]; then
+    die "refusing to grind in the default workspace ($root) — \`jt start\` would
+    seize the @ you work from. Point it at another workspace with -C <path>
+    (\`jj workspace list\`), or pass --here if you really mean this one."
+  fi
+
+  logdir="${logdir:-${XDG_STATE_HOME:-$HOME/.local/state}/jt/grind}"
+  local stamp; stamp=$(date +%Y%m%d-%H%M%S)
+
+  local -a claude_args=(-p --output-format json --permission-mode bypassPermissions)
+  # Deploying is the user's call, always — never a side effect of an
+  # unattended run. Everything else is fair game inside a workspace.
+  claude_args+=(--disallowedTools "Bash(just deploy:*)")
+  [[ -n "$model" ]]  && claude_args+=(--model "$model")
+  [[ -n "$budget" ]] && claude_args+=(--max-budget-usd "$budget")
+  local prompt="$cmd"; [[ -n "$focus" ]] && prompt="$cmd $focus"
+
+  if [[ $dry -eq 1 ]]; then
+    printf 'workspace: %s\nrounds:    %s\nlogs:      %s/%s-r<N>.json\nper round: claude %s %s\n' \
+      "$root" "$rounds" "$logdir" "$stamp" "${claude_args[*]}" "$prompt"
+    printf 'ready now: %s\n' "$(grind_ready)"
+    return 0
+  fi
+  mkdir -p "$logdir"
+
+  local round=1 ran=0 total=0 lasthash="" stall=0 leaked="" ready
+  while (( round <= rounds )); do
+    ready=$(grind_ready)
+    if (( ready == 0 )); then
+      printf 'jt grind: nothing ready — stopping after %d round(s)\n' "$((round - 1))"
+      jt list | grep -E '\[(blocked|testing)\]' || true
+      break
+    fi
+    printf '── round %d/%d — %d ready — %s\n' "$round" "$rounds" "$ready" "$(date +%H:%M)"
+    local log="$logdir/$stamp-r$round.json" rc=0
+    claude "${claude_args[@]}" "$prompt" >"$log" 2>&1 || rc=$?
+    if (( rc != 0 )); then
+      printf 'jt grind: claude exited %d — stopping (log: %s)\n' "$rc" "$log"
+      break
+    fi
+    ran=$((ran + 1))   # not (( ran++ )): under set -e a post-increment from 0
+                       # evaluates to 0 and kills the loop
+    local cost; cost=$(jq -r '.total_cost_usd // 0' "$log" 2>/dev/null || echo 0)
+    total=$(awk -v a="$total" -v b="$cost" 'BEGIN{printf "%.4f", a + b}')
+    printf '   done — $%s (run total $%s) — %s\n' "$cost" "$total" "$log"
+    jq -r '.result // empty' "$log" 2>/dev/null | head -20 | sed 's/^/   /'
+
+    # A task left `doing` means the worker misfired (verify failed, or it never
+    # closed out). It is no longer ready, so it would silently drop out of the
+    # pool and the loop would declare victory with work half-claimed. Reset it
+    # once; a second leak of the same task is a real stop.
+    local id
+    for id in $(grind_doing); do
+      if [[ " $leaked " == *" $id "* ]]; then
+        printf 'jt grind: %s left `doing` twice — stopping, it needs a look\n' "$id"
+        return 1
+      fi
+      leaked="$leaked $id"
+      jt set "$id" status=todo >/dev/null
+      printf '   reset %s doing→todo (worker did not close it out)\n' "$id"
+    done
+
+    local h; h=$(grind_hash)
+    if [[ "$h" == "$lasthash" ]]; then
+      (( ++stall >= 2 )) && { printf 'jt grind: board unchanged for 2 rounds — stopping\n'; break; }
+    else
+      stall=0
+    fi
+    lasthash="$h"
+    round=$((round + 1))
+  done
+  (( round > rounds )) && printf 'jt grind: hit the %d-round cap\n' "$rounds"
+  printf 'jt grind: spent $%s across %d round(s); tip %s\n' "$total" "$ran" "$(worktip)"
+}
+
+grind_usage() {
+  cat <<'EOF'
+jt grind [options] [focus] — run batches of tasks unattended.
+
+Each round is a fresh `claude -p` process running a slash command (default
+/jt:burst), so context starts at zero every batch. Between rounds only `jt
+json` is consulted, which costs no context.
+
+  -r, --rounds N     max batches (default 10)
+  -C, --dir PATH     workspace to run in (default: cwd's workspace)
+      --model M      model for each batch (e.g. sonnet)
+      --budget USD   per-round spend cap
+      --command CMD  slash command per round (default /jt:burst)
+      --log DIR      log dir (default $XDG_STATE_HOME/jt/grind)
+      --here         allow running in the default workspace
+  -n, --dry-run      show what would run
+
+Stops when nothing is ready, the round cap is hit, the board stops changing,
+claude exits nonzero, or a task is left `doing` twice.
+EOF
+}
+
 # ------------------------------------------------- Claude Code slash commands
 # Embedded so the script is the single source of truth: `jt install` writes them
 # to ~/.claude/commands/jt/, giving /jt:file /jt:board /jt:start /jt:burst
@@ -446,8 +724,10 @@ File the request above as **one** task. Do not write code, do not start the
 work, do not investigate beyond a quick look to scope it.
 
 1. **Dedupe.** If it's already on the board, say which task and stop. If it
-   refines an existing task, update that one (`jt show <id>`, then `jt set`)
-   rather than filing a near-duplicate.
+   refines an existing task, update that one instead of filing a
+   near-duplicate: `jt show <id>` for its current body, then `jt set <id>
+   body=-` (feed the merged detail via stdin — preserves the status/priority/
+   scope trailers, and stdin is the safe way to send a multi-line body).
 
 2. **Create it:**
    ```
@@ -487,7 +767,7 @@ allowed-tools: Bash(jt:*), Bash(jj workspace:*)
 
 ## Structured
 
-!`jt json`
+!`jt json -q`
 
 ## Workspaces
 
@@ -505,7 +785,11 @@ Summarise the board at a glance:
   scope.
 - **Collisions** — any ready task whose `scope` overlaps something `doing`.
   Those must wait; picking one up means a merge conflict later.
+- **Testing** — status `testing`. Implementation is done and waiting on me to
+  confirm; name each and what it's waiting on me to check.
 - **Blocked** — phrase each as the actual question waiting on me, not the title.
+- **Deferred** — one trailing line, count and ids only. They're shelved on
+  purpose; don't expand them into the glance.
 
 Filter to `$ARGUMENTS` if given. Be terse — this is a glance, not a report. End
 with the one task you'd pick up next, and why.
@@ -561,7 +845,9 @@ you just want a sanity check.
 - Keep a `- [ ]` / `- [x]` checklist in the task description, ticking items off
   as you go. `jt evo <id>` then shows the checklist filling in over time.
 - Update the description at **checkpoints** — a decision taken, a blocker hit.
-  Terse and high-level; not a transcript.
+  Rewrite it to describe the current state, don't just append; a couple of
+  short paragraphs at most, not a transcript. `jt set <id> body=-` (stdin)
+  rewrites the body without disturbing the status/priority/scope trailers.
 - New files: `jj file track <path>`. Auto-track is off, so an untracked file
   silently isn't in the commit.
 - Notice something unrelated? `jt new "…"` and carry on. Don't scope-creep.
@@ -572,11 +858,18 @@ you just want a sanity check.
 
 1. **Verify** — the project's verify command from `CLAUDE.md`. Exit 0 is the
    only thing that counts; ignore stale LSP diagnostics.
-2. **`jj describe <id>`** — trim the description to a clean implementation
-   summary explaining the change and the key reasoning.
-3. **`jt done <id>`** — strips the trailers so the task leaves the board as a
-   clean commit. It warns if the change is still empty; that warning means
-   something went wrong, so stop and say so.
+2. **`jj describe <id>`** — rewrite the description to a clean implementation
+   summary: the change and its motivation, matching how the code actually
+   ended up, not a log of the work or issues hit along the way. A couple of
+   short paragraphs, max — preferably less.
+3. **Needs eyes-on confirmation** (a UI/frontend change, anything the verify
+   command can't actually judge)? `jt set <id> status=testing` instead of
+   `jt done`, and say what to look at. The task stays on the board until I set
+   it to `done` myself (or tell you to). Otherwise, **`jt done <id>`** — marks
+   it done and drops it off the default board. It warns if the change is
+   still empty; that warning means something went wrong, so stop and say so.
+   Either way, the trailers stay put for now — `/jt:cleanup` tidies the
+   message and strips them later, in a batch.
 4. Report the change id, what you did, and anything you left for later.
 
 Don't squash, rebase other changes, or move bookmarks — that's mine.
@@ -596,7 +889,7 @@ allowed-tools: Bash(jt:*), Bash(jj:*)
 
 ## Structured
 
-!`jt json`
+!`jt json -q`
 
 ## Focus
 
@@ -609,24 +902,47 @@ the unattended counterpart to `/jt:start` — don't ask me things, park them.
 
 ### Picking
 
-Take tasks with `"ready":true`, priority order, narrowed to `$ARGUMENTS` if
-given. Skip anything whose `scope` overlaps a task marked `doing` — another
-session owns those files.
+**Select the whole batch before starting any work.** From the board above,
+pick — in priority order, narrowed to `$ARGUMENTS` if given — tasks with
+`"ready":true` whose `scope` doesn't overlap a task marked `doing` (another
+session owns those files). Write that list down now; the run works exactly
+that list, in that order. Don't re-query the board mid-run to fold in newly
+ready or newly filed tasks — those are next run's problem, not this one.
 
-**Only small tasks.** If one needs real design or a wide diff, stop, write what
-you learned into its description, leave it `todo`, and move on. Big work wants
-`/jt:start` or an orchestrate run, not this.
+**Cap the batch at 8 tasks.** If more than 8 qualify, take the top 8 by
+priority and note the rest as left for next time — hitting the cap is a
+normal stop, not a failure.
+
+**Only small tasks.** If one needs real design or a wide diff, leave it out of
+the batch, write what you learned into its description (`jt set <id>
+body=-`, stdin so it stays safe with a multi-line body), leave it `todo`, and
+move on. Big work wants `/jt:start` or an orchestrate run, not this.
 
 ### Per task
 
 1. **`jt start <id>`** — claims it, rebases onto the current work tip, makes it
    the working copy. For the second and later tasks in the run, the tip is the
-   one you just finished, so the run accumulates as a clean line.
+   one you just finished, so the run accumulates as a clean line. Then **`jt
+   show <id>`** for its full description — the board above is deliberately
+   body-less (`-q`), so read the one body you need, when you need it, rather
+   than carrying every task's body through the whole run. If the body reveals
+   it's bigger than the summary looked, write what you learned into it
+   (`jt set <id> body=-`) and **`jt set <id> status=todo`** before moving on:
+   you have already claimed it, and a task left `doing` is invisible to the
+   next run.
 2. Do the work inline. Don't delegate — spin-up costs more than the fix at this
    size.
 3. **`jj file track <path>`** for new files.
 4. **Verify** — the project's command from `CLAUDE.md`. Exit 0 or it isn't done.
-5. **`jj describe <id>`** to a clean summary, then **`jt done <id>`**.
+   Don't let raw stdout/stderr sit in context — report pass/fail, and on
+   failure keep only the relevant error/tail, not the full log.
+5. **`jj describe <id>`** to a clean summary — the change and why, matching
+   the code as it ended up, not a log of the work; a couple of short
+   paragraphs, max. Needs my eyes-on before it's really done (a UI change,
+   anything verify can't judge)? `jt set <id> status=testing` and note what to
+   check — that's finished for this run, the next task still builds on top of
+   it. Otherwise **`jt done <id>`** — marks it done; trailers stay put until a
+   later `/jt:cleanup` batch strips them.
 
 ### Along the way
 
@@ -636,12 +952,14 @@ you learned into its description, leave it `todo`, and move on. Big work wants
 - **Spot something new?** `jt new "…"` and keep going. Don't scope-creep.
 - **Broken tree** is top priority — fix it before starting anything else.
 - Keep descriptions terse: the decision and why, not a play-by-play.
+- Tasks marked `deferred` are shelved on purpose — never `jt start` one, even
+  if it looks small and ready.
 
 Don't squash, merge, or move bookmarks — history cleanup is mine.
 
-Stop when nothing is ready, everything left is too big, or I interrupt. Report
-one line per task (change id + what you did), anything blocked or skipped, and
-the final tip.
+Stop when the batch is done, nothing was ready to select, or I interrupt.
+Report one line per task (change id + what you did), anything blocked or
+skipped, any qualifying tasks left over past the cap, and the final tip.
 JTMD
 }
 
@@ -680,13 +998,19 @@ For each blocked task (or just the one named in `$ARGUMENTS`):
    If the task is vague about what's actually being asked, say so and ask the
    real question rather than a reconstructed one.
 
-2. **Record the decision** — `jj describe <id>`: state what was decided, why,
-   and the date, and **replace the open question** rather than leaving both. A
-   future reader should see the resolution, not the debate. `jt evo <id>` keeps
+2. **Record the decision** — `jt set <id> body=-` (stdin; keeps the
+   status/priority/scope trailers intact): state what was decided, why, and
+   the date, and **replace the open question** rather than leaving both. A
+   couple of sentences, not the debate. A future reader should see the
+   resolution, not the history. `jt evo <id>` keeps
    the original either way.
 
 3. **Unblock it** — `jt set <id> status=todo`. If my answer makes the task moot,
-   `jt done <id>` to take it off the board, and say you've done that.
+   `jt done <id>` (drops it off the default board; `/jt:cleanup` strips it for
+   good later) and say you've done that. If I'd rather not decide now,
+   `jt defer <id> "<why, so a later pass has context>"`
+   — it drops off `/jt:decide`'s list and won't be raised again until I set it
+   back to `todo` myself.
 
 4. **Cascade.** If the decision settles a question another blocked task was also
    waiting on, resolve that one too and tell me — don't ask me twice.
@@ -695,6 +1019,66 @@ Batch related forks into a single `AskUserQuestion` where they're genuinely one
 decision; ask separately when they're not.
 
 If nothing is blocked, say so in one line and stop.
+JTMD
+}
+
+md_strip() { cat <<'JTMD'
+---
+description: Strip trailers off a task, leaving a clean commit
+argument-hint: [task id, or words matching one]
+allowed-tools: Bash(jt:*)
+---
+
+## Which task
+
+$ARGUMENTS
+
+## Your task
+
+Purely mechanical — no code, no message rewrite, no judgment call. Resolve
+`$ARGUMENTS` to a task and run `jt strip <id>`. It removes the Task-Status/
+Priority/Scope trailers, leaving a clean commit that's off the board for good.
+
+If `$ARGUMENTS` is empty or ambiguous, ask which task before running anything.
+Report the change id.
+JTMD
+}
+
+md_cleanup() { cat <<'JTMD'
+---
+description: Tidy commit messages for done tasks and strip their trailers
+argument-hint: [optional filter, e.g. a task id or a word from its summary]
+allowed-tools: Bash(jt:*), Bash(jj:*)
+---
+
+## Done tasks
+
+!`jt json -a | grep '"status":"done"'`
+
+## Scope
+
+$ARGUMENTS
+
+## Your task
+
+Finish off every task listed above as `done` (or just the one matching
+`$ARGUMENTS`, if given). These already got a real implementation and my
+sign-off — this pass is bookkeeping, not review. For each:
+
+1. **`jt show <id>`** for the full description.
+2. **Rewrite the commit message** — a couple of short paragraphs, max,
+   preferably less. State the change and its motivation where relevant,
+   matching the code as it actually ended up — not a log of the work, dead
+   ends, or issues hit along the way. Drop anything that isn't commit-worthy:
+   the checklist, blocker notes, testing instructions. `jt set <id> body=-`
+   (stdin) rewrites the body without touching the trailers.
+3. **`jt strip <id>`** — removes the trailers and takes it off the board for
+   good.
+
+Don't skip a task because its message already looks fine — still strip it.
+Don't squash, rebase other changes, or move bookmarks — that's mine.
+
+Report one line per task: change id and the message it ended up with.
 JTMD
 }
 
@@ -721,10 +1105,13 @@ _jt() {
     'show:full description'
     'set:update trailers'
     'start:claim, rebase onto work tip, edit'
-    'done:strip trailers, leaves the board'
+    'done:mark done, off the default board'
+    'strip:strip trailers, leaves the board'
     'block:mark blocked, with a reason'
+    'defer:mark deferred, with a reason'
     'evo:evolution trail'
     'tip:current work tip'
+    'grind:run batches unattended, fresh context each'
     'install:write Claude commands + completions'
     'help:usage'
   )
@@ -733,19 +1120,23 @@ _jt() {
     return
   fi
   case "${words[2]}" in
-    show|start|done|evo)
+    show|start|done|strip|evo)
       (( CURRENT == 3 )) && _jt_ids ;;
-    block)
+    block|defer)
       (( CURRENT == 3 )) && _jt_ids ;;
     set)
       if (( CURRENT == 3 )); then _jt_ids; else
         _values -S = 'field' \
-          'status[task status]:status:(todo ready doing investigating blocked done)' \
+          'status[task status]:status:(todo ready doing investigating blocked testing deferred done)' \
           'priority[priority]:priority:(P0 P1 P2 P3)' \
-          'scope[files it touches]:scope:'
+          'scope[files it touches]:scope:' \
+          'body[description body, "-" for stdin]:body:'
       fi ;;
-    list|board|json)
+    list|board)
       _arguments '(-a --all)'{-a,--all}'[include done tasks]' ;;
+    json)
+      _arguments '(-a --all)'{-a,--all}'[include done tasks]' \
+                 '(-q --brief)'{-q,--brief}'[drop bodies]' ;;
     new)
       _arguments \
         '(-p --priority)'{-p,--priority}'[priority]:priority:(P0 P1 P2 P3)' \
@@ -753,6 +1144,16 @@ _jt() {
         '(-b --blocked-by)'{-b,--blocked-by}'[blocked by task]:task:_jt_ids' \
         '--parent[parent revision]:rev:' \
         '--body[body text]:text:' ;;
+    grind)
+      _arguments \
+        '(-r --rounds)'{-r,--rounds}'[max batches]:rounds:' \
+        '(-C --dir)'{-C,--dir}'[workspace to run in]:dir:_files -/' \
+        '--model[model per batch]:model:(fable opus sonnet haiku)' \
+        '--budget[per-round spend cap in USD]:usd:' \
+        '--command[slash command per batch]:cmd:' \
+        '--log[log dir]:dir:_files -/' \
+        '--here[allow the default workspace]' \
+        '(-n --dry-run)'{-n,--dry-run}'[show what would run]' ;;
     install)
       _arguments '--dir[Claude commands dir]:dir:_files -/' \
                  '(-n --dry-run)'{-n,--dry-run}'[show what would be written]' ;;
@@ -775,20 +1176,32 @@ complete -c jt -n __fish_use_subcommand -a new     -d 'file a task'
 complete -c jt -n __fish_use_subcommand -a show    -d 'full description'
 complete -c jt -n __fish_use_subcommand -a set     -d 'update trailers'
 complete -c jt -n __fish_use_subcommand -a start   -d 'claim, rebase onto work tip, edit'
-complete -c jt -n __fish_use_subcommand -a done    -d 'strip trailers, leaves the board'
+complete -c jt -n __fish_use_subcommand -a done    -d 'mark done, off the default board'
+complete -c jt -n __fish_use_subcommand -a strip   -d 'strip trailers, leaves the board'
 complete -c jt -n __fish_use_subcommand -a block   -d 'mark blocked, with a reason'
+complete -c jt -n __fish_use_subcommand -a defer   -d 'mark deferred, with a reason'
 complete -c jt -n __fish_use_subcommand -a evo     -d 'evolution trail'
 complete -c jt -n __fish_use_subcommand -a tip     -d 'current work tip'
+complete -c jt -n __fish_use_subcommand -a grind   -d 'run batches unattended, fresh context each'
 complete -c jt -n __fish_use_subcommand -a install -d 'write Claude commands + completions'
 
-complete -c jt -n '__fish_seen_subcommand_from show set start done block evo' -a '(__jt_ids)'
+complete -c jt -n '__fish_seen_subcommand_from show set start done strip block defer evo' -a '(__jt_ids)'
 complete -c jt -n '__fish_seen_subcommand_from list json' -s a -l all -d 'include done tasks'
+complete -c jt -n '__fish_seen_subcommand_from json' -s q -l brief -d 'drop bodies'
 complete -c jt -n '__fish_seen_subcommand_from new' -s p -l priority -d 'priority' -x -a 'P0 P1 P2 P3'
 complete -c jt -n '__fish_seen_subcommand_from new' -s s -l scope -d 'files it touches' -x
 complete -c jt -n '__fish_seen_subcommand_from new' -s b -l blocked-by -d 'blocked by task' -x -a '(__jt_ids)'
 complete -c jt -n '__fish_seen_subcommand_from new' -l body -d 'body text' -x
 complete -c jt -n '__fish_seen_subcommand_from install' -l dir -d 'Claude commands dir' -x -a '(__fish_complete_directories)'
 complete -c jt -n '__fish_seen_subcommand_from install' -s n -l dry-run -d 'show what would be written'
+complete -c jt -n '__fish_seen_subcommand_from grind' -s r -l rounds -d 'max batches' -x
+complete -c jt -n '__fish_seen_subcommand_from grind' -s C -l dir -d 'workspace to run in' -x -a '(__fish_complete_directories)'
+complete -c jt -n '__fish_seen_subcommand_from grind' -l model -d 'model per batch' -x -a 'fable opus sonnet haiku'
+complete -c jt -n '__fish_seen_subcommand_from grind' -l budget -d 'per-round spend cap (USD)' -x
+complete -c jt -n '__fish_seen_subcommand_from grind' -l command -d 'slash command per batch' -x
+complete -c jt -n '__fish_seen_subcommand_from grind' -l log -d 'log dir' -x -a '(__fish_complete_directories)'
+complete -c jt -n '__fish_seen_subcommand_from grind' -l here -d 'allow the default workspace'
+complete -c jt -n '__fish_seen_subcommand_from grind' -s n -l dry-run -d 'show what would run'
 JTEOF
 }
 
@@ -797,7 +1210,7 @@ _jt() {
   local cur prev cmds
   cur="${COMP_WORDS[COMP_CWORD]}"
   prev="${COMP_WORDS[COMP_CWORD-1]}"
-  cmds="list board json new show set start done block evo tip install help"
+  cmds="list board json new show set start done strip block defer evo tip grind install help"
 
   if [[ $COMP_CWORD -eq 1 ]]; then
     mapfile -t COMPREPLY < <(compgen -W "$cmds" -- "$cur")
@@ -805,7 +1218,7 @@ _jt() {
   fi
 
   case "${COMP_WORDS[1]}" in
-    show|start|done|evo|block)
+    show|start|done|strip|evo|block|defer)
       if [[ $COMP_CWORD -eq 2 ]]; then
         mapfile -t COMPREPLY < <(compgen -W \
           "$(jt json -a 2>/dev/null | sed -n 's/.*"id":"\([^"]*\)".*/\1/p')" -- "$cur")
@@ -816,14 +1229,18 @@ _jt() {
           "$(jt json -a 2>/dev/null | sed -n 's/.*"id":"\([^"]*\)".*/\1/p')" -- "$cur")
       elif [[ "$cur" == status=* ]]; then
         mapfile -t COMPREPLY < <(compgen -W \
-          "status=todo status=ready status=doing status=investigating status=blocked status=done" -- "$cur")
+          "status=todo status=ready status=doing status=investigating status=blocked status=testing status=deferred status=done" -- "$cur")
       elif [[ "$cur" == priority=* ]]; then
         mapfile -t COMPREPLY < <(compgen -W "priority=P0 priority=P1 priority=P2 priority=P3" -- "$cur")
+      elif [[ "$cur" == body=* ]]; then
+        mapfile -t COMPREPLY < <(compgen -W "body=-" -- "$cur")
       else
-        mapfile -t COMPREPLY < <(compgen -W "status= priority= scope=" -- "$cur")
+        mapfile -t COMPREPLY < <(compgen -W "status= priority= scope= body=" -- "$cur")
       fi ;;
-    list|board|json)
+    list|board)
       mapfile -t COMPREPLY < <(compgen -W "-a --all" -- "$cur") ;;
+    json)
+      mapfile -t COMPREPLY < <(compgen -W "-a --all -q --brief" -- "$cur") ;;
     new)
       case "$prev" in
         -p|--priority) mapfile -t COMPREPLY < <(compgen -W "P0 P1 P2 P3" -- "$cur") ;;
@@ -833,6 +1250,13 @@ _jt() {
       esac ;;
     install)
       mapfile -t COMPREPLY < <(compgen -W "--dir -n --dry-run" -- "$cur") ;;
+    grind)
+      case "$prev" in
+        --model) mapfile -t COMPREPLY < <(compgen -W "fable opus sonnet haiku" -- "$cur") ;;
+        -C|--dir|--log) mapfile -t COMPREPLY < <(compgen -d -- "$cur") ;;
+        *) mapfile -t COMPREPLY < <(compgen -W \
+             "-r --rounds -C --dir --model --budget --command --log --here -n --dry-run" -- "$cur") ;;
+      esac ;;
   esac
 }
 complete -F _jt jt
@@ -842,35 +1266,20 @@ JTEOF
 # jjui integration. Schema per jjui 0.10.x: [[actions]] takes name/desc/lua and
 # may carry key/seq/scope directly. `t` is unbound in the top-level `revisions`
 # scope and the defaults ship no seq bindings, so a t-prefixed chord is free.
-comp_jjui() { cat <<'JTEOF'
-# >>> jt tasks — managed by `jt install --jjui`, edits here will be overwritten >>>
-# Task-aware log template. Uses jj's `trailers` keyword — real trailer parsing,
-# not the substring matching the old revset board relied on. Non-task commits
-# fall through to builtin_log_compact so the working copy still reads normally.
-[revisions]
-template = '''
-if(trailers.contains_key("Task-Status"),
-  separate(" ",
-    format_short_change_id(change_id),
-    label("task_" ++ trailers.filter(|t| t.key()=="Task-Status").map(|t| t.value()).join(""),
-      "[" ++ trailers.filter(|t| t.key()=="Task-Status").map(|t| t.value()).join("") ++ "]"),
-    if(trailers.contains_key("Priority"),
-      label("task_priority", "(" ++ trailers.filter(|t| t.key()=="Priority").map(|t| t.value()).join("") ++ ")")),
-    description.first_line(),
-    if(parents.any(|p| p.trailers().contains_key("Task-Status")),
-      label("task_needs", "(needs " ++ parents.filter(|p| p.trailers().contains_key("Task-Status")).map(|p| p.change_id().shortest(8)).join(" ") ++ ")")),
-  ) ++ "\n",
-  builtin_log_compact
-)
-'''
-
+comp_jjui() {
+  # Composed rather than one heredoc so the template has a single definition
+  # (task_template) shared with `jt list --tree`.
+  printf '%s\n' "# >>> jt tasks — managed by \`jt install --jjui\`, edits here will be overwritten >>>"
+  printf '%s\n' "# Task-aware log template — see \`jt list --tree\` for the same view in the shell."
+  printf '[revisions]\ntemplate = %s\n%s%s\n\n' "'''" "$(task_template)" "'''"
+  cat <<'JTEOF'
 [[actions]]
 name = "jt_status"
 desc = "task: set status"
 lua = '''
 local id = context.change_id()
 if not id then return end
-local s = choose({ options = {"todo","ready","doing","investigating","blocked","done"}, title = "Task-Status" })
+local s = choose({ options = {"todo","ready","doing","investigating","blocked","testing","deferred","done"}, title = "Task-Status" })
 if s then
   exec_shell("jt set " .. id .. " status=" .. s)
   revisions.refresh({ keep_selections = true })
@@ -927,8 +1336,24 @@ seq = ["t", "b"]
 scope = "revisions"
 
 [[actions]]
+name = "jt_defer"
+desc = "task: defer with a reason"
+lua = '''
+local id = context.change_id()
+if not id then return end
+local r = input({ title = "Defer task", prompt = "reason: " })
+if r and r ~= "" then
+  exec_shell("jt defer " .. id .. " " .. string.format("%q", r))
+  revisions.refresh({ keep_selections = true })
+  flash("deferred")
+end
+'''
+seq = ["t", "D"]
+scope = "revisions"
+
+[[actions]]
 name = "jt_done"
-desc = "task: done (strip trailers)"
+desc = "task: mark done"
 lua = '''
 local id = context.change_id()
 if not id then return end
@@ -937,6 +1362,19 @@ revisions.refresh()
 flash("done: " .. id)
 '''
 seq = ["t", "d"]
+scope = "revisions"
+
+[[actions]]
+name = "jt_strip"
+desc = "task: strip trailers, leaves the board"
+lua = '''
+local id = context.change_id()
+if not id then return end
+exec_shell("jt strip " .. id)
+revisions.refresh()
+flash("stripped: " .. id)
+'''
+seq = ["t", "r"]
 scope = "revisions"
 
 [[actions]]
@@ -950,6 +1388,15 @@ revisions.refresh({ selected_revision = id })
 flash("started: " .. id)
 '''
 seq = ["t", "S"]
+scope = "revisions"
+
+[[actions]]
+name = "jt_list"
+desc = "task: the whole board"
+lua = '''
+exec_shell("jt list | less -R")
+'''
+seq = ["t", "t"]
 scope = "revisions"
 
 [[actions]]
@@ -981,6 +1428,10 @@ fg = "yellow"
 fg = "magenta"
 [colors.task_blocked]
 fg = "bright red"
+[colors.task_testing]
+fg = "bright yellow"
+[colors.task_deferred]
+fg = "white"
 [colors.task_done]
 fg = "bright black"
 [colors.task_priority]
@@ -1014,8 +1465,9 @@ install_jjui() {
   append_block "$cfg" comp_jjui
   printf 'wrote jjui template + actions to %s\n' "$cfg"
   install_jj_colors
-  printf '  t s  status    t p  priority   t n  new     t b  block\n'
-  printf '  t d  done      t S  start      t e  evo\n'
+  printf '  t t  board     t s  status     t p  priority  t n  new\n'
+  printf '  t b  block     t d  done       t S  start     t e  evo\n'
+  printf '  t D  defer     t r  strip\n'
   printf '  browse with: jt ui\n'
 }
 
@@ -1035,7 +1487,7 @@ cmd_install() {
   local n
   if [[ $dry -eq 1 ]]; then
     printf 'slash commands → %s\n' "$dir"
-    printf '  %s.md\n' file board start burst decide
+    printf '  %s.md\n' file board start burst decide strip cleanup
     printf 'completions:\n'
     printf '  %s/_jt\n  %s/jt.fish\n  %s/jt\n' "$zdir" "$fdir" "$bdir"
     [[ $do_jjui -eq 1 ]] && printf 'jjui actions → %s/config.toml (appended, marked block)\n' \
@@ -1043,7 +1495,7 @@ cmd_install() {
     return
   fi
   mkdir -p "$dir"
-  for n in file board start burst decide; do
+  for n in file board start burst decide strip cleanup; do
     "md_$n" > "$dir/$n.md"
     printf 'wrote %s/%s.md  → /jt:%s\n' "$dir" "$n" "$n"
   done
@@ -1063,24 +1515,37 @@ usage() {
   cat <<'EOF'
 jt — task tracker on jj changes. A task is a change with a Task-Status: trailer.
 
-  jt [list] [-a]              board of open tasks (-a includes done)
-  jt json [-a]                same, as JSONL — for scripts and agents
+  jt [list] [-a] [-t]         board of open tasks (-a includes done,
+                              -t draws the DAG instead of priority order)
+  jt json [-a] [-q]           same, as JSONL — for scripts and agents
+                              (-q drops bodies: ~10x smaller, poll with it)
   jt new <summary> [flags]    file a task
        -p P1  -s <scope>  -b <blocker-id>  --parent <rev>  --body <text>
   jt show <id>                full description
-  jt set <id> key=val...      status= priority= scope=, or any Trailer-Key=
+  jt set <id> key=val...      status= priority= scope= body= (body=- reads
+                              stdin), or any Trailer-Key=
   jt start <id>               rebase onto work tip, mark doing, jj edit it
-  jt done <id>                strip trailers — leaves the board, clean commit
+  jt done <id>                mark done (stays on the graph, drops off the
+                              default board; trailers stay until `jt strip`)
+  jt strip <id>               strip trailers — leaves the board, clean commit
   jt block <id> [reason]      mark blocked, appending the reason
+  jt defer <id> [reason]      mark deferred, appending the reason
   jt evo <id>                 evolution trail: status/priority/checklist changes
   jt tip                      the current work tip
   jt ui [jjui args]           browse the task graph in jjui
+  jt grind [-r N] [-C ws]     work batches unattended: one fresh `claude -p`
+                              per batch, so context resets between them
+                              (`jt grind --help` for the rest)
   jt install [--dir P] [-n] [--jjui]
                               write the /jt:* slash commands, shell completions,
                               and (with --jjui) jjui task actions
 
 <id> may be a change-id prefix or words matching a summary.
-Statuses: todo ready doing investigating blocked done
+Statuses: todo ready doing investigating blocked testing deferred done
+  testing  — implementation done, waiting on the user to confirm before `jt done`
+  done     — confirmed complete but not yet cleaned up; `/jt:cleanup` tidies
+             the message and runs `jt strip` to take it off the graph for good
+  deferred — shelved: never ready, never surfaced by /jt:decide
 EOF
 }
 
@@ -1098,9 +1563,12 @@ case "${1:-list}" in
   set)           shift; cmd_set "$@" ;;
   start)         shift; cmd_start "$@" ;;
   done)          shift; cmd_done "$@" ;;
+  strip)         shift; cmd_strip "$@" ;;
   block)         shift; cmd_block "$@" ;;
+  defer)         shift; cmd_defer "$@" ;;
   evo|taskevo)   shift; cmd_evo "$@" ;;
   ui|jjui)       shift; cmd_ui "$@" ;;
+  grind)         shift; cmd_grind "$@" ;;
   tip)           cmd_tip ;;
   -h|--help|help) usage ;;
   *) die "unknown command '$1' (try: jt --help)" ;;

@@ -57,3 +57,6 @@ iscmd jj && source <(COMPLETE=zsh jj)
 
 iscmd starship && source <(starship init zsh)
 iscmd atuin && source <(atuin init zsh --disable-up-arrow)
+
+# Scaleway CLI autocomplete initialization.
+iscmd scw && eval "$(scw autocomplete script shell=zsh)"

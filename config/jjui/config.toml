@@ -6,25 +6,34 @@ selected = { fg = "bright white", bg = "233" }
 "revset completion selected" = { bg = "233" }
 
 # >>> jt tasks — managed by `jt install --jjui`, edits here will be overwritten >>>
-# Task-aware log template. Uses jj's `trailers` keyword — real trailer parsing,
-# not the substring matching the old revset board relied on. Non-task commits
-# fall through to builtin_log_compact so the working copy still reads normally.
+# Task-aware log template — see `jt list --tree` for the same view in the shell.
 [revisions]
 template = '''
 if(trailers.contains_key("Task-Status"),
-  separate(" ",
-    format_short_change_id(change_id),
-    label("task_" ++ trailers.filter(|t| t.key()=="Task-Status").map(|t| t.value()).join(""),
-      "[" ++ trailers.filter(|t| t.key()=="Task-Status").map(|t| t.value()).join("") ++ "]"),
-    if(trailers.contains_key("Priority"),
-      label("task_priority", "(" ++ trailers.filter(|t| t.key()=="Priority").map(|t| t.value()).join("") ++ ")")),
-    description.first_line(),
-    if(parents.any(|p| p.trailers().contains_key("Task-Status")),
-      label("task_needs", "(needs " ++ parents.filter(|p| p.trailers().contains_key("Task-Status")).map(|p| p.change_id().shortest(8)).join(" ") ++ ")")),
-  ) ++ "\n",
+  label(
+    separate(" ",
+      if(current_working_copy, "working_copy"),
+      if(immutable, "immutable", "mutable"),
+      if(conflict, "conflicted"),
+    ),
+    concat(
+      format_short_commit_header(self) ++ "\n",
+      separate(" ",
+        label("task_" ++ trailers.filter(|t| t.key()=="Task-Status").map(|t| t.value()).join(""),
+          "[" ++ trailers.filter(|t| t.key()=="Task-Status").map(|t| t.value()).join("") ++ "]"),
+        if(trailers.contains_key("Priority"),
+          label("task_priority", "(" ++ trailers.filter(|t| t.key()=="Priority").map(|t| t.value()).join("") ++ ")")),
+        if(empty, empty_commit_marker),
+        if(description,
+          description.first_line(),
+          label(if(empty, "empty"), description_placeholder)),
+        if(parents.any(|p| p.trailers().contains_key("Task-Status")),
+          label("task_needs", "(needs " ++ parents.filter(|p| p.trailers().contains_key("Task-Status")).map(|p| p.change_id().shortest(8)).join(" ") ++ ")")),
+      ) ++ "\n",
+    ),
+  ),
   builtin_log_compact
-)
-'''
+)'''
 
 [[actions]]
 name = "jt_status"
@@ -32,7 +41,7 @@ desc = "task: set status"
 lua = '''
 local id = context.change_id()
 if not id then return end
-local s = choose({ options = {"todo","ready","doing","investigating","blocked","done"}, title = "Task-Status" })
+local s = choose({ options = {"todo","ready","doing","investigating","blocked","testing","deferred","done"}, title = "Task-Status" })
 if s then
   exec_shell("jt set " .. id .. " status=" .. s)
   revisions.refresh({ keep_selections = true })
@@ -89,6 +98,22 @@ seq = ["t", "b"]
 scope = "revisions"
 
 [[actions]]
+name = "jt_defer"
+desc = "task: defer with a reason"
+lua = '''
+local id = context.change_id()
+if not id then return end
+local r = input({ title = "Defer task", prompt = "reason: " })
+if r and r ~= "" then
+  exec_shell("jt defer " .. id .. " " .. string.format("%q", r))
+  revisions.refresh({ keep_selections = true })
+  flash("deferred")
+end
+'''
+seq = ["t", "D"]
+scope = "revisions"
+
+[[actions]]
 name = "jt_done"
 desc = "task: done (strip trailers)"
 lua = '''
@@ -112,6 +137,15 @@ revisions.refresh({ selected_revision = id })
 flash("started: " .. id)
 '''
 seq = ["t", "S"]
+scope = "revisions"
+
+[[actions]]
+name = "jt_list"
+desc = "task: the whole board"
+lua = '''
+exec_shell("jt list | less -R")
+'''
+seq = ["t", "t"]
 scope = "revisions"
 
 [[actions]]

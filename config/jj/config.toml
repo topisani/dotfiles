@@ -43,14 +43,21 @@ if(self && !current_working_copy && !immutable && !conflict && in_branch(self),
 # need it: revsets can't parse trailers, so it substring-matches. That is fine
 # as a coarse filter; `jt` re-checks the actual trailer block.
 'tasks()' = 'description(substring:"Task-Status:")'
+# A task placeholder is one nobody has built on: no code written into it (still
+# `empty()`), nothing stacked on top (`visible_heads()` — a commit with any
+# child at all drops out, so this also never hides an ancestor of something
+# shown), and not sitting under any workspace's `@` (`working_copies()` — most
+# `doing` tasks are still empty right after `jt start`, before the first edit,
+# and are exactly the case a plain `tasks() & empty()` used to hide).
+'task_placeholders()' = '(tasks() & empty() & visible_heads()) ~ working_copies()'
 
 [revsets]
 bookmark-advance-to = "@-"
 # Hide EMPTY task placeholders from the default `jj log` — they live off to the
 # side; view the board with `jt`. Once you `jt start` a task and write real code
 # it's non-empty and shows in the log like any other change, even while it still
-# carries its trailer. (Bare `tasks()` here hid every worked task too, incl. `@`.)
-log = "(present(@) | ancestors(immutable_heads().., 2) | trunk()) ~ (tasks() & empty())"
+# carries its trailer.
+log = "(present(@) | ancestors(immutable_heads().., 2) | trunk()) ~ task_placeholders()"
 
 [colors]
 # Highlight hunks with background
@@ -58,11 +65,11 @@ log = "(present(@) | ancestors(immutable_heads().., 2) | trunk()) ~ (tasks() & e
 "diff added token" = { bg = "#002200", underline = false }
 
 [git]
-# Prevent pushing anything labeled "private", or EMPTY task placeholders. A
-# finished task holds real code, so it's non-empty and stays pushable — which is
-# what lets `jt done` produce a landable commit. (Bare `tasks()` here blocked
-# every finished task from pushing, since it keeps its trailer until done.)
-private-commits = "description(glob:'private:*') | (tasks() & empty())"
+# Prevent pushing anything labeled "private", or any open task. `jt done` no
+# longer strips the trailer — it just flips Task-Status to done, so the commit
+# still matches `tasks()` and stays private until `jt strip` (normally via
+# `/jt:cleanup`) actually clears it and makes the commit landable.
+private-commits = "description(glob:'private:*') | tasks()"
 track-default-bookmark-on-clone = false
 
 [remotes.origin]
@@ -104,6 +111,10 @@ fg = "yellow"
 fg = "magenta"
 [colors.task_blocked]
 fg = "bright red"
+[colors.task_testing]
+fg = "bright yellow"
+[colors.task_deferred]
+fg = "white"
 [colors.task_done]
 fg = "bright black"
 [colors.task_priority]
