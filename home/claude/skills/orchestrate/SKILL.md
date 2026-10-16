@@ -123,14 +123,41 @@ you.
 Exception: a task that already failed once. Then investigate and root-cause it
 yourself before re-dispatching (see Failure below).
 
+**Delegate the SEARCH, not only the work.** Before designing anything that
+introduces a new name, fan out read-only agents to answer "does a general
+mechanism for this already exist, and where?" and take back a few lines. The
+reason this step gets skipped is that searching costs the ORCHESTRATOR's
+context — the one genuinely scarce resource in a long run. Subagent context is
+free and never reaches you, so the constraint driving the skip already has a
+tool that removes it. Hoarding design while delegating implementation is
+backwards: design is the half that needs the wide read.
+
+**What a worker inherits depends on its agent type — verified, not assumed.**
+A `general-purpose` subagent receives the project `CLAUDE.md`, the user's global
+`CLAUDE.md` and the memory index, injected as a `claudeMd` block. An `Explore`
+subagent receives NONE of them. So a rule that must reach a *searching* agent
+belongs in its dispatch prompt; a rule that must reach an *implementing* agent
+can live in `CLAUDE.md`. Re-probe rather than trusting this table if the harness
+changes — a delegated agent reporting on its own context is evidence about that
+agent only, and two of them disagreed before this was measured.
+
 Worker prompt should cover:
 - **GOAL + SCOPE** — the outcome and an entry-point file, not the exact edits
 - **CONSTRAINTS** — API/patterns to follow, what not to touch
-- **DESIGN** — resolve a fork alone when the choice is discoverable (record
-  the choice + why in the commit message); block instead of guessing when
-  it's genuinely up to the user: `jt block <id> "<the question, options, your
-  recommendation>"` and return early. Blocked tasks accumulate for a single
-  `/jt:decide` pass rather than pausing the run.
+- **SEARCH BEFORE DESIGN** — establish whether a general mechanism already
+  exists before introducing a new one. If it does, use it and name it in the
+  commit message. If it genuinely does not, say so explicitly before building
+  one. The trigger is **"am I about to introduce a name that does not exist
+  yet"** — a new function, flag, attribute, field, class, selector or concept —
+  **not** blast radius or file count. A one-line change that mints a concept
+  needs the search; a fifty-file change that only calls existing things does
+  not. A local picture always feels complete, and on any codebase larger than a
+  context window it will be wrong; only a mechanical search step catches that.
+- **DESIGN** — resolve a fork alone once the search above has shown that
+  nothing already answers it (record the choice + why in the commit message);
+  block instead of guessing when it's genuinely up to the user: `jt block <id>
+  "<the question, options, your recommendation>"` and return early. Blocked
+  tasks accumulate for a single `/jt:decide` pass rather than pausing the run.
 - **BUGS** — reproduce with a failing test first, then fix, keep the test
 - **VCS** — jj only, never `git commit`. `jt start` runs `jj edit`, seizing
   the *invoking* workspace's `@` — so **every** worker, sequential or
@@ -142,10 +169,18 @@ Worker prompt should cover:
   task filed from a different workspace can have a stale parent; that's
   harmless, `jt start` rebases it. If it reports it couldn't rebase, that's a
   stop-and-report, not something to push through. `jj file track` any new
-  file. Finish with the project's verify command (exit 0 only), `jj describe
-  <id>` to a clean implementation summary (a couple of short paragraphs, max —
-  the change and its motivation, not a log of the work), then `jt done <id>` —
-  marks it done and moves it off the default board. The trailers stay on the
+  file. Finish with the project's verify command (exit 0 only), `jt set <id>
+  body=-` (piping a heredoc from stdin: summary line, blank line, then a
+  clean implementation summary — a couple of short paragraphs max, the change
+  and its motivation, not a log of the work) to rewrite the message, then `jt
+  done <id>` — marks it done and moves it off the default board. **Never call
+  raw `jj describe <id>` on a jt-tracked change** — it replaces the whole
+  description and silently wipes the `Task-Status`/`Priority`/`Scope`
+  trailers, and `jt` then can't find the task at all (recoverable, but avoid
+  it: re-describe with the trailer block manually appended). Also never feed
+  `body=-` a heredoc that itself contains `Task-Status:`/`Priority:`/`Scope:`
+  lines — `jt set` re-adds the trailer block itself, so doing so doubles it.
+  The trailers stay on the
   commit until a later `/jt:cleanup` pass runs `jt strip`, so a `done` commit
   is not yet the clean landed prose the trailers will eventually give way to
   — that's a separate, later pass, not part of this worker's job. If the

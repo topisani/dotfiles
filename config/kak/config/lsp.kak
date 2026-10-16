@@ -307,41 +307,24 @@ hook -group lsp-filetype-janet global BufSetOption filetype=janet %{
 
 rmhooks global lsp-project-zephyr
 hook -group lsp-project-zephyr global BufSetOption filetype=(kconfig|conf) %{
-   eval %sh{
-      root=$(eval "$kak_opt_lsp_find_root" .west-lsp $(: kak_buffile))
-      [ -e "$root/.west-lsp" ] || exit 0
-      cat <<EOF
-      set-option buffer lsp_servers %{
-         [west]
-         root = '$root'
-         command = "west-lsp"
-         args = ["kconfig-lsp"]
-      }
-EOF
-   }
+  set-option buffer lsp_servers %{
+    [west]
+    root_globs = [".west/config"]
+    command = "west-lsp"
+    args = ["kconfig-lsp"]
+  }
 }
 
 hook -group lsp-project-zephyr global BufSetOption filetype=(devicetree) %{
-   eval %sh{
-      root=$(eval "$kak_opt_lsp_find_root" .west/config $(: kak_buffile))
-
-      settings=$(west-lsp dts-lsp-settings --root-dir "$root")
-
-      cat <<EOF
-      set-option buffer lsp_servers %{
-         [devicetree]
-         root = '$root'
-         command = "npm"
-         args = ["x", "--", "devicetree-language-server", "--stdio"]
-         # command = "node"
-         # args = ["/home/topisani/git/tools/dts-lsp/server/dist/server.js", "--stdio"]
-         settings_section = "_"
-
-      $settings
-      }
-EOF
-   }
+  set-option buffer lsp_servers %{
+    [devicetree]
+    root_globs = [".west/config"]
+    command = "west-lsp"
+    args = ["dts-lsp"]
+  }
 }
+
+
 
 rmhooks global lsp-openscad
 hook -group lsp-openscad global BufSetOption filetype=openscad %{

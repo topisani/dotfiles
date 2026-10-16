@@ -41,9 +41,10 @@ desc = "task: set status"
 lua = '''
 local id = context.change_id()
 if not id then return end
+local rev = "$(jj log --no-graph --ignore-working-copy -r " .. id .. " -T change_id)"
 local s = choose({ options = {"todo","ready","doing","investigating","blocked","testing","deferred","done"}, title = "Task-Status" })
 if s then
-  exec_shell("jt set " .. id .. " status=" .. s)
+  exec_shell("jt set " .. rev .. " status=" .. s)
   revisions.refresh({ keep_selections = true })
   flash("status → " .. s)
 end
@@ -57,9 +58,10 @@ desc = "task: set priority"
 lua = '''
 local id = context.change_id()
 if not id then return end
+local rev = "$(jj log --no-graph --ignore-working-copy -r " .. id .. " -T change_id)"
 local p = choose({ options = {"P0","P1","P2","P3"}, title = "Priority" })
 if p then
-  exec_shell("jt set " .. id .. " priority=" .. p)
+  exec_shell("jt set " .. rev .. " priority=" .. p)
   revisions.refresh({ keep_selections = true })
   flash("priority → " .. p)
 end
@@ -87,9 +89,10 @@ desc = "task: block with a reason"
 lua = '''
 local id = context.change_id()
 if not id then return end
+local rev = "$(jj log --no-graph --ignore-working-copy -r " .. id .. " -T change_id)"
 local r = input({ title = "Block task", prompt = "reason: " })
 if r and r ~= "" then
-  exec_shell("jt block " .. id .. " " .. string.format("%q", r))
+  exec_shell("jt block " .. rev .. " " .. string.format("%q", r))
   revisions.refresh({ keep_selections = true })
   flash("blocked")
 end
@@ -103,9 +106,10 @@ desc = "task: defer with a reason"
 lua = '''
 local id = context.change_id()
 if not id then return end
+local rev = "$(jj log --no-graph --ignore-working-copy -r " .. id .. " -T change_id)"
 local r = input({ title = "Defer task", prompt = "reason: " })
 if r and r ~= "" then
-  exec_shell("jt defer " .. id .. " " .. string.format("%q", r))
+  exec_shell("jt defer " .. rev .. " " .. string.format("%q", r))
   revisions.refresh({ keep_selections = true })
   flash("deferred")
 end
@@ -115,15 +119,28 @@ scope = "revisions"
 
 [[actions]]
 name = "jt_done"
-desc = "task: done (strip trailers)"
+desc = "task: mark done"
 lua = '''
 local id = context.change_id()
 if not id then return end
-exec_shell("jt done " .. id)
+exec_shell("jt done $(jj log --no-graph --ignore-working-copy -r " .. id .. " -T change_id)")
 revisions.refresh()
 flash("done: " .. id)
 '''
 seq = ["t", "d"]
+scope = "revisions"
+
+[[actions]]
+name = "jt_strip"
+desc = "task: strip trailers, leaves the board"
+lua = '''
+local id = context.change_id()
+if not id then return end
+exec_shell("jt strip $(jj log --no-graph --ignore-working-copy -r " .. id .. " -T change_id)")
+revisions.refresh()
+flash("stripped: " .. id)
+'''
+seq = ["t", "r"]
 scope = "revisions"
 
 [[actions]]
@@ -132,7 +149,7 @@ desc = "task: start (rebase onto tip, edit)"
 lua = '''
 local id = context.change_id()
 if not id then return end
-exec_shell("jt start " .. id)
+exec_shell("jt start $(jj log --no-graph --ignore-working-copy -r " .. id .. " -T change_id)")
 revisions.refresh({ selected_revision = id })
 flash("started: " .. id)
 '''
@@ -154,7 +171,7 @@ desc = "task: evolution trail"
 lua = '''
 local id = context.change_id()
 if not id then return end
-exec_shell("jt evo " .. id .. " | less -R")
+exec_shell("jt evo $(jj log --no-graph --ignore-working-copy -r " .. id .. " -T change_id) | less -R")
 '''
 seq = ["t", "e"]
 scope = "revisions"

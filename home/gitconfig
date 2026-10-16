@@ -52,6 +52,9 @@
 [url "gitlab-as-move:move-innovation/"]
 	insteadOf = git@gitlab.com:move-innovation/
 
+[url "gitlab-as-move:mouldflo/"]
+	insteadOf = git@gitlab.com:mouldflo/
+
 [push]
 	default = current
 	autoSetupRemote = true

@@ -12,6 +12,20 @@ define-command -override set-indent -params 2..3 -docstring 'set-indent <scope> 
   }
 }
 
+# Keep kak-lsp formatting options in sync with kakoune's indent style:
+# indentwidth 0 means tabs, > 0 means spaces (i.e. expandtab).
+# A window-scoped value shadows kak-lsp's global lsp_insert_spaces option.
+define-command -hidden -override sync-lsp-indent %{
+  try %{
+    set-option window lsp_insert_spaces %sh{
+      [ "${kak_opt_indentwidth:-0}" -gt 0 ] && echo true || echo false
+    }
+  }
+}
+
+hook global WinCreate .* sync-lsp-indent
+hook global WinSetOption indentwidth=\d+ sync-lsp-indent
+
 define-command -override enable-trim-trailing-whitespace -docstring 'enable-trim-trailing-whitespace: Enable automatic trailing whitespace trim on save' %{
   remove-hooks window trim-trailing-whitespace
   hook window -group trim-trailing-whitespace BufWritePre '.*' %{

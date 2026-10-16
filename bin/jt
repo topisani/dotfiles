@@ -140,46 +140,49 @@ if(trailers.contains_key("Task-Status"),
 JTEOF
 }
 
-# A task's code is buildable-on the moment it's implemented, even before its
-# trailers are stripped — so a task merely awaiting the user's confirmation
-# (status testing) counts as a tip candidate like a done (trailer-stripped)
-# commit does, not like an in-progress one.
+# Everything in `::@` is already IN the tree, so skipping a candidate does not
+# drop its content — it just bases the next task LOWER, quietly building on a
+# tree that is missing whatever sits above. Hence a DENYLIST of one: only
+# `doing` is excluded, because that commit is being rewritten right now and
+# stacking on it races the writer into a divergent change.
 #
-# An empty, undescribed commit is jj's scratch working copy, not work — it is
-# excluded too, so `jt new` doesn't parent a task on it and `jt start` doesn't
-# rebase onto it. Otherwise every task filed from a fresh `@` inherits a
-# pointless empty ancestor that outlives the run. Empty-*with*-a-description is
-# deliberate and still counts. If everything is excluded (fresh repo, @ on
-# root), fall back to @ so callers always get a revision.
+# Every other status is a fair tip. Do NOT special-case them individually: a
+# task's code is buildable-on the moment it is implemented, `jt done` does not
+# strip (so a finished task keeps its trailers until `jt strip`), and a LANDED
+# task is routinely flipped back to `todo` to carry follow-up feedback. An
+# allowlist misses one of those and silently reintroduces the skip.
+#
+# EMPTY commits are excluded whatever they are — jj's scratch working copy, and
+# equally a `jt new` task placeholder that is filed but not yet implemented.
+# Skipping them is always safe, and for the same reason the denylist above is
+# minimal: an empty commit contributes no content, so passing it over drops
+# nothing, whereas passing over a non-empty one would. Basing real work on a
+# placeholder would otherwise bury an unimplemented task mid-stack and invent a
+# dependency that was never intended. If everything is excluded (fresh repo, @
+# on root), fall back to @ so callers always get a revision.
 worktip() {
   local tip
-  tip=$(jj log -r "heads(::@ ~ ($TASKS ~ description(substring:\"Task-Status: testing\")) \
-        ~ (empty() & description(exact:\"\")))" \
+  tip=$(jj log -r "heads(::@ ~ description(substring:\"Task-Status: doing\") ~ empty())" \
     --no-graph --ignore-working-copy -T 'change_id.shortest(8)' | head -n1)
   [[ -z "$tip" ]] && tip=$(jj log -r @ --no-graph --ignore-working-copy -T 'change_id.shortest(8)')
   printf '%s' "$tip"
 }
 
-# Resolve a user-supplied id or search term to exactly one task id.
+# Resolve a revision to exactly one task id.
+#
+# The argument is a REVSET — jj does the prefix resolution, and reports an
+# ambiguous prefix in its own words; intersecting with $TASKS is what makes
+# "resolves, but isn't a task" an error. There is deliberately no matching
+# against summary text: that made a short prefix (all `change_id.shortest()`
+# ever yields, so what jjui passes) substring-hit half the board and silently
+# resolve to the wrong task.
 resolve() {
-  local q="$1" hits
-  hits=$(raw | awk -F'\t' -v AWKQ="$q" "$AWKLIB"'
-    { id = $1; d = unesc(substr($0, index($0, "\"")))
-      split(d, L, "\n")
-      if (id ~ "^" AWKQ || tolower(L[1]) ~ tolower(AWKQ)) print id }')
-  [[ -z "$hits" ]] && die "no task matches '$q'"
-  if [[ $(wc -l <<<"$hits") -gt 1 ]]; then
-    # An exact id match beats an incidental substring hit in another task's
-    # summary (e.g. one task's text mentions another task's id verbatim).
-    local exact
-    exact=$(grep -x -F "$q" <<<"$hits")
-    if [[ $(wc -l <<<"$exact") -eq 1 ]]; then
-      hits="$exact"
-    else
-      die "'$q' is ambiguous:"$'\n'"$hits"
-    fi
-  fi
-  printf '%s' "$hits"
+  local q="$1" out
+  out=$(jj log -r "($TASKS) & ($q)" --no-graph --ignore-working-copy \
+          -T 'change_id.shortest(8) ++ "\n"' 2>&1) || die "$out"
+  [[ -z "$out" ]] && die "no task matches '$q'"
+  [[ $(wc -l <<<"$out") -gt 1 ]] && die "'$q' is ambiguous:"$'\n'"$out"
+  printf '%s' "$out"
 }
 
 desc_of() { jj log -r "$1" --no-graph --ignore-working-copy -T 'description'; }
@@ -345,7 +348,7 @@ cmd_set() {
         k = (lk in CASE) ? CASE[lk] : O[i]
         printf "%s: %s\n", k, T[lk]
       }
-    }' | jj describe "$id" --stdin --quiet
+    }' | jj describe "$id" --stdin "${JJ_IGNORE_IMMUTABLE[@]}" --quiet
   printf 'jt: %s updated\n' "$id"
 }
 
@@ -381,15 +384,28 @@ cmd_start() {
   local id; id=$(resolve "${1:?usage: jt start <id>}")
   local tip; tip=$(worktip)
   local cur; cur=$(jj log -r "$id-" --no-graph --ignore-working-copy -T 'change_id.shortest(8)' | head -n1)
-  if [[ "$cur" != "$tip" && "$id" != "$tip" ]]; then
-    if jj rebase -r "$id" -d "$tip" --quiet 2>/dev/null; then
+  # NEVER rebase a task that is already an ANCESTOR of the tip. A task whose
+  # work landed earlier and is now being reopened (a `testing` task above all —
+  # `worktip` counts those as tip candidates, so a reopened one is routinely
+  # buried mid-stack) sits UNDER commits that were built on top of it. Moving it
+  # to the top tears it out of the middle: every descendant that touched the
+  # same lines has to re-apply without it, which conflicts the entire stack
+  # above it — 18 landed commits, in the case that prompted this guard. Leave it
+  # where it sits and let the work continue in place; `jj edit` below still puts
+  # the caller on it.
+  local buried; buried=$(jj log -r "($id) & (::($tip))" --no-graph --ignore-working-copy \
+                           -T 'change_id.shortest(8)' 2>/dev/null | head -n1)
+  if [[ -n "$buried" ]]; then
+    printf 'jt: %s is already an ancestor of %s — working it in place (no rebase)\n' "$id" "$tip"
+  elif [[ "$cur" != "$tip" && "$id" != "$tip" ]]; then
+    if jj rebase -r "$id" -d "$tip" "${JJ_IGNORE_IMMUTABLE[@]}" --quiet 2>/dev/null; then
       printf 'jt: rebased %s onto %s\n' "$id" "$tip"
     else
       printf 'jt: could not rebase onto %s — working it where it sits\n' "$tip" >&2
     fi
   fi
   cmd_set "$id" status=doing >/dev/null
-  jj edit "$id" --quiet
+  jj edit "$id" "${JJ_IGNORE_IMMUTABLE[@]}" --quiet
   printf 'jt: %s is now @ (status doing)\n' "$id"
 }
 
@@ -422,7 +438,7 @@ cmd_strip() {
       }
       printf "%s\n", body
       if (keep != "") printf "\n%s", keep
-    }' | jj describe "$id" --stdin --quiet
+    }' | jj describe "$id" --stdin "${JJ_IGNORE_IMMUTABLE[@]}" --quiet
   printf 'jt: %s stripped — trailers gone, off the board for good\n' "$id"
 }
 
@@ -440,7 +456,7 @@ cmd_block() {
           for (i = 1; i <= O[0]; i++) { lk = tolower(O[i])
             if (done_[lk]++) continue
             printf "%s: %s\n", O[i], (lk == "task-status" ? "blocked" : T[lk]) } }
-      }' | jj describe "$id" --stdin --quiet
+      }' | jj describe "$id" --stdin "${JJ_IGNORE_IMMUTABLE[@]}" --quiet
     printf 'jt: %s blocked\n' "$id"
   else
     cmd_set "$id" status=blocked
@@ -461,7 +477,7 @@ cmd_defer() {
           for (i = 1; i <= O[0]; i++) { lk = tolower(O[i])
             if (done_[lk]++) continue
             printf "%s: %s\n", O[i], (lk == "task-status" ? "deferred" : T[lk]) } }
-      }' | jj describe "$id" --stdin --quiet
+      }' | jj describe "$id" --stdin "${JJ_IGNORE_IMMUTABLE[@]}" --quiet
     printf 'jt: %s deferred\n' "$id"
   else
     cmd_set "$id" status=deferred
@@ -799,7 +815,7 @@ JTMD
 md_start() { cat <<'JTMD'
 ---
 description: Work one task with me in the loop on the design
-argument-hint: [task id, or words matching one]
+argument-hint: [task id]
 allowed-tools: Bash(jt:*), Bash(jj:*), AskUserQuestion
 ---
 
@@ -819,7 +835,7 @@ wanted it done unsupervised I'd have said `/jt:burst`.
 
 ### Set up
 
-`jt start <id>` — takes a change-id prefix or words matching a summary. It
+`jt start <id>` — takes a change-id prefix (ids only; there is no text search). It
 claims the task as `doing`, rebases it onto the current work tip so you build on
 current code rather than the state it was filed against, and makes it the
 working copy. If it reports that it couldn't rebase, tell me before continuing.
@@ -1025,7 +1041,7 @@ JTMD
 md_strip() { cat <<'JTMD'
 ---
 description: Strip trailers off a task, leaving a clean commit
-argument-hint: [task id, or words matching one]
+argument-hint: [task id]
 allowed-tools: Bash(jt:*)
 ---
 
@@ -1266,6 +1282,11 @@ JTEOF
 # jjui integration. Schema per jjui 0.10.x: [[actions]] takes name/desc/lua and
 # may carry key/seq/scope directly. `t` is unbound in the top-level `revisions`
 # scope and the defaults ship no seq bindings, so a t-prefixed chord is free.
+#
+# `context.change_id()` hands back jjui's `change_id.shortest()` — a prefix that
+# is only unique against the CURRENT graph. Every action therefore expands it to
+# the full change id in the shell ($(jj log … -T change_id)) before passing it to
+# `jt`; the bare prefix is kept only for jjui-side use (flash, reselection).
 comp_jjui() {
   # Composed rather than one heredoc so the template has a single definition
   # (task_template) shared with `jt list --tree`.
@@ -1279,9 +1300,10 @@ desc = "task: set status"
 lua = '''
 local id = context.change_id()
 if not id then return end
+local rev = "$(jj log --no-graph --ignore-working-copy -r " .. id .. " -T change_id)"
 local s = choose({ options = {"todo","ready","doing","investigating","blocked","testing","deferred","done"}, title = "Task-Status" })
 if s then
-  exec_shell("jt set " .. id .. " status=" .. s)
+  exec_shell("jt set " .. rev .. " status=" .. s)
   revisions.refresh({ keep_selections = true })
   flash("status → " .. s)
 end
@@ -1295,9 +1317,10 @@ desc = "task: set priority"
 lua = '''
 local id = context.change_id()
 if not id then return end
+local rev = "$(jj log --no-graph --ignore-working-copy -r " .. id .. " -T change_id)"
 local p = choose({ options = {"P0","P1","P2","P3"}, title = "Priority" })
 if p then
-  exec_shell("jt set " .. id .. " priority=" .. p)
+  exec_shell("jt set " .. rev .. " priority=" .. p)
   revisions.refresh({ keep_selections = true })
   flash("priority → " .. p)
 end
@@ -1325,9 +1348,10 @@ desc = "task: block with a reason"
 lua = '''
 local id = context.change_id()
 if not id then return end
+local rev = "$(jj log --no-graph --ignore-working-copy -r " .. id .. " -T change_id)"
 local r = input({ title = "Block task", prompt = "reason: " })
 if r and r ~= "" then
-  exec_shell("jt block " .. id .. " " .. string.format("%q", r))
+  exec_shell("jt block " .. rev .. " " .. string.format("%q", r))
   revisions.refresh({ keep_selections = true })
   flash("blocked")
 end
@@ -1341,9 +1365,10 @@ desc = "task: defer with a reason"
 lua = '''
 local id = context.change_id()
 if not id then return end
+local rev = "$(jj log --no-graph --ignore-working-copy -r " .. id .. " -T change_id)"
 local r = input({ title = "Defer task", prompt = "reason: " })
 if r and r ~= "" then
-  exec_shell("jt defer " .. id .. " " .. string.format("%q", r))
+  exec_shell("jt defer " .. rev .. " " .. string.format("%q", r))
   revisions.refresh({ keep_selections = true })
   flash("deferred")
 end
@@ -1357,7 +1382,7 @@ desc = "task: mark done"
 lua = '''
 local id = context.change_id()
 if not id then return end
-exec_shell("jt done " .. id)
+exec_shell("jt done $(jj log --no-graph --ignore-working-copy -r " .. id .. " -T change_id)")
 revisions.refresh()
 flash("done: " .. id)
 '''
@@ -1370,7 +1395,7 @@ desc = "task: strip trailers, leaves the board"
 lua = '''
 local id = context.change_id()
 if not id then return end
-exec_shell("jt strip " .. id)
+exec_shell("jt strip $(jj log --no-graph --ignore-working-copy -r " .. id .. " -T change_id)")
 revisions.refresh()
 flash("stripped: " .. id)
 '''
@@ -1383,7 +1408,7 @@ desc = "task: start (rebase onto tip, edit)"
 lua = '''
 local id = context.change_id()
 if not id then return end
-exec_shell("jt start " .. id)
+exec_shell("jt start $(jj log --no-graph --ignore-working-copy -r " .. id .. " -T change_id)")
 revisions.refresh({ selected_revision = id })
 flash("started: " .. id)
 '''
@@ -1405,7 +1430,7 @@ desc = "task: evolution trail"
 lua = '''
 local id = context.change_id()
 if not id then return end
-exec_shell("jt evo " .. id .. " | less -R")
+exec_shell("jt evo $(jj log --no-graph --ignore-working-copy -r " .. id .. " -T change_id) | less -R")
 '''
 seq = ["t", "e"]
 scope = "revisions"
@@ -1540,7 +1565,11 @@ jt — task tracker on jj changes. A task is a change with a Task-Status: traile
                               write the /jt:* slash commands, shell completions,
                               and (with --jjui) jjui task actions
 
-<id> may be a change-id prefix or words matching a summary.
+  --ignore-immutable          global flag, any position: forwarded to the
+                              underlying jj rebase/edit/describe calls
+                              (start, set, strip, block, defer)
+
+<id> is a change-id prefix — ids only, never a text search.
 Statuses: todo ready doing investigating blocked testing deferred done
   testing  — implementation done, waiting on the user to confirm before `jt done`
   done     — confirmed complete but not yet cleaned up; `/jt:cleanup` tidies
@@ -1548,6 +1577,20 @@ Statuses: todo ready doing investigating blocked testing deferred done
   deferred — shelved: never ready, never surfaced by /jt:decide
 EOF
 }
+
+# --ignore-immutable is a global flag, valid anywhere in the args, stripped
+# here and threaded through to the jj rebase/edit/describe calls below that
+# can otherwise refuse to touch an immutable commit.
+JJ_IGNORE_IMMUTABLE=()
+filtered=()
+for a in "$@"; do
+  if [[ "$a" == "--ignore-immutable" ]]; then
+    JJ_IGNORE_IMMUTABLE=(--ignore-immutable)
+  else
+    filtered+=("$a")
+  fi
+done
+set -- "${filtered[@]}"
 
 case "${1:-list}" in
   -h|--help|help) usage; exit 0 ;;

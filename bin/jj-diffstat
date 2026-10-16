@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# jj diffstat — jj diff --stat, plus the net line delta (insertions - deletions).
+set -euo pipefail
+
+out="$(jj diff --stat "$@")"
+printf '%s\n' "$out"
+
+summary="$(printf '%s\n' "$out" | tail -n 1)"
+ins=0
+del=0
+[[ "$summary" =~ ([0-9]+)\ insertion ]] && ins="${BASH_REMATCH[1]}"
+[[ "$summary" =~ ([0-9]+)\ deletion ]] && del="${BASH_REMATCH[1]}"
+
+printf 'net: %+d\n' "$((ins - del))"

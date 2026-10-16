@@ -59,6 +59,8 @@ bookmark-advance-to = "@-"
 # carries its trailer.
 log = "(present(@) | ancestors(immutable_heads().., 2) | trunk()) ~ task_placeholders()"
 
+immutable_heads="none()"
+
 [colors]
 # Highlight hunks with background
 "diff removed token" = { bg = "#221111", underline = false }
@@ -91,6 +93,8 @@ delta = [
 ]
 
 difft = ["diff", "--tool=difft"]
+
+diffstat = ['util', 'exec', '--', 'jj-diffstat']
 
 notrack = [
   'util', 'exec', '--', 'bash', '-c',

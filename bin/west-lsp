@@ -5,11 +5,17 @@
 # dependencies = [
 #     "lsprotocol==2024.0.0b1",
 #     "pygls==2.0.0a2",
-#     "typer",
+#     "click",
 #     "pyyaml",
-#     "toml",
 # ]
 # ///
+
+# Kconfig/devicetree language server for Zephyr west workspaces.
+#
+# All configuration is reconstructed from build artifacts that Zephyr's CMake
+# build already generates (build_info.yml, Kconfig/kconfig_module_dirs.env and
+# the menuconfig target in build.ninja). No init step or cmake hook is needed:
+# build the project once and the LSP picks up the latest build's configuration.
 
 
 import enum
@@ -17,14 +23,16 @@ import itertools
 import json
 import logging
 import os
+import re
+import shlex
 import subprocess
 import sys
+import threading
 from pathlib import Path
 from typing import Any
 
 import click
 import yaml
-import toml
 
 
 def mod_kconfig_lsp():
@@ -117,7 +125,7 @@ def mod_kconfig_lsp():
             path = Path(filename)
             if not path.is_absolute():
                 base = os.getenv("srctree")
-                path = base / path
+                path = Path(base) / path
             return path.resolve().as_uri()
 
         def sym_prompt(self, sym: Symbol) -> str:
@@ -168,18 +176,6 @@ def mod_kconfig_lsp():
 
             if not sym.is_constant:
                 # These aren't helpful to show for constant symbols
-
-                # if sym.user_value is not None:
-                #     # Only add quotes for non-bool/tristate symbols
-                #     add(
-                #         "user value: "
-                #         + (
-                #             self.__kcl.TRI_TO_STR[sym.user_value]
-                #             if sym.orig_type in self.__kcl._BOOL_TRISTATE
-                #             else '"{}"'.format(sym.user_value)
-                #         )
-                #     )
-
                 add("visibility: " + self.__kcl.TRI_TO_STR[sym.visibility])
 
                 if sym.choice:
@@ -246,14 +242,10 @@ def mod_kconfig_lsp():
 
                 if after:
                     while end < len(line) and end >= 0 and is_word_char(line[end]):
-                        logging.info(f"  end: {end}")
                         end += 1
-                res = line[start:end].strip()
+                return line[start:end].strip()
 
-                return res
-
-            except IndexError as e:
-                logging.exception(e)
+            except IndexError:
                 return None
 
     server = KconfLsp("kconfig-lsp", "v0.1")
@@ -345,101 +337,130 @@ def mod_kconfig_lsp():
 
 
 ###############################################################################
-# Commands                                                                    #
+# Build metadata discovery                                                    #
 ###############################################################################
 
-CONFIG_FILE_PATH = Path(".west-lsp")
+
+def find_workspace_root(start: Path | None = None) -> Path | None:
+    """Find the west workspace root (the directory containing .west/)."""
+    start = Path(start) if start else Path.cwd()
+    for base in [start, *start.parents]:
+        if (base / ".west").is_dir():
+            return base
+    return None
+
+
+def find_build_info(root_dir: Path) -> Path | None:
+    """Find the most recently modified app build_info.yml under root_dir.
+
+    Prefers the conventional build/ directory to avoid walking the whole tree,
+    and skips sysbuild's `_sysbuild` directory in favor of the application
+    build directory (the one whose Kconfig the editor should index).
+    """
+    search_dir = root_dir / "build"
+    if not search_dir.is_dir():
+        search_dir = root_dir
+
+    candidates = sorted(
+        (
+            p
+            for p in search_dir.rglob("build_info.yml")
+            if (p.parent / "Kconfig").is_dir()
+        ),
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )
+    # With sysbuild, the top-level build dir only holds SB_CONFIG_* symbols;
+    # prefer an image build dir (e.g. build/<dir>/app) with a real CONFIG_ tree.
+    for p in candidates:
+        if parse_kconfig_env(p.parent).get("CONFIG_") == "CONFIG_":
+            return p
+    return candidates[0] if candidates else None
+
+
+def parse_kconfig_env(build_dir: Path) -> dict[str, str]:
+    """Extract the full Kconfig environment from build.ninja.
+
+    Zephyr's kconfig.cmake generates menuconfig/guiconfig targets that invoke
+    `cmake -E env <VAR=VALUE>... <python> <script>`. That env list is exactly
+    what Kconfig needs to re-parse the tree, so scrape it from there.
+    """
+    ninja = build_dir / "build.ninja"
+    try:
+        text = ninja.read_text(errors="replace")
+    except OSError:
+        return {}
+
+    for line in text.splitlines():
+        if not re.search(r"(menuconfig|guiconfig)\.py", line):
+            continue
+        env = {}
+        for tok in shlex.split(line):
+            m = re.fullmatch(r"([A-Za-z_][A-Za-z0-9_]*)=(.*)", tok)
+            if m:
+                env[m.group(1)] = m.group(2)
+        if env:
+            return env
+    return {}
+
+
+def kconfig_env(build_dir: Path) -> dict[str, str]:
+    """Reconstruct the environment needed to load the app's Kconfig tree."""
+    env: dict[str, str] = {}
+
+    build_info_path = build_dir / "build_info.yml"
+    info = {}
+    if build_info_path.exists():
+        with open(build_info_path) as f:
+            info = yaml.safe_load(f) or {}
+
+    cmake = getkey(info, "cmake") or {}
+    zephyr_base = getkey(cmake, "zephyr", "zephyr-base")
+    app_dir = getkey(cmake, "application", "configuration-dir")
+
+    # Baseline from build_info.yml, in case build.ninja is unavailable
+    if zephyr_base:
+        env["ZEPHYR_BASE"] = zephyr_base
+        env["srctree"] = zephyr_base
+    if board := cmake.get("board"):
+        env["BOARD"] = board.get("name", "")
+        env["BOARD_QUALIFIERS"] = board.get("qualifiers") or ""
+        env["BOARD_REVISION"] = board.get("revision") or ""
+    if app := cmake.get("application"):
+        env["APPLICATION_SOURCE_DIR"] = app.get("source-dir", "")
+    if toolchain_path := getkey(cmake, "toolchain", "path"):
+        env["ZEPHYR_SDK_INSTALL_DIR"] = toolchain_path
+    env["KCONFIG_BINARY_DIR"] = (build_dir / "Kconfig").as_posix()
+    env["KCONFIG_BOARD_DIR"] = (build_dir / "Kconfig/boards").as_posix()
+    dotconfig = build_dir / "zephyr/.config"
+    if dotconfig.exists():
+        env["KCONFIG_CONFIG"] = dotconfig.as_posix()
+
+    # Authoritative values scraped from build.ninja override the baseline
+    env.update(parse_kconfig_env(build_dir))
+
+    # ZEPHYR_<MODULE>_MODULE_DIR variables used by Kconfig.modules
+    module_dirs = build_dir / "Kconfig/kconfig_module_dirs.env"
+    if module_dirs.exists():
+        for line in module_dirs.read_text().splitlines():
+            k, _, v = line.partition("=")
+            if v:
+                env[k] = v
+
+    if app_dir:
+        env["WEST_LSP_KCONFIG_ROOT"] = str(Path(app_dir) / "Kconfig")
+
+    return env
+
+
+###############################################################################
+# Commands                                                                    #
+###############################################################################
 
 
 @click.group()
 def app():
     pass
-
-
-def generate_env(kconfig_root, output_file):
-    vars = [
-        "ZEPHYR_BASE",
-        "PYTHON_EXECUTABLE",
-        "srctree",
-        "KERNELVERSION",
-        "APPVERSION",
-        "APP_VERSION_EXTENDED_STRING",
-        "APP_VERSION_TWEAK_STRING",
-        "CONFIG_",
-        "KCONFIG_CONFIG",
-        "KCONFIG_BOARD_DIR",
-        "BOARD",
-        "BOARD_REVISION",
-        "BOARD_QUALIFIERS",
-        "HWM_SCHEME",
-        "KCONFIG_BINARY_DIR",
-        "APPLICATION_SOURCE_DIR",
-        "ZEPHYR_TOOLCHAIN_VARIANT",
-        "TOOLCHAIN_KCONFIG_DIR",
-        "TOOLCHAIN_HAS_NEWLIB",
-        "TOOLCHAIN_HAS_PICOLIBC",
-        "EDT_PICKLE",
-        "ARCH",
-        "ARCH_DIR",
-        "SHIELD_AS_LIST",
-        "DTS_POST_CPP",
-        "DTS_ROOT_BINDINGS",
-    ]
-
-    def envfilt(k: str) -> bool:
-        return k in vars or k.startswith("ZEPHYR_") or k.startswith("NCS_")
-
-    vals = {k: v for k, v in os.environ.items() if envfilt(k)}
-
-    vals["WEST_LSP_KCONFIG_ROOT"] = kconfig_root
-
-    bindir = Path(vals["KCONFIG_BINARY_DIR"]).parent
-    build_info = bindir / "build_info.yml"
-    if not build_info.exists():
-        logging.warn("Could not find build_info.yml")
-
-    vals["WEST_LSP_BUILD_INFO"] = build_info
-
-    with open(output_file, "w") as f:
-        f.writelines([f"{k}={v}\n" for k, v in vals.items() if v is not None])
-
-
-@app.command()
-def init(*args):
-    script = __file__
-    subprocess.run(
-        [
-            "west",
-            "build",
-            "-t",
-            "lsp",
-            *args,
-            "--",
-            "-DEXTRA_KCONFIG_TARGETS=lsp",
-            f"-DEXTRA_KCONFIG_TARGET_COMMAND_FOR_lsp={script}",
-        ],
-        env=os.environ | {"WEST_LSP_GENERATE_ENV": CONFIG_FILE_PATH.resolve()},
-    )
-
-
-def get_build_info(root_dir: Path | None = None) -> dict[Path, dict[str, Any]]:
-    if root_dir is None:
-        root_dir = os.getcwd()
-    root_dir = Path(root_dir)
-
-    build_info = {}
-    for root, dirs, files in os.walk(root_dir, topdown=False):
-        for file in files:
-            if file == "build_info.yml":
-                p = Path(root) / file
-                with open(p, "r") as f:
-                    build_info[p] = yaml.safe_load(f)
-
-    build_info = dict(
-        sorted(build_info.items(), key=lambda i: os.path.getmtime(i[0]), reverse=True)
-    )
-
-    return build_info
 
 
 def getkey(d: Any, *args) -> Any:
@@ -449,99 +470,145 @@ def getkey(d: Any, *args) -> Any:
         if len(args) == 1:
             return d[args[0]]
         return getkey(d[args[0]], *args[1:])
-    except KeyError:
+    except (KeyError, TypeError):
         return None
 
 
 @app.command()
-def kconfig_lsp():
+@click.option("--build-dir", required=False, type=Path, help="Build directory to use")
+def kconfig_lsp(build_dir: Path | None):
     logging.basicConfig(level=logging.INFO, format="%(message)s")
 
-    if CONFIG_FILE_PATH.exists():
-        with open(".west-lsp", "r") as f:
-            for line in f.readlines():
-                s = line.rstrip("\n").split("=", 1)
-                os.environ[s[0]] = s[1]
-    else:
-        # logging.fatal(
-        #     f"Could not find {CONFIG_FILE_PATH}. Consider running '{sys.argv[0]} init' to generate it"
-        # )
-        # exit(0)
+    if build_dir is None:
+        root = find_workspace_root() or Path.cwd()
+        build_info = find_build_info(root)
+        if build_info is None:
+            logging.fatal(
+                f"No build_info.yml found under {root}. Build the project first."
+            )
+            exit(1)
+        build_dir = build_info.parent
 
-        infos = get_build_info()
-
-        env = {}
-        for f, info in infos.items():
-            if (zephyr_sdk := getkey(info, "cmake", "toolchain", "path")):
-                env["ZEPHYR_SDK_VARIANT"] = "host"
-                env["ZEPHYR_SDK_INSTALL_DIR"] = zephyr_sdk
-                break
-
-        for f, info in infos.items():
-            if (
-                (zephyr_base := getkey(info, "cmake", "zephyr", "zephyr-base"))
-                and (board := getkey(info, "cmake", "board"))
-                and (application := getkey(info, "cmake", "application"))
-                and (kconfig := getkey(info, "cmake", "kconfig"))
-            ):
-                build_dir = f.parent
-                env["ZEPHYR_BASE"] = zephyr_base
-                env["APPLICATION_SOURCE_DIR"] = application["source-dir"]
-                env["BOARD"] = board["name"]
-                env["BOARD_QUALIFIERS"] = board["qualifiers"] or ""
-                env["BOARD_REVISION"] = board["revision"] or ""
-                env["KCONFIG_BINARY_DIR"] = (build_dir / "Kconfig").as_posix()
-                env["KCONFIG_BOARD_DIR"] = (build_dir / "Kconfig/boards").as_posix()
-                env["WEST_LSP_KCONFIG_ROOT"] = application["configuration-dir"] + "/Kconfig"
-                env["srctree"] = zephyr_base
-                # env["KCONFIG_CONFIG"] = (buil)
-
-               # env["HWM_SCHEME"] = "v2"
-                break
-
-        logging.info("env: ", json.dumps(env))
-        os.environ.update(env)
+    logging.info(f"Using build directory: {build_dir}")
+    os.environ.update(kconfig_env(build_dir))
 
     server = mod_kconfig_lsp()
     server.load_env()
     server.start_io()
 
 
-@app.command()
-@click.option("--root-dir", required=False)
-@click.option("--fmt", type=click.Choice(["kakoune", "json"]), default="kakoune")
-def dts_lsp_settings(root_dir: Path | None, fmt: str):
-    def context(build_info: dict):
+def dts_settings(root_dir: Path) -> dict:
+    """Build devicetree-language-server settings from build_info.yml metadata."""
+
+    def context(info: dict):
         try:
             return {
                 "bindingType": "Zephyr",
-                "zephyrBindings": build_info["cmake"]["devicetree"]["bindings-dirs"],
-                "includePaths": build_info["cmake"]["devicetree"]["include-dirs"],
-                "dtsFile": build_info["cmake"]["devicetree"]["files"][0],
-                "overlays": build_info["cmake"]["devicetree"]["files"][1:],
+                "zephyrBindings": info["cmake"]["devicetree"]["bindings-dirs"],
+                "includePaths": info["cmake"]["devicetree"]["include-dirs"],
+                "dtsFile": info["cmake"]["devicetree"]["files"][0],
+                "overlays": info["cmake"]["devicetree"]["files"][1:],
             }
-        except KeyError:
+        except (KeyError, IndexError):
             return None
 
-    build_info = get_build_info(root_dir)
-    res = {
-        "contexts": [c for k, x in build_info.items() if (c := context(x))],
-        "preferredContext": 0,
-    }
+    search_dir = root_dir / "build"
+    if not search_dir.is_dir():
+        search_dir = root_dir
 
-    if fmt == "kakoune":
-        res = {"devicetree": {"settings": {"_": {"devicetree": res}}}}
-        print(toml.dumps(res))
-    elif fmt == "json":
-        print(json.dumps(res, indent=4))
+    # One context per image build (sysbuild may produce several), newest first
+    candidates = sorted(
+        search_dir.rglob("build_info.yml"),
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )
+
+    contexts = []
+    for p in candidates:
+        with open(p) as f:
+            info = yaml.safe_load(f) or {}
+        if c := context(info):
+            contexts.append(c)
+
+    return {"contexts": contexts, "preferredContext": 0}
+
+
+def read_frame(stream) -> bytes | None:
+    """Read one Content-Length framed JSON-RPC message."""
+    length = None
+    while True:
+        line = stream.readline()
+        if not line:
+            return None
+        line = line.rstrip(b"\r\n")
+        if not line:
+            break
+        k, _, v = line.partition(b":")
+        if k.lower() == b"content-length":
+            length = int(v)
+    return stream.read(length) if length else None
+
+
+def write_frame(stream, body: bytes):
+    stream.write(b"Content-Length: %d\r\n\r\n" % len(body) + body)
+    stream.flush()
+
+
+def pump(src, dst, close_dst=False):
+    # read1 (not read) so data is forwarded as soon as it arrives; a blocking
+    # read(n) would stall until the buffer fills and the server would appear
+    # to never answer requests.
+    try:
+        while chunk := src.read1(65536):
+            dst.write(chunk)
+            dst.flush()
+    finally:
+        if close_dst:
+            dst.close()
+
+
+@app.command()
+@click.option("--root-dir", required=False, type=Path)
+def dts_lsp(root_dir: Path | None):
+    """Run devicetree-language-server with settings injected from build metadata.
+
+    Acts as a stdio proxy: computes the devicetree LS settings from the
+    workspace's build_info.yml, injects them into the initialize request's
+    initializationOptions, then passes all traffic through untouched. This
+    keeps editor-side configuration static (no settings baked into the
+    editor config at startup).
+    """
+    root_dir = root_dir or find_workspace_root() or Path.cwd()
+    settings = dts_settings(root_dir)
+    if not settings["contexts"]:
+        logging.error(f"No devicetree build metadata found under {root_dir}")
+
+    child = subprocess.Popen(
+        ["npm", "x", "--", "devicetree-language-server", "--stdio"],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+    )
+
+    stdin = sys.stdin.buffer
+    frame = read_frame(stdin)
+    if frame is None:
+        child.terminate()
+        return
+    msg = json.loads(frame)
+    if msg.get("method") == "initialize":
+        opts = msg.setdefault("params", {}).setdefault("initializationOptions", {})
+        opts.setdefault("settings", {})["devicetree"] = settings
+        frame = json.dumps(msg).encode()
+    write_frame(child.stdin, frame)
+
+    threading.Thread(
+        target=pump, args=(stdin, child.stdin), kwargs={"close_dst": True}, daemon=True
+    ).start()
+    pump(child.stdout, sys.stdout.buffer)
+    child.wait()
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        if output_file := os.getenv("WEST_LSP_GENERATE_ENV"):
-            generate_env(sys.argv[1], output_file)
-            exit(0)
-
     app()
 
 # vim: ft=python
