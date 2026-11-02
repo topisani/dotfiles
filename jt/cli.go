@@ -99,6 +99,24 @@ func style(code, s string) string {
 	return "\x1b[" + code + "m" + s + "\x1b[0m"
 }
 
+// idStr colors a short change id like jj does: bold magenta for the unique
+// prefix, dim for the rest.
+func idStr(id string) string {
+	p, r := core.SplitID(id)
+	if r == "" {
+		return style("1;35", p)
+	}
+	return style("1;35", p) + style("90", r)
+}
+
+func needsStr(needs string) string {
+	ids := strings.Fields(needs)
+	for i, id := range ids {
+		ids[i] = idStr(id)
+	}
+	return style("36", "(needs ") + strings.Join(ids, " ") + style("36", ")")
+}
+
 func statusCode(s string) string {
 	switch s {
 	case "doing":
@@ -119,7 +137,7 @@ func statusCode(s string) string {
 
 func taskLine(t *core.Task) string {
 	var b strings.Builder
-	b.WriteString(style("33", t.ID) + " " + style(statusCode(t.Status), "["+t.Status+"]"))
+	b.WriteString(idStr(t.ID) + " " + style(statusCode(t.Status), "["+t.Status+"]"))
 	if t.Priority != "" {
 		b.WriteString(" " + style("35", "("+t.Priority+")"))
 	}
@@ -129,7 +147,7 @@ func taskLine(t *core.Task) string {
 		b.WriteString(" " + t.Summary)
 	}
 	if t.Needs != "" {
-		b.WriteString(" " + style("36", "(needs "+t.Needs+")"))
+		b.WriteString(" " + needsStr(t.Needs))
 	}
 	if t.Conflict {
 		b.WriteString(" " + style("31", "(conflict)"))
@@ -389,7 +407,7 @@ func statusCmd() *cobra.Command {
 			if len(problems) > 0 {
 				fmt.Println(style("1", "Problems"))
 				for _, p := range problems {
-					fmt.Printf("  %s %s %s: %s\n", p.Level, style("33", p.ID), p.Kind, p.Detail)
+					fmt.Printf("  %s %s %s: %s\n", p.Level, idStr(p.ID), p.Kind, p.Detail)
 				}
 			}
 			fmt.Printf("%s", style("1", "Workspaces"))
@@ -425,7 +443,7 @@ func showCmd() *cobra.Command {
 			if jsonOut {
 				return printJSON(t.Full())
 			}
-			fmt.Printf("%s\n\n%s", style("33", t.ID), t.Msg.String())
+			fmt.Printf("%s\n\n%s", idStr(t.ID), t.Msg.String())
 			return nil
 		},
 	})
@@ -450,7 +468,7 @@ func evoCmd() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("no such task or revision '%s'", args[0])
 			}
-			fmt.Printf("%s %s\n\n", style("33", rev), title)
+			fmt.Printf("%s %s\n\n", idStr(rev), title)
 			for _, e := range entries {
 				empty := ""
 				if e.Empty {
@@ -648,7 +666,7 @@ func newCmd() *cobra.Command {
 			if jsonOut {
 				return report(res, nil)
 			}
-			fmt.Printf("%s %s\n", style("33", res.Task.ID), res.Task.Summary)
+			fmt.Printf("%s %s\n", idStr(res.Task.ID), res.Task.Summary)
 			return nil
 		},
 	})

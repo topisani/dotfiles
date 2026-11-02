@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 // Trailer keys jt owns. Everything else in a trailer block (Co-Authored-By,
@@ -28,6 +29,18 @@ var Statuses = []string{"todo", "ready", "doing", "investigating", "blocked", "t
 
 // Priorities offered by pickers and completions; the field itself is free-form.
 var Priorities = []string{"P0", "P1", "P2", "P3"}
+
+// MaxSummary is the longest summary jt will write, in characters. It's a commit
+// subject and a board row: what doesn't fit belongs in the body.
+const MaxSummary = 80
+
+// CheckSummary refuses a summary over MaxSummary.
+func CheckSummary(s string) error {
+	if n := utf8.RuneCountInString(s); n > MaxSummary {
+		return fmt.Errorf("summary is %d characters, the limit is %d: shorten it and put the rest in the body", n, MaxSummary)
+	}
+	return nil
+}
 
 func ValidStatus(s string) bool {
 	for _, v := range Statuses {

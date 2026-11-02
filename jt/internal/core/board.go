@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"sync"
 )
 
 // TasksRevset is the coarse prefilter; ParseMessage has the final word. Anchored
@@ -131,6 +132,9 @@ type Task struct {
 	Current  bool     `json:"-"` // this workspace's @
 	Updated  string   `json:"-"`
 	Msg      Message  `json:"-"`
+
+	// Filled by FillStats only: Load is polled, and these need a diff per task.
+	Added, Removed, Files int `json:"-"`
 }
 
 // Brief returns a copy without the fields a polling caller shouldn't pay for.
@@ -160,6 +164,19 @@ func (t Task) PriorityRank() string {
 	return t.Priority
 }
 
+var idPrefixes sync.Map // short change id -> length of its unique prefix
+
+// SplitID splits a short change id into jj's unique prefix and the rest, the
+// way jj colors them. An id jt hasn't loaded comes back whole as the prefix.
+func SplitID(id string) (prefix, rest string) {
+	if n, ok := idPrefixes.Load(id); ok {
+		if n := n.(int); n <= len(id) {
+			return id[:n], id[n:]
+		}
+	}
+	return id, ""
+}
+
 // Board is every task in graph order (blockers before dependents).
 type Board struct {
 	Tasks      []*Task
@@ -168,6 +185,7 @@ type Board struct {
 }
 
 const taskTemplate = `"{\"id\":" ++ json(stringify(change_id.shortest(8))) ++
+  ",\"prefix\":" ++ change_id.shortest(8).prefix().len() ++
   ",\"full\":" ++ json(stringify(change_id)) ++
   ",\"commit\":" ++ json(stringify(commit_id.short(12))) ++
   ",\"parents\":" ++ json(stringify(parents.map(|p| p.change_id().shortest(8)).join(" "))) ++
@@ -181,6 +199,7 @@ const taskTemplate = `"{\"id\":" ++ json(stringify(change_id.shortest(8))) ++
 
 type rawTask struct {
 	ID, Full, Commit, Parents, Updated, Desc string
+	Prefix                                   int
 	Empty, Conflict, Divergent, Immutable    bool
 	Current                                  bool
 }
@@ -211,6 +230,7 @@ func (r Repo) Load() (*Board, error) {
 			Immutable: raw.Immutable, FullID: raw.Full, CommitID: raw.Commit, Current: raw.Current,
 			Parents: strings.Fields(raw.Parents), Updated: raw.Updated, Msg: m,
 		}
+		idPrefixes.Store(raw.ID, raw.Prefix)
 		if prev, dup := b.ByID[t.ID]; dup { // divergent: two commits, one change id
 			prev.Divergent = true
 			continue
@@ -431,6 +451,9 @@ func (b *Board) Check() []Problem {
 	for _, t := range b.Tasks {
 		if !ValidStatus(t.Status) {
 			add(t, "unknown-status", "error", "status %q is not one of %s", t.Status, strings.Join(Statuses, " "))
+		}
+		if err := CheckSummary(t.Summary); err != nil {
+			add(t, "long-summary", "warn", "%v", err)
 		}
 		if t.Orphaned {
 			add(t, "orphaned", "error", "doing, but no workspace is on it — worker died or never closed out; `jt reap` resets it")

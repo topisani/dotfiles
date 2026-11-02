@@ -23,7 +23,7 @@ Rules:
 - jj only, never `git commit`. Don't run `jj describe` on a task: it can wipe the trailers jt stores its state in. Use `jt finish -m`, or `jt set {{.Ref}} body=-` (stdin) mid-task.
 - Don't squash, move bookmarks, or rebase other changes.
 - A fork that's genuinely the user's call: `jt block {{.Ref}} "<question>" -o "<option>" -o "<option>" --recommend N`, then return. Resolve it yourself when the answer is discoverable, and say why in the message.
-- Something unrelated noticed: `jt new "<summary>" -s <scope> --body "<detail>"` and carry on.
+- Something unrelated noticed: `jt new "<summary, 80 characters at most>" -s <scope> --body "<detail>"` and carry on.
 - Much bigger than it looked: `jt set {{.Ref}} body=-` with what you learned, `jt set {{.Ref}} status=todo`, and return. A task left `doing` is invisible to the next run.
 
 Return **at most 3 lines per task**: change id, done/testing/blocked, one line of what changed and why. No diffs, no file contents, no play-by-play. That belongs in the commit message.

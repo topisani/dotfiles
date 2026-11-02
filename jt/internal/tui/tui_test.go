@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 
 	"jt/internal/core"
 )
@@ -29,7 +31,7 @@ func scratch(t *testing.T) core.Repo {
 	return core.Repo{Dir: dir + "/r"}
 }
 
-func key(s string) tea.KeyPressMsg {
+func keyMsg(s string) tea.KeyPressMsg {
 	switch s {
 	case "enter":
 		return tea.KeyPressMsg{Code: tea.KeyEnter}
@@ -73,7 +75,7 @@ func drive(t *testing.T, m *Model, cmd tea.Cmd) {
 func press(t *testing.T, m *Model, keys ...string) {
 	t.Helper()
 	for _, k := range keys {
-		_, cmd := m.Update(key(k))
+		_, cmd := m.Update(keyMsg(k))
 		drive(t, m, cmd)
 	}
 }
@@ -92,7 +94,7 @@ func TestEveryModeDrawsAtAnySize(t *testing.T) {
 	res, _ := r.New(core.NewOpts{Summary: "blocked one"})
 	r.Block(res.Task.ID, "which?", []string{"this", "that"}, 1)
 
-	sizes := [][2]int{{0, 0}, {1, 1}, {10, 3}, {40, 10}, {89, 20}, {90, 20}, {200, 60}}
+	sizes := [][2]int{{0, 0}, {1, 1}, {10, 3}, {40, 10}, {80, 24}, {89, 20}, {90, 20}, {200, 60}}
 	modes := []mode{modeNormal, modeSearch, modePicker, modeInput, modeConfirm, modeNew, modeHelp, modeGraph, modeDecide, modeDecideText}
 	for _, screen := range []Screen{ScreenBoard, ScreenDecide} {
 		for _, sz := range sizes {
@@ -100,12 +102,140 @@ func TestEveryModeDrawsAtAnySize(t *testing.T) {
 			_ = m.View() // before anything arrives
 			m.Update(tea.WindowSizeMsg{Width: sz[0], Height: sz[1]})
 			load(t, m)
-			m.pickOpts, m.pickAsk = core.Statuses, "x"
+			m.pick("x", core.Statuses, "", nil)
 			for _, md := range modes {
 				m.mode = md
-				_ = m.View()
+				m.sync()
+				content := m.View().Content
+				if got := lipgloss.Height(content); content != "" && got > sz[1] {
+					t.Errorf("mode %d at %v: %d lines", md, sz, got)
+				}
+				for _, l := range strings.Split(content, "\n") {
+					if got := lipgloss.Width(l); got > sz[0] {
+						t.Errorf("mode %d at %v: line is %d wide: %q", md, sz, got, l)
+					}
+				}
 			}
 		}
+	}
+}
+
+// The list pages, so its rows outnumbering the terminal is the case to get right:
+// j must walk every task in order, across pages and over the lane headers.
+func TestListWalksAcrossPagesAndHeaders(t *testing.T) {
+	r := scratch(t)
+	var want []string
+	for _, p := range []string{"P0", "P1", "P2", "P3"} {
+		for i := range 3 {
+			res, err := r.New(core.NewOpts{Summary: fmt.Sprintf("%s number %d", p, i), Priority: p})
+			if err != nil {
+				t.Fatal(err)
+			}
+			want = append(want, res.Task.ID)
+		}
+	}
+	r.Block(want[0], "which?", nil, 0) // a second lane, so there's a header to step over
+	m := newModel(r, ScreenBoard, "builtin_log_compact")
+	m.Update(tea.WindowSizeMsg{Width: 120, Height: 10})
+	load(t, m)
+	press(t, m, "t") // lanes: the view with headers to step over
+	if m.list.Paginator.TotalPages < 2 {
+		t.Fatalf("expected several pages, got %d", m.list.Paginator.TotalPages)
+	}
+	seen := map[string]bool{m.current().ID: true}
+	for range len(want) - 1 {
+		press(t, m, "j")
+		c := m.current()
+		if c == nil {
+			t.Fatal("cursor landed on a lane header")
+		}
+		seen[c.ID] = true
+		if !strings.Contains(m.View().Content, c.Summary) {
+			t.Errorf("selected task %q isn't on screen", c.Summary)
+		}
+	}
+	if len(seen) != len(want) {
+		t.Errorf("walked %d of %d tasks", len(seen), len(want))
+	}
+	press(t, m, "g")
+	if c := m.current(); c == nil {
+		t.Error("g landed on a header")
+	}
+	press(t, m, "G")
+	if c := m.current(); c == nil {
+		t.Error("G landed on a header")
+	}
+}
+
+func TestTreeShowsDependencies(t *testing.T) {
+	r := scratch(t)
+	base, _ := r.New(core.NewOpts{Summary: "base", Priority: "P0"})
+	r.New(core.NewOpts{Summary: "left", Priority: "P1", Blockers: []string{base.Task.ID}})
+	right, _ := r.New(core.NewOpts{Summary: "right", Priority: "P2", Blockers: []string{base.Task.ID}})
+	r.New(core.NewOpts{Summary: "on top", Priority: "P2", Blockers: []string{right.Task.ID}})
+	m := newModel(r, ScreenBoard, "builtin_log_compact")
+	m.Update(tea.WindowSizeMsg{Width: 120, Height: 30})
+	load(t, m)
+	prefix := map[string]string{}
+	for _, it := range m.list.Items() {
+		rw := it.(row)
+		if rw.task == nil {
+			t.Fatalf("tree has a header: %q", rw.header)
+		}
+		prefix[rw.task.Summary] = rw.prefix
+	}
+	want := map[string]string{"base": "", "left": "├ ", "right": "└ ", "on top": "  ↳ "}
+	for s, p := range want {
+		if prefix[s] != p {
+			t.Errorf("%q: prefix %q, want %q (all: %q)", s, prefix[s], p, prefix)
+		}
+	}
+	content := m.View().Content
+	if !strings.Contains(content, "(empty)") {
+		t.Errorf("empty tasks aren't marked: %q", content)
+	}
+	// A filtered-out parent hands its children to the nearest visible ancestor.
+	r.Set(right.Task.ID, [][2]string{{"status", "done"}})
+	load(t, m)
+	for _, it := range m.list.Items() {
+		if rw := it.(row); rw.task.Summary == "on top" && rw.prefix != "└ " && rw.prefix != "├ " {
+			t.Errorf("hoisted child prefix %q", rw.prefix)
+		}
+	}
+}
+
+func TestDetailScrollsAndResetsOnMove(t *testing.T) {
+	r := scratch(t)
+	r.New(core.NewOpts{Summary: "long", Body: strings.Repeat("line\n\n", 40), Priority: "P0"})
+	r.New(core.NewOpts{Summary: "next", Priority: "P1"})
+	m := newModel(r, ScreenBoard, "builtin_log_compact")
+	m.Update(tea.WindowSizeMsg{Width: 120, Height: 20})
+	load(t, m)
+	press(t, m, "J")
+	if m.detail.YOffset() == 0 {
+		t.Fatal("J didn't scroll the detail pane")
+	}
+	press(t, m, "j", "k")
+	if m.detail.YOffset() != 0 {
+		t.Errorf("selection change kept the offset: %d", m.detail.YOffset())
+	}
+}
+
+// The form can't take more than the limit in the first place.
+func TestFormHoldsSummaryToLimit(t *testing.T) {
+	r := scratch(t)
+	m := newModel(r, ScreenBoard, "builtin_log_compact")
+	m.Update(tea.WindowSizeMsg{Width: 120, Height: 30})
+	load(t, m)
+	press(t, m, "n")
+	for range core.MaxSummary + 5 {
+		press(t, m, "x")
+	}
+	if n := len(m.form.summary.Value()); n != core.MaxSummary {
+		t.Errorf("summary holds %d characters", n)
+	}
+	if !strings.Contains(m.View().Content, fmt.Sprintf("%d/%d", core.MaxSummary, core.MaxSummary)) {
+		t.Error("counter not shown")
 	}
 }
 

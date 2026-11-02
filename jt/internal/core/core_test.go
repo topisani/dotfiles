@@ -464,3 +464,55 @@ func TestResolve(t *testing.T) {
 		t.Errorf("full id: %v %v", tk, err)
 	}
 }
+
+func TestSummaryLimit(t *testing.T) {
+	r := repo(t)
+	ok := strings.Repeat("é", MaxSummary) // characters, not bytes
+	long := ok + "x"
+	if _, err := r.New(NewOpts{Summary: long}); err == nil || !strings.Contains(err.Error(), "81 characters") {
+		t.Errorf("new took a long summary: %v", err)
+	}
+	id := newTask(t, r, NewOpts{Summary: ok})
+	for _, kv := range [][2]string{{"summary", long}, {"message", long + "\n\nbody"}} {
+		if _, err := r.Set(id, [][2]string{kv}); err == nil {
+			t.Errorf("set %s took a long summary", kv[0])
+		}
+	}
+	if _, err := r.Strip(id, long); err == nil {
+		t.Error("strip -m took a long summary")
+	}
+
+	// One written behind jt's back is flagged, but doesn't wedge the task.
+	mustRun(t, r, "describe", "-r", id, "-m", long+"\n\nTask-Status: todo\n")
+	if _, err := r.Set(id, [][2]string{{"status", "ready"}}); err != nil {
+		t.Errorf("status change refused over an old summary: %v", err)
+	}
+	found := false
+	for _, p := range load(t, r).Check() {
+		found = found || p.Kind == "long-summary"
+	}
+	if !found {
+		t.Error("check didn't flag the long summary")
+	}
+}
+
+func TestFillStats(t *testing.T) {
+	r := repo(t)
+	empty := newTask(t, r, NewOpts{Summary: "nothing yet"})
+	code := newTask(t, r, NewOpts{Summary: "has code"})
+	if _, err := r.Start(code, StartOpts{Force: true}); err != nil {
+		t.Fatal(err)
+	}
+	os.WriteFile(filepath.Join(r.Dir, "f"), []byte("a\nb\n"), 0o644)
+	mustRun(t, r, "status")
+	b := load(t, r)
+	if err := r.FillStats(b); err != nil {
+		t.Fatal(err)
+	}
+	if c := b.ByID[code]; c.Added != 2 || c.Removed != 0 || c.Files != 1 || c.Empty {
+		t.Errorf("code: %+v", c)
+	}
+	if e := b.ByID[empty]; e.Added != 0 || e.Files != 0 || !e.Empty {
+		t.Errorf("empty: %+v", e)
+	}
+}

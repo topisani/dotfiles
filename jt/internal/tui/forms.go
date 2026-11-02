@@ -1,8 +1,11 @@
 package tui
 
 import (
+	"fmt"
 	"strings"
+	"unicode/utf8"
 
+	"charm.land/bubbles/v2/key"
 	"charm.land/bubbles/v2/textarea"
 	"charm.land/bubbles/v2/textinput"
 	tea "charm.land/bubbletea/v2"
@@ -33,6 +36,7 @@ func newNewForm(w, h int) newForm {
 	f := newForm{priority: 2}
 	f.summary, f.scope, f.needs = textinput.New(), textinput.New(), textinput.New()
 	f.summary.Placeholder = "one line, what and why"
+	f.summary.CharLimit = core.MaxSummary
 	f.scope.Placeholder = "paths it should touch: this is what collision detection runs on"
 	f.needs.Placeholder = "ids or words of blocking tasks"
 	f.body = textarea.New()
@@ -43,12 +47,25 @@ func newNewForm(w, h int) newForm {
 }
 
 func (f *newForm) resize(w, h int) {
-	fw := max(min(w-16, 100), 20)
+	fw := max(min(w-22, 100), 20) // frame, label, prompt, cursor and the counter
 	f.summary.SetWidth(fw)
 	f.scope.SetWidth(fw)
 	f.needs.SetWidth(fw)
-	f.body.SetWidth(fw)
-	f.body.SetHeight(max(h-14, 3))
+	f.body.SetWidth(max(min(w-4, 110), 20))
+	f.body.SetHeight(max(h-10, 3))
+}
+
+// counter shows how much of the summary limit is used, warming up towards it.
+func (f *newForm) counter() string {
+	n := utf8.RuneCountInString(f.summary.Value())
+	s := fmt.Sprintf("%d/%d", n, core.MaxSummary)
+	switch {
+	case n >= core.MaxSummary:
+		return redStyle.Render(s)
+	case n >= core.MaxSummary-10:
+		return yellowStyle.Render(s)
+	}
+	return dimStyle.Render(s)
 }
 
 func (f *newForm) focus() tea.Cmd {
@@ -84,25 +101,25 @@ func (f *newForm) update(msg tea.Msg) tea.Cmd {
 	return cmd
 }
 
-func (m *Model) keyNew(k tea.KeyPressMsg) (tea.Model, tea.Cmd) {
+func (m *Model) keyNew(k tea.KeyPressMsg) tea.Cmd {
 	f := &m.form
 	s := k.String()
 	switch s {
 	case "esc":
 		m.mode = modeNormal
-		return m, nil
+		return nil
 	case "tab":
 		f.focused = (f.focused + 1) % fieldCount
-		return m, f.focus()
+		return f.focus()
 	case "shift+tab":
 		f.focused = (f.focused + fieldCount - 1) % fieldCount
-		return m, f.focus()
+		return f.focus()
 	case "ctrl+s":
-		return m, m.submitNew()
+		return m.submitNew()
 	case "enter":
 		if f.focused != fieldBody {
 			f.focused = (f.focused + 1) % fieldCount
-			return m, f.focus()
+			return f.focus()
 		}
 	}
 	if f.focused == fieldPriority {
@@ -115,9 +132,9 @@ func (m *Model) keyNew(k tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		case "0", "1", "2", "3":
 			f.priority = int(s[0] - '0')
 		}
-		return m, nil
+		return nil
 	}
-	return m, f.update(k)
+	return f.update(k)
 }
 
 func (m *Model) submitNew() tea.Cmd {
@@ -168,45 +185,54 @@ func (m *Model) decideCurrent() (*core.Task, *core.Fork) {
 	return t, f
 }
 
-func (m *Model) leaveDecide() (tea.Model, tea.Cmd) {
+func (m *Model) leaveDecide() tea.Cmd {
 	if m.standaloneDecide {
-		return m, tea.Quit
+		return tea.Quit
 	}
 	m.mode = modeNormal
-	return m, nil
+	return nil
 }
 
-func (m *Model) keyDecide(s string) (tea.Model, tea.Cmd) {
+func (m *Model) keyDecide(k tea.KeyPressMsg) tea.Cmd {
+	s := k.String()
 	t, f := m.decideCurrent()
 	if s == "q" || s == "esc" {
 		return m.leaveDecide()
 	}
 	if t == nil {
-		return m, nil
+		return nil
+	}
+	switch {
+	case key.Matches(k, keys.ScrollDown):
+		m.decideView.HalfPageDown()
+		return nil
+	case key.Matches(k, keys.ScrollUp):
+		m.decideView.HalfPageUp()
+		return nil
 	}
 	r, id := m.repo, t.ID
 	switch s {
 	case "j", "down":
-		m.decideIdx = min(m.decideIdx+1, len(f.Options)-1)
+		m.decideIdx = max(min(m.decideIdx+1, len(f.Options)-1), 0)
 	case "k", "up":
 		m.decideIdx = max(m.decideIdx-1, 0)
 	case "enter":
 		if len(f.Options) == 0 {
-			return m, m.openDecideText(false)
+			return m.openDecideText(false)
 		}
 		key := f.Options[min(m.decideIdx, len(f.Options)-1)].Key
 		m.decideIdx = 0
 		m.decidePending = true
-		return m, m.act(func() (*core.Result, error) { return r.Decide(id, core.DecideOpts{Option: key}) })
+		return m.act(func() (*core.Result, error) { return r.Decide(id, core.DecideOpts{Option: key}) })
 	case "w":
-		return m, m.openDecideText(false)
+		return m.openDecideText(false)
 	case "m":
-		return m, m.openDecideText(true)
+		return m.openDecideText(true)
 	case "s":
 		m.decideSkipped[id] = true
 		m.decideIdx = 0
 	case "d":
-		return m, m.ask(decideDeferAsk, "", func(v string) tea.Cmd {
+		return m.ask(decideDeferAsk, "", func(v string) tea.Cmd {
 			m.decideIdx = 0
 			return m.act(func() (*core.Result, error) { return r.Defer(id, v) })
 		})
@@ -218,7 +244,7 @@ func (m *Model) keyDecide(s string) (tea.Model, tea.Cmd) {
 			}
 		}
 	}
-	return m, nil
+	return nil
 }
 
 func (m *Model) openDecideText(moot bool) tea.Cmd {
@@ -231,31 +257,31 @@ func (m *Model) openDecideText(moot bool) tea.Cmd {
 }
 
 // keyDecideText takes a free-form answer, recorded as the whole decision.
-func (m *Model) keyDecideText(k tea.KeyPressMsg) (tea.Model, tea.Cmd) {
+func (m *Model) keyDecideText(k tea.KeyPressMsg) tea.Cmd {
 	switch k.String() {
 	case "esc":
 		m.mode = modeDecide
 		m.decideText.Blur()
-		return m, nil
+		return nil
 	case "ctrl+s":
 		t, _ := m.decideCurrent()
 		text := strings.TrimSpace(m.decideText.Value())
 		if t == nil {
 			m.mode = modeDecide
-			return m, nil
+			return nil
 		}
 		if text == "" {
 			m.setFlash("a decision needs text", true)
-			return m, nil
+			return nil
 		}
 		m.mode = modeDecide
 		m.decideText.Blur()
 		m.decideIdx = 0
 		m.decidePending = true
 		r, id, moot := m.repo, t.ID, m.decideMoot
-		return m, m.act(func() (*core.Result, error) { return r.Decide(id, core.DecideOpts{Text: text, Moot: moot}) })
+		return m.act(func() (*core.Result, error) { return r.Decide(id, core.DecideOpts{Text: text, Moot: moot}) })
 	}
 	var cmd tea.Cmd
 	m.decideText, cmd = m.decideText.Update(k)
-	return m, cmd
+	return cmd
 }

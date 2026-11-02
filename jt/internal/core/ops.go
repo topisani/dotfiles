@@ -84,6 +84,9 @@ func (r Repo) New(o NewOpts) (*Result, error) {
 	if strings.TrimSpace(o.Summary) == "" {
 		return nil, errors.New("a task needs a summary")
 	}
+	if err := CheckSummary(strings.TrimSpace(o.Summary)); err != nil {
+		return nil, err
+	}
 	parents := slices.Clone(o.Parents)
 	if len(o.Blockers) > 0 {
 		b, err := r.Load()
@@ -176,6 +179,13 @@ func (r Repo) Set(q string, kvs [][2]string) (*Result, error) {
 	}
 	if m.Get(KeyStatus) == "" {
 		return nil, errors.New("refusing to clear the status: `jt strip` is how a task leaves the board")
+	}
+	// Only a changed summary is held to the limit: an old long one mustn't stop the
+	// task from changing status. `jt check` flags those.
+	if m.Subject != t.Msg.Subject {
+		if err := CheckSummary(m.Subject); err != nil {
+			return nil, err
+		}
 	}
 	if err := r.describe(t.ID, m); err != nil {
 		return nil, err
@@ -508,6 +518,11 @@ func (r Repo) Strip(q, message string) (*Result, error) {
 	m := t.Msg
 	if message != "" {
 		m.SetAbove(message)
+		if m.Subject != t.Msg.Subject {
+			if err := CheckSummary(m.Subject); err != nil {
+				return nil, err
+			}
+		}
 	}
 	m.Strip()
 	if err := r.describe(t.ID, m); err != nil {
@@ -955,4 +970,29 @@ func (r Repo) Graph(template string, color bool) (string, error) {
 // GraphRevset is what the graph views show.
 func GraphRevset() string {
 	return fmt.Sprintf("(%s) | @ | parents(%s)", TasksRevset, TasksRevset)
+}
+
+// FillStats adds each task's diff totals to a loaded board. It's separate from
+// Load because it costs a diff per task, which the CLI's polling shouldn't pay.
+func (r Repo) FillStats(b *Board) error {
+	out, err := r.read("log", "-r", TasksRevset, "--no-graph", "-T",
+		`commit_id.short(12) ++ "\t" ++ self.diff().stat(80).total_added() ++ "\t" ++ self.diff().stat(80).total_removed() ++ "\t" ++ self.diff().stat(80).files().len() ++ "\n"`)
+	if err != nil {
+		return err
+	}
+	byCommit := map[string]*Task{}
+	for _, t := range b.Tasks {
+		byCommit[t.CommitID] = t
+	}
+	for _, line := range strings.Split(out, "\n") {
+		var commit string
+		var added, removed, files int
+		if _, err := fmt.Sscanf(line, "%s\t%d\t%d\t%d", &commit, &added, &removed, &files); err != nil {
+			continue
+		}
+		if t := byCommit[commit]; t != nil {
+			t.Added, t.Removed, t.Files = added, removed, files
+		}
+	}
+	return nil
 }

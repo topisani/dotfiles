@@ -132,7 +132,7 @@ func checkCmd() *cobra.Command {
 				fmt.Println("jt: board is consistent")
 			} else {
 				for _, p := range ps {
-					fmt.Printf("%s %s %s: %s\n", p.Level, style("33", p.ID), p.Kind, p.Detail)
+					fmt.Printf("%s %s %s: %s\n", p.Level, idStr(p.ID), p.Kind, p.Detail)
 				}
 			}
 			if core.HasErrors(ps) {
