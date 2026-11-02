@@ -90,7 +90,7 @@ RowLayout {
 
             // Handle clicks
             onClicked: function (mouse) {
-                if (trayItem.item.menuOnly || trayItem.item.id == "nm-applet" || trayItem.item.id == "udiskie") {
+                if (trayItem.item.menuOnly || trayItem.item.id == "nm-applet" || trayItem.item.id == "udiskie" || trayItem.item.id == "blueman") {
                     root.showPopup(trayItem, menuContents, {});
                     return
                 }

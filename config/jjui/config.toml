@@ -27,13 +27,14 @@ if(trailers.contains_key("Task-Status"),
         if(description,
           description.first_line(),
           label(if(empty, "empty"), description_placeholder)),
-        if(parents.any(|p| p.trailers().contains_key("Task-Status")),
-          label("task_needs", "(needs " ++ parents.filter(|p| p.trailers().contains_key("Task-Status")).map(|p| p.change_id().shortest(8)).join(" ") ++ ")")),
+        if(parents.any(|p| p.trailers().any(|t| t.key()=="Task-Status" && t.value()!="done" && t.value()!="testing")),
+          label("task_needs", "(needs " ++ parents.filter(|p| p.trailers().any(|t| t.key()=="Task-Status" && t.value()!="done" && t.value()!="testing")).map(|p| p.change_id().shortest(8)).join(" ") ++ ")")),
       ) ++ "\n",
     ),
   ),
   builtin_log_compact
-)'''
+)
+'''
 
 [[actions]]
 name = "jt_status"
@@ -136,7 +137,7 @@ desc = "task: strip trailers, leaves the board"
 lua = '''
 local id = context.change_id()
 if not id then return end
-exec_shell("jt strip $(jj log --no-graph --ignore-working-copy -r " .. id .. " -T change_id)")
+exec_shell("jt strip " .. id)
 revisions.refresh()
 flash("stripped: " .. id)
 '''

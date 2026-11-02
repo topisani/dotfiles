@@ -60,3 +60,4 @@ iscmd atuin && source <(atuin init zsh --disable-up-arrow)
 
 # Scaleway CLI autocomplete initialization.
 iscmd scw && eval "$(scw autocomplete script shell=zsh)"
+. "/home/topisani/.distrobox/arch/home/.deno/env"

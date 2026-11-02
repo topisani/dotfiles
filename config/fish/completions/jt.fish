@@ -1,37 +1,235 @@
-function __jt_ids
-    jt json -a 2>/dev/null | string replace -rf '.*"id":"([^"]*)".*"summary":"([^"]*)".*' '$1\t$2'
+# fish completion for jt                                   -*- shell-script -*-
+
+function __jt_debug
+    set -l file "$BASH_COMP_DEBUG_FILE"
+    if test -n "$file"
+        echo "$argv" >> $file
+    end
 end
 
-complete -c jt -f
-complete -c jt -n __fish_use_subcommand -a list    -d 'board of open tasks'
-complete -c jt -n __fish_use_subcommand -a json    -d 'board as JSONL'
-complete -c jt -n __fish_use_subcommand -a new     -d 'file a task'
-complete -c jt -n __fish_use_subcommand -a show    -d 'full description'
-complete -c jt -n __fish_use_subcommand -a set     -d 'update trailers'
-complete -c jt -n __fish_use_subcommand -a start   -d 'claim, rebase onto work tip, edit'
-complete -c jt -n __fish_use_subcommand -a done    -d 'mark done, off the default board'
-complete -c jt -n __fish_use_subcommand -a strip   -d 'strip trailers, leaves the board'
-complete -c jt -n __fish_use_subcommand -a block   -d 'mark blocked, with a reason'
-complete -c jt -n __fish_use_subcommand -a defer   -d 'mark deferred, with a reason'
-complete -c jt -n __fish_use_subcommand -a evo     -d 'evolution trail'
-complete -c jt -n __fish_use_subcommand -a tip     -d 'current work tip'
-complete -c jt -n __fish_use_subcommand -a grind   -d 'run batches unattended, fresh context each'
-complete -c jt -n __fish_use_subcommand -a install -d 'write Claude commands + completions'
+function __jt_perform_completion
+    __jt_debug "Starting __jt_perform_completion"
 
-complete -c jt -n '__fish_seen_subcommand_from show set start done strip block defer evo' -a '(__jt_ids)'
-complete -c jt -n '__fish_seen_subcommand_from list json' -s a -l all -d 'include done tasks'
-complete -c jt -n '__fish_seen_subcommand_from json' -s q -l brief -d 'drop bodies'
-complete -c jt -n '__fish_seen_subcommand_from new' -s p -l priority -d 'priority' -x -a 'P0 P1 P2 P3'
-complete -c jt -n '__fish_seen_subcommand_from new' -s s -l scope -d 'files it touches' -x
-complete -c jt -n '__fish_seen_subcommand_from new' -s b -l blocked-by -d 'blocked by task' -x -a '(__jt_ids)'
-complete -c jt -n '__fish_seen_subcommand_from new' -l body -d 'body text' -x
-complete -c jt -n '__fish_seen_subcommand_from install' -l dir -d 'Claude commands dir' -x -a '(__fish_complete_directories)'
-complete -c jt -n '__fish_seen_subcommand_from install' -s n -l dry-run -d 'show what would be written'
-complete -c jt -n '__fish_seen_subcommand_from grind' -s r -l rounds -d 'max batches' -x
-complete -c jt -n '__fish_seen_subcommand_from grind' -s C -l dir -d 'workspace to run in' -x -a '(__fish_complete_directories)'
-complete -c jt -n '__fish_seen_subcommand_from grind' -l model -d 'model per batch' -x -a 'fable opus sonnet haiku'
-complete -c jt -n '__fish_seen_subcommand_from grind' -l budget -d 'per-round spend cap (USD)' -x
-complete -c jt -n '__fish_seen_subcommand_from grind' -l command -d 'slash command per batch' -x
-complete -c jt -n '__fish_seen_subcommand_from grind' -l log -d 'log dir' -x -a '(__fish_complete_directories)'
-complete -c jt -n '__fish_seen_subcommand_from grind' -l here -d 'allow the default workspace'
-complete -c jt -n '__fish_seen_subcommand_from grind' -s n -l dry-run -d 'show what would run'
+    # Extract all args except the last one
+    set -l args (commandline -opc)
+    # Extract the last arg and escape it in case it is a space
+    set -l lastArg (string escape -- (commandline -ct))
+
+    __jt_debug "args: $args"
+    __jt_debug "last arg: $lastArg"
+
+    # Disable ActiveHelp which is not supported for fish shell
+    set -l requestComp "JT_ACTIVE_HELP=0 $args[1] __complete $args[2..-1] $lastArg"
+
+    __jt_debug "Calling $requestComp"
+    set -l results (eval $requestComp 2> /dev/null)
+
+    # Some programs may output extra empty lines after the directive.
+    # Let's ignore them or else it will break completion.
+    # Ref: https://github.com/spf13/cobra/issues/1279
+    for line in $results[-1..1]
+        if test (string trim -- $line) = ""
+            # Found an empty line, remove it
+            set results $results[1..-2]
+        else
+            # Found non-empty line, we have our proper output
+            break
+        end
+    end
+
+    set -l comps $results[1..-2]
+    set -l directiveLine $results[-1]
+
+    # For Fish, when completing a flag with an = (e.g., <program> -n=<TAB>)
+    # completions must be prefixed with the flag
+    set -l flagPrefix (string match -r -- '-.*=' "$lastArg")
+
+    __jt_debug "Comps: $comps"
+    __jt_debug "DirectiveLine: $directiveLine"
+    __jt_debug "flagPrefix: $flagPrefix"
+
+    for comp in $comps
+        printf "%s%s\n" "$flagPrefix" "$comp"
+    end
+
+    printf "%s\n" "$directiveLine"
+end
+
+# this function limits calls to __jt_perform_completion, by caching the result behind $__jt_perform_completion_once_result
+function __jt_perform_completion_once
+    __jt_debug "Starting __jt_perform_completion_once"
+
+    if test -n "$__jt_perform_completion_once_result"
+        __jt_debug "Seems like a valid result already exists, skipping __jt_perform_completion"
+        return 0
+    end
+
+    set --global __jt_perform_completion_once_result (__jt_perform_completion)
+    if test -z "$__jt_perform_completion_once_result"
+        __jt_debug "No completions, probably due to a failure"
+        return 1
+    end
+
+    __jt_debug "Performed completions and set __jt_perform_completion_once_result"
+    return 0
+end
+
+# this function is used to clear the $__jt_perform_completion_once_result variable after completions are run
+function __jt_clear_perform_completion_once_result
+    __jt_debug ""
+    __jt_debug "========= clearing previously set __jt_perform_completion_once_result variable =========="
+    set --erase __jt_perform_completion_once_result
+    __jt_debug "Successfully erased the variable __jt_perform_completion_once_result"
+end
+
+function __jt_requires_order_preservation
+    __jt_debug ""
+    __jt_debug "========= checking if order preservation is required =========="
+
+    __jt_perform_completion_once
+    if test -z "$__jt_perform_completion_once_result"
+        __jt_debug "Error determining if order preservation is required"
+        return 1
+    end
+
+    set -l directive (string sub --start 2 $__jt_perform_completion_once_result[-1])
+    __jt_debug "Directive is: $directive"
+
+    set -l shellCompDirectiveKeepOrder 32
+    set -l keeporder (math (math --scale 0 $directive / $shellCompDirectiveKeepOrder) % 2)
+    __jt_debug "Keeporder is: $keeporder"
+
+    if test $keeporder -ne 0
+        __jt_debug "This does require order preservation"
+        return 0
+    end
+
+    __jt_debug "This doesn't require order preservation"
+    return 1
+end
+
+
+# This function does two things:
+# - Obtain the completions and store them in the global __jt_comp_results
+# - Return false if file completion should be performed
+function __jt_prepare_completions
+    __jt_debug ""
+    __jt_debug "========= starting completion logic =========="
+
+    # Start fresh
+    set --erase __jt_comp_results
+
+    __jt_perform_completion_once
+    __jt_debug "Completion results: $__jt_perform_completion_once_result"
+
+    if test -z "$__jt_perform_completion_once_result"
+        __jt_debug "No completion, probably due to a failure"
+        # Might as well do file completion, in case it helps
+        return 1
+    end
+
+    set -l directive (string sub --start 2 $__jt_perform_completion_once_result[-1])
+    set --global __jt_comp_results $__jt_perform_completion_once_result[1..-2]
+
+    __jt_debug "Completions are: $__jt_comp_results"
+    __jt_debug "Directive is: $directive"
+
+    set -l shellCompDirectiveError 1
+    set -l shellCompDirectiveNoSpace 2
+    set -l shellCompDirectiveNoFileComp 4
+    set -l shellCompDirectiveFilterFileExt 8
+    set -l shellCompDirectiveFilterDirs 16
+
+    if test -z "$directive"
+        set directive 0
+    end
+
+    set -l compErr (math (math --scale 0 $directive / $shellCompDirectiveError) % 2)
+    if test $compErr -eq 1
+        __jt_debug "Received error directive: aborting."
+        # Might as well do file completion, in case it helps
+        return 1
+    end
+
+    set -l filefilter (math (math --scale 0 $directive / $shellCompDirectiveFilterFileExt) % 2)
+    set -l dirfilter (math (math --scale 0 $directive / $shellCompDirectiveFilterDirs) % 2)
+    if test $filefilter -eq 1; or test $dirfilter -eq 1
+        __jt_debug "File extension filtering or directory filtering not supported"
+        # Do full file completion instead
+        return 1
+    end
+
+    set -l nospace (math (math --scale 0 $directive / $shellCompDirectiveNoSpace) % 2)
+    set -l nofiles (math (math --scale 0 $directive / $shellCompDirectiveNoFileComp) % 2)
+
+    __jt_debug "nospace: $nospace, nofiles: $nofiles"
+
+    # If we want to prevent a space, or if file completion is NOT disabled,
+    # we need to count the number of valid completions.
+    # To do so, we will filter on prefix as the completions we have received
+    # may not already be filtered so as to allow fish to match on different
+    # criteria than the prefix.
+    if test $nospace -ne 0; or test $nofiles -eq 0
+        set -l prefix (commandline -t | string escape --style=regex)
+        __jt_debug "prefix: $prefix"
+
+        set -l completions (string match -r -- "^$prefix.*" $__jt_comp_results)
+        set --global __jt_comp_results $completions
+        __jt_debug "Filtered completions are: $__jt_comp_results"
+
+        # Important not to quote the variable for count to work
+        set -l numComps (count $__jt_comp_results)
+        __jt_debug "numComps: $numComps"
+
+        if test $numComps -eq 1; and test $nospace -ne 0
+            # We must first split on \t to get rid of the descriptions to be
+            # able to check what the actual completion will be.
+            # We don't need descriptions anyway since there is only a single
+            # real completion which the shell will expand immediately.
+            set -l split (string split --max 1 \t $__jt_comp_results[1])
+
+            # Fish won't add a space if the completion ends with any
+            # of the following characters: @=/:.,
+            set -l lastChar (string sub -s -1 -- $split)
+            if not string match -r -q "[@=/:.,]" -- "$lastChar"
+                # In other cases, to support the "nospace" directive we trick the shell
+                # by outputting an extra, longer completion.
+                __jt_debug "Adding second completion to perform nospace directive"
+                set --global __jt_comp_results $split[1] $split[1].
+                __jt_debug "Completions are now: $__jt_comp_results"
+            end
+        end
+
+        if test $numComps -eq 0; and test $nofiles -eq 0
+            # To be consistent with bash and zsh, we only trigger file
+            # completion when there are no other completions
+            __jt_debug "Requesting file completion"
+            return 1
+        end
+    end
+
+    return 0
+end
+
+# Since Fish completions are only loaded once the user triggers them, we trigger them ourselves
+# so we can properly delete any completions provided by another script.
+# Only do this if the program can be found, or else fish may print some errors; besides,
+# the existing completions will only be loaded if the program can be found.
+if type -q "jt"
+    # The space after the program name is essential to trigger completion for the program
+    # and not completion of the program name itself.
+    # Also, we use '> /dev/null 2>&1' since '&>' is not supported in older versions of fish.
+    complete --do-complete "jt " > /dev/null 2>&1
+end
+
+# Remove any pre-existing completions for the program since we will be handling all of them.
+complete -c jt -e
+
+# this will get called after the two calls below and clear the $__jt_perform_completion_once_result global
+complete -c jt -n '__jt_clear_perform_completion_once_result'
+# The call to __jt_prepare_completions will setup __jt_comp_results
+# which provides the program's completion choices.
+# If this doesn't require order preservation, we don't use the -k flag
+complete -c jt -n 'not __jt_requires_order_preservation && __jt_prepare_completions' -f -a '$__jt_comp_results'
+# otherwise we use the -k flag
+complete -k -c jt -n '__jt_requires_order_preservation && __jt_prepare_completions' -f -a '$__jt_comp_results'

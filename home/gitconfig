@@ -78,3 +78,5 @@
 	confirm = always
 	annotate = yes
 	assume8bitEncoding = UTF-8
+[safe]
+	directory = /opt/esp-idf

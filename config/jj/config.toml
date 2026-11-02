@@ -40,9 +40,11 @@ if(self && !current_working_copy && !immutable && !conflict && in_branch(self),
 [revset-aliases]
 # Tasks are commits with a `Task-Status:` trailer — the board lives in `jt`
 # (~/.bin/jt), not here. This alias remains only because the two settings below
-# need it: revsets can't parse trailers, so it substring-matches. That is fine
-# as a coarse filter; `jt` re-checks the actual trailer block.
-'tasks()' = 'description(substring:"Task-Status:")'
+# need it: revsets can't parse trailers, so it matches at line starts. That is a
+# coarse filter, and `jt` re-checks the actual trailer block; anchoring it means
+# prose *about* the format doesn't make a commit unpushable. Keep in step with
+# TasksRevset in jt/internal/core/board.go.
+'tasks()' = 'description(regex:"(?m)^Task-Status:[ \t]")'
 # A task placeholder is one nobody has built on: no code written into it (still
 # `empty()`), nothing stacked on top (`visible_heads()` — a commit with any
 # child at all drops out, so this also never hides an ancestor of something

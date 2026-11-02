@@ -464,7 +464,8 @@ binds {
 
     Mod+Shift+Return { spawn "ghostty" "--command=distrobox enter arch"; }
     Mod+Return { spawn-sh "ghostty --working-directory=$HOME"; }
-    Mod+Space { spawn-sh  "(which anyrun &2>&1 > /dev/null && anyrun) || wofi"; }
+    Mod+Space { spawn-sh  "(which anyrun &2>&1 > /dev/null && (pkill anyrun || anyrun)) || wofi"; }
+    Mod+e { spawn-sh  "(which anyrun &2>&1 > /dev/null && anyrun --plugins niri-focus --show-results-immediately true)"; }
     Mod+P { spawn "~/.dotfiles/quickshell/run.sh" "ipc" "call" "shell" "toggleBar"; }
     Mod+Semicolon { spawn "~/.dotfiles/quickshell/run.sh" "ipc" "call" "shell" "toggleCC"; }
     // Mod+P { spawn "killall" "-SIGUSR1" "waybar"; }
@@ -705,4 +706,9 @@ binds {
     Mod+Shift+P { power-off-monitors; }
 
     Mod+Ctrl+Shift+F { toggle-windowed-fullscreen; }
+}
+
+window-rule {
+    match app-id="wlvncc"
+    open-fullscreen true
 }

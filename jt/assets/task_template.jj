@@ -1,0 +1,25 @@
+if(trailers.contains_key("Task-Status"),
+  label(
+    separate(" ",
+      if(current_working_copy, "working_copy"),
+      if(immutable, "immutable", "mutable"),
+      if(conflict, "conflicted"),
+    ),
+    concat(
+      format_short_commit_header(self) ++ "\n",
+      separate(" ",
+        label("task_" ++ trailers.filter(|t| t.key()=="Task-Status").map(|t| t.value()).join(""),
+          "[" ++ trailers.filter(|t| t.key()=="Task-Status").map(|t| t.value()).join("") ++ "]"),
+        if(trailers.contains_key("Priority"),
+          label("task_priority", "(" ++ trailers.filter(|t| t.key()=="Priority").map(|t| t.value()).join("") ++ ")")),
+        if(empty, empty_commit_marker),
+        if(description,
+          description.first_line(),
+          label(if(empty, "empty"), description_placeholder)),
+        if(parents.any(|p| p.trailers().any(|t| t.key()=="Task-Status" && t.value()!="done" && t.value()!="testing")),
+          label("task_needs", "(needs " ++ parents.filter(|p| p.trailers().any(|t| t.key()=="Task-Status" && t.value()!="done" && t.value()!="testing")).map(|p| p.change_id().shortest(8)).join(" ") ++ ")")),
+      ) ++ "\n",
+    ),
+  ),
+  builtin_log_compact
+)

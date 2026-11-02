@@ -1,0 +1,20 @@
+[colors.task_todo]
+fg = "blue"
+[colors.task_ready]
+fg = "bright blue"
+[colors.task_doing]
+fg = "yellow"
+[colors.task_investigating]
+fg = "magenta"
+[colors.task_blocked]
+fg = "bright red"
+[colors.task_testing]
+fg = "bright yellow"
+[colors.task_deferred]
+fg = "white"
+[colors.task_done]
+fg = "bright black"
+[colors.task_priority]
+fg = "bright black"
+[colors.task_needs]
+fg = "bright black"

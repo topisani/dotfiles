@@ -1,0 +1,29 @@
+{{- range .Tasks}}# Task {{.ID}}: {{.Summary}}
+{{if .Priority}}Priority: {{.Priority}}
+{{end}}{{if .Scope}}Expected scope: {{.Scope}}
+{{end}}{{if .Msg.Detail}}
+{{.Msg.Detail}}
+{{end}}
+{{end -}}
+# How to work this
+
+You are a worker with one job: {{if gt (len .Tasks) 1}}these {{len .Tasks}} tasks, in order{{else}}this task{{end}}. Investigate, decide the approach, implement.
+{{if .Dir}}
+**Your workspace is `{{.Dir}}`. Begin every shell command with `cd {{.Dir}} && `**: your shell's directory may not carry over between calls, and jt and jj act on whichever workspace they run from.
+{{end}}
+For {{if gt (len .Tasks) 1}}each task{{else}}the task{{end}}:
+
+1. `jt start {{.Ref}}{{if .Lane}} --in {{.Lane}}{{end}}{{if .Base}} --base {{.Base}}{{end}}`. It refuses if the task can't be claimed, and warns if the rebase conflicted. Either one: stop and report.
+2. Do the work. Bugs: reproduce with a failing test first, keep the test. New files need `jj file track <path>` if the repo has auto-track off (`jt finish` warns about untracked paths).
+3. `jt finish {{.Ref}} -m "<message>"`{{if .Verify}} runs `{{.Verify}}` itself{{else}} — first run the project's verify command from CLAUDE.md, exit 0 only{{end}}. The message is the change and its motivation as the code ended up, a couple of short paragraphs at most, not a log of the work. It refuses on an empty change or failed verify, and the task stays yours: fix it and retry.
+   - Needs a person's eyes (UI, anything verify can't judge)? Add `--testing "<what to look at>"`.
+
+Rules:
+
+- jj only, never `git commit`. Don't run `jj describe` on a task: it can wipe the trailers jt stores its state in. Use `jt finish -m`, or `jt set {{.Ref}} body=-` (stdin) mid-task.
+- Don't squash, move bookmarks, or rebase other changes.
+- A fork that's genuinely the user's call: `jt block {{.Ref}} "<question>" -o "<option>" -o "<option>" --recommend N`, then return. Resolve it yourself when the answer is discoverable, and say why in the message.
+- Something unrelated noticed: `jt new "<summary>" -s <scope> --body "<detail>"` and carry on.
+- Much bigger than it looked: `jt set {{.Ref}} body=-` with what you learned, `jt set {{.Ref}} status=todo`, and return. A task left `doing` is invisible to the next run.
+
+Return **at most 3 lines per task**: change id, done/testing/blocked, one line of what changed and why. No diffs, no file contents, no play-by-play. That belongs in the commit message.
